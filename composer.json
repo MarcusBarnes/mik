@@ -4,7 +4,7 @@
     "type": "project",
     "description": "Move to Islandora Kit",
     "autoload": {
-        "psr-0": { "": "src/" }
+        "classmap": ["src/"]
     },
     "require": {
         "php": ">=5.3.3",

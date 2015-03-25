@@ -7,4 +7,9 @@
 // Use composer to load vendor and project classes.
 require 'vendor/autoload.php';
 
-echo "Welcome the Move to Islandora Kit project.\n";
+
+use mik\Config;
+
+$mikConfig = new Config();
+
+echo $mikConfig->echoPhrase("Welcome the Move to Islandora Kit project.\n");
