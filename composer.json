@@ -1,0 +1,15 @@
+{
+    "name": "mik/move-to-islandora-kit",
+    "license": "MIT",
+    "type": "project",
+    "description": "Move to Islandora Kit",
+    "autoload": {
+        "psr-0": { "": "src/" }
+    },
+    "require": {
+        "php": ">=5.3.3",
+        "monolog/monolog": "~1.13",
+        "phpunit/phpunit":"~4.5",
+        "squizlabs/php_codesniffer":"~2.3"
+    }
+}
