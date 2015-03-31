@@ -18,7 +18,7 @@ $options = getopt('', array('config:', 'limit::'));
 $configPath = $options['config'];
 $ini = parse_ini_file($configPath, TRUE);
 
-// @ToDo - validate - is number.
+// @ToDo - validate - is number and that it exists (param is optional)
 $numberOfInputObjects = $options['limit'];
 
 // Configure
@@ -26,11 +26,14 @@ $numberOfInputObjects = $options['limit'];
 //echo "limit: " . $numberOfInputObjects . "\n";
 use mik\config\Config;
 $mikConfig = new Config($configPath);
+$settings = $mikConfig->settings;
 //echo $mikConfig->echoPhrase("Welcome the Move to Islandora Kit project.\n");
-// var_dump($mikConfig);
+//var_dump($mikConfig);
 
 // Fetch Metadata
-// $fetcher = 'mik\\fetcher\\' .  $ini['FETCHER']['class'];
+$fetcherClass = 'mik\\fetchers\\' .  $ini['FETCHER']['class'];
+$fetcher = new $fetcherClass($settings);
+echo $fetcher->echoPhrase("The $fetcherClass class has been loaded.\n");
 // use $fetcher
 // use mik\metadata\ModsMetadata;
 print_r($ini);
