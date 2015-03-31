@@ -1,9 +1,9 @@
 <?php
-// src/metadata/ModsMetadata.php
+// src/metadata/mods/CdmToMods.php
 
-namespace mik\metadata;
+namespace mik\metadata\mods;
 
-class ModsMetadata extends Metadata
+class CdmToMods extends Mods
 {
     /**
      * @var array $collectionMappingArray - array containing CONTENTdm

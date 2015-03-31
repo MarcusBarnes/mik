@@ -24,8 +24,8 @@ class Config
     {
         //echo $configPath;
         $settings = parse_ini_file($configPath, true);
-        $this->settings = $settings;
-        $this->outputBaseDir = $settings['OUTPUT']['output_base_dir'];
+        // $this->settings = $settings;
+        // $this->outputBaseDir = $settings['OUTPUT']['output_base_dir'];
     }
 
     /**
