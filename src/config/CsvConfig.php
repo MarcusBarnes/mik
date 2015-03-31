@@ -9,7 +9,6 @@ namespace mik\config;
 class CsvConfig extends Config
 {
 
-  
     /**
      * @var Path to the csv file that contains the CONTENTdm to MODS mappings.
      */

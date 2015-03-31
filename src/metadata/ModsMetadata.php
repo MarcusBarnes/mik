@@ -31,14 +31,18 @@ class ModsMetadata extends Metadata
      * Create a new Metadata Instance
      * @param path to CSV file containing the Cdm to Mods mapping info.
      */
-    public function __construct($settings, $objectInfo)
+    public function __construct($settings /*, $objectInfo*/)
     {
         // Call Metadata.php contructor
         parent::__construct($settings);
-        $this->collectionMappingArray = $this->getCDMtoModsMappingArray($mappingCSVpath);
-        $this->includeMigratedFromUri = $this->settings['include_migrated_from_uri'];
-        $this->mappingCSVpath = $this->settings['mapping_csv_path'];
-        $this->objectInfo = $objectInfo;
+        //print_r($this->settings);
+        $this->includeMigratedFromUri = 
+            $this->settings['METADATA']['include_migrated_from_uri'];
+        $this->mappingCSVpath = $this->settings['INPUT']['mapping_csv_path'];
+        $mappingCSVpath = $this->mappingCSVpath;
+        $this->collectionMappingArray =
+           $this->getCDMtoModsMappingArray($mappingCSVpath);
+        //$this->objectInfo = $objectInfo;
 
     }
 
@@ -128,7 +132,7 @@ class ModsMetadata extends Metadata
         if ($includeMigratedFromUri === true) {
             $CONTENTdmItemUrl = '<identifier type="uri" invalid="yes" ';
             $CONTENTdmItemUrl .= 'displayLabel="Migrated From">';
-            $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection'
+            $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection';
             $CONTENTdmItemUrl .= $collectionAlias. '/id/'. $itemId .'</identifier>';
             $modsOpeningTag .= $CONTENTdmItemUrl;
         }

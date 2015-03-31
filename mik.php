@@ -7,9 +7,41 @@
 // Use composer to load vendor and project classes.
 require 'vendor/autoload.php';
 
+// Get command line options.
+// Assumes --longopts.
+// Required --config path/to/config/ini_file
+// Optional --limit=10 (the number of input objects to proces)
+// If no --limit is provided, process all input object in a collection.
+$options = getopt('', array('config:', 'limit::')); 
 
-use mik\Config;
+// @ToDo - validate that file at path exists.
+$configPath = $options['config'];
 
-$mikConfig = new Config();
+// @ToDo - validate - is number.
+$numberOfInputObjects = $options['limit'];
 
-echo $mikConfig->echoPhrase("Welcome the Move to Islandora Kit project.\n");
+
+// Configure
+//echo "The configuration file is located at: " . $configPath . "\n";
+//echo "limit: " . $numberOfInputObjects . "\n";
+use mik\config\CdmConfig;
+$mikConfig = new CdmConfig($configPath);
+//echo $mikConfig->echoPhrase("Welcome the Move to Islandora Kit project.\n");
+
+//Fetch Metadata
+use mik\metadata\ModsMetadata;
+
+$settings = $mikConfig->settings;
+$modsMedadata = new ModsMetadata($settings);
+//print_r($modsMedadata->collectionMappingArray);
+
+
+//Parse metadata
+
+//Manipulate metadata
+
+//Get files
+
+//Manipulate files
+
+//Write Islandora ingest packages
