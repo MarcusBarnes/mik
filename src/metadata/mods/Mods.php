@@ -2,6 +2,7 @@
 // src/metadata/mods/Mods.php
 
 namespace mik\metadata\mods;
+use mik\metadata\Metadata;
 
 class Mods extends Metadata
 {
@@ -40,8 +41,8 @@ class Mods extends Metadata
             $this->settings['METADATA']['include_migrated_from_uri'];
         $this->mappingCSVpath = $this->settings['INPUT']['mapping_csv_path'];
         $mappingCSVpath = $this->mappingCSVpath;
-        $this->collectionMappingArray =
-           $this->getCDMtoModsMappingArray($mappingCSVpath);
+        // $this->collectionMappingArray =
+           // $this->getCDMtoModsMappingArray($mappingCSVpath);
         //$this->objectInfo = $objectInfo;
 
     }
@@ -62,7 +63,7 @@ class Mods extends Metadata
 
         $numOfFields = count($fieldNamesArray);
         $filename = $mappingCSVpath;
-
+        
         $fp = fopen($filename, 'r') or die("Unable to open file.");
         $collectionMappingArray = array();
         while ($csvLine = fgetcsv($fp)) {
@@ -75,6 +76,7 @@ class Mods extends Metadata
         }
 
         fclose($fp) or die("Unable to close file.");
+
 
         return $collectionMappingArray;
     }

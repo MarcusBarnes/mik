@@ -15,7 +15,7 @@ class Cdm extends Fetcher
      */
     public function __construct($settings)
     {
-        // $this->settings = $settings['FETCHER'];
+        $this->settings = $settings['FETCHER'];
     }
     
     /**
@@ -27,6 +27,17 @@ class Cdm extends Fetcher
     */
     public function echoPhrase($phrase)
     {
-        return $phrase;
+        return $phrase . " (from the Cdm fetcher)\n";
     }
+
+    /**
+    * Return an array of records.
+    *
+    * @return array The records.
+    */
+    public function getRecords()
+    {
+        return array(1, 2, 3, 4, 5);
+    }
+
 }

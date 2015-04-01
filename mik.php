@@ -14,41 +14,42 @@ require 'vendor/autoload.php';
 // If no --limit is provided, process all input object in a collection.
 $options = getopt('', array('config:', 'limit::'));
 
-// @ToDo - validate that file at path exists.
 $configPath = $options['config'];
+if (!file_exists($options['config'])) {
+  exit("Sorry, can't find " . $options['config'] . "\n");
+}
+
 $ini = parse_ini_file($configPath, TRUE);
 
-// @ToDo - validate - is number and that it exists (param is optional)
-$numberOfInputObjects = $options['limit'];
+if (isset($options['limit'])) {
+  $numberOfInputObjects = $options['limit'];
+}
+else {
+  $numberOfInputObjects = NULL;
+}
 
 // Configure
-//echo "The configuration file is located at: " . $configPath . "\n";
-//echo "limit: " . $numberOfInputObjects . "\n";
 use mik\config\Config;
 $mikConfig = new Config($configPath);
 $settings = $mikConfig->settings;
-//echo $mikConfig->echoPhrase("Welcome the Move to Islandora Kit project.\n");
-//var_dump($mikConfig);
 
-// Fetch Metadata
-$fetcherClass = 'mik\\fetchers\\' .  $ini['FETCHER']['class'];
+// Fetch records
+$fetcherClass = 'mik\\fetchers\\' . $ini['FETCHER']['class'];
 $fetcher = new $fetcherClass($settings);
-echo $fetcher->echoPhrase("The $fetcherClass class has been loaded.\n");
-// use $fetcher
-// use mik\metadata\ModsMetadata;
-print_r($ini);
+echo $fetcher->echoPhrase("The $fetcherClass class has been loaded.");
+echo $fetcher->testMethod();
 
-// $settings = $mikConfig->settings;
-// $modsMedadata = new ModsMetadata($settings);
-//print_r($modsMedadata->collectionMappingArray);
+foreach ($fetcher->getRecords() as $record) {
+  // Parse metadata
+  $metadtaClass = 'mik\\metadata\\' . $ini['METADATA']['class'];
+  $parser = new $metadtaClass($settings);
+  echo $parser->echoPhrase("The $metadtaClass class been loaded for record $record.\n");
 
+  // Manipulate metadata
 
-//Parse metadata
+  // Get files
 
-//Manipulate metadata
+  // Manipulate files
 
-//Get files
-
-//Manipulate files
-
-//Write Islandora ingest packages
+  // Write Islandora ingest packages
+}
