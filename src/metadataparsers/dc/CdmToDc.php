@@ -1,7 +1,7 @@
 <?php
 // src/metadataparsers/dc/CdmToDc.php
 
-namespace mik\metadataparsers\cdmtodc;
+namespace mik\metadataparsers\dc;
 
 class CdmToDc
 {

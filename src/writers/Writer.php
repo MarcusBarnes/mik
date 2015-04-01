@@ -19,15 +19,13 @@ class Writer
     }
 
     /**
-    * Friendly welcome
-    *
-    * @param string $phrase Phrase to return
-    *
-    * @return string Returns the phrase passed in
-    */
-    public function echoPhrase($phrase)
+     * Create the output directory specified in the config file.
+     */
+    public function createOutputDirectory($output_directory)
     {
-        return $phrase;
+      if (!file_exists($output_directory)) {
+        mkdir($output_directory, 0777, TRUE);
+      }
     }
 
     /**

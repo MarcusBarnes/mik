@@ -23,10 +23,7 @@ class Newspapers extends Writer
      */
     public function createOutputDirectory()
     {
-      if (!file_exists($this->settings['output_directory'])) {
-        mkdir($this->settings['output_directory'], 0777, TRUE);
-      }
-      return $this->settings;
+      parent::createOutputDirectory($this->settings['output_directory']);
     }
 
     

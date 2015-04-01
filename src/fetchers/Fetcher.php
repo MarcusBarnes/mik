@@ -15,7 +15,7 @@ class Fetcher
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FETCHER'];
+        // $this->settings = $settings['FETCHER'];
     }
     
     /**

@@ -2,8 +2,9 @@
 // src/metadataparsers/dc/Dc.php
 
 namespace mik\metadataparsers\dc;
+use mik\metadataparsers\MetadataParser;
 
-class Dc
+class Dc extends MetadataParser
 {
     /**
      * @var array $settings - configuration settings from confugration class.
