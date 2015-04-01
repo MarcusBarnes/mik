@@ -15,8 +15,20 @@ class Newspapers extends Writer
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FETCHER'];
+        $this->settings = $settings['WRITER'];
     }
+
+    /**
+     * Create the output directory specified in the config file.
+     */
+    public function createOutputDirectory()
+    {
+      if (!file_exists($this->settings['output_directory'])) {
+        mkdir($this->settings['output_directory'], 0777, TRUE);
+      }
+      return $this->settings;
+    }
+
     
     /**
     * Friendly welcome
@@ -27,17 +39,6 @@ class Newspapers extends Writer
     */
     public function echoPhrase($phrase)
     {
-        return $phrase . " (from the Cdm fetcher)\n";
+        return $phrase . " (from the newspaper writer)\n";
     }
-
-    /**
-    * Return an array of records.
-    *
-    * @return array The records.
-    */
-    public function getRecords()
-    {
-        return array(1, 2, 3, 4, 5);
-    }
-
 }

@@ -38,7 +38,7 @@ class Mods extends MetadataParser
         parent::__construct($settings);
         //print_r($this->settings);
         $this->includeMigratedFromUri = 
-            $this->settings['METADATA']['include_migrated_from_uri'];
+            $this->settings['METADATA_PARSER']['include_migrated_from_uri'];
         $this->mappingCSVpath = $this->settings['INPUT']['mapping_csv_path'];
         $mappingCSVpath = $this->mappingCSVpath;
         // $this->collectionMappingArray =

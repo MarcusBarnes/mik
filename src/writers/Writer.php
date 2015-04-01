@@ -15,9 +15,9 @@ class Writer
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FETCHER'];
+        // $this->settings = $settings['WRITER'];
     }
-    
+
     /**
     * Friendly welcome
     *
@@ -37,6 +37,6 @@ class Writer
     */
     public function testMethod()
     {
-        return "I am a method defined in the parent Fetcher class.\n";
+        return "I am a method defined in the parent Writer class.\n";
     }
 }

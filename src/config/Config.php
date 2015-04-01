@@ -23,7 +23,8 @@ class Config
     public function __construct($configPath)
     {
         //echo $configPath;
-        $settings = parse_ini_file($configPath, true);
+        // $settings = parse_ini_file($configPath, true);
+        $this->settings = parse_ini_file($configPath, true);
         // $this->settings = $settings;
         // $this->outputBaseDir = $settings['OUTPUT']['output_base_dir'];
     }

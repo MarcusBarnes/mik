@@ -20,6 +20,7 @@ if (!file_exists($options['config'])) {
 }
 
 $ini = parse_ini_file($configPath, TRUE);
+// print_r($ini);
 
 if (isset($options['limit'])) {
   $numberOfInputObjects = $options['limit'];
@@ -39,6 +40,11 @@ $fetcher = new $fetcherClass($settings);
 echo $fetcher->echoPhrase("The $fetcherClass class has been loaded.");
 echo $fetcher->testMethod();
 
+// Write Islandora ingest packages
+$writerClass = 'mik\\writers\\' . $ini['WRITER']['class'];
+$writer = new $writerClass($settings);
+$writer->createOutputDirectory();
+
 foreach ($fetcher->getRecords() as $record) {
   // Parse metadata
   $metadtaClass = 'mik\\metadataparsers\\' . $ini['METADATA_PARSER']['class'];
@@ -56,8 +62,6 @@ foreach ($fetcher->getRecords() as $record) {
   // Manipulate files
   // Classes are loaded in file getters.
 
-  // Write Islandora ingest packages
-  $writerClass = 'mik\\writers\\' . $ini['WRITER']['class'];
-  $writer = new $writerClass($settings);
   echo $writer->echoPhrase("The $writerClass class been loaded for record $record.");
+
 }
