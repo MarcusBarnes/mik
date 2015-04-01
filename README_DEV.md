@@ -12,8 +12,8 @@ When creating classes (or modifying the namespaces of existing classes), you may
 
 Use the PSR-2 coding standard.  You can check your work using PHP Code Sniffer by issuing the following command:
 
-phpcs --standard=PSR2 yourfile.php
+`phpcs --standard=PSR2 yourfile.php`
 
 ## Running tests
 
-./vendor/bin/phpunit --bootstrap ./vendor/autoload.php tests
+`./vendor/bin/phpunit --bootstrap ./vendor/autoload.php tests`
