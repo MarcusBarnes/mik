@@ -13,7 +13,7 @@ class Cdm extends Fetcher
     /**
      *
      */
-    protected $chunck_size = 100;
+    protected $chunk_size = 100;
 
     /**
      *
@@ -28,18 +28,16 @@ class Cdm extends Fetcher
     /**
      *
      */
+
     protected $queryMap = array(
-        // 'alias' => $this->settings['alias'],
-        'alias' => 'cexpress',
+        // 'alias' => 'foo',
         'searchstrings' => '0',
         // We ask for as little possible info at this point since we'll
         // be doing another query on each item later.
         'fields' => 'dmcreated',
         'sortby' => 'dmcreated!dmrecord',
-        'maxrecs' => 1000,
-        // 'maxrecs' => $this->chunk_size,
-        // 'start' => $start_at,
-        'start' => 1,
+        // 'maxrecs' => 1000,
+        // 'start' => 1,
         // We only want top-level items, not pages at this point.
         'supress' => 1,
         'docptr' => 0,
@@ -64,41 +62,16 @@ class Cdm extends Fetcher
       'fullrs', 'find', 'dmaccess', 'dmimage', 'dmcreated', 'dmmodified', 'dmoclcno', 'dmrecord'
     );
 
-
-    protected function setQueryMap()
-    {
-      $this->queryMap = array(
-        'alias' => $this->settings['alias'],
-        'searchstrings' => '0',
-        // We ask for as little possible info at this point since we'll
-        // be doing another query on each item later.
-        'fields' => 'dmcreated',
-        'sortby' => 'dmcreated!dmrecord',
-        'maxrecs' => $this->chunk_size,
-        'start' => $start_at,
-        // We only want top-level items, not pages at this point.
-        'supress' => 1,
-        'docptr' => 0,
-        'suggest' => 0,
-        'facets' => 0,
-        'format' => 'json'
-      );
-    }
-
-    protected function getQueryMap()
-    {
-      return $this->queryMap;
-    }
-
     /**
      * Query CONTENTdm with the values in the query map and return an array of records.
      */
     public function queryContentdm()
     {
-      $qm = $this->getQueryMap();
-      $query = $this->settings['ws_url'] . 'dmQuery/'. $qm['alias'] . '/'. $qm['searchstrings'] .
-        '/'. $qm['fields'] . '/'. $qm['sortby'] . '/'. $qm['maxrecs'] . '/'. $this->start_at .
-        '/'. $qm['supress'] . '/'. $qm['docptr'] . '/'.  $qm['suggest'] . '/'. $qm['facets'] .
+      $qm = $this->queryMap;
+      $query = $this->settings['ws_url'] . 'dmQuery/'. $this->settings['alias'] .
+        '/'. $qm['searchstrings'] . '/'. $qm['fields'] . '/'. $qm['sortby'] .
+        '/'. $this->chunk_size . '/'. $this->start_at . '/'. $qm['supress'] .
+        '/'. $qm['docptr'] . '/'.  $qm['suggest'] . '/'. $qm['facets'] .
         '/' . $qm['format'];
 
       // Query CONTENTdm and return records; if failure, log problem.
@@ -106,10 +79,10 @@ class Cdm extends Fetcher
         return json_decode($json);
       } else {
         $message = date('c') . "\t". 'Query failed:' . "\t" . $query . "\n";
+        // @todo: Log failure.
         return FALSE;
       }
     }
-
 
     /**
     * Friendly welcome
