@@ -11,7 +11,7 @@ class CdmToDc
     public $settings;
       
     /**
-     * Create a new Metadata Instance
+     * Create a new CdmToDc Instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)

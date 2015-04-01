@@ -11,7 +11,7 @@ class Dc
     public $settings;
       
     /**
-     * Create a new Metadata Instance
+     * Create a new DC Instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
