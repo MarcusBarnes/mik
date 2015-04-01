@@ -1,9 +1,8 @@
 <?php
-// src/metadata/dc/Dc.php
 
-namespace mik\metadata\dc;
+namespace mik\writers;
 
-class Dc
+class Writer
 {
     /**
      * @var array $settings - configuration settings from confugration class.
@@ -11,12 +10,12 @@ class Dc
     public $settings;
       
     /**
-     * Create a new Metadata Instance
+     * Create a new Writer Instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
     {
-        $this->settings = $settings;
+        $this->settings = $settings['FETCHER'];
     }
     
     /**
@@ -29,5 +28,15 @@ class Dc
     public function echoPhrase($phrase)
     {
         return $phrase;
+    }
+
+    /**
+    * A test method.
+    *
+    * @return string Returns a message.
+    */
+    public function testMethod()
+    {
+        return "I am a method defined in the parent Fetcher class.\n";
     }
 }

@@ -41,15 +41,23 @@ echo $fetcher->testMethod();
 
 foreach ($fetcher->getRecords() as $record) {
   // Parse metadata
-  $metadtaClass = 'mik\\metadata\\' . $ini['METADATA']['class'];
+  $metadtaClass = 'mik\\metadataparsers\\' . $ini['METADATA_PARSER']['class'];
   $parser = new $metadtaClass($settings);
   echo $parser->echoPhrase("The $metadtaClass class been loaded for record $record.\n");
 
   // Manipulate metadata
+  // Classes are loaded in metadata parsers.
 
   // Get files
+  $fileGetterClass = 'mik\\filegetters\\' . $ini['FILE_GETTER']['class'];
+  $fileGetter = new $fileGetterClass($settings);
+  echo $fileGetter->echoPhrase("The $fileGetterClass class been loaded for record $record.");
 
   // Manipulate files
+  // Classes are loaded in file getters.
 
   // Write Islandora ingest packages
+  $writerClass = 'mik\\writers\\' . $ini['WRITER']['class'];
+  $writer = new $writerClass($settings);
+  echo $writer->echoPhrase("The $writerClass class been loaded for record $record.");
 }

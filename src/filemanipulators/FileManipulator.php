@@ -1,9 +1,8 @@
 <?php
-// src/metadata/Metadata.php
 
-namespace mik\metadata;
+namespace mik\filemanipulators;
 
-class Metadata
+class FileManipulator
 {
     /**
      * @var array $settings - configuration settings from confugration class.
@@ -11,12 +10,12 @@ class Metadata
     public $settings;
       
     /**
-     * Create a new Metadata Instance
+     * Create a new Fetcher Instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
     {
-        $this->settings = $settings;
+        // $this->settings = $settings['FILE_GETTER'];
     }
     
     /**
@@ -29,5 +28,15 @@ class Metadata
     public function echoPhrase($phrase)
     {
         return $phrase;
+    }
+
+    /**
+    * A test method.
+    *
+    * @return string Returns a message.
+    */
+    public function testMethod()
+    {
+        return "I am a method defined in the parent FileManipulator class.\n";
     }
 }

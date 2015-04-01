@@ -1,10 +1,9 @@
 <?php
-// src/metadata/mods/Mods.php
+// src/metadataparsers/mods/CdmToMods.php
 
-namespace mik\metadata\mods;
-use mik\metadata\Metadata;
+namespace mik\metadataparsers\mods;
 
-class Mods extends Metadata
+class CdmToMods extends Mods
 {
     /**
      * @var array $collectionMappingArray - array containing CONTENTdm
@@ -63,7 +62,7 @@ class Mods extends Metadata
 
         $numOfFields = count($fieldNamesArray);
         $filename = $mappingCSVpath;
-        
+
         $fp = fopen($filename, 'r') or die("Unable to open file.");
         $collectionMappingArray = array();
         while ($csvLine = fgetcsv($fp)) {
@@ -76,7 +75,6 @@ class Mods extends Metadata
         }
 
         fclose($fp) or die("Unable to close file.");
-
 
         return $collectionMappingArray;
     }

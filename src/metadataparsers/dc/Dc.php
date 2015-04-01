@@ -1,9 +1,9 @@
 <?php
-// src/metadata/dc/CdmToDc.php
+// src/metadataparsers/dc/Dc.php
 
-namespace mik\metadata\cdmtodc;
+namespace mik\metadataparsers\dc;
 
-class CdmToDc
+class Dc
 {
     /**
      * @var array $settings - configuration settings from confugration class.
