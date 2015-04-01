@@ -1,9 +1,9 @@
 <?php
-// src/metadataparsers/Metadata.php
+// src/metadatamanipulators/MetadataManipulator.php
 
-namespace mik\metadataparsers;
+namespace mik\metadatamanipulators;
 
-class Metadata
+class MetadataManipulator
 {
     /**
      * @var array $settings - configuration settings from confugration class.
