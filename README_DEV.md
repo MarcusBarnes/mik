@@ -1,19 +1,19 @@
-DEVELOPMENT README
-==================
+# Development README
 
-Autoloading Classes
+## Autoloading Classes
 
-When creating classes (or modifying the namespaces of existing classes), you 
-may need to regenerate the autoload files.  To do this, run the following from
-the command-line:
+When creating classes (or modifying the namespaces of existing classes), you may need to regenerate the autoload files.  To do this, run the following from the command-line:
 
 `composer dump-autoload`
 
 `composer update`
 
-Coding Standards
+## Coding Standards
 
-Use the PSR-2 coding standard.  You can check your work using PHP Code Sniffer
-by issuing the following command:
+Use the PSR-2 coding standard.  You can check your work using PHP Code Sniffer by issuing the following command:
 
 phpcs --standard=PSR2 yourfile.php
+
+## Running tests
+
+./vendor/bin/phpunit --bootstrap ./vendor/autoload.php tests
