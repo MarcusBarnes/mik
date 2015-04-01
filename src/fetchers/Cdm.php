@@ -26,10 +26,11 @@ class Cdm extends Fetcher
     protected $last_rec = 0;
 
     /**
-     *
+     * Define a template for the CONTENTdm query. Some values, i.e.,
+     * alias, maxrecs, and start, are taken from either configuration
+     * values or from object properties.
      */
-
-    protected $queryMap = array(
+    protected $browseQueryMap = array(
         // 'alias' => 'foo',
         'searchstrings' => '0',
         // We ask for as little possible info at this point since we'll
@@ -38,7 +39,7 @@ class Cdm extends Fetcher
         'sortby' => 'dmcreated!dmrecord',
         // 'maxrecs' => 1000,
         // 'start' => 1,
-        // We only want top-level items, not pages at this point.
+        // We only want top-level items, not children, at this point.
         'supress' => 1,
         'docptr' => 0,
         'suggest' => 0,
@@ -64,10 +65,11 @@ class Cdm extends Fetcher
 
     /**
      * Query CONTENTdm with the values in the query map and return an array of records.
+     * @todo: account for CONTENTdm's limit of only returning 1024 records per query.
      */
     public function queryContentdm()
     {
-      $qm = $this->queryMap;
+      $qm = $this->browseQueryMap;
       $query = $this->settings['ws_url'] . 'dmQuery/'. $this->settings['alias'] .
         '/'. $qm['searchstrings'] . '/'. $qm['fields'] . '/'. $qm['sortby'] .
         '/'. $this->chunk_size . '/'. $this->start_at . '/'. $qm['supress'] .

@@ -50,7 +50,9 @@ foreach ($fetcher->getRecords()->records as $record) {
   // Parse metadata
   $metadtaClass = 'mik\\metadataparsers\\' . $ini['METADATA_PARSER']['class'];
   $parser = new $metadtaClass($settings);
-  echo $parser->echoPhrase("The $metadtaClass class been loaded for CONTENTdm record $record_id.\n");
+  // echo $parser->echoPhrase("The $metadtaClass class been loaded for CONTENTdm record $record_id.\n");
+
+  echo $parser->echoPhrase("The $fetcherClass class has returned record $record_id.\n");
 
   // Manipulate metadata
   // Classes are loaded in metadata parsers.
@@ -58,11 +60,11 @@ foreach ($fetcher->getRecords()->records as $record) {
   // Get files
   $fileGetterClass = 'mik\\filegetters\\' . $ini['FILE_GETTER']['class'];
   $fileGetter = new $fileGetterClass($settings);
-  echo $fileGetter->echoPhrase("The $fileGetterClass class been loaded for record $record_id.");
+  // echo $fileGetter->echoPhrase("The $fileGetterClass class been loaded for record $record_id.");
 
   // Manipulate files
   // Classes are loaded in file getters.
 
-  echo $writer->echoPhrase("The $writerClass class been loaded for record $record_id.");
+  // echo $writer->echoPhrase("The $writerClass class been loaded for record $record_id.");
 
 }
