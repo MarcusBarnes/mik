@@ -4,19 +4,11 @@ namespace mik\fetchers;
 
 class Cdm extends Fetcher
 {
+
     /**
      * @var array $settings - configuration settings from confugration class.
      */
     public $settings;
-
-    /**
-     * Create a new CONTENTdm Fetcher Instance
-     * @param array $settings configuration settings.
-     */
-    public function __construct($settings)
-    {
-        $this->settings = $settings['FETCHER'];
-    }
 
     /**
      *
@@ -34,19 +26,52 @@ class Cdm extends Fetcher
     protected $last_rec = 0;
 
     /**
+     *
+     */
+    protected $queryMap = array(
+        // 'alias' => $this->settings['alias'],
+        'alias' => 'cexpress',
+        'searchstrings' => '0',
+        // We ask for as little possible info at this point since we'll
+        // be doing another query on each item later.
+        'fields' => 'dmcreated',
+        'sortby' => 'dmcreated!dmrecord',
+        'maxrecs' => 1000,
+        // 'maxrecs' => $this->chunk_size,
+        // 'start' => $start_at,
+        'start' => 1,
+        // We only want top-level items, not pages at this point.
+        'supress' => 1,
+        'docptr' => 0,
+        'suggest' => 0,
+        'facets' => 0,
+        'format' => 'json'
+      );
+
+    /**
+     * Create a new CONTENTdm Fetcher Instance.
+     * @param array $settings configuration settings.
+     */
+    public function __construct($settings)
+    {
+        $this->settings = $settings['FETCHER'];
+    }
+
+    /**
      * CONTENTdm nicknames for administrative fields.
      */
     protected $admin_fields = array(
       'fullrs', 'find', 'dmaccess', 'dmimage', 'dmcreated', 'dmmodified', 'dmoclcno', 'dmrecord'
     );
 
+
     protected function setQueryMap()
     {
       $this->queryMap = array(
         'alias' => $this->settings['alias'],
         'searchstrings' => '0',
-        // We ask for as little possible info at this point since we'll be doing another query 
-        // on each item later.
+        // We ask for as little possible info at this point since we'll
+        // be doing another query on each item later.
         'fields' => 'dmcreated',
         'sortby' => 'dmcreated!dmrecord',
         'maxrecs' => $this->chunk_size,
@@ -70,16 +95,15 @@ class Cdm extends Fetcher
      */
     public function queryContentdm()
     {
-      $query_map = $this->getQueryMap();
-      $qm = $query_map;
-      $query = $this->settings['ws_url'] . 'dmQuery'. $qm['alias'] . '/'. $qm['searchstrings'] .
+      $qm = $this->getQueryMap();
+      $query = $this->settings['ws_url'] . 'dmQuery/'. $qm['alias'] . '/'. $qm['searchstrings'] .
         '/'. $qm['fields'] . '/'. $qm['sortby'] . '/'. $qm['maxrecs'] . '/'. $this->start_at .
         '/'. $qm['supress'] . '/'. $qm['docptr'] . '/'.  $qm['suggest'] . '/'. $qm['facets'] .
         '/' . $qm['format'];
 
       // Query CONTENTdm and return records; if failure, log problem.
       if ($json = file_get_contents($query, false, NULL)) {
-        return json_decode($json, true);
+        return json_decode($json);
       } else {
         $message = date('c') . "\t". 'Query failed:' . "\t" . $query . "\n";
         return FALSE;
@@ -106,7 +130,8 @@ class Cdm extends Fetcher
     */
     public function getRecords()
     {
-        return array(1, 2, 3, 4, 5);
+        // return array(1, 2, 3, 4, 5);
+        return $this->queryContentdm();
     }
 
 }
