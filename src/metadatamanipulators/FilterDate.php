@@ -13,10 +13,9 @@ class FilterDate extends MetadataManipulator
     public function __construct($input)
     {
         if (preg_replace('/(\d\d)\-(\d\d)\-(\d\d\d\d)/', $input, $matches)) {
-          return $matches[2] . '-' . $matches[1] . '-' . $matches[0];
-        }
-        else {
-          // Log the failure and return $input.
+            return $matches[2] . '-' . $matches[1] . '-' . $matches[0];
+        } else {
+            // Log the failure and return $input.
         }
     }
 }

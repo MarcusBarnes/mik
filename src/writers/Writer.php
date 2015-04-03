@@ -23,9 +23,9 @@ class Writer
      */
     public function createOutputDirectory($output_directory)
     {
-      if (!file_exists($output_directory)) {
-        mkdir($output_directory, 0777, TRUE);
-      }
+        if (!file_exists($output_directory)) {
+            mkdir($output_directory, 0777, true);
+        }
     }
 
     /**

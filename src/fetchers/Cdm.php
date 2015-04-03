@@ -69,21 +69,21 @@ class Cdm extends Fetcher
      */
     public function queryContentdm()
     {
-      $qm = $this->browseQueryMap;
-      $query = $this->settings['ws_url'] . 'dmQuery/'. $this->settings['alias'] .
-        '/'. $qm['searchstrings'] . '/'. $qm['fields'] . '/'. $qm['sortby'] .
-        '/'. $this->chunk_size . '/'. $this->start_at . '/'. $qm['supress'] .
-        '/'. $qm['docptr'] . '/'.  $qm['suggest'] . '/'. $qm['facets'] .
-        '/' . $qm['format'];
+        $qm = $this->browseQueryMap;
+        $query = $this->settings['ws_url'] . 'dmQuery/'. $this->settings['alias'] .
+            '/'. $qm['searchstrings'] . '/'. $qm['fields'] . '/'. $qm['sortby'] .
+            '/'. $this->chunk_size . '/'. $this->start_at . '/'. $qm['supress'] .
+            '/'. $qm['docptr'] . '/'.  $qm['suggest'] . '/'. $qm['facets'] .
+            '/' . $qm['format'];
 
-      // Query CONTENTdm and return records; if failure, log problem.
-      if ($json = file_get_contents($query, false, NULL)) {
-        return json_decode($json);
-      } else {
-        $message = date('c') . "\t". 'Query failed:' . "\t" . $query . "\n";
-        // @todo: Log failure.
-        return FALSE;
-      }
+        // Query CONTENTdm and return records; if failure, log problem.
+        if ($json = file_get_contents($query, false, null)) {
+            return json_decode($json);
+        } else {
+            $message = date('c') . "\t". 'Query failed:' . "\t" . $query . "\n";
+            // @todo: Log failure.
+            return false;
+        }
     }
 
     /**
@@ -108,5 +108,4 @@ class Cdm extends Fetcher
         // return array(1, 2, 3, 4, 5);
         return $this->queryContentdm();
     }
-
 }

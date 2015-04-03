@@ -2,6 +2,7 @@
 // src/metadataparsers/dc/Dc.php
 
 namespace mik\metadataparsers\dc;
+
 use mik\metadataparsers\MetadataParser;
 
 class Dc extends MetadataParser

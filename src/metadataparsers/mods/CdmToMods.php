@@ -36,8 +36,7 @@ class CdmToMods extends Mods
         // Call Metadata.php contructor
         parent::__construct($settings);
         //print_r($this->settings);
-        $this->includeMigratedFromUri = 
-            $this->settings['METADATA_PARSER']['include_migrated_from_uri'];
+        $this->includeMigratedFromUri = $this->settings['METADATA_PARSER']['include_migrated_from_uri'];
         $this->mappingCSVpath = $this->settings['INPUT']['mapping_csv_path'];
         $mappingCSVpath = $this->mappingCSVpath;
         // $this->collectionMappingArray =

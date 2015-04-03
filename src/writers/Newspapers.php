@@ -23,7 +23,7 @@ class Newspapers extends Writer
      */
     public function createOutputDirectory()
     {
-      parent::createOutputDirectory($this->settings['output_directory']);
+        parent::createOutputDirectory($this->settings['output_directory']);
     }
 
     
