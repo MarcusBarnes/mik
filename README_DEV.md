@@ -16,4 +16,6 @@ Use the PSR-2 coding standard.  You can check your work using PHP Code Sniffer b
 
 ## Running tests
 
-`./vendor/bin/phpunit --bootstrap ./vendor/autoload.php tests`
+From within the mik directory, run:
+
+`phpunit --bootstrap vendor/autoload.php tests`

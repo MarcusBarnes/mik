@@ -1,6 +1,8 @@
 <?php
 
-class FetcherTest extends PHPUnit_Framework_TestCase
+namespace mik\fetchers;
+
+class FetcherTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testEchoPhrase()
