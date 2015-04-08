@@ -21,28 +21,34 @@ class CdmToMods extends Mods
      */
     public $mappingCSVpath;
     
+    
+    /**
+     * @var string $alias - CONTENTdm collection alias
+     */
+    public $alias;
+    
     /**
      * @var array $objectInfo - objects info from CONTENTdm.
      * @ToDo - De-couple ModsMetadata creation from CONTENTdm?
      */
-    public $objectInfo;
+    //public $objectInfo;
 
     /**
      * Create a new Metadata Instance
      * @param path to CSV file containing the Cdm to Mods mapping info.
      */
-    public function __construct($settings /*, $objectInfo*/)
+    public function __construct($settings)
     {
-        // Call Metadata.php contructor
+
         parent::__construct($settings);
         //print_r($this->settings);
         $this->includeMigratedFromUri = $this->settings['METADATA_PARSER']['include_migrated_from_uri'];
-        $this->mappingCSVpath = $this->settings['INPUT']['mapping_csv_path'];
+        $this->mappingCSVpath = $this->settings['METADATA_PARSER']['mapping_csv_path'];
+        $this->wsUrl = $this->settings['METADATA_PARSER']['ws_url'];
+        $this->alias = $this->settings['METADATA_PARSER']['alias'];
         $mappingCSVpath = $this->mappingCSVpath;
-        // $this->collectionMappingArray =
-           // $this->getCDMtoModsMappingArray($mappingCSVpath);
-        //$this->objectInfo = $objectInfo;
-
+        $this->collectionMappingArray =
+            $this->getCDMtoModsMappingArray($mappingCSVpath);
     }
 
     private function getCDMtoModsMappingArray($mappingCSVpath)
@@ -87,7 +93,10 @@ class CdmToMods extends Mods
         $CONTENTdmFieldValuesArray = array();
         foreach ($objectInfo as $key => $value) {
             // $key is the 'nick'
-            $fieldAttributes = get_field_attribute($key);
+            $fieldAttributes = $this->getFieldAttribute($key);
+            //echo $key;
+            //print_r($fieldAttributes);
+            //echo "\n";
             $name = $fieldAttributes['name'];
             $CONTENTdmFieldValuesArray[$name] = $value;
         }
@@ -128,6 +137,7 @@ class CdmToMods extends Mods
         }
 
         $includeMigratedFromUri = $this->includeMigratedFromUri;
+        echo is_bool($includeMigratedFromUri);
         if ($includeMigratedFromUri === true) {
             $CONTENTdmItemUrl = '<identifier type="uri" invalid="yes" ';
             $CONTENTdmItemUrl .= 'displayLabel="Migrated From">';
@@ -137,30 +147,102 @@ class CdmToMods extends Mods
         }
 
         $modsString = $modsOpeningTag . '</mods>';
+        return $modsString;
+        //$doc = new DomDocument('1.0');
+        //$doc->loadXML($mods_string);
 
-        $doc = new DomDocument('1.0');
-        $doc->loadXML($mods_string);
+        //$doc->formatOutput = true;
 
-        $doc->formatOutput = true;
-
-        $modsxml = $doc->saveXML();
+        //$modsxml = $doc->saveXML();
         
         return $modsxml;
     }
 
-    public function outputModsXML($modsxml, $outputPath = '')
+    /**
+     * Gets the item's info from CONTENTdm. $alia needs to include the leading '/'.
+     */
+    public function getItemInfo($pointer)
     {
-        /**
-         * $modsxml - MODS xml string - required.
-         * $outputPath - output path for writing to a file.
-         */
-        if ($outputPath !='') {
-            $filecreationStatus = file_put_contents($outputPath .'/MODS.xml', $modsxml);
-            if ($filecreationStatus === false) {
-                echo "There was a problem writing the MODS XML to a file.\n";
-            } else {
-                echo "MODS.XML file created.\n";
+        $wsUrl = $this->wsUrl;
+        $alias = $this->alias;
+        $queryUrl = $wsUrl . 'dmGetItemInfo/' . $alias . '/' .
+          $pointer . '/json';
+        $response = file_get_contents($queryUrl);
+        $itemInfo = json_decode($response, true);
+        if (is_array($itemInfo)) {
+            return $itemInfo;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Given the value of a field nick (e.g., 'date'), returns an array of field attribute.
+     * $attributes is an optional list of field configuration attibutes to return.
+     */
+    /*
+    Array
+    (
+        [name] => Birth date
+        [nick] => date
+        [type] => TEXT
+        [size] => 0
+        [find] => i8
+        [req] => 0
+        [search] => 1
+        [hide] => 0
+        [vocdb] =>
+        [vocab] => 0
+        [dc] => dateb
+        [admin] => 0
+        [readonly] => 0
+    )
+    */
+    private function getFieldAttribute($nick, $attributes = array())
+    {
+        $fieldConfig = $this->getCollectionFieldConfig();
+        // Loop through every field defined in $field_config.
+        for ($i = 0; $i < count($fieldConfig); $i++) {
+            // Pick out the field identified by the incoming 'nick' attribute.
+            if ($fieldConfig[$i]['nick'] == $nick) {
+                // If we only want selected attributes, filter out the ones we don't want.
+                if (count($attributes)) {
+                    // If we are going to modify this field's config info, we need to make a
+                    // copy since $field_config is a global variable.
+                    $reducedFieldConfig = $fieldConfig[$i];
+                    foreach ($reducedFieldConfig as $key => $value) {
+                        if (!in_array($key, $attributes)) {
+                            unset($reducedFieldConfig[$key]);
+                        }
+                    }
+                    return $reducedFieldConfig;
+                } else {
+                    // If we didn't filter out specific attributes, return the whole thing.
+                    return $fieldConfig[$i];
+                }
             }
         }
+    }
+
+    /**
+     * Gets the collection's field configuration from CONTENTdm.
+     */
+    private function getCollectionFieldConfig()
+    {
+        $wsUrl = $this->wsUrl;
+        $alias = $this->alias;
+        $query = $wsUrl . 'dmGetCollectionFieldInfo/' . $alias . '/json';
+        $json = file_get_contents($query, false, null);
+        return json_decode($json, true);
+    }
+
+    public function metadata($pointer)
+    {
+        $objectInfo = $this->getItemInfo($pointer);
+        $CONTENTdmFieldValuesArray =
+          $this->createCONTENTdmFieldValuesArray($objectInfo);
+        $collectionMappingArray = $this->collectionMappingArray;
+        $metadata = $this->createModsXML($collectionMappingArray, $CONTENTdmFieldValuesArray);
+        return $metadata;
     }
 }
