@@ -97,7 +97,7 @@ class Mods extends MetadataParser
         return $CONTENTdmFieldValuesArray;
     }
 
-    public function createModsXML($collectionMappingArray, $CONTENTdmFieldValuesArray)
+    public function createModsXML($collectionMappingArray, $CONTENTdmFieldValuesArray, $pointer)
     {
         $modsString = '';
 

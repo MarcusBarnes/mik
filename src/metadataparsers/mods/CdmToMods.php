@@ -103,7 +103,7 @@ class CdmToMods extends Mods
         return $CONTENTdmFieldValuesArray;
     }
 
-    public function createModsXML($collectionMappingArray, $CONTENTdmFieldValuesArray)
+    public function createModsXML($collectionMappingArray, $CONTENTdmFieldValuesArray, $pointer)
     {
         $modsString = '';
 
@@ -135,13 +135,15 @@ class CdmToMods extends Mods
                 // Determine if we need to store the CONTENTdm_field as an identifier.
             }
         }
+        
 
         $includeMigratedFromUri = $this->includeMigratedFromUri;
-        echo is_bool($includeMigratedFromUri);
-        if ($includeMigratedFromUri === true) {
+        $itemId = $pointer;
+        $collectionAlias = $this->alias;
+        if ($includeMigratedFromUri == true) {
             $CONTENTdmItemUrl = '<identifier type="uri" invalid="yes" ';
             $CONTENTdmItemUrl .= 'displayLabel="Migrated From">';
-            $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection';
+            $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection/';
             $CONTENTdmItemUrl .= $collectionAlias. '/id/'. $itemId .'</identifier>';
             $modsOpeningTag .= $CONTENTdmItemUrl;
         }
@@ -242,7 +244,7 @@ class CdmToMods extends Mods
         $CONTENTdmFieldValuesArray =
           $this->createCONTENTdmFieldValuesArray($objectInfo);
         $collectionMappingArray = $this->collectionMappingArray;
-        $metadata = $this->createModsXML($collectionMappingArray, $CONTENTdmFieldValuesArray);
+        $metadata = $this->createModsXML($collectionMappingArray, $CONTENTdmFieldValuesArray, $pointer);
         return $metadata;
     }
 }
