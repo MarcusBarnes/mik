@@ -8,26 +8,57 @@ class Writer
      * @var array $settings - configuration settings from confugration class.
      */
     public $settings;
-      
+    
+    /**
+     * @var string outputDirectory - output directory (where packages will be
+     * written to)
+     */
+    public $outputDirectory;
+    
+    /**
+     * @var string $metadataFileName - file name for metadata file to be written
+     */
+    public $metadataFileName;
     /**
      * Create a new Writer Instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
     {
-        // $this->settings = $settings['WRITER'];
+        $this->settings = $settings['WRITER'];
+        $this->outputDirectory = $this->settings['output_directory'];
+        $this->metadataFileName = $this->settings['metadata_filename'];
     }
 
     /**
      * Create the output directory specified in the config file.
      */
-    public function createOutputDirectory($output_directory)
+    public function createOutputDirectory()
     {
-        if (!file_exists($output_directory)) {
-            mkdir($output_directory, 0777, true);
+        $outputDirectory = $this->outputDirectory;
+        if (!file_exists($outputDirectory)) {
+            mkdir($outputDirectory, 0777, true);
         }
     }
 
+
+    /**
+     *  Write metedata file in the appropriate location.
+     *  This method is meant to be overridden in child classes.
+     */
+    public function writeMetadataFile($metadata, $path)
+    {
+        $filename = $this->metadataFileName;
+        if ($path !='') {
+            $filecreationStatus = file_put_contents($path .'/' . $filename, $modsxml);
+            if ($filecreationStatus === false) {
+                echo "There was a problem writing the metadata to a file.\n";
+            } else {
+                echo "The metadata file created.\n";
+            }
+        }
+    }
+    
     /**
     * A test method.
     *
