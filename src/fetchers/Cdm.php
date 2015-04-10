@@ -67,8 +67,13 @@ class Cdm extends Fetcher
      * Query CONTENTdm with the values in the query map and return an array of records.
      * @todo: account for CONTENTdm's limit of only returning 1024 records per query.
      */
-    public function queryContentdm()
+    public function queryContentdm($limit)
     {
+        // Limit the number of records.
+        if($limit != null && $limit >= 0){
+           $this->chunk_size = $limit;
+        } 
+        
         $qm = $this->browseQueryMap;
         $query = $this->settings['ws_url'] . 'dmQuery/'. $this->settings['alias'] .
             '/'. $qm['searchstrings'] . '/'. $qm['fields'] . '/'. $qm['sortby'] .
@@ -103,9 +108,9 @@ class Cdm extends Fetcher
     *
     * @return array The records.
     */
-    public function getRecords()
+    public function getRecords($limit)
     {
         // return array(1, 2, 3, 4, 5);
-        return $this->queryContentdm();
+        return $this->queryContentdm($limit);
     }
 }
