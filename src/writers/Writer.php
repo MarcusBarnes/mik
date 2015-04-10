@@ -37,8 +37,12 @@ class Writer
     {
         $outputDirectory = $this->outputDirectory;
         if (!file_exists($outputDirectory)) {
-            mkdir($outputDirectory, 0777, true);
+            // mkdir returns true if successful; false otherwise.
+            $result = mkdir($outputDirectory, 0777, true);
+        } else {
+            $result = true; // directory already exists.
         }
+        return $result;
     }
 
 

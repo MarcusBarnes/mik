@@ -15,17 +15,30 @@ class Newspapers extends Writer
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['WRITER'];
+        parent::__construct($settings);
     }
 
+    /**
+     * Write folders and files.
+     */
+    public function writePackages() {
+        // Create root output folder
+        $this->createOutputDirectory();
+    }
+    
+    
     /**
      * Create the output directory specified in the config file.
      */
     public function createOutputDirectory()
     {
-        parent::createOutputDirectory($this->settings['output_directory']);
+        parent::createOutputDirectory();
     }
-
+    
+    public function writeMetadataFile($metadata, $path)
+    {
+        parent::writeMetadataFile($metadata, $path);
+    }
     
     /**
     * Friendly welcome
