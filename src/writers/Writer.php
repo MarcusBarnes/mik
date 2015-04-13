@@ -54,7 +54,7 @@ class Writer
     {
         $filename = $this->metadataFileName;
         if ($path !='') {
-            $filecreationStatus = file_put_contents($path .'/' . $filename, $modsxml);
+            $filecreationStatus = file_put_contents($path .'/' . $filename, $metadata);
             if ($filecreationStatus === false) {
                 echo "There was a problem writing the metadata to a file.\n";
             } else {
