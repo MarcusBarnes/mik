@@ -76,10 +76,10 @@ class Cdm extends Fetcher
     public function queryContentdm($limit)
     {
         // Limit the number of records.
-        if($limit != null && $limit >= 0){
-           $this->chunk_size = $limit;
-        } 
-        
+        if ($limit != null && $limit >= 0) {
+            $this->chunk_size = $limit;
+        }
+
         $qm = $this->browseQueryMap;
         $query = $this->settings['ws_url'] . 'dmQuery/'. $this->settings['alias'] .
             '/'. $qm['searchstrings'] . '/'. $qm['fields'] . '/'. $qm['sortby'] .
@@ -99,7 +99,7 @@ class Cdm extends Fetcher
 
     /**
      * Query CDM for total records for a colletion.
-     */ 
+     */
     public function queryTotalRec()
     {
         $qm = $this->browseQueryMap;
