@@ -24,6 +24,12 @@ class Cdm extends Fetcher
      *
      */
     protected $last_rec = 0;
+    
+    /**
+     *
+     */
+    public $totalRecordsInCollection;
+
 
     /**
      * Define a template for the CONTENTdm query. Some values, i.e.,
@@ -89,6 +95,28 @@ class Cdm extends Fetcher
             // @todo: Log failure.
             return false;
         }
+    }
+
+    /**
+     * Query CDM for total records for a colletion.
+     */ 
+    public function queryTotalRec()
+    {
+        $qm = $this->browseQueryMap;
+        $query = $this->settings['ws_url'] . 'dmQueryTotalRecs/'
+          . $this->settings['alias'] . '|0/xml';
+        //return $query;
+        // Query CONTENTdm and return records; if failure, log problem.
+        if ($xml = file_get_contents($query, false, null)) {
+            $doc = new \DomDocument('1.0');
+            $doc->loadXML($xml);
+            return $doc->getElementsByTagName('total')->item(0)->nodeValue;
+        } else {
+            $message = date('c') . "\t". 'Query failed:' . "\t" . $query . "\n";
+            // @todo: Log failure.
+            return false;
+        }
+
     }
 
     /**
