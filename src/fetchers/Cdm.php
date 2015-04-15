@@ -118,6 +118,25 @@ class Cdm extends Fetcher
         }
 
     }
+    
+        /**
+     * Gets the item's info from CONTENTdm. $alias needs to include the leading '/'.
+     */
+    public function getItemInfo($pointer)
+    {
+        $wsUrl = $this->settings['ws_url'];
+        $alias = $this->settings['alias'];
+        $queryUrl = $wsUrl . 'dmGetItemInfo/' . $alias . '/' .
+          $pointer . '/json';
+        $response = file_get_contents($queryUrl);
+        $itemInfo = json_decode($response, true);
+        if (is_array($itemInfo)) {
+            return $itemInfo;
+        } else {
+            return false;
+        }
+    }
+
 
     /**
     * Friendly welcome
