@@ -8,17 +8,18 @@ class Writer
      * @var array $settings - configuration settings from confugration class.
      */
     public $settings;
-    
+
     /**
      * @var string outputDirectory - output directory (where packages will be
      * written to)
      */
     public $outputDirectory;
-    
+
     /**
      * @var string $metadataFileName - file name for metadata file to be written
      */
     public $metadataFileName;
+
     /**
      * Create a new Writer Instance
      * @param array $settings configuration settings.
@@ -28,6 +29,7 @@ class Writer
         $this->settings = $settings['WRITER'];
         $this->outputDirectory = $this->settings['output_directory'];
         $this->metadataFileName = $this->settings['metadata_filename'];
+        
     }
 
     /**
@@ -45,7 +47,6 @@ class Writer
         return $result;
     }
 
-
     /**
      *  Write metedata file in the appropriate location.
      *  This method is meant to be overridden in child classes.
@@ -62,7 +63,7 @@ class Writer
             }
         }
     }
-    
+
     /**
     * A test method.
     *
