@@ -15,6 +15,12 @@ class Newspapers extends Writer
     private $fetcher;
     
     /**
+     * @var object $thumbnail - filemanipulators class for helping
+     * create thumbnails from CDM
+     */
+    private $thumbnail;
+    
+    /**
      *  @var $issueDate - newspaper issue date.
      */
     public $issueDate = '0000-00-00';
@@ -33,6 +39,7 @@ class Newspapers extends Writer
         parent::__construct($settings);
         $this->fetcher = new \mik\fetchers\Cdm($settings);
         $this->alias = $settings['WRITER']['alias'];
+        $this->thumbnail = new \mik\filemanipulators\ThumbnailFromCdm($settings);
     }
 
     /**
@@ -77,20 +84,21 @@ class Newspapers extends Writer
             file_put_contents($jp2_output_file_path, $jp2_content);
 
             //$image_info = get_image_scaling_info($results_record['collection'], $page_pointer);
+            $image_info = $this->thumbnail->getImageScalingInfo($page_pointer);
 
             // Get a JPEG to use as the Islandora thubnail,
             // which should be 200 pixels high. The filename should be TN.jpg.
             // See http://www.contentdm.org/help6/custom/customize2aj.asp for CONTENTdm API docs.
             // Based on a target height of 200 pixels, get the scale value.
-            //$thumbnail_height = 200;
-            //$scale = $thumbnail_height / $image_info['width'] * 100;
-            //$new_height = round($image_info['height'] * $scale / 100);
-            //$get_image_url_thumbnail = 'http://content.lib.sfu.ca/utils/ajaxhelper/?CISOROOT=' .
-            //  ltrim($results_record['collection'], '/') . '&CISOPTR=' . $page_pointer .
-            //  '&action=2&DMSCALE=' . $scale. '&DMWIDTH='. $thumbnail_height . 'DMHEIGHT=' . $new_height;
-            //$thumbnail_content = file_get_contents($get_image_url_thumbnail);
-            //$thumbnail_output_file_path = $page_dir . '/TN.jpg';
-            //file_put_contents($thumbnail_output_file_path, $thumbnail_content);
+            $thumbnail_height = 200;
+            $scale = $thumbnail_height / $image_info['width'] * 100;
+            $new_height = round($image_info['height'] * $scale / 100);
+            $get_image_url_thumbnail = 'http://content.lib.sfu.ca/utils/ajaxhelper/?CISOROOT=' .
+              ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer .
+              '&action=2&DMSCALE=' . $scale. '&DMWIDTH='. $thumbnail_height . 'DMHEIGHT=' . $new_height;
+            $thumbnail_content = file_get_contents($get_image_url_thumbnail);
+            $thumbnail_output_file_path = $page_dir . '/TN.jpg';
+            file_put_contents($thumbnail_output_file_path, $thumbnail_content);
 
             // Get a JPEG to use as the Islandora preview image,
             //which should be 800 pixels high. The filename should be JPG.jpg.
