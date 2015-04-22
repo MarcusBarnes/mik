@@ -27,6 +27,8 @@ class CdmToMods extends Mods
      */
     public $alias;
     
+    
+    public $metadatafilter;
     /**
      * @var array $objectInfo - objects info from CONTENTdm.
      * @ToDo - De-couple ModsMetadata creation from CONTENTdm?
@@ -49,6 +51,8 @@ class CdmToMods extends Mods
         $mappingCSVpath = $this->mappingCSVpath;
         $this->collectionMappingArray =
             $this->getCDMtoModsMappingArray($mappingCSVpath);
+            
+        $this->metadatafilter = new \mik\metadatamanipulators\FilterModsTopic();
     }
 
     private function getCDMtoModsMappingArray($mappingCSVpath)
@@ -116,7 +120,7 @@ class CdmToMods extends Mods
             $CONTENTdmField = $valueArray[0];
             $fieldValue = $CONTENTdmFieldValuesArray[$CONTENTdmField];
             $xmlSnippet = $valueArray[4];
-
+            
             if (is_array($fieldValue) && empty($fieldValue)) {
                 // The JSON returned was like "key": {}.
                 // This appears in the object_info array as "key"=>array().
@@ -125,17 +129,22 @@ class CdmToMods extends Mods
                 $fieldValue = '';
             }
 
-            if (!empty($xmlSnippet) & !is_array($fieldValue)) {
-
+            if ($key == "Subject" & !empty($xmlSnippet) & !is_array($fieldValue)) {
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
+                $xmlSnippet = $this->metadatafilter->breakTopicMetadaOnSemiColon($xmlSnippet);
+                $modsOpeningTag .= $xmlSnippet;
 
+            } elseif (!empty($xmlSnippet) & !is_array($fieldValue)) {
+                
+                // @ToDo - determine appropriate metadata filters
+                $pattern = '/%value%/';
+                $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
                 $modsOpeningTag .= $xmlSnippet;
             } else {
                 // Determine if we need to store the CONTENTdm_field as an identifier.
             }
         }
-        
 
         $includeMigratedFromUri = $this->includeMigratedFromUri;
         $itemId = $pointer;
@@ -149,19 +158,17 @@ class CdmToMods extends Mods
         }
 
         $modsString = $modsOpeningTag . '</mods>';
-        return $modsString;
-        //$doc = new DomDocument('1.0');
-        //$doc->loadXML($mods_string);
-
-        //$doc->formatOutput = true;
-
-        //$modsxml = $doc->saveXML();
+        
+        $doc = new \DomDocument('1.0');
+        $doc->loadXML($modsString);
+        $doc->formatOutput = true;
+        $modsxml = $doc->saveXML();
         
         return $modsxml;
     }
 
     /**
-     * Gets the item's info from CONTENTdm. $alia needs to include the leading '/'.
+     * Gets the item's info from CONTENTdm. $alias needs to include the leading '/'.
      */
     public function getItemInfo($pointer)
     {
