@@ -21,6 +21,12 @@ class Newspapers extends Writer
     private $thumbnail;
     
     /**
+     * @var object cdmNewspapersFileGetter - filegetter class for 
+     * getting files related to CDM Newspaper issues.
+     */
+    private $cdmNewspapersFileGetter;
+    
+    /**
      *  @var $issueDate - newspaper issue date.
      */
     public $issueDate = '0000-00-00';
@@ -40,6 +46,7 @@ class Newspapers extends Writer
         $this->fetcher = new \mik\fetchers\Cdm($settings);
         $this->alias = $settings['WRITER']['alias'];
         $this->thumbnail = new \mik\filemanipulators\ThumbnailFromCdm($settings);
+        $this->cdmNewspapersFileGetter = new \mik\filegetters\CdmNewspapers($settings);
     }
 
     /**
@@ -51,12 +58,16 @@ class Newspapers extends Writer
         $this->createOutputDirectory();
         $issueObjectPath = $this->createIssueDirectory($metadata);
         $this->writeMetadataFile($metadata, $issueObjectPath);
-        // Create subdirectory for each page of newspaper issue
+        
+        // filegetter for OBJ.tiff files for newspaper issue pages
+        $OBJFilesArray = $this->cdmNewspapersFileGetter
+                 ->getIssueLocalFilesForOBJ($this->issueDate);
 
         $page_number = 0;
         foreach ($pages as $page_pointer) {
             $page_number++;
 
+            // Create subdirectory for each page of newspaper issue
             $page_object_info = $this->fetcher->getItemInfo($page_pointer);
             $page_dir = $issueObjectPath  . '/' . $page_number;
             // Create a directory for each day of the newspaper.
@@ -102,17 +113,31 @@ class Newspapers extends Writer
 
             // Get a JPEG to use as the Islandora preview image,
             //which should be 800 pixels high. The filename should be JPG.jpg.
-            //$jpeg_height = 800;
-            //$scale = $jpeg_height / $image_info['width'] * 100;
-            //$new_height = round($image_info['height'] * $scale / 100);
-            //$get_image_url_jpg = 'http://content.lib.sfu.ca/utils/ajaxhelper/?CISOROOT=' .
-            //  ltrim($results_record['collection'], '/') . '&CISOPTR=' . $page_pointer .
-            //  '&action=2&DMSCALE=' . $scale. '&DMWIDTH=' . $jpeg_height . '&DMHEIGHT=' . $new_height;
-            //$jpg_content = file_get_contents($get_image_url_jpg);
-            //$jpg_output_file_path = $page_dir . '/JPEG.jpg';
-            //file_put_contents($jpg_output_file_path, $jpg_content);
+            $jpeg_height = 800;
+            $scale = $jpeg_height / $image_info['width'] * 100;
+            $new_height = round($image_info['height'] * $scale / 100);
+            $get_image_url_jpg = 'http://content.lib.sfu.ca/utils/ajaxhelper/?CISOROOT=' .
+              ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer .
+              '&action=2&DMSCALE=' . $scale. '&DMWIDTH=' . $jpeg_height . '&DMHEIGHT=' . $new_height;
+            $jpg_content = file_get_contents($get_image_url_jpg);
+            $jpg_output_file_path = $page_dir . '/JPEG.jpg';
+            file_put_contents($jpg_output_file_path, $jpg_content);
 
             // For each page, we need two files that can't be downloaded from CONTENTdm: PDF.pdf and MODS.xml.
+
+            // Create OBJ file for page.
+            $filekey = $page_number - 1;
+            $pathToFile = $OBJFilesArray[$filekey];
+            // Check path page tiffs should be in the format yyyy-mm-dd-
+            $regex_pattern = '%[/\\\\][0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9]*' . $page_number . '%';
+            $result = preg_match($regex_pattern, $pathToFile);
+            if ($result === 1) {
+                $obj_content = file_get_contents($pathToFile);
+                $obj_output_file_path = $page_dir . '/OBJ.tiff';
+                file_put_contents($obj_output_file_path, $obj_content);
+            } else {
+                // log
+            }
         }
     }
 
