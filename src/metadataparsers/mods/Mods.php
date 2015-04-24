@@ -121,6 +121,9 @@ class Mods extends MetadataParser
 
             if (!empty($xmlSnippet) & !is_array($fieldValue)) {
 
+                // @ToDo - Determine appropriate metadatamanipulators on the fly
+                // based on configuration?
+
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
 
