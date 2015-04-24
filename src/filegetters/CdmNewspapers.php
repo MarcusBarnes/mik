@@ -85,7 +85,6 @@ class CdmNewspapers extends FileGetter
         // to use for the OBJ.tiff of each newspaper page.
         // Deal on an issue-by-issue bassis.
 
-        
         //print_r($this->getIssueMasterFiles($inputDirectory, $issueDate));
         //return $arrayOfFilePaths;
         $key = '/' . $issueDate . '/';
