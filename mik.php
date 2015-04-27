@@ -70,14 +70,14 @@ foreach ($fetcher->getRecords($limit)->records as $record) {
       // Classes are loaded in metadata parsers.
 
       // Get files
+      echo "Getting file information.\n";
+      echo "Please be patient as this may take some time.\n";
+
       // When finished, the file getter will return some files... whatever that means.
       $fileGetterClass = 'mik\\filegetters\\' . $ini['FILE_GETTER']['class'];
       $fileGetter = new $fileGetterClass($settings);
 
       $child_pointers = $fileGetter->getChildrenPointers($record_id);
-
-      echo "Getting file information.\n";
-      echo "Please be patient as this may take some time.\n";
 
       // echo $fileGetter->echoPhrase("The $fileGetterClass class been loaded for record $record_id.");
 
