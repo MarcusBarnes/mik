@@ -189,4 +189,20 @@ class CdmNewspapers extends FileGetter
 
         return $thumbnail_content;
     }
+
+    public function getPreviewJPGContent($page_pointer, $jpeg_height = 800)
+    {
+        // Get a JPEG to use as the Islandora preview image,
+        // which should be 800 pixels high. The filename should be JPG.jpg.
+        $image_info = $this->thumbnail->getImageScalingInfo($page_pointer);
+
+        $scale = $jpeg_height / $image_info['width'] * 100;
+        $new_height = round($image_info['height'] * $scale / 100);
+        $get_image_url_jpg = $this->utilsUrl . 'ajaxhelper/?CISOROOT=' .
+          ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer .
+          '&action=2&DMSCALE=' . $scale. '&DMWIDTH=' . $jpeg_height . '&DMHEIGHT=' . $new_height;
+        $jpg_content = file_get_contents($get_image_url_jpg);
+
+        return $jpg_content;
+    }
 }

@@ -95,6 +95,10 @@ class Newspapers extends Writer
             file_put_contents($jp2_output_file_path, $jp2_content);
 
             //$image_info = get_image_scaling_info($results_record['collection'], $page_pointer);
+            
+            // @ToDo: Determine if it's better to use $image_info as a parameter
+            // in getThumbnailcontent and getPreviewJPGContent - as this 
+            // may reduce the number of API calls by 1.
             $image_info = $this->thumbnail->getImageScalingInfo($page_pointer);
 
             // Get a JPEG to use as the Islandora thubnail,
@@ -108,19 +112,22 @@ class Newspapers extends Writer
             //  ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer .
             //  '&action=2&DMSCALE=' . $scale. '&DMWIDTH='. $thumbnail_height . 'DMHEIGHT=' . $new_height;
             //$thumbnail_content = file_get_contents($get_image_url_thumbnail);
-            $thumbnail_content = $this->cdmNewspapersFileGetter->getThumbnailcontent($page_pointer);
+            $thumbnail_content = $this->cdmNewspapersFileGetter
+                                      ->getThumbnailcontent($page_pointer);
             $thumbnail_output_file_path = $page_dir . '/TN.jpg';
             file_put_contents($thumbnail_output_file_path, $thumbnail_content);
 
             // Get a JPEG to use as the Islandora preview image,
             //which should be 800 pixels high. The filename should be JPG.jpg.
-            $jpeg_height = 800;
-            $scale = $jpeg_height / $image_info['width'] * 100;
-            $new_height = round($image_info['height'] * $scale / 100);
-            $get_image_url_jpg = 'http://content.lib.sfu.ca/utils/ajaxhelper/?CISOROOT=' .
-              ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer .
-              '&action=2&DMSCALE=' . $scale. '&DMWIDTH=' . $jpeg_height . '&DMHEIGHT=' . $new_height;
-            $jpg_content = file_get_contents($get_image_url_jpg);
+            //$jpeg_height = 800;
+            //$scale = $jpeg_height / $image_info['width'] * 100;
+            //$new_height = round($image_info['height'] * $scale / 100);
+            //$get_image_url_jpg = 'http://content.lib.sfu.ca/utils/ajaxhelper/?CISOROOT=' .
+            //  ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer .
+            //  '&action=2&DMSCALE=' . $scale. '&DMWIDTH=' . $jpeg_height . '&DMHEIGHT=' . $new_height;
+            //$jpg_content = file_get_contents($get_image_url_jpg);
+            $jpg_content = $this->cdmNewspapersFileGetter
+                                ->getPreviewJPGContent($page_pointer);
             $jpg_output_file_path = $page_dir . '/JPEG.jpg';
             file_put_contents($jpg_output_file_path, $jpg_content);
 
