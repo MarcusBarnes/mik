@@ -101,13 +101,14 @@ class Newspapers extends Writer
             // which should be 200 pixels high. The filename should be TN.jpg.
             // See http://www.contentdm.org/help6/custom/customize2aj.asp for CONTENTdm API docs.
             // Based on a target height of 200 pixels, get the scale value.
-            $thumbnail_height = 200;
-            $scale = $thumbnail_height / $image_info['width'] * 100;
-            $new_height = round($image_info['height'] * $scale / 100);
-            $get_image_url_thumbnail = 'http://content.lib.sfu.ca/utils/ajaxhelper/?CISOROOT=' .
-              ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer .
-              '&action=2&DMSCALE=' . $scale. '&DMWIDTH='. $thumbnail_height . 'DMHEIGHT=' . $new_height;
-            $thumbnail_content = file_get_contents($get_image_url_thumbnail);
+            //$thumbnail_height = 200;
+            //$scale = $thumbnail_height / $image_info['width'] * 100;
+            //$new_height = round($image_info['height'] * $scale / 100);
+            //$get_image_url_thumbnail = 'http://content.lib.sfu.ca/utils/ajaxhelper/?CISOROOT=' .
+            //  ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer .
+            //  '&action=2&DMSCALE=' . $scale. '&DMWIDTH='. $thumbnail_height . 'DMHEIGHT=' . $new_height;
+            //$thumbnail_content = file_get_contents($get_image_url_thumbnail);
+            $thumbnail_content = $this->cdmNewspapersFileGetter->getThumbnailcontent($page_pointer);
             $thumbnail_output_file_path = $page_dir . '/TN.jpg';
             file_put_contents($thumbnail_output_file_path, $thumbnail_content);
 

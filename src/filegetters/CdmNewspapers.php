@@ -18,6 +18,22 @@ class CdmNewspapers extends FileGetter
      * @var array (dict) $OBJFilePaths - paths to OBJ files for collection
      */
     public $OBJFilePaths;
+    
+    /**
+     * @var string $utilsUrl - CDM utils url.
+     */
+    public $utils_url;
+
+    /**
+     * @var string $alias - CDM alias
+     */
+    public $alias;
+    
+    /**
+     * @var object $thumbnail - filemanipulators class for helping
+     * create thumbnails from CDM
+     */
+    private $thumbnail;
 
     /**
      * Create a new CONTENTdm Fetcher Instance
@@ -26,12 +42,16 @@ class CdmNewspapers extends FileGetter
     public function __construct($settings)
     {
         $this->settings = $settings['FILE_GETTER'];
+        $this->utilsUrl = $this->settings['utils_url'];
+        $this->alias = $this->settings['alias'];
         $this->inputDirectory = $this->settings['input_directory'];
         $potentialObjFiles = $this
             ->getIssueMasterFiles($this->inputDirectory);
         $this->OBJFilePaths = $this->determineObjItems($potentialObjFiles);
+        // information and methods for thumbnail minipulation
+        $this->thumbnail = new \mik\filemanipulators\ThumbnailFromCdm($settings);
     }
-    
+
     /**
     * Friendly welcome
     *
@@ -53,7 +73,7 @@ class CdmNewspapers extends FileGetter
     {
         return array(1, 2, 3, 4, 5);
     }
-    
+
     /**
      * Gets a compound item's children pointers. $alias needs to include the leading '/'.
      * @ToDo - clerify whether this method should be part of filegetters or fetchers.
@@ -149,5 +169,24 @@ class CdmNewspapers extends FileGetter
         }
 
         return $dictOfItems;
+    }
+
+    public function getThumbnailcontent($page_pointer, $thumbnail_height = 200)
+    {
+        // Get a JPEG to use as the Islandora thumbnail,
+        // which should be 200 pixels high. The filename should be TN.jpg.
+        // See http://www.contentdm.org/help6/custom/customize2aj.asp for CONTENTdm API docs.
+        // Based on a target height of 200 pixels, get the scale value.
+
+        $image_info = $this->thumbnail->getImageScalingInfo($page_pointer);
+
+        $scale = $thumbnail_height / $image_info['width'] * 100;
+        $new_height = round($image_info['height'] * $scale / 100);
+        $get_image_url_thumbnail = $this->utilsUrl . 'ajaxhelper/?CISOROOT=' .
+          ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer .
+          '&action=2&DMSCALE=' . $scale. '&DMWIDTH='. $thumbnail_height . 'DMHEIGHT=' . $new_height;
+        $thumbnail_content = file_get_contents($get_image_url_thumbnail);
+
+        return $thumbnail_content;
     }
 }
