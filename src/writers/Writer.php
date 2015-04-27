@@ -57,9 +57,9 @@ class Writer
         if ($path !='') {
             $filecreationStatus = file_put_contents($path .'/' . $filename, $metadata);
             if ($filecreationStatus === false) {
-                echo "There was a problem writing the metadata to a file.\n";
+                echo "There was a problem exporting the metadata to a file.\n";
             } else {
-                echo "The metadata file created.\n";
+                echo "Exporting metadata file.\n";
             }
         }
     }
