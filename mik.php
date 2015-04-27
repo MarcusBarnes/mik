@@ -63,7 +63,7 @@ foreach ($fetcher->getRecords($limit)->records as $record) {
       // can be passed on to the metadata manipulater.
       // echo $parser->echoPhrase("The $fetcherClass class has returned record $record_id.\n");
       $metadata = $parser->metadata($record_id) . "\n";
-      echo $metadata;
+      echo "The metatdata file for record $record_id has been created.\n";
 
       // Manipulate metadata
       // When finished, the manipulater will return an XML file or DOM object that can be passed on to writer.
@@ -75,6 +75,9 @@ foreach ($fetcher->getRecords($limit)->records as $record) {
       $fileGetter = new $fileGetterClass($settings);
 
       $child_pointers = $fileGetter->getChildrenPointers($record_id);
+
+      echo "Getting file information.\n";
+      echo "Please be patient as this may take some time.\n";
 
       // echo $fileGetter->echoPhrase("The $fileGetterClass class been loaded for record $record_id.");
 
