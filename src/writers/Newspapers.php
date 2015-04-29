@@ -88,9 +88,8 @@ class Newspapers extends Writer
 
             // Retrieve the file associated with the child-level object. In the case of
             // the Chinese Times and some other newspapers, this is a JPEG2000 file.
-            $get_file_url = 'http://content.lib.sfu.ca/utils/getfile/collection/'
-              . $this->alias . '/id/' . $page_pointer . '/filename/' . $page_object_info['find'];
-            $jp2_content = file_get_contents($get_file_url);
+            $jp2_content = $this->cdmNewspapersFileGetter
+                ->getChildLevelFileContent($page_pointer, $page_object_info);
             $jp2_output_file_path = $page_dir . '/JP2.jp2';
             file_put_contents($jp2_output_file_path, $jp2_content);
 

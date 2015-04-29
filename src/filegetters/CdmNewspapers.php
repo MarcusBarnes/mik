@@ -198,11 +198,24 @@ class CdmNewspapers extends FileGetter
 
         $scale = $jpeg_height / $image_info['width'] * 100;
         $new_height = round($image_info['height'] * $scale / 100);
-        $get_image_url_jpg = $this->utilsUrl . 'ajaxhelper/?CISOROOT=' .
-          ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer .
-          '&action=2&DMSCALE=' . $scale. '&DMWIDTH=' . $jpeg_height . '&DMHEIGHT=' . $new_height;
+        $get_image_url_jpg = $this->utilsUrl . 'ajaxhelper/?CISOROOT='
+          . ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer
+          . '&action=2&DMSCALE=' . $scale. '&DMWIDTH=' . $jpeg_height 
+          . '&DMHEIGHT=' . $new_height;
         $jpg_content = file_get_contents($get_image_url_jpg);
 
         return $jpg_content;
+    }
+
+    public function getChildLevelFileContent($page_pointer, $page_object_info)
+    {
+        // Retrieve the file associated with the child-level object. In the case of
+        // the Chinese Times and some other newspapers, this is a JPEG2000 file.
+        $get_file_url = $this->utilsUrl .'getfile/collection/'
+            . $this->alias . '/id/' . $page_pointer . '/filename/' 
+            . $page_object_info['find'];
+        $content = file_get_contents($get_file_url);
+        
+        return $content;
     }
 }
