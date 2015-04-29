@@ -200,7 +200,7 @@ class CdmNewspapers extends FileGetter
         $new_height = round($image_info['height'] * $scale / 100);
         $get_image_url_jpg = $this->utilsUrl . 'ajaxhelper/?CISOROOT='
           . ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer
-          . '&action=2&DMSCALE=' . $scale. '&DMWIDTH=' . $jpeg_height 
+          . '&action=2&DMSCALE=' . $scale. '&DMWIDTH=' . $jpeg_height
           . '&DMHEIGHT=' . $new_height;
         $jpg_content = file_get_contents($get_image_url_jpg);
 
@@ -212,10 +212,30 @@ class CdmNewspapers extends FileGetter
         // Retrieve the file associated with the child-level object. In the case of
         // the Chinese Times and some other newspapers, this is a JPEG2000 file.
         $get_file_url = $this->utilsUrl .'getfile/collection/'
-            . $this->alias . '/id/' . $page_pointer . '/filename/' 
+            . $this->alias . '/id/' . $page_pointer . '/filename/'
             . $page_object_info['find'];
         $content = file_get_contents($get_file_url);
         
         return $content;
+    }
+
+    public function getPageOBJfileContent($pathToFile, $page_number)
+    {
+        // Check path page tiffs should be in the format yyyy-mm-dd-pp.
+        // @ToDo - move this method to FileGetter parent class
+        // to be extended in child classes such as CdmNewspapers
+        $regex_pattern = '%[/\\\\][0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9]*' . $page_number . '%';
+        $result = preg_match($regex_pattern, $pathToFile);
+        if ($result === 1) {
+            // file_get_contents returns false on failure.
+            $obj_content = file_get_contents($pathToFile);
+        } else {
+            // log
+            // file_get_contents returns false on failure.
+            $obj_content = false;
+        }
+
+        return $obj_content;
+
     }
 }

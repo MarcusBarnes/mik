@@ -94,7 +94,7 @@ class Newspapers extends Writer
             file_put_contents($jp2_output_file_path, $jp2_content);
 
             // @ToDo: Determine if it's better to use $image_info as a parameter
-            // in getThumbnailcontent and getPreviewJPGContent - as this 
+            // in getThumbnailcontent and getPreviewJPGContent - as this
             // may reduce the number of API calls by 1.
             //$image_info = $this->thumbnail->getImageScalingInfo($page_pointer);
 
@@ -119,11 +119,9 @@ class Newspapers extends Writer
             // Create OBJ file for page.
             $filekey = $page_number - 1;
             $pathToFile = $OBJFilesArray[$filekey];
-            // Check path page tiffs should be in the format yyyy-mm-dd-
-            $regex_pattern = '%[/\\\\][0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9]*' . $page_number . '%';
-            $result = preg_match($regex_pattern, $pathToFile);
-            if ($result === 1) {
-                $obj_content = file_get_contents($pathToFile);
+            $obj_content = $this->cdmNewspapersFileGetter
+                 ->getPageOBJfileContent($pathToFile, $page_number);
+            if ($obj_content != false) {
                 $obj_output_file_path = $page_dir . '/OBJ.tiff';
                 file_put_contents($obj_output_file_path, $obj_content);
             } else {
