@@ -109,6 +109,7 @@ class CdmToMods extends Mods
 
     public function createModsXML($collectionMappingArray, $CONTENTdmFieldValuesArray, $pointer)
     {
+
         $modsString = '';
 
         $modsOpeningTag = '<mods xmlns="http://www.loc.gov/mods/v3" ';
@@ -120,7 +121,7 @@ class CdmToMods extends Mods
             $CONTENTdmField = $valueArray[0];
             $fieldValue = $CONTENTdmFieldValuesArray[$CONTENTdmField];
             $xmlSnippet = $valueArray[4];
-            
+
             if (is_array($fieldValue) && empty($fieldValue)) {
                 // The JSON returned was like "key": {}.
                 // This appears in the object_info array as "key"=>array().
@@ -136,6 +137,14 @@ class CdmToMods extends Mods
                 $modsOpeningTag .= $xmlSnippet;
 
             } elseif (!empty($xmlSnippet) & !is_array($fieldValue)) {
+                // @ToDo - move into metadatamanipulator 
+                // check fieldValue for <br> characters.  If present, wrap in fieldValue
+                // is cdata section <![CDATA[$fieldValue]]>
+                $pattern = '/<br>/';
+                $result = preg_match($pattern, $fieldValue);
+                if ($result === 1) {
+                    $fieldValue = '<![CDATA[' . $fieldValue . ']]>';
+                }
                 
                 // @ToDo - determine appropriate metadata filters
                 $pattern = '/%value%/';
