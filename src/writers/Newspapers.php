@@ -62,7 +62,6 @@ class Newspapers extends Writer
         // filegetter for OBJ.tiff files for newspaper issue pages
         $OBJFilesArray = $this->cdmNewspapersFileGetter
                  ->getIssueLocalFilesForOBJ($this->issueDate);
-
         $page_number = 0;
         foreach ($pages as $page_pointer) {
             $page_number++;
@@ -126,6 +125,7 @@ class Newspapers extends Writer
                 file_put_contents($obj_output_file_path, $obj_content);
             } else {
                 // log
+                echo "obj_content = false : $pathToFile\n";
             }
         }
     }
@@ -145,10 +145,20 @@ class Newspapers extends Writer
         $doc = new \DomDocument('1.0');
         $doc->loadXML($metadata);
         $nodes = $doc->getElementsByTagName('dateIssued');
+        // There may be more than one 'dateIssued' node
+        // use the one with keyDate and metadataminipulator to 
+        // manipulate date to yyyy-mm-dd format.
         if ($nodes->length == 1) {
             $this->issueDate = trim($nodes->item(0)->nodeValue);
         } else {
-          // log exception - unable to determine issue date.
+            foreach($nodes as $item) {
+                foreach($item->attributes as $attribute) {
+                    if($attribute->name == 'keyDate' &&  $attribute->nodeValue == 'yes') {
+                        $this->issueDate = $item->nodeValue;
+                    }
+                }
+            }
+            
         }
         
         //$doc->formatOutput = true;
