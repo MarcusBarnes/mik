@@ -21,6 +21,7 @@ class FilterModsTopic extends MetadataManipulator
     
     public function breakTopicMetadaOnSemiColon($xmlsnippet)
     {
+        
         // break topic metadata on ; into seperate topic elements.
         $xml = new \DomDocument();
         $xml->loadxml($xmlsnippet);

@@ -22,7 +22,7 @@ class CdmNewspapers extends FileGetter
     /**
      * @var string $utilsUrl - CDM utils url.
      */
-    public $utils_url;
+    public $utilsUrl;
 
     /**
      * @var string $alias - CDM alias
@@ -155,9 +155,9 @@ class CdmNewspapers extends FileGetter
             $tempItemList = array();
             //$pattern = "%" . $dateIdentifier ."%";
             #special directories in
-            $specialDirectoryNameCases = array('Merged', 'JPG');
+            $specialDirectoryNameCases = array('Merged', 'JPG', 'Uncompressed TIFF');
             foreach ($arrayOfFilesToPreserve as $filepath) {
-                //if $dateIdentifier is in $specialDirectoryNameCases
+                //if $dateIdentifier is in $specialDirectoryName Cases
                 if (stristr($filepath, $dateIdentifier)) {
                     array_push($tempItemList, $filepath);
                 }
@@ -167,7 +167,6 @@ class CdmNewspapers extends FileGetter
                 $dictOfItems[$dateIdentifier] = $tempItemList;
             }
         }
-
         return $dictOfItems;
     }
 
@@ -224,13 +223,14 @@ class CdmNewspapers extends FileGetter
         // Check path page tiffs should be in the format yyyy-mm-dd-pp.
         // @ToDo - move this method to FileGetter parent class
         // to be extended in child classes such as CdmNewspapers
+
         $regex_pattern = '%[/\\\\][0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9]*' . $page_number . '%';
         $result = preg_match($regex_pattern, $pathToFile);
         if ($result === 1) {
             // file_get_contents returns false on failure.
             $obj_content = file_get_contents($pathToFile);
         } else {
-            // log
+            // log            
             // file_get_contents returns false on failure.
             $obj_content = false;
         }
