@@ -107,7 +107,7 @@ class CdmNewspapers extends FileGetter
 
         //print_r($this->getIssueMasterFiles($inputDirectory, $issueDate));
         //return $arrayOfFilePaths;
-        $key = '/' . $issueDate . '/';
+        $key = DIRECTORY_SEPARATOR . $issueDate . DIRECTORY_SEPARATOR;
         return $this->OBJFilePaths[$key];
     }
 
@@ -230,7 +230,7 @@ class CdmNewspapers extends FileGetter
             // file_get_contents returns false on failure.
             $obj_content = file_get_contents($pathToFile);
         } else {
-            // log            
+            // log
             // file_get_contents returns false on failure.
             $obj_content = false;
         }
