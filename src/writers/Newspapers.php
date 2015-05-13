@@ -68,7 +68,7 @@ class Newspapers extends Writer
 
             // Create subdirectory for each page of newspaper issue
             $page_object_info = $this->fetcher->getItemInfo($page_pointer);
-            $page_dir = $issueObjectPath  . '/' . $page_number;
+            $page_dir = $issueObjectPath  . DIRECTORY_SEPARATOR . $page_number;
             // Create a directory for each day of the newspaper.
             if (!file_exists($page_dir)) {
                 mkdir($page_dir, 0777, true);
@@ -82,14 +82,14 @@ class Newspapers extends Writer
               . ', page ' . $page_number . "\n";
 
             // Write out $page_object_info['full'], which we'll use as the OCR datastream.
-            $ocr_output_file_path = $page_dir . '/OCR.txt';
+            $ocr_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OCR.txt';
             file_put_contents($ocr_output_file_path, $page_object_info['full']);
 
             // Retrieve the file associated with the child-level object. In the case of
             // the Chinese Times and some other newspapers, this is a JPEG2000 file.
             $jp2_content = $this->cdmNewspapersFileGetter
                 ->getChildLevelFileContent($page_pointer, $page_object_info);
-            $jp2_output_file_path = $page_dir . '/JP2.jp2';
+            $jp2_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'JP2.jp2';
             file_put_contents($jp2_output_file_path, $jp2_content);
 
             // @ToDo: Determine if it's better to use $image_info as a parameter
@@ -103,14 +103,14 @@ class Newspapers extends Writer
             // Based on a target height of 200 pixels, get the scale value.
             $thumbnail_content = $this->cdmNewspapersFileGetter
                                       ->getThumbnailcontent($page_pointer);
-            $thumbnail_output_file_path = $page_dir . '/TN.jpg';
+            $thumbnail_output_file_path = $page_dir . DIRECTORY_SEPARATOR .'TN.jpg';
             file_put_contents($thumbnail_output_file_path, $thumbnail_content);
 
             // Get a JPEG to use as the Islandora preview image,
             //which should be 800 pixels high. The filename should be JPG.jpg.
             $jpg_content = $this->cdmNewspapersFileGetter
                                 ->getPreviewJPGContent($page_pointer);
-            $jpg_output_file_path = $page_dir . '/JPEG.jpg';
+            $jpg_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'JPEG.jpg';
             file_put_contents($jpg_output_file_path, $jpg_content);
 
             // For each page, we need two files that can't be downloaded from CONTENTdm: PDF.pdf and MODS.xml.
@@ -121,7 +121,7 @@ class Newspapers extends Writer
             $obj_content = $this->cdmNewspapersFileGetter
                  ->getPageOBJfileContent($pathToFile, $page_number);
             if ($obj_content != false) {
-                $obj_output_file_path = $page_dir . '/OBJ.tiff';
+                $obj_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.tiff';
                 file_put_contents($obj_output_file_path, $obj_content);
             } else {
                 // log
@@ -146,14 +146,14 @@ class Newspapers extends Writer
         $doc->loadXML($metadata);
         $nodes = $doc->getElementsByTagName('dateIssued');
         // There may be more than one 'dateIssued' node
-        // use the one with keyDate and metadataminipulator to 
+        // use the one with keyDate and metadataminipulator to
         // manipulate date to yyyy-mm-dd format.
         if ($nodes->length == 1) {
             $this->issueDate = trim($nodes->item(0)->nodeValue);
         } else {
-            foreach($nodes as $item) {
-                foreach($item->attributes as $attribute) {
-                    if($attribute->name == 'keyDate' &&  $attribute->nodeValue == 'yes') {
+            foreach ($nodes as $item) {
+                foreach ($item->attributes as $attribute) {
+                    if ($attribute->name == 'keyDate' &&  $attribute->nodeValue == 'yes') {
                         $this->issueDate = $item->nodeValue;
                     }
                 }
@@ -168,7 +168,7 @@ class Newspapers extends Writer
         // the date value from the issue's metadata.
         //$issue_object_info = get_item_info($results_record['collection'], $results_record['pointer']);
         
-        $issueObjectPath = $this->outputDirectory . $this->issueDate;
+        $issueObjectPath = $this->outputDirectory . DIRECTORY_SEPARATOR . $this->issueDate;
         if (!file_exists($issueObjectPath)) {
             mkdir($issueObjectPath);
             // return issue_object_path for use when writing files.
