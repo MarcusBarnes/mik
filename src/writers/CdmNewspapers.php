@@ -2,7 +2,7 @@
 
 namespace mik\writers;
 
-class Newspapers extends Writer
+class CdmNewspapers extends Writer
 {
     /**
      * @var array $settings - configuration settings from confugration class.
@@ -45,8 +45,10 @@ class Newspapers extends Writer
         parent::__construct($settings);
         $this->fetcher = new \mik\fetchers\Cdm($settings);
         $this->alias = $settings['WRITER']['alias'];
+        // @Todo load manipulators someway based on those to be listed in config.
         $this->thumbnail = new \mik\filemanipulators\ThumbnailFromCdm($settings);
-        $this->cdmNewspapersFileGetter = new \mik\filegetters\CdmNewspapers($settings);
+        $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
+        $this->cdmNewspapersFileGetter = new $fileGetterClass($settings);
     }
 
     /**
