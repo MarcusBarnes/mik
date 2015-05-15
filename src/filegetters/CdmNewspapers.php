@@ -12,7 +12,12 @@ class CdmNewspapers extends FileGetter
     /**
      * @var string $inputDirectory - path to newspaper collection.
      */
-    public $inputDirectory;
+    //public $inputDirectory;
+    
+    /**
+     * @var array $inputDirectories - array of paths to files for newspaper collection.
+     */
+    public $inputDirectories;
 
     /**
      * @var array (dict) $OBJFilePaths - paths to OBJ files for collection
@@ -44,9 +49,15 @@ class CdmNewspapers extends FileGetter
         $this->settings = $settings['FILE_GETTER'];
         $this->utilsUrl = $this->settings['utils_url'];
         $this->alias = $this->settings['alias'];
-        $this->inputDirectory = $this->settings['input_directory'];
-        $potentialObjFiles = $this
-            ->getIssueMasterFiles($this->inputDirectory);
+        //$this->inputDirectory = $this->settings['input_directory'];
+        $this->inputDirectories = $this->settings['input_directories'];
+        // interate over inputDirectories to create $potentialObjFiles array.
+        $potentialObjFiles = array();
+        foreach ($this->inputDirectories as $inputDirectory) {
+            $potentialObjFilesPart = $this
+                ->getIssueMasterFiles($inputDirectory);
+            $potentialObjFiles = array_merge($potentialObjFiles, $potentialObjFilesPart);
+        }
         $this->OBJFilePaths = $this->determineObjItems($potentialObjFiles);
         // information and methods for thumbnail minipulation
         $this->thumbnail = new \mik\filemanipulators\ThumbnailFromCdm($settings);
@@ -105,8 +116,6 @@ class CdmNewspapers extends FileGetter
         // to use for the OBJ.tiff of each newspaper page.
         // Deal on an issue-by-issue bassis.
 
-        //print_r($this->getIssueMasterFiles($inputDirectory, $issueDate));
-        //return $arrayOfFilePaths;
         $key = DIRECTORY_SEPARATOR . $issueDate . DIRECTORY_SEPARATOR;
         return $this->OBJFilePaths[$key];
     }
