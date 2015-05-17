@@ -1,0 +1,3 @@
+Calendar name,,Title,,<titleInfo><title>%value%</title></titleInfo>,
+Publisher,,Publisher,,<originInfo><publisher>%value%</publisher></originInfo>,
+Year,,Date,,<originInfo><dateIssued encoding="iso8601" keyDate="yes">%value%</dateIssued></originInfo>,Encoding is only used when it is possible to code a date in w3cdtf format (YYYY-MM-DD)
