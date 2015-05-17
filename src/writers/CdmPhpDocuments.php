@@ -19,11 +19,6 @@ class CdmPhpDocuments extends Writer
      * getting files related to CDM PHP documents.
      */
     private $cdmPhpDocumentsFileGetter;
-    
-    /**
-     *  @var $issueDate - newspaper issue date.
-     */
-    public $issueDate = '0000-00-00';
 
     /**
      * @var $alias - collection alias
@@ -53,7 +48,8 @@ class CdmPhpDocuments extends Writer
         $object_path = $this->outputDirectory . DIRECTORY_SEPARATOR;
         $this->writeMetadataFile($metadata, $object_path . $record_id . '.xml');
 
-        // Retrieve the PDF file associated with the document.
+        // Retrieve the PDF file associated with the document and write it to the
+        // output folder, using the CONTENTdm pointer as the file basename.
         $pdf_content = $this->cdmPhpDocumentsFileGetter
             ->getDocumentLevelPDFContent($record_id);
         $pdf_output_file_path = $object_path . $record_id . '.pdf';
