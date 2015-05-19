@@ -119,9 +119,13 @@ class CdmToMods extends Mods
         $devTempArray = array();
         foreach ($collectionMappingArray as $key => $valueArray) {
             $CONTENTdmField = $valueArray[0];
-            $fieldValue = $CONTENTdmFieldValuesArray[$CONTENTdmField];
-            $fieldValue = htmlspecialchars($fieldValue, ENT_NOQUOTES|ENT_XML1);
-            $xmlSnippet = $valueArray[4];
+
+            if (isset($CONTENTdmFieldValuesArray[$CONTENTdmField])) {
+                $fieldValue = $CONTENTdmFieldValuesArray[$CONTENTdmField];
+            } else {
+                // log mismatch between mapping file and source fields (e.g., CDM)
+                continue;
+            }
 
             if (is_array($fieldValue) && empty($fieldValue)) {
                 // The JSON returned was like "key": {}.
@@ -131,6 +135,11 @@ class CdmToMods extends Mods
                 $fieldValue = '';
             }
 
+            // Special characters in metadata field values need to be encoded or
+            // metadata creation may break.
+            $fieldValue = htmlspecialchars($fieldValue, ENT_NOQUOTES|ENT_XML1);
+
+            $xmlSnippet = $valueArray[4];
             if ($key == "Subject" & !empty($xmlSnippet) & !is_array($fieldValue)) {
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
@@ -138,7 +147,7 @@ class CdmToMods extends Mods
                 $modsOpeningTag .= $xmlSnippet;
 
             } elseif (!empty($xmlSnippet) & !is_array($fieldValue)) {
-                // @ToDo - move into metadatamanipulator 
+                // @ToDo - move into metadatamanipulator
                 // check fieldValue for <br> characters.  If present, wrap in fieldValue
                 // is cdata section <![CDATA[$fieldValue]]>
                 $pattern = '/<br>/';
