@@ -155,7 +155,7 @@ class CdmToMods extends Mods
                 if ($result === 1) {
                     $fieldValue = '<![CDATA[' . $fieldValue . ']]>';
                 }
-                
+
                 // @ToDo - determine appropriate metadata filters
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
