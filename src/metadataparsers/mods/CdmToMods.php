@@ -120,6 +120,7 @@ class CdmToMods extends Mods
         foreach ($collectionMappingArray as $key => $valueArray) {
             $CONTENTdmField = $valueArray[0];
             $fieldValue = $CONTENTdmFieldValuesArray[$CONTENTdmField];
+            $fieldValue = htmlspecialchars($fieldValue, ENT_NOQUOTES|ENT_XML1);
             $xmlSnippet = $valueArray[4];
 
             if (is_array($fieldValue) && empty($fieldValue)) {
