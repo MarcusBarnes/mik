@@ -18,7 +18,22 @@ class FilterModsTopic extends MetadataManipulator
     {
         //$this->settings = $settings;
     }
-    
+
+    /**
+     * General manipulate wrapper method.
+     *
+     * @param string $xmlsnippet
+     *     XML snippett to be manipulated.
+     *
+     * @return string
+     *     Manipulated XML snippet
+     */
+    public function manipulate($xmlsnippet){
+        $output = $this->breakTopicMetadaOnSemiColon($xmlsnippet);
+
+        return $output;
+    }
+
     public function breakTopicMetadaOnSemiColon($xmlsnippet)
     {
         

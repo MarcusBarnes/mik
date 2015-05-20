@@ -29,6 +29,12 @@ class CdmToMods extends Mods
     
     
     public $metadatafilter;
+    
+    /**
+     * @var array $metadatamanipulators - array of metadatamanimpulors from config.
+     */
+    public $metadatamanipulators;
+    
     /**
      * @var array $objectInfo - objects info from CONTENTdm.
      * @ToDo - De-couple ModsMetadata creation from CONTENTdm?
@@ -51,7 +57,7 @@ class CdmToMods extends Mods
         $mappingCSVpath = $this->mappingCSVpath;
         $this->collectionMappingArray =
             $this->getCDMtoModsMappingArray($mappingCSVpath);
-            
+        $this->metadatamanipulators = $this->settings['MANIPULATORS']['metadatamanipulators'];
         $this->metadatafilter = new \mik\metadatamanipulators\FilterModsTopic();
     }
 
@@ -143,7 +149,8 @@ class CdmToMods extends Mods
             if ($key == "Subject" & !empty($xmlSnippet) & !is_array($fieldValue)) {
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
-                $xmlSnippet = $this->metadatafilter->breakTopicMetadaOnSemiColon($xmlSnippet);
+                $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet);
+                //$xmlSnippet = $this->metadatafilter->breakTopicMetadaOnSemiColon($xmlSnippet);
                 $modsOpeningTag .= $xmlSnippet;
 
             } elseif (!empty($xmlSnippet) & !is_array($fieldValue)) {
@@ -186,6 +193,24 @@ class CdmToMods extends Mods
         return $modsxml;
     }
 
+    /**
+     * Applies metadatamanipulators listed in the config to provided XML snippet.
+     * @param string $xmlSnippet 
+     *     An XML snippet that can be turned into a valid XML document.
+     * @return string
+     *     XML snippet as string that whose nodes have been manipulated if applicable.
+     */
+    private function applyMetadatamanipulators($xmlSnippet)
+    {
+        foreach ($this->metadatamanipulators as $metadatamanipulator) {
+            $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulator;
+            $metadatamanipulator = new $metdataManipulatorClass($xmlSnippet);
+            $xmlSnippet = $metadatamanipulator->manipulate($xmlSnippet);
+        }
+
+        return $xmlSnippet;
+    }
+    
     /**
      * Gets the item's info from CONTENTdm. $alias needs to include the leading '/'.
      */
