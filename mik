@@ -53,24 +53,24 @@ $fileGetter = new $fileGetterClass($settings);
 // Create and Export Islandora ingest packages
 foreach ($fetcher->getRecords($limit)->records as $record) {
 
-      $record_id = $record->pointer;
+      $record_key = $record->key;
 
       // Parse metadata
       $metadtaClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
       $parser = new $metadtaClass($settings);
-      echo $parser->echoPhrase("The $metadtaClass class been loaded for CONTENTdm record $record_id.\n");
+      echo $parser->echoPhrase("The $metadtaClass class been loaded for CONTENTdm record $record_key.\n");
 
       // When finished, the parser will return an XML file or DOM object that
       // can be passed on to the metadata manipulater.
-      // echo $parser->echoPhrase("The $fetcherClass class has returned record $record_id.\n");
-      $metadata = $parser->metadata($record_id) . "\n";
-      echo "The metatdata file for record $record_id has been created.\n";
+      // echo $parser->echoPhrase("The $fetcherClass class has returned record $record_key.\n");
+      $metadata = $parser->metadata($record_key) . "\n";
+      echo "The metatdata file for record $record_key has been created.\n";
 
       // Manipulate metadata
       // When finished, the manipulater will return an XML file or DOM object that can be passed on to writer.
       // Classes are loaded in metadata parsers.
 
-      $child_pointers = $fileGetter->getChildrenPointers($record_id);
+      $child_pointers = $fileGetter->getChildrenPointers($record_key);
 
       // Manipulate files
       // When finished, the file manipulater will...

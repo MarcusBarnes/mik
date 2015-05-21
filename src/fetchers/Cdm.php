@@ -11,6 +11,13 @@ class Cdm extends Fetcher
     public $settings;
 
     /**
+     * @var string $key - record identifier, id, key
+     * For CONTENTdm, this is the pointer CONTENTdm property.
+     * For csv input, this may be the row number.
+     */
+    public $key;
+
+    /**
      *
      */
     protected $chunk_size = 100;
@@ -60,6 +67,7 @@ class Cdm extends Fetcher
     public function __construct($settings)
     {
         $this->settings = $settings['FETCHER'];
+        $this->key = $this->settings['record_key'];
     }
 
     /**
@@ -89,12 +97,39 @@ class Cdm extends Fetcher
 
         // Query CONTENTdm and return records; if failure, log problem.
         if ($json = file_get_contents($query, false, null)) {
-            return json_decode($json);
+            $output = json_decode($json);
+            $output = $this->addKeyPropertyForRecords($output);
+            return $output;
         } else {
             $message = date('c') . "\t". 'Query failed:' . "\t" . $query . "\n";
             // @todo: Log failure.
             return false;
         }
+    }
+    
+    /**
+     * Adds key property to record properties.
+     * In the case of CONTENTdm, this will be the value of the pointer property.
+     * @param $propertiesOfRecordsArray array
+     * @return array
+     */
+    private function addKeyPropertyForRecords($propertiesOfRecordsObj)
+    {
+
+        $arrayOfRecordObjects = array();
+
+        foreach ($propertiesOfRecordsObj->records as $recordProperties) {
+
+            if (isset($recordProperties->pointer)) {
+                $record_key = $this->key;
+                $recordProperties->key = $recordProperties->$record_key;
+            }
+            $arrayOfRecordObjects[] = $recordProperties;
+        }
+
+        $propertiesOfRecordsObj->records = $arrayOfRecordObjects;
+
+        return $propertiesOfRecordsObj;
     }
 
     /**
