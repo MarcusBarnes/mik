@@ -54,7 +54,7 @@ class CdmNewspapers extends Writer
     /**
      * Write folders and files.
      */
-    public function writePackages($metadata, $pages)
+    public function writePackages($metadata, $pages, $record_key)
     {
         // Create root output folder
         $this->createOutputDirectory();
