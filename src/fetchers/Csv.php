@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\fetchers;
+use League\Csv\Reader;
 
 class Csv extends Fetcher
 {
@@ -16,6 +17,7 @@ class Csv extends Fetcher
     public function __construct($settings)
     {
         $this->settings = $settings['FETCHER'];
+        $this->input_file = $this->settings['input_file'];
     }
 
     /**
@@ -25,14 +27,17 @@ class Csv extends Fetcher
     */
     public function getRecords()
     {
-        $data = array();
-        $file = $this->settings['input_file'];
-        ini_set('auto_detect_line_endings', TRUE);
-        $handle = fopen($file, 'r');
-        while (($row = fgetcsv($handle)) !== FALSE) {
-            $data[] = $row;
-        }
-        ini_set('auto_detect_line_endings', FALSE);
-        return $data;
+        $inputData = Reader::createFromPath($this->input_file);
+        $data = $inputData
+            ->addFilter(function ($row, $index) {
+                    return $index > 0; // Skip header row.
+            })
+            ->setLimit()
+            ->fetchAssoc();
+
+        $csv = new \stdClass;
+        $csv->records = $data;
+
+        return $csv;
     }
 }
