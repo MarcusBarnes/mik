@@ -2,6 +2,8 @@
 // src/metadataparsers/mods/CdmToMods.php
 
 namespace mik\metadataparsers\mods;
+//use \Monolog\Logger;
+//use \Monolog\Handler\StreamHandler;
 
 class CdmToMods extends Mods
 {
@@ -123,13 +125,18 @@ class CdmToMods extends Mods
         $modsOpeningTag .= 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
         $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
         $devTempArray = array();
+        $this->log->addWarning('Test Warning');
+
+        
         foreach ($collectionMappingArray as $key => $valueArray) {
             $CONTENTdmField = $valueArray[0];
-
             if (isset($CONTENTdmFieldValuesArray[$CONTENTdmField])) {
                 $fieldValue = $CONTENTdmFieldValuesArray[$CONTENTdmField];
             } else {
                 // log mismatch between mapping file and source fields (e.g., CDM)
+                $logMessage = "Mappings file contains a row $CONTENTdmField that ";
+                $logMessage .= "is not in CONTENTdm source collection.";
+                $this->log->addWarning('$logMessage');
                 continue;
             }
 
