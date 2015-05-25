@@ -125,9 +125,7 @@ class CdmToMods extends Mods
         $modsOpeningTag .= 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
         $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
         $devTempArray = array();
-        $this->log->addWarning('Test Warning');
 
-        
         foreach ($collectionMappingArray as $key => $valueArray) {
             $CONTENTdmField = $valueArray[0];
             if (isset($CONTENTdmFieldValuesArray[$CONTENTdmField])) {
