@@ -2,7 +2,7 @@
 
 namespace mik\fetchers;
 
-class Fetcher
+abstract class Fetcher
 {
     /**
      * @var array $settings - configuration settings from confugration class.
@@ -17,6 +17,15 @@ class Fetcher
     {
         // $this->settings = $settings['FETCHER'];
     }
+    
+    /**
+     * Returns the number of records under consideration.
+     *    For CONTENTdm, this will be the number of records in a collection.
+     *    For CSV, this will be the number of rows of data with a unique index.
+     * @return total number of records
+     * Note that extending classes must define this method.
+     */
+    abstract public function queryTotalRec();
 
     /**
     * A test method.
