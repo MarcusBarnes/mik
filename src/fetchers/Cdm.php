@@ -154,7 +154,7 @@ class Cdm extends Fetcher
 
     }
     
-        /**
+    /**
      * Gets the item's info from CONTENTdm. $alias needs to include the leading '/'.
      */
     public function getItemInfo($pointer)

@@ -17,15 +17,28 @@ abstract class Fetcher
     {
         // $this->settings = $settings['FETCHER'];
     }
-    
+
     /**
      * Returns the number of records under consideration.
      *    For CONTENTdm, this will be the number of records in a collection.
      *    For CSV, this will be the number of rows of data with a unique index.
+     *
      * @return total number of records
+     *
      * Note that extending classes must define this method.
      */
     abstract public function queryTotalRec();
+    
+    /**
+     * Returns a hashed array or object containing a record's information.
+     *
+     * @param $record_key the unique record_key
+     *      For CONTENTdm, this will be the item pointer
+     *      For CSV, this will the the unique id assisgned to a row of data.
+     *
+     * @return array or object of record info.
+     */
+    abstract public function getItemInfo($record_key);
 
     /**
     * A test method.
