@@ -89,7 +89,7 @@ class CdmNewspapers extends FileGetter
      * Gets a compound item's children pointers. $alias needs to include the leading '/'.
      * @ToDo - clerify whether this method should be part of filegetters or fetchers.
      */
-    public function getChildrenPointers($pointer)
+    public function getChildren($pointer)
     {
         $alias = $this->settings['alias'];
         $ws_url = $this->settings['ws_url'];

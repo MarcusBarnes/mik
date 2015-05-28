@@ -70,7 +70,7 @@ foreach ($fetcher->getRecords($limit)->records as $record) {
       // When finished, the manipulater will return an XML file or DOM object that can be passed on to writer.
       // Classes are loaded in metadata parsers.
 
-      $child_pointers = $fileGetter->getChildrenPointers($record_key);
+      $child_pointers = $fileGetter->getChildren($record_key);
 
       // Manipulate files
       // When finished, the file manipulater will...

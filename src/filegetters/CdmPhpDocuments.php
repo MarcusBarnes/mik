@@ -45,7 +45,7 @@ class CdmPhpDocuments extends FileGetter
     /**
      * Placeholder method needed because it's called in the main loop in mik.
      */
-    public function getChildrenPointers($pointer)
+    public function getChildren($pointer)
     {
         return array();
     }
