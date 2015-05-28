@@ -1,14 +1,24 @@
 <?php
 
 namespace mik\fetchers;
-
+/**
+ * Fetcher (abstract):
+ *    Browse, read, and gather information about records 
+ *    that comprise a given collection.
+ *
+ *    Extend this abstract class with for specific implemenations.
+ *    For example, see fetchers/Cdm.php and fecthers/Csv.php.
+ *
+ *    Note that methods marked as abstract must be defined in 
+ *    the extending class.
+ */
 abstract class Fetcher
 {
     /**
      * @var array $settings - configuration settings from confugration class.
      */
     public $settings;
-      
+
     /**
      * Create a new Fetcher Instance
      * @param array $settings configuration settings.
@@ -28,17 +38,17 @@ abstract class Fetcher
      * Note that extending classes must define this method.
      */
     abstract public function queryTotalRec();
-    
+
     /**
      * Returns a hashed array or object containing a record's information.
      *
-     * @param $record_key the unique record_key
+     * @param string $recordKey the unique record_key
      *      For CONTENTdm, this will be the item pointer
      *      For CSV, this will the the unique id assisgned to a row of data.
      *
      * @return array or object of record info.
      */
-    abstract public function getItemInfo($record_key);
+    abstract public function getItemInfo($recordKey);
 
     /**
     * A test method.
