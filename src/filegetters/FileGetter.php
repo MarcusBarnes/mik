@@ -2,7 +2,17 @@
 
 namespace mik\filegetters;
 
-class FileGetter
+/**
+ * FileGetter (abstract):
+ *    Methods related to getting actual file contents.
+ *
+ *    Extend this abstract class with for specific implemenations.
+ *    For example, see filegetters/CdmNewspapers.php.
+ *
+ *    Note that methods marked as abstract must be defined in 
+ *    the extending class.
+ */
+abstract class FileGetter
 {
     /**
      * @var array $settings - configuration settings from confugration class.
@@ -16,18 +26,6 @@ class FileGetter
     public function __construct($settings)
     {
         $this->settings = $settings['FILE_GETTER'];
-    }
-    
-    /**
-    * Friendly welcome
-    *
-    * @param string $phrase Phrase to return
-    *
-    * @return string Returns the phrase passed in
-    */
-    public function echoPhrase($phrase)
-    {
-        return $phrase;
     }
 
     /**
