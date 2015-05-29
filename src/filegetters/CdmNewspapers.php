@@ -64,18 +64,6 @@ class CdmNewspapers extends FileGetter
     }
 
     /**
-    * Friendly welcome
-    *
-    * @param string $phrase Phrase to return
-    *
-    * @return string Returns the phrase passed in
-    */
-    public function echoPhrase($phrase)
-    {
-        return $phrase . " (from the CdmNewspapers filegetter)\n";
-    }
-
-    /**
     * Return an array of records.
     *
     * @return array The records.
