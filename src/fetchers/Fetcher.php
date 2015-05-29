@@ -10,7 +10,11 @@ namespace mik\fetchers;
  *    For example, see fetchers/Cdm.php and fecthers/Csv.php.
  *
  *    Note that methods marked as abstract must be defined in 
- *    the extending class.
+ *    the extending class.   
+ *
+ *    Abstract methods:
+ *        - queryTotalRec
+ *        - getItemInfo
  */
 abstract class Fetcher
 {
