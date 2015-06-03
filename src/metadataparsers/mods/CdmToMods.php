@@ -2,8 +2,6 @@
 // src/metadataparsers/mods/CdmToMods.php
 
 namespace mik\metadataparsers\mods;
-//use \Monolog\Logger;
-//use \Monolog\Handler\StreamHandler;
 
 class CdmToMods extends Mods
 {
@@ -28,15 +26,12 @@ class CdmToMods extends Mods
      * @var string $alias - CONTENTdm collection alias
      */
     public $alias;
-    
-    
-    public $metadatafilter;
-    
+
     /**
      * @var array $metadatamanipulators - array of metadatamanimpulors from config.
      */
     public $metadatamanipulators;
-    
+
     /**
      * @var array $objectInfo - objects info from CONTENTdm.
      * @ToDo - De-couple ModsMetadata creation from CONTENTdm?
@@ -59,8 +54,11 @@ class CdmToMods extends Mods
         $mappingCSVpath = $this->mappingCSVpath;
         $this->collectionMappingArray =
             $this->getCDMtoModsMappingArray($mappingCSVpath);
-        $this->metadatamanipulators = $this->settings['MANIPULATORS']['metadatamanipulators'];
-        $this->metadatafilter = new \mik\metadatamanipulators\FilterModsTopic();
+        if (isset($this->settings['MANIPULATORS']['metadatamanipulators'])) {
+            $this->metadatamanipulators = $this->settings['MANIPULATORS']['metadatamanipulators'];
+        } else {
+            $this->metadatamanipulators = null;
+        }
     }
 
     private function getCDMtoModsMappingArray($mappingCSVpath)
@@ -154,8 +152,10 @@ class CdmToMods extends Mods
             if ($key == "Subject" & !empty($xmlSnippet) & !is_array($fieldValue)) {
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
-                $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet);
-                //$xmlSnippet = $this->metadatafilter->breakTopicMetadaOnSemiColon($xmlSnippet);
+                if (isset($this->metadatamanipulators)) {
+                    $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet);
+                }
+
                 $modsOpeningTag .= $xmlSnippet;
 
             } elseif (!empty($xmlSnippet) & !is_array($fieldValue)) {
