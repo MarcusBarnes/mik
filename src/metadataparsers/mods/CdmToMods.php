@@ -20,8 +20,7 @@ class CdmToMods extends Mods
      *  @var string $mappingCSVpath path to CONTENTdm to MODS XML CSV file.
      */
     public $mappingCSVpath;
-    
-    
+
     /**
      * @var string $alias - CONTENTdm collection alias
      */
@@ -67,12 +66,10 @@ class CdmToMods extends Mods
         // that contains the CONTENTdm to MODS XML mapping.
         // field_names assumes that the csv file has certain fields.
         $fieldNamesArray = array(
-          0 => "CONTENTdm_field",
-          1 => "content_type",
-          2 => "DCTERMS_mapping",
-          3 => "language",
-          4 => "MODS_mapping",
-          5 => "mapping_notes"
+          'source_field_label' => "CONTENTdm_field",
+          'language_of_field' => "language",
+          'target_element' => "MODS_mapping",
+          'note' => "mapping_notes"
         );
 
         $numOfFields = count($fieldNamesArray);
@@ -148,7 +145,7 @@ class CdmToMods extends Mods
             // metadata creation may break.
             $fieldValue = htmlspecialchars($fieldValue, ENT_NOQUOTES|ENT_XML1);
 
-            $xmlSnippet = $valueArray[4];
+            $xmlSnippet = $valueArray[2];
             if ($key == "Subject" & !empty($xmlSnippet) & !is_array($fieldValue)) {
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
@@ -189,12 +186,12 @@ class CdmToMods extends Mods
         }
 
         $modsString = $modsOpeningTag . '</mods>';
-        
+
         $doc = new \DomDocument('1.0');
         $doc->loadXML($modsString);
         $doc->formatOutput = true;
         $modsxml = $doc->saveXML();
-        
+
         return $modsxml;
     }
 
