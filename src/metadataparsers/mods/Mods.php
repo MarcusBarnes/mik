@@ -52,22 +52,6 @@ class Mods extends MetadataParser
         return $collectionMappingArray;
     }
 
-    /**
-     *  @param $objectInfo CONTENTdm get_item_info
-     */
-    private function createCONTENTdmFieldValuesArray($objectInfo)
-    {
-        // Create array with field values of proper name as $keys rather than 'nick' keys
-        $CONTENTdmFieldValuesArray = array();
-        foreach ($objectInfo as $key => $value) {
-            // $key is the 'nick'
-            $fieldAttributes = get_field_attribute($key);
-            $name = $fieldAttributes['name'];
-            $CONTENTdmFieldValuesArray[$name] = $value;
-        }
-        return $CONTENTdmFieldValuesArray;
-    }
-
     public function createModsXML($collectionMappingArray, $CONTENTdmFieldValuesArray, $pointer)
     {
         $modsString = '';
