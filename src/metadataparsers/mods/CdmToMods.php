@@ -60,19 +60,9 @@ class CdmToMods extends Mods
         }
     }
 
-    private function getMappingsArray($mappingCSVpath)
+    private function getMappingsArray($mappingCSVpath, $numOfFields = 4)
     {
-        // @ToDo Properly document an appropriate fields for the CSV file
-        // that contains the CONTENTdm to MODS XML mapping.
-        // field_names assumes that the csv file has certain fields.
-        $fieldNamesArray = array(
-          'source_field_label' => "CONTENTdm_field",
-          'language_of_field' => "language",
-          'target_element' => "MODS_mapping",
-          'note' => "mapping_notes"
-        );
 
-        $numOfFields = count($fieldNamesArray);
         $filename = $mappingCSVpath;
 
         $fp = fopen($filename, 'r') or die("Unable to open file.");
