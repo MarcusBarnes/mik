@@ -27,7 +27,7 @@ class Mods extends MetadataParser
      * @var array $objectInfo - objects info from CONTENTdm.
      * @ToDo - De-couple ModsMetadata creation from CONTENTdm?
      */
-    public $objectInfo;
+    //public $objectInfo;
 
     /**
      * Create a new Metadata Instance
@@ -52,7 +52,7 @@ class Mods extends MetadataParser
         return $collectionMappingArray;
     }
 
-    public function createModsXML($collectionMappingArray, $CONTENTdmFieldValuesArray, $pointer)
+    public function createModsXML($collectionMappingArray, $sourceFieldValuesArray, $record_key)
     {
         $modsString = '';
 
@@ -62,8 +62,8 @@ class Mods extends MetadataParser
         $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
         $devTempArray = array();
         foreach ($collectionMappingArray as $key => $valueArray) {
-            $CONTENTdmField = $valueArray[0];
-            $fieldValue = $CONTENTdmFieldValuesArray[$CONTENTdmField];
+            $sourceFieldKey = $valueArray[0];
+            $fieldValue = $sourceFieldValuesArray[$sourcefieldKey];
             $xmlSnippet = $valueArray[4];
 
             if (is_array($fieldValue) && empty($fieldValue)) {
@@ -76,9 +76,6 @@ class Mods extends MetadataParser
 
             if (!empty($xmlSnippet) & !is_array($fieldValue)) {
 
-                // @ToDo - Determine appropriate metadatamanipulators on the fly
-                // based on configuration?
-
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
 
@@ -86,15 +83,6 @@ class Mods extends MetadataParser
             } else {
                 // Determine if we need to store the CONTENTdm_field as an identifier.
             }
-        }
-
-        $includeMigratedFromUri = $this->includeMigratedFromUri;
-        if ($includeMigratedFromUri === true) {
-            $CONTENTdmItemUrl = '<identifier type="uri" invalid="yes" ';
-            $CONTENTdmItemUrl .= 'displayLabel="Migrated From">';
-            $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection';
-            $CONTENTdmItemUrl .= $collectionAlias. '/id/'. $itemId .'</identifier>';
-            $modsOpeningTag .= $CONTENTdmItemUrl;
         }
 
         $modsString = $modsOpeningTag . '</mods>';
