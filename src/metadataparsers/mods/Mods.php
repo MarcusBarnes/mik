@@ -8,43 +8,23 @@ use mik\metadataparsers\MetadataParser;
 class Mods extends MetadataParser
 {
     /**
-     * @var array $collectionMappingArray - array containing CONTENTdm
+     * @var array $collectionMappingArray - array containing the source
      * to MODS XML mapping.
      */
     public $collectionMappingArray;
 
     /**
-     * @var bool $include_migrated_from_uri
-     */
-    public $includeMigratedFromUri;
-
-    /**
-     *  @var string $mappingCSVpath path to CONTENTdm to MODS XML CSV file.
+     *  @var string $mappingCSVpath path to the source to MODS XML CSV file.
      */
     public $mappingCSVpath;
-    
-    /**
-     * @var array $objectInfo - objects info from CONTENTdm.
-     * @ToDo - De-couple ModsMetadata creation from CONTENTdm?
-     */
-    //public $objectInfo;
 
     /**
      * Create a new Metadata Instance
-     * @param path to CSV file containing the Cdm to Mods mapping info.
      */
     public function __construct($settings /*, $objectInfo*/)
     {
         // Call Metadata.php contructor
         parent::__construct($settings);
-        //print_r($this->settings);
-        //$this->includeMigratedFromUri = $this->settings['METADATA_PARSER']['include_migrated_from_uri'];
-        //$this->mappingCSVpath = $this->settings['METADATA_PARSER']['mapping_csv_path'];
-        //$mappingCSVpath = $this->mappingCSVpath;
-        // $this->collectionMappingArray =
-           // $this->getCDMtoModsMappingArray($mappingCSVpath);
-        //$this->objectInfo = $objectInfo;
-
     }
 
     private function getMappingsArray($mappingCSVpath)
@@ -64,11 +44,9 @@ class Mods extends MetadataParser
         foreach ($collectionMappingArray as $key => $valueArray) {
             $sourceFieldKey = $valueArray[0];
             $fieldValue = $sourceFieldValuesArray[$sourcefieldKey];
-            $xmlSnippet = $valueArray[4];
+            $xmlSnippet = $valueArray[3];
 
             if (is_array($fieldValue) && empty($fieldValue)) {
-                // The JSON returned was like "key": {}.
-                // This appears in the object_info array as "key"=>array().
                 // This corresponds to having no value.
                 // Set field value to the empty string for use in preg_replace
                 $fieldValue = '';
@@ -81,7 +59,7 @@ class Mods extends MetadataParser
 
                 $modsOpeningTag .= $xmlSnippet;
             } else {
-                // Determine if we need to store the CONTENTdm_field as an identifier.
+                // 
             }
         }
 
