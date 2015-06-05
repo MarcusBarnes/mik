@@ -47,37 +47,8 @@ class Mods extends MetadataParser
 
     }
 
-    private function getCDMtoModsMappingArray($mappingCSVpath)
+    private function getMappingsArray($mappingCSVpath)
     {
-        // @ToDo Properly document an appropriate fields for the CSV file
-        // that contains the CONTENTdm to MODS XML mapping.
-        // field_names assumes that the csv file has certain fields.
-        $fieldNamesArray = array(
-          0 => "CONTENTdm_field",
-          1 => "content_type",
-          2 => "DCTERMS_mapping",
-          3 => "language",
-          4 => "MODS_mapping",
-          5 => "mapping_notes"
-        );
-
-        $numOfFields = count($fieldNamesArray);
-        $filename = $mappingCSVpath;
-        
-        $fp = fopen($filename, 'r') or die("Unable to open file.");
-        $collectionMappingArray = array();
-        while ($csvLine = fgetcsv($fp)) {
-            $tempArray = array();
-            for ($i = 0; $i < $numOfFields; $i++) {
-                 $tempArray[] = $csvLine[$i];
-            }
-            // Use CONTENTdm_field as Key
-            $collectionMappingArray[$tempArray[0]] = $tempArray;
-        }
-
-        fclose($fp) or die("Unable to close file.");
-
-
         return $collectionMappingArray;
     }
 

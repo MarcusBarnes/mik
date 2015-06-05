@@ -52,7 +52,7 @@ class CdmToMods extends Mods
         $this->alias = $this->settings['METADATA_PARSER']['alias'];
         $mappingCSVpath = $this->mappingCSVpath;
         $this->collectionMappingArray =
-            $this->getCDMtoModsMappingArray($mappingCSVpath);
+            $this->getMappingsArray($mappingCSVpath);
         if (isset($this->settings['MANIPULATORS']['metadatamanipulators'])) {
             $this->metadatamanipulators = $this->settings['MANIPULATORS']['metadatamanipulators'];
         } else {
@@ -60,7 +60,7 @@ class CdmToMods extends Mods
         }
     }
 
-    private function getCDMtoModsMappingArray($mappingCSVpath)
+    private function getMappingsArray($mappingCSVpath)
     {
         // @ToDo Properly document an appropriate fields for the CSV file
         // that contains the CONTENTdm to MODS XML mapping.
