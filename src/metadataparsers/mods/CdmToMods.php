@@ -45,7 +45,7 @@ class CdmToMods extends Mods
     {
 
         parent::__construct($settings);
-        //print_r($this->settings);
+
         $this->includeMigratedFromUri = $this->settings['METADATA_PARSER']['include_migrated_from_uri'];
         $this->mappingCSVpath = $this->settings['METADATA_PARSER']['mapping_csv_path'];
         $this->wsUrl = $this->settings['METADATA_PARSER']['ws_url'];
@@ -91,9 +91,6 @@ class CdmToMods extends Mods
         foreach ($objectInfo as $key => $value) {
             // $key is the 'nick'
             $fieldAttributes = $this->getFieldAttribute($key);
-            //echo $key;
-            //print_r($fieldAttributes);
-            //echo "\n";
             $name = $fieldAttributes['name'];
             $CONTENTdmFieldValuesArray[$name] = $value;
         }
@@ -109,7 +106,6 @@ class CdmToMods extends Mods
         $modsOpeningTag .= 'xmlns:mods="http://www.loc.gov/mods/v3" ';
         $modsOpeningTag .= 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
         $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
-        $devTempArray = array();
 
         foreach ($collectionMappingArray as $key => $valueArray) {
             $CONTENTdmField = $valueArray[0];
