@@ -40,10 +40,10 @@ class Mods extends MetadataParser
         $modsOpeningTag .= 'xmlns:mods="http://www.loc.gov/mods/v3" ';
         $modsOpeningTag .= 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
         $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
-        $devTempArray = array();
+
         foreach ($collectionMappingArray as $key => $valueArray) {
             $sourceFieldKey = $valueArray[0];
-            $fieldValue = $sourceFieldValuesArray[$sourcefieldKey];
+            $fieldValue = $sourceFieldValuesArray[$sourceFieldKey];
             $xmlSnippet = $valueArray[3];
 
             if (is_array($fieldValue) && empty($fieldValue)) {
