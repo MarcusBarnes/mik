@@ -60,7 +60,7 @@ class CdmToMods extends Mods
         }
     }
 
-    private function getMappingsArray($mappingCSVpath, $numOfFields = 4)
+    private function getMappingsArray($mappingCSVpath, $numOfFields = 3)
     {
 
         $filename = $mappingCSVpath;
@@ -131,7 +131,7 @@ class CdmToMods extends Mods
             // metadata creation may break.
             $fieldValue = htmlspecialchars($fieldValue, ENT_NOQUOTES|ENT_XML1);
 
-            $xmlSnippet = $valueArray[2];
+            $xmlSnippet = $valueArray[1];
             if ($key == "Subject" & !empty($xmlSnippet) & !is_array($fieldValue)) {
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
