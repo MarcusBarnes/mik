@@ -3,6 +3,8 @@
 
 namespace mik\metadataparsers\mods;
 
+use League\Csv\Reader;
+
 class CdmToMods extends Mods
 {
     /**
@@ -65,18 +67,12 @@ class CdmToMods extends Mods
 
         $filename = $mappingCSVpath;
 
-        $fp = fopen($filename, 'r') or die("Unable to open file.");
+        $reader = Reader::createFromPath($filename);
         $collectionMappingArray = array();
-        while ($csvLine = fgetcsv($fp)) {
-            $tempArray = array();
-            for ($i = 0; $i < $numOfFields; $i++) {
-                 $tempArray[] = $csvLine[$i];
-            }
-            // Use CONTENTdm_field as Key
-            $collectionMappingArray[$tempArray[0]] = $tempArray;
-        }
+        foreach ($reader as $index => $row) {
+            $collectionMappingArray[$row[0]] = $row;
 
-        fclose($fp) or die("Unable to close file.");
+        }
 
         return $collectionMappingArray;
     }
