@@ -2,7 +2,7 @@
 
 namespace mik\writers;
 
-class Writer
+abstract class Writer
 {
     /**
      * @var array $settings - configuration settings from confugration class.
