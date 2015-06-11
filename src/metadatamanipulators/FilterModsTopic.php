@@ -28,13 +28,14 @@ class FilterModsTopic extends MetadataManipulator
      * @return string
      *     Manipulated XML snippet
      */
-    public function manipulate($xmlsnippet){
-        $output = $this->breakTopicMetadaOnSemiColon($xmlsnippet);
+    public function manipulate($xmlsnippet)
+    {
+        $output = $this->breakTopicMetadaOnCharacter($xmlsnippet);
 
         return $output;
     }
 
-    public function breakTopicMetadaOnSemiColon($xmlsnippet)
+    public function breakTopicMetadaOnCharacter($xmlsnippet, $breakOnCharacter = ';')
     {
         
         // break topic metadata on ; into seperate topic elements.
@@ -44,7 +45,7 @@ class FilterModsTopic extends MetadataManipulator
         $topicNode = $xml->getElementsByTagName('topic')->item(0);
         $topictext = $topicNode->nodeValue;
 
-        $topics = explode(';', $topictext);
+        $topics = explode($breakOnCharacter, $topictext);
 
         // remove old topic node.
         $topicNodeParent = $topicNode->parentNode;
@@ -66,17 +67,5 @@ class FilterModsTopic extends MetadataManipulator
 
         return $xmlstring;
 
-    }
-
-    /**
-    * Friendly welcome
-    *
-    * @param string $phrase Phrase to return
-    *
-    * @return string Returns the phrase passed in
-    */
-    public function echoPhrase($phrase)
-    {
-        return $phrase;
     }
 }
