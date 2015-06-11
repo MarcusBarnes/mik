@@ -35,12 +35,12 @@ abstract class MetadataManipulator
     /**
      * General manipulate wrapper method.
      *
-     * @param string $xmlsnippet XML snippet to be manipulated.
+     * @param string $input A string, typically an XML snippet to be manipulated.
      *
      * @return string
-     *     Manipulated XML snippet
+     *     Manipulated string
      */
-    abstract public function manipulate($xmlsnippet);
+    abstract public function manipulate($input);
 
     /**
     * Friendly welcome
