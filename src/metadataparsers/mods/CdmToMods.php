@@ -32,12 +32,12 @@ class CdmToMods extends Mods
      * @var array $metadatamanipulators - array of metadatamanimpulors from config.
      */
     public $metadatamanipulators;
-
+    
     /**
-     * @var array $objectInfo - objects info from CONTENTdm.
-     * @ToDo - De-couple ModsMetadata creation from CONTENTdm?
+     * @var array $repeatableWrapperElements - array of wrapper elements 
+     *that can be repeated (not consolidated) set in the config.
      */
-    //public $objectInfo;
+    public $repeatableWrapperElements;
 
     /**
      * Create a new Metadata Instance
@@ -52,6 +52,11 @@ class CdmToMods extends Mods
         $this->mappingCSVpath = $this->settings['METADATA_PARSER']['mapping_csv_path'];
         $this->wsUrl = $this->settings['METADATA_PARSER']['ws_url'];
         $this->alias = $this->settings['METADATA_PARSER']['alias'];
+        if (isset($this->settings['METADATA_PARSER']['repeatable_wrapper_elements'])) {
+            $this->repeatableWrapperElements = $this->settings['METADATA_PARSER']['repeatable_wrapper_elements'];
+        } else {
+            $this->repeatableWrapperElements = array();
+        }
         $mappingCSVpath = $this->mappingCSVpath;
         $this->collectionMappingArray =
             $this->getMappingsArray($mappingCSVpath);
@@ -187,14 +192,14 @@ class CdmToMods extends Mods
      *
      *  @return array of unique child node names.
      */
-    private function getChildNodesFromModsXMLString($xmlString) 
+    private function getChildNodesFromModsXMLString($xmlString)
     {
         $xml = new \DomDocument();
         $xml->loadXML($xmlString);
 
         $childNodesNamesArray = array();
         foreach ($xml->documentElement->childNodes as $node) {
-          $childNodesNamesArray[] = $node->nodeName;
+            $childNodesNamesArray[] = $node->nodeName;
         }
 
         $returnArray = array_unique($childNodesNamesArray);
@@ -213,20 +218,18 @@ class CdmToMods extends Mods
      * 
      * @return arrry of XML elemets that are wrapper elements (children of root element).
      */
-    private function determineRepeatedWrapperChildElements($xml, $uniqueChildNodeNamesArray){
+    private function determineRepeatedWrapperChildElements($xml, $uniqueChildNodeNamesArray)
+    {
         $wrapperDomNodes = array();
         // Grab the elements
         foreach ($uniqueChildNodeNamesArray as $nodeName) {
             //DOMNodeList
             $nodeListObj = $xml->getElementsByTagName($nodeName);
-            if ($nodeListObj->length >= 2) {
-                foreach($nodeListObj as $node)
-                {
-                    if ($node->hasChildNodes()) {
-                        foreach($node->childNodes as $childNode) {
-                            if($childNode->nodeType == XML_ELEMENT_NODE) {
-                                //echo $node->nodeName . " has a " . $childNode->nodeName;
-                                //echo " XML element child node.\n ";
+            if ($nodeListObj->length >= 2 && !in_array($nodeName, $this->repeatableWrapperElements)) {
+                foreach ($nodeListObj as $node) {
+                    if ($node->hasChildNodes() && !$node->hasAttributes()) {
+                        foreach ($node->childNodes as $childNode) {
+                            if ($childNode->nodeType == XML_ELEMENT_NODE) {
                                 $wrapperDomNodes[] = $node;
                             }
                         }
@@ -247,18 +250,18 @@ class CdmToMods extends Mods
      *
      * @return array An array of consolidated wrapper elements of type XML_ELEMENT_NODE 
      */
-    private function consolidateWrapperElements($wrapperElementArray) 
+    private function consolidateWrapperElements($wrapperElementArray)
     {
         $consolidatedWrapperElementsArray = array();
         $elementNameTrackingArray = array();
-        foreach($wrapperElementArray as $wrapperElement){
+        foreach ($wrapperElementArray as $wrapperElement) {
             if ($wrapperElement->hasAttributes()) {
-                // if the wrapper element has attributes, we will 
+                // if the wrapper element has attributes, we will
                 // not consolidate and repeat it.
                 $consolidatedWrapperElementsArray[] = $wrapperElement;
             } else {
                 $elementName = $wrapperElement->nodeName;
-                if(array_key_exists($elementName, $elementNameTrackingArray)) {
+                if (array_key_exists($elementName, $elementNameTrackingArray)) {
                     // $elementName is already in the tracking array
                     // push the element's childnodes to the end of the array.
                     array_push($elementNameTrackingArray[$elementName], $wrapperElement->childNodes);
@@ -268,7 +271,7 @@ class CdmToMods extends Mods
                 }
             }
         }
-        
+
         return $elementNameTrackingArray;
     }
 
@@ -284,8 +287,9 @@ class CdmToMods extends Mods
      *     and which can be validated successfully against an XML schema
      *     such as MODS.
      */
-    private function oneParentWrapperElement($xmlString) {
-         
+    private function oneParentWrapperElement($xmlString)
+    {
+
         $xml = new \DomDocument();
         $xml->loadXML($xmlString);
 
@@ -294,10 +298,10 @@ class CdmToMods extends Mods
 
         // Determine which child elements of MODS root element are wrapper elements:
         //  1) They have child elements of type XML_ELEMENT_NODE (Value: 1)
-        $wrapperElementArray = 
+        $wrapperElementArray =
           $this->determineRepeatedWrapperChildElements($xml, $uniqueChildNodeNamesArray);
-        
-        // @ToDo: Verify that wrapper elements don't have different attributes. 
+
+        // @ToDo: Verify that wrapper elements don't have different attributes.
 
         // remove repeated wrapper nodes.
         foreach ($wrapperElementArray as $wrapperElement) {
@@ -308,16 +312,16 @@ class CdmToMods extends Mods
             $xml->saveXML($parentNode);
         }
 
-        // consolidate nodes with one wrapper 
+        // consolidate nodes with one wrapper
         $consolidatedRepeatedWrapperElements =
           $this->consolidateWrapperElements($wrapperElementArray);
 
         // Add nodes back into $xml document.
         $modsElement = $xml->getElementsByTagName('mods')->item(0);
-        foreach($consolidatedRepeatedWrapperElements as $key => $valueArray) {
+        foreach ($consolidatedRepeatedWrapperElements as $key => $valueArray) {
             //$wrapperElement = $xml->createElement($key);
             $wrapperElement = $xml->createElementNS('http://www.loc.gov/mods/v3', $key);
-            foreach($valueArray as $nodes) {
+            foreach ($valueArray as $nodes) {
                 foreach ($nodes as $node) {
                     $wrapperElement->appendChild($node);
                 }
