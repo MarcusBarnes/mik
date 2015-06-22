@@ -50,10 +50,15 @@ class CdmPhpDocuments extends Writer
 
         // Retrieve the PDF file associated with the document and write it to the
         // output folder, using the CONTENTdm pointer as the file basename.
-        $pdf_content = $this->cdmPhpDocumentsFileGetter
+        $temp_file_path = $this->cdmPhpDocumentsFileGetter
             ->getDocumentLevelPDFContent($record_id);
-        $pdf_output_file_path = $object_path . $record_id . '.pdf';
-        file_put_contents($pdf_output_file_path, $pdf_content);
+        if ($temp_file_path) {
+          $pdf_output_file_path = $object_path . $record_id . '.pdf';
+          rename($temp_file_path, $pdf_output_file_path);
+        }
+        else {
+          // @todo: Log failure.
+        }
 
         // https://github.com/Islandora/islandora_batch only allows two files per
         // object, the MODS (or DC) file and the OBJ file. Therefore, we can't
