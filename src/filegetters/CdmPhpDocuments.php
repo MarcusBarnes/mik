@@ -47,6 +47,7 @@ class CdmPhpDocuments extends FileGetter
 
     /**
      * Placeholder method needed because it's called in the main loop in mik.
+     * PDF documents don't have any children.
      */
     public function getChildren($pointer)
     {
@@ -67,6 +68,15 @@ class CdmPhpDocuments extends FileGetter
         return $item_structure;
     }
 
+    /**
+     * Retrives the PDF file from CONTENTdm.
+     *
+     * @param string $pointer
+     *  The CONTENTdm pointer of the object containing the PDF file.
+     *
+     * @return mixed
+     *  The path to the downloaded PDF, or false.
+     */
     public function getDocumentLevelPDFContent($pointer)
     {
         $document_structure = $this->getDocumentStructure($pointer);
@@ -80,11 +90,13 @@ class CdmPhpDocuments extends FileGetter
             . $this->alias . '/id/' . $pointer . '/type/compoundobject/show/1/cpdtype/document-pdf/filename/'
             . $document_structure['page'][0]['pagefile'] . '/width/0/height/0/mapsto/pdf/filesize/0/title/'
             . urlencode($document_structure['page'][0]['pagetitle']);
+        // Create a new Guzzle client to fetch the PDF as a stream,
+        // which will allow us to handle large PDF files.
         $client = new Client();
         $response = $client->get($get_file_url, ['stream' => true]);
         $body = $response->getBody();
         while (!$body->eof()) {
-          file_put_contents($temp_file_path, $body->read(1024), FILE_APPEND);
+          file_put_contents($temp_file_path, $body->read(2048), FILE_APPEND);
         }
         if (file_exists($temp_file_path)) {
           return $temp_file_path;
