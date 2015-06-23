@@ -1,3 +1,17 @@
-Calendar name,,Title,,<titleInfo><title>%value%</title></titleInfo>,
-Publisher,,Publisher,,<originInfo><publisher>%value%</publisher></originInfo>,
-Year,,Date,,<originInfo><dateIssued encoding="iso8601" keyDate="yes">%value%</dateIssued></originInfo>,Encoding is only used when it is possible to code a date in w3cdtf format (YYYY-MM-DD)
+Calendar name,<titleInfo><title>%value%</title></titleInfo>
+School name,"<name type=""corporate""><namePart>%value%</namePart></name>"
+Medium,<physicalDescription><form>%value%</form></physicalDescription>
+Work Measurements,<physicalDescription><note>%value%</note></physicalDescription>
+Publisher,<originInfo><publisher>%value%</publisher></originInfo>
+Year,<originInfo><dateIssued>%value%</dateIssued></originInfo>
+Format type,<genre>%value%</genre>
+President,"<extension><president type=""ECU custom metadata for the ecucals collection"">%value%</president></extension>"
+Board members,"<extension><board_members type=""ECU custom metadata for the ecucals collection"">%value%</board_members></extension>"
+Administrators,"<extension><administrators type=""ECU custom metadata for the ecucals collection"">%value%</administrators></extension>"
+Instructors,"<extension><instructors type=""ECU custom metadata for the ecucals collection"">%value%</instructors></extension>"
+"Staff(technicians,support staff)","<extension type=""ECU custom metadata for the ecucals collection""><staff>%value%</staff></extension>"
+Degree/Diplomas/Programs,<subject><topic>%value%</topic></subject>
+Majors/Concentration,<subject><topic>%value%</topic></subject>
+Honorary Degree Recipients,"<extension><honorary_degree_recipients type=""ECU custom metadata for the ecucals collection"">%value%</honorary_degree_recipients></extension>"
+Scholarships/Awards Recipients,"<extension><scholarship_award_recipients type=""ECU custom metadata for the ecucals collection"">%value%</scholarship_award_recipients></extension>"
+Notes,<note>%value%</note>
