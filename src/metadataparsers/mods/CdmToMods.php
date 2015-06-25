@@ -112,6 +112,9 @@ class CdmToMods extends Mods
             $CONTENTdmField = $valueArray[0];
             if (isset($CONTENTdmFieldValuesArray[$CONTENTdmField])) {
                 $fieldValue = $CONTENTdmFieldValuesArray[$CONTENTdmField];
+            } elseif (preg_match("/(null)\d+/i", $key)) {
+                // special source field name for mappings to static snippets
+                $fiedlValue = '';
             } else {
                 // log mismatch between mapping file and source fields (e.g., CDM)
                 $logMessage = "Mappings file contains a row $CONTENTdmField that ";
