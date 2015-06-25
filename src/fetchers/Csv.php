@@ -18,6 +18,7 @@ class Csv extends Fetcher
     {
         $this->settings = $settings['FETCHER'];
         $this->input_file = $this->settings['input_file'];
+        $this->record_key = $this->settings['record_key'];
     }
 
     /**
@@ -27,16 +28,25 @@ class Csv extends Fetcher
     */
     public function getRecords()
     {
-        $inputData = Reader::createFromPath($this->input_file);
-        $data = $inputData
-            ->addFilter(function ($row, $index) {
-                    return $index > 0; // Skip header row.
-            })
-            ->setLimit()
-            ->fetchAssoc();
+        // Use a static cache to avoid reading the CSV file multiple times.
+        static $csv;
+        if (!isset($csv)) {
+	    $inputData = Reader::createFromPath($this->input_file);
+	    $data = $inputData
+		->addFilter(function ($row, $index) {
+			return $index > 0; // Skip header row.
+		})
+		->setLimit()
+		->fetchAssoc();
 
-        $csv = new \stdClass;
-        $csv->records = $data;
+	    $csv = new \stdClass;
+	    $csv->records = $data;
+
+	    foreach ($csv->records as &$record) {
+	      $record = (object) $record;
+	      $record->key = $record->{$this->record_key};
+	    }
+        }
 
         return $csv;
     }
@@ -53,8 +63,8 @@ class Csv extends Fetcher
      */
     public function queryTotalRec()
     {
-        // @ToDo - implmentation specific details
-        return false;
+        $records = $this->getRecords();
+        return count($records);
     }
 
     /**
@@ -69,8 +79,8 @@ class Csv extends Fetcher
      */
     public function getItemInfo($recordKey)
     {
-        // @ToDo - implementation specific details.
-        return false;
+        // $records = $this->getRecords();
+        // var_dump($records);
     }
 
 }
