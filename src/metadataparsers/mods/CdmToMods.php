@@ -29,7 +29,9 @@ class CdmToMods extends Mods
     public $alias;
 
     /**
-     * @var array $metadatamanipulators - array of metadatamanimpulors from config.
+     * @var array $metadatamanipulators - array of metadatamanipulors from config.
+     *   array values will be of the form 
+     *   metadatamanipulator_class_name|param_0|param_1|...|param_n
      */
     public $metadatamanipulators;
     
@@ -136,16 +138,8 @@ class CdmToMods extends Mods
             $fieldValue = htmlspecialchars($fieldValue, ENT_NOQUOTES|ENT_XML1);
 
             $xmlSnippet = $valueArray[1];
-            if ($key == "Subject" & !empty($xmlSnippet) & !is_array($fieldValue)) {
-                $pattern = '/%value%/';
-                $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
-                if (isset($this->metadatamanipulators)) {
-                    $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet);
-                }
 
-                $modsOpeningTag .= $xmlSnippet;
-
-            } elseif (!empty($xmlSnippet) & !is_array($fieldValue)) {
+            if (!empty($xmlSnippet) & !is_array($fieldValue)) {
                 // @ToDo - move into metadatamanipulator
                 // check fieldValue for <br> characters.  If present, wrap in fieldValue
                 // is cdata section <![CDATA[$fieldValue]]>
@@ -155,9 +149,11 @@ class CdmToMods extends Mods
                     $fieldValue = '<![CDATA[' . $fieldValue . ']]>';
                 }
 
-                // @ToDo - determine appropriate metadata filters
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
+                if (isset($this->metadatamanipulators)) {
+                    $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet);
+                }
                 $modsOpeningTag .= $xmlSnippet;
             } else {
                 // Determine if we need to store the CONTENTdm_field as an identifier.
@@ -347,8 +343,13 @@ class CdmToMods extends Mods
     private function applyMetadatamanipulators($xmlSnippet)
     {
         foreach ($this->metadatamanipulators as $metadatamanipulator) {
-            $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulator;
-            $metadatamanipulator = new $metdataManipulatorClass($xmlSnippet);
+            //echo $metadatamanipulator;
+            //exit();
+            $metadatamanipulatorClassAndParams = explode('|', $metadatamanipulator);
+            $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
+            $manipulatorParams = $metadatamanipulatorClassAndParams;
+            $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
+            $metadatamanipulator = new $metdataManipulatorClass($manipulatorParams);
             $xmlSnippet = $metadatamanipulator->manipulate($xmlSnippet);
         }
 

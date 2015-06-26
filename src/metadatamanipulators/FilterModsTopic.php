@@ -15,11 +15,23 @@ class FilterModsTopic extends MetadataManipulator
     public $settings;
 
     /**
+     * @var string $topLevelNodeName - the name of the top level node of the snippet.
+     */
+    
+    private $topLevelNodeName;
+    
+    /**
      * Create a new Metadata Instance
      */
-    public function __construct()
+    public function __construct($paramsArray)
     {
-        //$this->settings = $settings;
+        // FilterModsTopic expects only one parameter.
+        if(count($paramsArray) == 1 ) {
+            $this->topLevelNodeName = $paramsArray[0];
+        } else {
+          // log that the number of parameters does not meet the assumption for
+          // for this metadatamanipulator.
+        }
     }
 
     /**
@@ -32,7 +44,20 @@ class FilterModsTopic extends MetadataManipulator
      */
     public function manipulate($input)
     {
-        $output = $this->breakTopicMetadaOnCharacter($input);
+        // break topic metadata on ; into seperate topic elements.
+        $xml = new \DomDocument();
+        $xml->loadxml($input);
+
+        $subjectNode = $xml->getElementsByTagName($this->topLevelNodeName)->item(0);
+
+        if (!isset($subjectNode) ) {
+            // This metadatamanipulator does not apply to this input.
+            // return the $input unmodified.
+            $output = $input;
+
+        } else {
+            $output = $this->breakTopicMetadaOnCharacter($input);
+        }
 
         return $output;
     }
@@ -65,7 +90,7 @@ class FilterModsTopic extends MetadataManipulator
         $topicNodeParent = $topicNode->parentNode;
         $topicNode->parentNode->removeChild($topicNode);
 
-        $subjectNode = $xml->getElementsByTagName('subject')->item(0);
+        $subjectNode = $xml->getElementsByTagName($this->topLevelNodeName)->item(0);  
 
         foreach ($topics as $topic) {
             $topic = trim($topic);
