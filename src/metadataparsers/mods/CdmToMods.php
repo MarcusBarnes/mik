@@ -102,7 +102,7 @@ class CdmToMods extends Mods
 
     public function createModsXML($collectionMappingArray, $CONTENTdmFieldValuesArray, $pointer)
     {
-
+ 
         $modsString = '';
 
         $modsOpeningTag = '<mods xmlns="http://www.loc.gov/mods/v3" ';
@@ -136,8 +136,14 @@ class CdmToMods extends Mods
             // Special characters in metadata field values need to be encoded or
             // metadata creation may break.
             $fieldValue = htmlspecialchars($fieldValue, ENT_NOQUOTES|ENT_XML1);
-
-            $xmlSnippet = $valueArray[1];
+            if(isset($valueArray[1])){
+                $xmlSnippet = $valueArray[1];
+            } else {
+                // If $valueArray[1] is not set, then there coule be
+                // issues with the mappings file or there may be 
+                // newline in the mappings file.
+                $xmlSnippet = '';
+            }
 
             if (!empty($xmlSnippet) & !is_array($fieldValue)) {
                 // @ToDo - move into metadatamanipulator
@@ -306,9 +312,11 @@ class CdmToMods extends Mods
         foreach ($wrapperElementArray as $wrapperElement) {
             $nodeName = $wrapperElement->nodeName;
             $deleteThisNode = $xml->getElementsByTagName($nodeName)->item('0');
-            $parentNode = $deleteThisNode->parentNode;
-            $parentNode->removeChild($deleteThisNode);
-            $xml->saveXML($parentNode);
+            if (isset($deleteThisNode->parentNode)) {
+                $parentNode = $deleteThisNode->parentNode;
+                $parentNode->removeChild($deleteThisNode);
+                $xml->saveXML($parentNode);
+            }
         }
 
         // consolidate nodes with one wrapper
