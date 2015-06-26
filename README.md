@@ -10,7 +10,7 @@ MIK is developed by staff at Simon Fraser University Library in support of their
 
 ## Requirements
 
-PHP 5.4.0 or higher.
+PHP 5.5.0 or higher.
 
 ## Installation
 
