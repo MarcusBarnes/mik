@@ -24,14 +24,13 @@ PHP 5.4.0 or higher.
 
 1. Clone this git repo (or download the zip if you don't have git).
 2. Install PHP and ensure that you can run php -v from a command prompt (you will need to adjust your PATH so it can find php.exe).
-3. Make sure OpenSSL is enabled by adding these lines to php.ini contains:
+3. Make sure the required extensions are enabled by adding these lines to your php.ini:
 
   ```
   extension_dir = "ext"
   extension=php_openssl.dll
   extension=php_mbstring.dll
   ```
-
 4. Install composer using "Composer-Setup.exe" linked from the [Composer website](https://getcomposer.org/doc/00-intro.md).
 5. In the mik directory, run `composer install`.
 
