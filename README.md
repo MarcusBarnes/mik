@@ -32,7 +32,7 @@ PHP 5.4.0 or higher.
   extension=php_mbstring.dll
   ```
 4. Install composer using "Composer-Setup.exe" linked from the [Composer website](https://getcomposer.org/doc/00-intro.md).
-5. In the mik directory, run `composer install`.
+5. In the mik directory, run `composer install`
 
 ## Usage
 
