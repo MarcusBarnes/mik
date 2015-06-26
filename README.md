@@ -23,7 +23,7 @@ PHP 5.4.0 or higher.
 ### Windows
 
 1. Clone this git repo (or download the zip if you don't have git).
-2. Install PHP and ensure that you can run php -v from a command prompt (you will need to adjust your PATH so it can find php.exe).
+2. Install PHP and ensure that you can run `php -v` from a command prompt (you will need to adjust your PATH so it can find php.exe).
 3. Make sure the required extensions are enabled by adding these lines to your php.ini:
 
   ```
