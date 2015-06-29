@@ -29,7 +29,9 @@ class CdmToMods extends Mods
     public $alias;
 
     /**
-     * @var array $metadatamanipulators - array of metadatamanimpulors from config.
+     * @var array $metadatamanipulators - array of metadatamanipulors from config.
+     *   array values will be of the form 
+     *   metadatamanipulator_class_name|param_0|param_1|...|param_n
      */
     public $metadatamanipulators;
     
@@ -38,6 +40,11 @@ class CdmToMods extends Mods
      *that can be repeated (not consolidated) set in the config.
      */
     public $repeatableWrapperElements;
+    
+    /**
+     * @var object $fetcher fetcher object for access to public methods as needed.
+     */
+    public $fetcher;
 
     /**
      * Create a new Metadata Instance
@@ -48,6 +55,7 @@ class CdmToMods extends Mods
 
         parent::__construct($settings);
 
+        $this->fetcher = new \mik\fetchers\Cdm($settings);
         $this->includeMigratedFromUri = $this->settings['METADATA_PARSER']['include_migrated_from_uri'];
         $this->mappingCSVpath = $this->settings['METADATA_PARSER']['mapping_csv_path'];
         $this->wsUrl = $this->settings['METADATA_PARSER']['ws_url'];
@@ -100,7 +108,7 @@ class CdmToMods extends Mods
 
     public function createModsXML($collectionMappingArray, $CONTENTdmFieldValuesArray, $pointer)
     {
-
+ 
         $modsString = '';
 
         $modsOpeningTag = '<mods xmlns="http://www.loc.gov/mods/v3" ';
@@ -112,6 +120,9 @@ class CdmToMods extends Mods
             $CONTENTdmField = $valueArray[0];
             if (isset($CONTENTdmFieldValuesArray[$CONTENTdmField])) {
                 $fieldValue = $CONTENTdmFieldValuesArray[$CONTENTdmField];
+            } elseif (preg_match("/(null)\d+/i", $key)) {
+                // special source field name for mappings to static snippets
+                $fiedlValue = '';
             } else {
                 // log mismatch between mapping file and source fields (e.g., CDM)
                 $logMessage = "Mappings file contains a row $CONTENTdmField that ";
@@ -131,18 +142,16 @@ class CdmToMods extends Mods
             // Special characters in metadata field values need to be encoded or
             // metadata creation may break.
             $fieldValue = htmlspecialchars($fieldValue, ENT_NOQUOTES|ENT_XML1);
+            if (isset($valueArray[1])) {
+                $xmlSnippet = $valueArray[1];
+            } else {
+                // If $valueArray[1] is not set, then there coule be
+                // issues with the mappings file or there may be
+                // newline in the mappings file.
+                $xmlSnippet = '';
+            }
 
-            $xmlSnippet = $valueArray[1];
-            if ($key == "Subject" & !empty($xmlSnippet) & !is_array($fieldValue)) {
-                $pattern = '/%value%/';
-                $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
-                if (isset($this->metadatamanipulators)) {
-                    $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet);
-                }
-
-                $modsOpeningTag .= $xmlSnippet;
-
-            } elseif (!empty($xmlSnippet) & !is_array($fieldValue)) {
+            if (!empty($xmlSnippet) & !is_array($fieldValue)) {
                 // @ToDo - move into metadatamanipulator
                 // check fieldValue for <br> characters.  If present, wrap in fieldValue
                 // is cdata section <![CDATA[$fieldValue]]>
@@ -152,9 +161,11 @@ class CdmToMods extends Mods
                     $fieldValue = '<![CDATA[' . $fieldValue . ']]>';
                 }
 
-                // @ToDo - determine appropriate metadata filters
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
+                if (isset($this->metadatamanipulators)) {
+                    $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet);
+                }
                 $modsOpeningTag .= $xmlSnippet;
             } else {
                 // Determine if we need to store the CONTENTdm_field as an identifier.
@@ -307,9 +318,11 @@ class CdmToMods extends Mods
         foreach ($wrapperElementArray as $wrapperElement) {
             $nodeName = $wrapperElement->nodeName;
             $deleteThisNode = $xml->getElementsByTagName($nodeName)->item('0');
-            $parentNode = $deleteThisNode->parentNode;
-            $parentNode->removeChild($deleteThisNode);
-            $xml->saveXML($parentNode);
+            if (isset($deleteThisNode->parentNode)) {
+                $parentNode = $deleteThisNode->parentNode;
+                $parentNode->removeChild($deleteThisNode);
+                $xml->saveXML($parentNode);
+            }
         }
 
         // consolidate nodes with one wrapper
@@ -344,30 +357,15 @@ class CdmToMods extends Mods
     private function applyMetadatamanipulators($xmlSnippet)
     {
         foreach ($this->metadatamanipulators as $metadatamanipulator) {
-            $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulator;
-            $metadatamanipulator = new $metdataManipulatorClass($xmlSnippet);
+            $metadatamanipulatorClassAndParams = explode('|', $metadatamanipulator);
+            $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
+            $manipulatorParams = $metadatamanipulatorClassAndParams;
+            $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
+            $metadatamanipulator = new $metdataManipulatorClass($manipulatorParams);
             $xmlSnippet = $metadatamanipulator->manipulate($xmlSnippet);
         }
 
         return $xmlSnippet;
-    }
-
-    /**
-     * Gets the item's info from CONTENTdm. $alias needs to include the leading '/'.
-     */
-    public function getItemInfo($pointer)
-    {
-        $wsUrl = $this->wsUrl;
-        $alias = $this->alias;
-        $queryUrl = $wsUrl . 'dmGetItemInfo/' . $alias . '/' .
-          $pointer . '/json';
-        $response = file_get_contents($queryUrl);
-        $itemInfo = json_decode($response, true);
-        if (is_array($itemInfo)) {
-            return $itemInfo;
-        } else {
-            return false;
-        }
     }
 
     /**
@@ -432,7 +430,7 @@ class CdmToMods extends Mods
 
     public function metadata($pointer)
     {
-        $objectInfo = $this->getItemInfo($pointer);
+        $objectInfo = $this->fetcher->getItemInfo($pointer);
         $CONTENTdmFieldValuesArray =
           $this->createCONTENTdmFieldValuesArray($objectInfo);
         $collectionMappingArray = $this->collectionMappingArray;

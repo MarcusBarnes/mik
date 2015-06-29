@@ -10,19 +10,39 @@ MIK is developed by staff at Simon Fraser University Library in support of their
 
 ## Requirements
 
-PHP 5.4.0 or higher.
+PHP 5.5.0 or higher.
 
 ## Installation
+
+### Linux/OSX
 
 1. Clone this git repo.
 2. Change into the resulting directory and install Composer by running the following command: ```curl -sS https://getcomposer.org/installer | php```
 3. Run the following command: ```php composer.phar install```
+
+### Windows
+
+1. Clone this git repo (or download the zip if you don't have git).
+2. Install PHP and ensure that you can run `php -v` from a command prompt (you will need to adjust your PATH so it can find php.exe).
+3. Make sure the required extensions are enabled by adding these lines to your php.ini:
+
+  ```
+  extension_dir = "ext"
+  extension=php_openssl.dll
+  extension=php_mbstring.dll
+  ```
+4. Install composer using "Composer-Setup.exe" linked from the [Composer website](https://getcomposer.org/doc/00-intro.md).
+5. In the mik directory, run `composer install`
 
 ## Usage
 
 Configure your conversion job by creating an .ini file, and then run:
 
 ```mik --config=foo.ini```
+
+On Windows, you'll need to run:
+
+```php mik --config=foo.ini```
 
 ## Current status
 
