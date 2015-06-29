@@ -24,7 +24,7 @@ class Csv extends Fetcher
     /**
     * Return an array of records.
     *
-    * @return array The records.
+    * @return object The records.
     */
     public function getRecords()
     {
@@ -47,7 +47,6 @@ class Csv extends Fetcher
 	      $record->key = $record->{$this->record_key};
 	    }
         }
-
         return $csv;
     }
 
@@ -63,8 +62,8 @@ class Csv extends Fetcher
      */
     public function queryTotalRec()
     {
-        $records = $this->getRecords();
-        return count($records);
+        $csv = $this->getRecords();
+        return count($csv);
     }
 
     /**
@@ -72,15 +71,17 @@ class Csv extends Fetcher
      * Returns a hashed array or object containing a record's information.
      *
      * @param string $recordKey the unique record_key
-     *      For CONTENTdm, this will be the item pointer
      *      For CSV, this will the the unique id assisgned to a row of data.
      *
-     * @return array or object of record info.
+     * @return object The record.
      */
-    public function getItemInfo($recordKey)
+    public function getItemInfo($record_key)
     {
-        // $records = $this->getRecords();
-        // var_dump($records);
+        $csv = $this->getRecords();
+        foreach ($csv->records as $record) {
+          if (strlen($record->key) && $record->key == $record_key) {
+            return $record;
+          }
+        }
     }
-
 }
