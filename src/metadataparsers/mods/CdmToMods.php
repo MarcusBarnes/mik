@@ -40,6 +40,11 @@ class CdmToMods extends Mods
      *that can be repeated (not consolidated) set in the config.
      */
     public $repeatableWrapperElements;
+    
+    /**
+     * @var object $fetcher fetcher object for access to public methods as needed.
+     */
+    public $fetcher;
 
     /**
      * Create a new Metadata Instance
@@ -50,6 +55,7 @@ class CdmToMods extends Mods
 
         parent::__construct($settings);
 
+        $this->fetcher = new \mik\fetchers\Cdm($settings);
         $this->includeMigratedFromUri = $this->settings['METADATA_PARSER']['include_migrated_from_uri'];
         $this->mappingCSVpath = $this->settings['METADATA_PARSER']['mapping_csv_path'];
         $this->wsUrl = $this->settings['METADATA_PARSER']['ws_url'];
@@ -351,8 +357,6 @@ class CdmToMods extends Mods
     private function applyMetadatamanipulators($xmlSnippet)
     {
         foreach ($this->metadatamanipulators as $metadatamanipulator) {
-            //echo $metadatamanipulator;
-            //exit();
             $metadatamanipulatorClassAndParams = explode('|', $metadatamanipulator);
             $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
             $manipulatorParams = $metadatamanipulatorClassAndParams;
@@ -362,24 +366,6 @@ class CdmToMods extends Mods
         }
 
         return $xmlSnippet;
-    }
-
-    /**
-     * Gets the item's info from CONTENTdm. $alias needs to include the leading '/'.
-     */
-    public function getItemInfo($pointer)
-    {
-        $wsUrl = $this->wsUrl;
-        $alias = $this->alias;
-        $queryUrl = $wsUrl . 'dmGetItemInfo/' . $alias . '/' .
-          $pointer . '/json';
-        $response = file_get_contents($queryUrl);
-        $itemInfo = json_decode($response, true);
-        if (is_array($itemInfo)) {
-            return $itemInfo;
-        } else {
-            return false;
-        }
     }
 
     /**
@@ -444,7 +430,7 @@ class CdmToMods extends Mods
 
     public function metadata($pointer)
     {
-        $objectInfo = $this->getItemInfo($pointer);
+        $objectInfo = $this->fetcher->getItemInfo($pointer);
         $CONTENTdmFieldValuesArray =
           $this->createCONTENTdmFieldValuesArray($objectInfo);
         $collectionMappingArray = $this->collectionMappingArray;
