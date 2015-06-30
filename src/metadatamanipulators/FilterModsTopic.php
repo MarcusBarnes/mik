@@ -78,31 +78,40 @@ class FilterModsTopic extends MetadataManipulator
     {
 
         // break topic metadata on ; into seperate topic elements.
+        
         $xml = new \DomDocument();
-        $xml->loadxml($xmlsnippet);
+        $xml->loadxml($xmlsnippet, LIBXML_NSCLEAN);
 
         $topicNode = $xml->getElementsByTagName('topic')->item(0);
-        $topictext = $topicNode->nodeValue;
 
-        $topics = explode($breakOnCharacter, $topictext);
+        if (!is_object($topicNode)) {
 
-        // remove old topic node.
-        $topicNodeParent = $topicNode->parentNode;
-        $topicNode->parentNode->removeChild($topicNode);
+            $xmlstring = $xmlsnippet;
 
-        $subjectNode = $xml->getElementsByTagName($this->topLevelNodeName)->item(0);  
+        } else {
 
-        foreach ($topics as $topic) {
-            $topic = trim($topic);
-            $newtopicElement = $xml->createElement('topic');
-            $topictextNode = $xml->createTextNode($topic);
-            $newtopicElement->appendChild($topictextNode);
-            $subjectNode->appendChild($newtopicElement);
-            unset($topictextNode);
-            unset($newtopicElement);
+            $topictext = $topicNode->nodeValue;
+
+            $topics = explode($breakOnCharacter, $topictext);
+
+            // remove old topic node.
+            $topicNodeParent = $topicNode->parentNode;
+            $topicNode->parentNode->removeChild($topicNode);
+
+            $subjectNode = $xml->getElementsByTagName($this->topLevelNodeName)->item(0);  
+
+            foreach ($topics as $topic) {
+                $topic = trim($topic);
+                $newtopicElement = $xml->createElement('topic');
+                $topictextNode = $xml->createTextNode($topic);
+                $newtopicElement->appendChild($topictextNode);
+                $subjectNode->appendChild($newtopicElement);
+                unset($topictextNode);
+                unset($newtopicElement);
+            }
+
+            $xmlstring = $xml->saveXML($subjectNode);
         }
-
-        $xmlstring = $xml->saveXML($subjectNode);
 
         return $xmlstring;
 

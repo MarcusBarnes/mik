@@ -264,9 +264,11 @@ class CsvToMods extends Mods
         foreach ($wrapperElementArray as $wrapperElement) {
             $nodeName = $wrapperElement->nodeName;
             $deleteThisNode = $xml->getElementsByTagName($nodeName)->item('0');
-            $parentNode = $deleteThisNode->parentNode;
-            $parentNode->removeChild($deleteThisNode);
-            $xml->saveXML($parentNode);
+            if(is_object($deleteThisNode) ) {
+                $parentNode = $deleteThisNode->parentNode;
+                $parentNode->removeChild($deleteThisNode);
+                $xml->saveXML($parentNode);
+            }
         }
 
         // consolidate nodes with one wrapper
@@ -301,8 +303,11 @@ class CsvToMods extends Mods
     private function applyMetadatamanipulators($xmlSnippet)
     {
         foreach ($this->metadatamanipulators as $metadatamanipulator) {
-            $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulator;
-            $metadatamanipulator = new $metdataManipulatorClass($xmlSnippet);
+            $metadatamanipulatorClassAndParams = explode('|', $metadatamanipulator);
+            $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
+            $manipulatorParams = $metadatamanipulatorClassAndParams;
+            $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
+            $metadatamanipulator = new $metdataManipulatorClass($manipulatorParams);
             $xmlSnippet = $metadatamanipulator->manipulate($xmlSnippet);
         }
 
