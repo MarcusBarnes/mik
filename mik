@@ -22,7 +22,8 @@ if (!file_exists($options['config'])) {
 
 if (isset($options['limit'])) {
     $limit = $options['limit'];
-} else {
+}
+else {
     $limit = null;
 }
 
@@ -36,9 +37,6 @@ $settings = $mikConfig->settings;
 $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];
 $fetcher = new $fetcherClass($settings);
 
-//echo $fetcher->queryTotalRec();
-//echo $fetcher->determineTotalRecords();
-
 // Instantiate fileGetter class.
 echo "Getting file information.\n";
 echo "Please be patient as this may take some time.\n";
@@ -50,12 +48,15 @@ $fileGetter = new $fileGetterClass($settings);
 // Create and Export Islandora ingest packages.
 foreach ($fetcher->getRecords($limit)->records as $record) {
       $record_key = $record->key;
+      if (strlen($record_key) == 0) {
+          continue;
+      }
 
       // The metadata parser returns an XML file or DOM object that
       // can be passed on to the metadata manipulater.
       $metadtaClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
       $parser = new $metadtaClass($settings);
-      echo $parser->echoPhrase("The $metadtaClass class been loaded for CONTENTdm record $record_key.\n");
+      echo $parser->echoPhrase("The $metadtaClass class been loaded for record $record_key.\n");
       $metadata = $parser->metadata($record_key) . "\n";
       echo "The metatdata file for record $record_key has been created.\n";
 

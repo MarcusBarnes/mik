@@ -85,7 +85,7 @@ class CsvToMods extends Mods
             $csvFieldName = $fieldMappings[0];
             if (property_exists($objectInfo, $csvFieldName)) {
                 $fieldValue = $objectInfo->$csvFieldName;
-            } elseif (preg_match("/(null)\d+/i", $key)) {
+            } elseif (preg_match("/(null)\d+/i", $field)) {
                 // special source field name for mappings to static snippets
                 $fiedlValue = '';
             } else {
@@ -310,8 +310,6 @@ class CsvToMods extends Mods
     }
 
     /**
-     * @todo: For CSV parser, replace $CONTENTdmFieldValuesArray with CSV record and
-     * $pointer with migrated from URI.
      */
     public function metadata($record_key)
     {

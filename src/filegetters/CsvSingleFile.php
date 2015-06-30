@@ -10,40 +10,20 @@ class CsvSingleFile extends FileGetter
     public $settings;
 
     /**
-     * @var string $utilsUrl - CDM utils url.
-     */
-    public $utilsUrl;
-
-    /**
-     * @var string $alias - CDM alias
-     */
-    public $alias;
-
-    /**
-     * Create a new CONTENTdm Fetcher Instance
+     * Create a new CSV Fetcher Instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
     {
         $this->settings = $settings['FILE_GETTER'];
-        $this->utilsUrl = $this->settings['utils_url'];
-        $this->alias = $this->settings['alias'];
-    }
-
-    /**
-    * Friendly welcome
-    *
-    * @param string $phrase Phrase to return
-    *
-    * @return string Returns the phrase passed in
-    */
-    public function echoPhrase($phrase)
-    {
-        return $phrase . " (from the CdmPhPDocuments filegetter)\n";
+        $this->input_directory = $this->settings['input_directory'];
+        $this->file_name_field = $this->settings['file_name_field'];
+        $this->fetcher = new \mik\fetchers\Csv($settings);
     }
 
     /**
      * Placeholder method needed because it's called in the main loop in mik.
+     * PDF documents don't have any children.
      */
     public function getChildren($pointer)
     {
@@ -51,32 +31,15 @@ class CsvSingleFile extends FileGetter
     }
 
     /**
-     * Gets a PHP document's structure.
+     * @param string $record_key
+     *
+     * @return string $path_to_file
      */
-    public function getDocumentStructure($pointer)
+    public function getFilePath($record_key)
     {
-        $alias = $this->settings['alias'];
-        $ws_url = $this->settings['ws_url'];
-        $query_url = $ws_url . 'dmGetCompoundObjectInfo/' . $alias . '/' .  $pointer . '/json';
-        $item_structure = file_get_contents($query_url);
-        $item_structure = json_decode($item_structure, true);
-        
-        return $item_structure;
-    }
-
-    public function getDocumentLevelPDFContent($pointer)
-    {
-        $document_structure = $this->getDocumentStructure($pointer);
-
-        // Retrieve the file associated with the object. In the case of PDF Documents,
-        // the file is a single PDF comprised of all the page-level PDFs joined into a
-        // single PDF file using the (undocumented) CONTENTdm API call below.
-        $get_file_url = $this->utilsUrl .'getdownloaditem/collection/'
-            . $this->alias . '/id/' . $pointer . '/type/compoundobject/show/1/cpdtype/document-pdf/filename/'
-            . $document_structure['page'][0]['pagefile'] . '/width/0/height/0/mapsto/pdf/filesize/0/title/'
-            . urlencode($document_structure['page'][0]['pagetitle']);
-        $content = file_get_contents($get_file_url);
-        
-        return $content;
+        $objectInfo = $this->fetcher->getItemInfo($record_key);
+        $file_name_field = $this->file_name_field;
+        $file_name = $objectInfo->$file_name_field;
+        return $this->input_directory . DIRECTORY_SEPARATOR . $file_name;
     }
 }

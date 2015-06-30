@@ -135,7 +135,7 @@ class Cdm extends Fetcher
     /**
      * Query CDM for total records for a colletion.
      */
-    public function queryTotalRec()
+    public function getNumRecs()
     {
         $qm = $this->browseQueryMap;
         $query = $this->settings['ws_url'] . 'dmQueryTotalRecs/'

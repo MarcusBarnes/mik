@@ -13,7 +13,7 @@ namespace mik\fetchers;
  *    the extending class.   
  *
  *    Abstract methods:
- *        - queryTotalRec
+ *        - getNumRecs
  *        - getItemInfo
  */
 abstract class Fetcher
@@ -41,7 +41,7 @@ abstract class Fetcher
      *
      * Note that extending classes must define this method.
      */
-    abstract public function queryTotalRec();
+    abstract public function getNumRecs();
 
     /**
      * Returns a hashed array or object containing a record's information.

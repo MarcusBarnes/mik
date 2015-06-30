@@ -24,19 +24,26 @@ class Csv extends Fetcher
     /**
     * Return an array of records.
     *
+    * @param $limit int
+    *   The number of records to get.
+    *
     * @return object The records.
     */
-    public function getRecords()
+    public function getRecords($limit = null)
     {
         // Use a static cache to avoid reading the CSV file multiple times.
         static $csv;
         if (!isset($csv)) {
 	    $inputData = Reader::createFromPath($this->input_file);
+            $num_rows = count($inputData);
+            if (is_null($limit)) {
+                $limit = -1;
+            }
 	    $data = $inputData
 		->addFilter(function ($row, $index) {
-			return $index > 0; // Skip header row.
+	            return $index > 0; // Skip header row.
 		})
-		->setLimit()
+		->setLimit($limit)
 		->fetchAssoc();
 
 	    $csv = new \stdClass;
@@ -51,7 +58,7 @@ class Csv extends Fetcher
     }
 
     /**
-     * Implements fetchers\Fetcher::queryTotalRec.
+     * Implements fetchers\Fetcher::getNumRecs.
      * 
      * Returns the number of records under consideration.
      *    For CSV, this will be the number of rows of data with a unique index.
@@ -60,7 +67,7 @@ class Csv extends Fetcher
      *
      * Note that extending classes must define this method.
      */
-    public function queryTotalRec()
+    public function getNumRecs()
     {
         $csv = $this->getRecords();
         return count($csv);
