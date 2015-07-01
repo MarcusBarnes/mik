@@ -19,6 +19,7 @@ class Csv extends Fetcher
         $this->settings = $settings['FETCHER'];
         $this->input_file = $this->settings['input_file'];
         $this->record_key = $this->settings['record_key'];
+        $this->field_delimiter = $this->settings['field_delimiter'];
     }
 
     /**
@@ -35,6 +36,7 @@ class Csv extends Fetcher
         static $csv;
         if (!isset($csv)) {
 	    $inputData = Reader::createFromPath($this->input_file);
+            $inputData->setDelimiter($this->field_delimiter);
             $num_rows = count($inputData);
             if (is_null($limit)) {
                 $limit = -1;
