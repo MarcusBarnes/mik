@@ -45,7 +45,9 @@ On Windows, you'll need to run:
 
 ```php mik --config=foo.ini```
 
-The `--config` option is required, but you can also add a `--limit` option if you only want to create a specific number of import packages. This option is useful for testing.
+The `--config` option is required, but you can also add a `--limit` option if you only want to create a specific number of import packages. This option is useful for testing. For example:
+
+```mik --config=foo.ini --limit=10```
 
 ## Current status
 
