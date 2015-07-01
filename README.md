@@ -8,29 +8,30 @@ MIK is designed to be extensible. The base classes that convert from the source 
 
 MIK is developed by staff at Simon Fraser University Library in support of their migration from CONTENTdm to Islandora, but its longer-term purpose is as a general toolkit for preparing content for importing content into Islandora.
 
+Additional information is available on the MIK [wiki](https://github.com/MarcusBarnes/mik/wiki).
+
 ## Requirements
 
 PHP 5.5.0 or higher.
 
 ## Installation
 
-### Linux/OSX
+### Linux/OS X
 
 1. Clone this git repo.
 2. Change into the resulting directory and install Composer by running the following command: ```curl -sS https://getcomposer.org/installer | php```
 3. Run the following command: ```php composer.phar install```
 
 ### Windows
-
-1. Clone this git repo (or download the zip if you don't have git).
-2. Install PHP and ensure that you can run `php -v` from a command prompt (you will need to adjust your PATH so it can find php.exe).
-3. Make sure the required extensions are enabled by adding these lines to your php.ini:
+1. Install PHP and ensure that you can run `php -v` from a command prompt (you will need to adjust your PATH so it can find php.exe).
+2. Make sure the required extensions are enabled by adding these lines to your php.ini:
 
   ```
   extension_dir = "ext"
   extension=php_openssl.dll
   extension=php_mbstring.dll
   ```
+3. Clone this git repo (or download the zip if you don't have git).
 4. Install composer using "Composer-Setup.exe" linked from the [Composer website](https://getcomposer.org/doc/00-intro.md).
 5. In the mik directory, run `composer install`
 
@@ -44,9 +45,11 @@ On Windows, you'll need to run:
 
 ```php mik --config=foo.ini```
 
+The `--config` option is required, but you can also add a `--limit` option if you only want to create a specific number of import packages. This option is useful for testing.
+
 ## Current status
 
-We're focusing on converting CONTENTdm collections into ingest packages for newspapers. After that, we'll move on to CONTENTdm-to-single-file Islandora objects, then after that, creating ingest packages from CSV metadata files + local filesystem content.
+So far, we have "toolchains" (complete sets of MIK code) to for converting CONTENTdm newspapers and multi-file PDFs into Islandora import packages. We also have a toolchain for creating import packages from CSV metadata files and content files on a local filesystem. We are now focusing on CONTENTdm-to-single-file Islandora objects, then after that, CONTENTdm books objects.
 
 ## Development
 
