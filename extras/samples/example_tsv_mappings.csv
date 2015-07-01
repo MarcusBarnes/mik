@@ -1,0 +1,6 @@
+Title,<titleInfo><title>%value%</title></titleInfo>
+Date,<originInfo><dateIssued>%value%</dateIssued></originInfo>
+Subjects,<subject><topic>%value%</topic></subject>
+Place,<subject><geographic>%value%</geographic></subject>
+Description,<abstract>%value%</abstract>
+null0,<accessCondition>You are free to use this resource.</accessCondition>

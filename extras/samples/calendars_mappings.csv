@@ -1,0 +1,17 @@
+Calendar name,<titleInfo><title>%value%</title></titleInfo>
+School name,"<name type=""corporate""><namePart>%value%</namePart></name>"
+Medium,<physicalDescription><form>%value%</form></physicalDescription>
+Work Measurements,<physicalDescription><note>%value%</note></physicalDescription>
+Publisher,<originInfo><publisher>%value%</publisher></originInfo>
+Year,<originInfo><dateIssued>%value%</dateIssued></originInfo>
+Format type,<genre>%value%</genre>
+President,"<extension><president type=""Custom metadata for the calendars collection"">%value%</president></extension>"
+Board members,"<extension><board_members type=""Custom metadata for the calendars collection"">%value%</board_members></extension>"
+Administrators,"<extension><administrators type=""Custom metadata for the calendars collection"">%value%</administrators></extension>"
+Instructors,"<extension><instructors type=""Custom metadata for the calendars collection"">%value%</instructors></extension>"
+"Staff(technicians,support staff)","<extension type=""Custom metadata for the calendars collection""><staff>%value%</staff></extension>"
+Degree/Diplomas/Programs,<subject><topic>%value%</topic></subject>
+Majors/Concentration,<subject><topic>%value%</topic></subject>
+Honorary Degree Recipients,"<extension><honorary_degree_recipients type=""Custom metadata for the calendars collection"">%value%</honorary_degree_recipients></extension>"
+Scholarships/Awards Recipients,"<extension><scholarship_award_recipients type=""Custom metadata for the calendars collection"">%value%</scholarship_award_recipients></extension>"
+Notes,<note>%value%</note>
