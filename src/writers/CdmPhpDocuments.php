@@ -82,16 +82,5 @@ class CdmPhpDocuments extends Writer
             }
         }
     }
-    
-    /**
-    * Friendly welcome
-    *
-    * @param string $phrase Phrase to return
-    *
-    * @return string Returns the phrase passed in
-    */
-    public function echoPhrase($phrase)
-    {
-        return $phrase . " (from the PDF document writer)\n";
-    }
+
 }
