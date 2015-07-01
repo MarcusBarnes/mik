@@ -51,7 +51,7 @@ The `--config` option is required, but you can also add a `--limit` option if yo
 
 ## Current status
 
-So far, we have "toolchains" (complete sets of MIK code) to for converting CONTENTdm newspapers and multi-file PDFs into Islandora import packages. We also have a toolchain for creating import packages from CSV metadata files and content files on a local filesystem. We are now focusing on CONTENTdm-to-single-file Islandora objects, then after that, CONTENTdm books objects.
+So far, we have "toolchains" (complete sets of MIK code) for converting CONTENTdm newspapers and multi-file PDFs into Islandora import packages. We also have a toolchain for creating import packages from CSV metadata files and content files on a local filesystem. We are now focusing on toolchains for CONTENTdm single-file objects, then after that, CONTENTdm books objects.
 
 ## Development
 
