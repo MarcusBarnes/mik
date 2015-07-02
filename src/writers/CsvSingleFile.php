@@ -21,6 +21,12 @@ class CsvSingleFile extends Writer
     private $fileGetter;
 
     /**
+     * @var object $modsValidator - filemanipulator class for validating
+     * the MODS file. 
+     */
+    private $modsValidator;
+
+    /**
      * Create a new newspaper writer Instance
      * @param array $settings configuration settings.
      */
@@ -31,6 +37,7 @@ class CsvSingleFile extends Writer
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
         $this->output_directory = $settings['WRITER']['output_directory'];
+        $this->modsValidator = new \mik\filemanipulators\ValidateMods($settings);
     }
 
     /**
@@ -66,6 +73,7 @@ class CsvSingleFile extends Writer
                 echo "There was a problem exporting the metadata to a file.\n";
             } else {
                 echo "Exporting metadata file.\n";
+                $this->modsValidator->validate($path);
             }
         }
     }
