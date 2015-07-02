@@ -54,7 +54,7 @@ class CdmSingleFile extends Writer
             ->getFileContent($record_id);
         // Get the filename used by CONTENTdm (stored in the 'find' field)
         // so we can grab the extension.
-        $item_info = $this->fetcher->getItemInfo($page_pointer);
+        $item_info = $this->fetcher->getItemInfo($record_id);
         $source_file_extension = pathinfo($item_info['find'], PATHINFO_EXTENSION);
         if ($temp_file_path) {
           $output_file_path = $object_path . $record_id . '.' . $source_file_extension;
