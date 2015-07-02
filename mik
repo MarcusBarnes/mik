@@ -32,6 +32,7 @@ use mik\config\Config;
 
 $mikConfig = new Config($configPath);
 $settings = $mikConfig->settings;
+$mikConfig->validate();
 
 // Fetch metadata records.
 $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];
