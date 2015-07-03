@@ -39,12 +39,20 @@ PHP 5.5.0 or higher.
 
 Typical workflow is to 1) configure your toolchain (defined below) by creating an .ini file, 2) check your configuration options and then 3) run MIK to perform the conversion of your source content into Islandora ingest packages.
 
+### Configure your toolchain
+
+In a nutshell, this means create an .ini file for MIK. Details are provided on the [wiki](https://github.com/MarcusBarnes/mik/wiki). 
+
+### Check your configuration
+
 To check your configuration options, run MIK and include the `--checkconfig` option with a value of of 'snippets', 'urls', 'paths', or 'all':
 
 * `./mik --config=foo.ini --checkconfig=snippets` checks your metadata mappings snippets for well formedness (not validity againt a schema).
 * `./mik --config=foo.ini --checkconfig=urls` checks all URLs in your config file to make sure they are accessible.
 * `./mik --config=foo.ini --checkconfig=paths` checks to make sure that all the paths to files and directories in your configuration file exist (except for `[LOGGING] path_to_log`, which is created as needed)
 * `./mik --config=foo.ini --checkconfig=all` checks all of the above.
+
+### Convert your source content into Islandora ingest packages
 
 Once you have checked your configuration options, you can run MIK to perform the data conversion:
 
