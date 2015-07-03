@@ -10,10 +10,10 @@ require 'vendor/autoload.php';
 
 // Get command line options.
 // Assumes --longopts.
-// Required --config path/to/config/ini_file
-// Optional --limit=10 (the number of input objects to proces)
-// If no --limit is provided, process all input objects from the source.
-$options = getopt('', array('config:', 'limit::'));
+// Required --config=path/to/config/ini_file
+// Optional --limit=10 (where 10 is the number of input objects to process; if not set, processes all objects)
+//          --checkconfig=type (where type is one of 'snippets', 'urls', 'paths', or 'all'; just apply checks to configuration, do not process objects)
+$options = getopt('', array('config:', 'limit::', 'checkconfig::'));
 
 $configPath = $options['config'];
 if (!file_exists($options['config'])) {
@@ -32,7 +32,9 @@ use mik\config\Config;
 
 $mikConfig = new Config($configPath);
 $settings = $mikConfig->settings;
-$mikConfig->validate();
+if (isset($options['checkconfig'])) {
+    $mikConfig->validate($options['checkconfig']);
+}
 
 // Fetch metadata records.
 $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];

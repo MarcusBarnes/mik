@@ -5,6 +5,7 @@ namespace mik\config;
 
 use League\Csv\Reader;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 
 class Config
 {
@@ -27,13 +28,31 @@ class Config
     /**
      * Wrapper function for calling other functions that validate configuration data.
      *
-     * @param $configPath - path to configuraiton file.
+     * @param $type string
+     *   One of 'of 'snippets', 'urls', 'paths', or 'all'.
      */
-    public function validate()
+    public function validate($type = 'all')
     {
-        $this->checkMappingSnippets();
-        // $this->checkUrls();
-        $this->checkPaths();
+        switch ($type) {
+            case 'all':
+                $this->checkMappingSnippets();
+                $this->checkPaths();
+                $this->checkUrls();
+                exit;
+                break;
+            case 'snippets':
+                $this->checkMappingSnippets();
+                exit;
+                break;
+            case 'urls':
+                $this->checkUrls();
+                exit;
+                break;
+            case 'paths':
+                $this->checkPaths();
+                exit;
+                break;
+        }
     }
 
     /**
@@ -59,34 +78,48 @@ class Config
                 }
             }
         }
+        print "Mapping snippets are OK\n";
     }
 
     /**
-     * Tests URLs in configuration files.
+     * Tests URLs (whose setting names end in _url) in configuration files.
      */
     public function checkUrls()
     {
         $client = new Client();
-
         $sections = array_values($this->settings);
         foreach ($sections as $section) {
             foreach ($section as $key => $value) {
-                if (preg_match('/_url/', $key) && strlen($value)) {
-                    print "Value is $value\n";
-                    $response = $client->get($value);
-                    $code = $response->getStatusCode();
-                    print "code is $code\n";
+                if (preg_match('/_url$/', $key) && strlen($value)) {
+                    try {
+                        $response = $client->get($value);
+                        $code = $response->getStatusCode();
+                    }
+                    catch (RequestException $e) {
+                        exit("Error: The URL $value (defined in configuration setting $key) appears to be a bad URL (response code $code).\n");
+                    }
                 }
             }
         }
+        print "URLs are OK\n";
     }
 
     /**
-     * Tests filesystem paths in configuration files.
+     * Tests filesystem paths (whose setting names end in _path or _directory) in configuration files.
      */
     public function checkPaths()
     {
-        // @todo: write code!
+        $sections = array_values($this->settings);
+        foreach ($sections as $section) {
+            foreach ($section as $key => $value) {
+                if (preg_match('/(_path|_directory)$/', $key) && strlen($value)) {
+                    if (!file_exists($value)) {
+                        exit("Error: The path $value (defined in configuration setting $key) does not exist.\n");
+                    }
+                }
+            }
+        }
+        print "Paths are OK\n";
     }
 
 }

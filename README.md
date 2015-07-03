@@ -19,8 +19,8 @@ PHP 5.5.0 or higher.
 ### Linux/OS X
 
 1. Clone this git repo.
-2. Change into the resulting directory and install Composer by running the following command: ```curl -sS https://getcomposer.org/installer | php```
-3. Run the following command: ```php composer.phar install```
+2. Change into the resulting directory and install Composer by running the following command: `curl -sS https://getcomposer.org/installer | php`
+3. Run the following command: `php composer.phar install`
 
 ### Windows
 1. Install PHP and ensure that you can run `php -v` from a command prompt (you will need to adjust your PATH so it can find php.exe).
@@ -37,9 +37,18 @@ PHP 5.5.0 or higher.
 
 ## Usage
 
-Configure your conversion job by creating an .ini file, and then run:
+Typical usage is to 1) configure your conversion job by creating an .ini file, 2) check your configuration options and then 3) run MIK.
 
-```mik --config=foo.ini```
+To check your configuration options, include the `--checkconfig` option with a value of of 'snippets', 'urls', 'paths', or 'all':
+
+* `./mik --config=foo.ini --checkconfig=snippets` checks your metadata mappings snippets for well formedness.
+* `./mik --config=foo.ini --checkconfig=urls` checks all URLs in your config file to make sure they are accessible.
+* `./mik --config=foo.ini --checkconfig=paths` checks to make sure that all the paths to files and directories in your configuration file exist (except for `[LOGGING] path_to_log`, which is created as needed)
+* `./mik --config=foo.ini --checkconfig=all` checks all of the above.
+
+Once you have checked your configuration options, you can run MIK to perform the data conversion:
+
+```./mik --config=foo.ini```
 
 On Windows, you'll need to run:
 
@@ -47,7 +56,7 @@ On Windows, you'll need to run:
 
 The `--config` option is required, but you can also add a `--limit` option if you only want to create a specific number of import packages. This option is useful for testing. For example:
 
-```mik --config=foo.ini --limit=10```
+```./mik --config=foo.ini --limit=10```
 
 ## Current status
 
