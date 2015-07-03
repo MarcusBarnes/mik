@@ -37,11 +37,11 @@ PHP 5.5.0 or higher.
 
 ## Usage
 
-Typical usage is to 1) configure your conversion job by creating an .ini file, 2) check your configuration options and then 3) run MIK.
+Typical workflow is to 1) configure your toolchain (defined below) by creating an .ini file, 2) check your configuration options and then 3) run MIK to perform the conversion of your source content into Islandora ingest packages.
 
-To check your configuration options, include the `--checkconfig` option with a value of of 'snippets', 'urls', 'paths', or 'all':
+To check your configuration options, run MIK and include the `--checkconfig` option with a value of of 'snippets', 'urls', 'paths', or 'all':
 
-* `./mik --config=foo.ini --checkconfig=snippets` checks your metadata mappings snippets for well formedness.
+* `./mik --config=foo.ini --checkconfig=snippets` checks your metadata mappings snippets for well formedness (not validity againt a schema).
 * `./mik --config=foo.ini --checkconfig=urls` checks all URLs in your config file to make sure they are accessible.
 * `./mik --config=foo.ini --checkconfig=paths` checks to make sure that all the paths to files and directories in your configuration file exist (except for `[LOGGING] path_to_log`, which is created as needed)
 * `./mik --config=foo.ini --checkconfig=all` checks all of the above.
