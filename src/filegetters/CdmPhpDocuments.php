@@ -34,18 +34,6 @@ class CdmPhpDocuments extends FileGetter
     }
 
     /**
-    * Friendly welcome
-    *
-    * @param string $phrase Phrase to return
-    *
-    * @return string Returns the phrase passed in
-    */
-    public function echoPhrase($phrase)
-    {
-        return $phrase . " (from the CdmPhPDocuments filegetter)\n";
-    }
-
-    /**
      * Placeholder method needed because it's called in the main loop in mik.
      * PDF documents don't have any children.
      */
