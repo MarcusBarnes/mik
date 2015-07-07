@@ -189,15 +189,4 @@ class CdmNewspapers extends Writer
         parent::writeMetadataFile($metadata, $path);
     }
     
-    /**
-    * Friendly welcome
-    *
-    * @param string $phrase Phrase to return
-    *
-    * @return string Returns the phrase passed in
-    */
-    public function echoPhrase($phrase)
-    {
-        return $phrase . " (from the newspaper writer)\n";
-    }
 }

@@ -41,12 +41,9 @@ class CdmConfig extends Config
         parent::__construct($configPath);
 
         $this->wsUrl = $this->settings['API']['ws_url'];
-        //echo $this->wsUrl . "\n";
 
         $this->mappingCSVpath = $this->settings['INPUT']['mapping_csv_path'];
-        //echo $this->mappingCSVpath . "\n";
 
         $this->includeMigratedFromUri = $this->settings['METADATA']['include_migrated_from_uri'];
-        //echo $this->includeMigratedFromUri . "\n";
     }
 }

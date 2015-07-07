@@ -28,13 +28,4 @@ abstract class FileGetter
         $this->settings = $settings['FILE_GETTER'];
     }
 
-    /**
-    * A test method.
-    *
-    * @return string Returns a message.
-    */
-    public function testMethod()
-    {
-        return "I am a method defined in the parent FileGetter class.\n";
-    }
 }

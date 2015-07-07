@@ -60,7 +60,6 @@ foreach ($fetcher->getRecords($limit)->records as $record) {
       // the metadata manipulater.
       $metadtaClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
       $parser = new $metadtaClass($settings);
-      echo $parser->echoPhrase("The $metadtaClass class been loaded for record $record_key.\n");
       $metadata = $parser->metadata($record_key) . "\n";
       echo "The metatdata file for record $record_key has been created.\n";
 

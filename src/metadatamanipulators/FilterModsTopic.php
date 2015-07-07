@@ -26,7 +26,7 @@ class FilterModsTopic extends MetadataManipulator
     public function __construct($paramsArray)
     {
         // FilterModsTopic expects only one parameter.
-        if(count($paramsArray) == 1 ) {
+        if (count($paramsArray) == 1 ) {
             $this->topLevelNodeName = $paramsArray[0];
         } else {
           // log that the number of parameters does not meet the assumption for
@@ -77,8 +77,7 @@ class FilterModsTopic extends MetadataManipulator
     public function breakTopicMetadaOnCharacter($xmlsnippet, $breakOnCharacter = ';')
     {
 
-        // break topic metadata on ; into seperate topic elements.
-        
+        // Break topic metadata on ; into seperate topic elements.
         $xml = new \DomDocument();
         $xml->loadxml($xmlsnippet, LIBXML_NSCLEAN);
 

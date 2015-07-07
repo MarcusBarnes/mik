@@ -172,19 +172,6 @@ class Cdm extends Fetcher
         }
     }
 
-
-    /**
-    * Friendly welcome
-    *
-    * @param string $phrase Phrase to return
-    *
-    * @return string Returns the phrase passed in
-    */
-    public function echoPhrase($phrase)
-    {
-        return $phrase . " (from the Cdm fetcher)\n";
-    }
-
     /**
     * Return an array of records.
     *

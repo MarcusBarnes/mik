@@ -66,13 +66,4 @@ abstract class Writer
         }
     }
 
-    /**
-    * A test method.
-    *
-    * @return string Returns a message.
-    */
-    public function testMethod()
-    {
-        return "I am a method defined in the parent Writer class.\n";
-    }
 }

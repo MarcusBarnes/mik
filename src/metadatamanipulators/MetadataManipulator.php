@@ -41,16 +41,4 @@ abstract class MetadataManipulator
      *     Manipulated string
      */
     abstract public function manipulate($input);
-
-    /**
-    * Friendly welcome
-    *
-    * @param string $phrase Phrase to return
-    *
-    * @return string Returns the phrase passed in
-    */
-    public function echoPhrase($phrase)
-    {
-        return $phrase;
-    }
 }
