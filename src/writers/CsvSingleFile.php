@@ -72,7 +72,6 @@ class CsvSingleFile extends Writer
             if ($fileCreationStatus === false) {
                 echo "There was a problem exporting the metadata to a file.\n";
             } else {
-                echo "Exporting metadata file.\n";
                 $this->modsValidator->validate($path);
             }
         }

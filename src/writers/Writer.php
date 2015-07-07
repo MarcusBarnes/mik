@@ -61,7 +61,7 @@ abstract class Writer
             if ($filecreationStatus === false) {
                 echo "There was a problem exporting the metadata to a file.\n";
             } else {
-                echo "Exporting metadata file.\n";
+                // echo "Exporting metadata file.\n";
             }
         }
     }

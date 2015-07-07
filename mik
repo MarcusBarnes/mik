@@ -8,6 +8,9 @@
 // Use composer to load vendor and project classes.
 require 'vendor/autoload.php';
 
+use mik\config\Config;
+use League\CLImate\CLImate;
+
 // Get command line options.
 // Assumes --longopts.
 // Required --config=path/to/config/ini_file
@@ -27,9 +30,7 @@ else {
     $limit = null;
 }
 
-// Configure
-use mik\config\Config;
-
+// Instantiate a configuration.
 $mikConfig = new Config($configPath);
 $settings = $mikConfig->settings;
 if (isset($options['checkconfig'])) {
@@ -41,15 +42,17 @@ $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];
 $fetcher = new $fetcherClass($settings);
 $numRecs = $fetcher->getNumRecs();
 
-// Instantiate fileGetter class.
-echo "Getting file information.\n";
-echo "Please be patient as this may take some time.\n";
+// Instantiate the progress bar.
+$climate = new League\CLImate\CLImate;
+$progress = $climate->progress()->total($numRecs);
 
-// File getters determine what files are associated with a metadata record.
+// Instantiate fileGetter class.
 $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
 $fileGetter = new $fileGetterClass($settings);
 
-// Create and Export Islandora ingest packages.
+// Create Islandora ingest packages.
+echo "Creating $numRecs Islandora ingest packages. Please be patient.\n";
+$record_num = 0;
 foreach ($fetcher->getRecords($limit)->records as $record) {
       $record_key = $record->key;
       if (strlen($record_key) == 0) {
@@ -61,7 +64,6 @@ foreach ($fetcher->getRecords($limit)->records as $record) {
       $metadtaClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
       $parser = new $metadtaClass($settings);
       $metadata = $parser->metadata($record_key) . "\n";
-      echo "The metatdata file for record $record_key has been created.\n";
 
       // The metadata manipulater will return an XML file or DOM object that can be passed on to writer.
       // Classes are loaded in metadata parsers.
@@ -76,4 +78,7 @@ foreach ($fetcher->getRecords($limit)->records as $record) {
       $writerClass = 'mik\\writers\\' . $settings['WRITER']['class'];
       $writer = new $writerClass($settings);
       $writer->writePackages($metadata, $children, $record_key);
+
+      $record_num++;  
+      $progress->current($record_num);
 }

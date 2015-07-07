@@ -66,6 +66,14 @@ The `--config` option is required, but you can also add a `--limit` option if yo
 
 ```./mik --config=foo.ini --limit=10```
 
+Once MIK starts running, it will display its progress:
+
+```
+./mik --config=foo.ini
+Creating Islandora ingest packages. Please be patient as this may take some time.
+===================================================>                                        56%
+```
+
 ## Current status
 
 So far, we have "toolchains" (complete sets of MIK metadata parsers, file getters, etc.) for converting the following into Islandora import packages:
