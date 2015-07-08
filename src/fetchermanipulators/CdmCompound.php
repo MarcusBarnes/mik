@@ -1,6 +1,8 @@
 <?php
 
 namespace mik\fetchermanipulators;
+use GuzzleHttp\Client;
+use League\CLImate\CLImate;
 
 class CdmCompound extends FetcherManipulator
 {
@@ -30,19 +32,28 @@ class CdmCompound extends FetcherManipulator
      * Tests each record to see if it has a .cpd file, and if so,
      * what the value of the CPD <type> element is.
      *
-     * @param array $records
+     * @param array $all_records
      *   All of the records from the fetcher.
-     * @return array $records
-     *   An array of records that pass the test.
+     * @return array $filtered_records
+     *   An array of records that pass the test(s) defined in the fetcher manipulator.
      */
     public function manipulate($all_records)
     {
+        $numRecs = count($all_records);
+        echo "Fetching $numRecs records, filitering them.\n";
+        // Instantiate the progress bar.
+        $climate = new \League\CLImate\CLImate;
+        $progress = $climate->progress()->total($numRecs);
+
+        $record_num = 0;
         $filtered_records = array();
-        foreach ($all_records->records as $record) {
-          $structure = $this->getDocumentStructure($record->pointer);
-          if ($record->filetype == 'cpd' && $structure['type'] == 'Document-PDF') {
-              $filtered_records[] = $record;
-          }
+        foreach ($all_records as $record) {
+            $structure = $this->getDocumentStructure($record->pointer);
+            if ($record->filetype == 'cpd' && $structure['type'] == $this->type) {
+                $filtered_records[] = $record;
+            }
+            $record_num++;  
+            $progress->current($record_num);
         }
         return $filtered_records;
     }
@@ -54,8 +65,11 @@ class CdmCompound extends FetcherManipulator
     {
         $query_url = $this->ws_url . 'dmGetCompoundObjectInfo/' . $this->alias . '/' .
             $pointer . '/json';
-        $item_structure = file_get_contents($query_url);
-        $item_structure = json_decode($item_structure, true);
+        // Create a new Guzzle client to fetch the CPD (stucture)   file.
+        $client = new Client();
+        $response = $client->get($query_url);
+        $body = $response->getBody();
+        $item_structure = json_decode($body, true);
         return $item_structure;
     }
 }

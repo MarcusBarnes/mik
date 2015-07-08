@@ -74,7 +74,15 @@ class Cdm extends Fetcher
         $this->settings = $settings['FETCHER'];
         $this->key = $this->settings['record_key'];
         $this->thumbnail = new \mik\filemanipulators\ThumbnailFromCdm($settings);
-        $this->fetchermanipulator = new \mik\fetchermanipulators\CdmCompound($settings);
+
+        if (isset($settings['MANIPULATORS']['fetchermanipulator'])) {
+            $manipulator_setting_array = explode('|', $settings['MANIPULATORS']['fetchermanipulator']);
+            $manipulator_class = '\\mik\\fetchermanipulators\\' . $manipulator_setting_array[0];
+            $this->fetchermanipulator = new $manipulator_class($settings);
+        }
+        else {
+            $this->fetchermanipulator = null;
+        }
     }
 
     /**
@@ -188,21 +196,23 @@ class Cdm extends Fetcher
     *
     * @param int $limit
     *   The number of records to return.
-    
+    *
     * @return array The records.
     */
     public function getRecords($limit)
     {
-        $records = $this->queryContentdm($limit);
+        $results = $this->queryContentdm($limit);
         if ($this->fetchermanipulator) {
-            $filtered_records = $this->applyFetchermanipulator($records);
+            $filtered_records = $this->applyFetchermanipulator($results->records);
         }
-        $filtered_records = $records;
+        else {
+            $filtered_records = $results->records;
+        }
         return $filtered_records;
     }
 
     /**
-     * Applies fetchermanipulator listed in the config.
+     * Applies the fetchermanipulator listed in the config.
      */
     private function applyFetchermanipulator($records)
     {

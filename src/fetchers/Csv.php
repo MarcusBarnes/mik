@@ -35,26 +35,26 @@ class Csv extends Fetcher
         // Use a static cache to avoid reading the CSV file multiple times.
         static $csv;
         if (!isset($csv)) {
-	    $inputData = Reader::createFromPath($this->input_file);
-            $inputData->setDelimiter($this->field_delimiter);
-            $num_rows = count($inputData);
-            if (is_null($limit)) {
-                $limit = -1;
-            }
-	    $data = $inputData
-		->addFilter(function ($row, $index) {
-	            return $index > 0; // Skip header row.
-		})
-		->setLimit($limit)
-		->fetchAssoc();
+    	    $inputData = Reader::createFromPath($this->input_file);
+                $inputData->setDelimiter($this->field_delimiter);
+                $num_rows = count($inputData);
+                if (is_null($limit)) {
+                    $limit = -1;
+                }
+    	    $data = $inputData
+    		->addFilter(function ($row, $index) {
+    	            return $index > 0; // Skip header row.
+    		})
+    		->setLimit($limit)
+    		->fetchAssoc();
 
-	    $csv = new \stdClass;
-	    $csv->records = $data;
+    	    $csv = new \stdClass;
+    	    $csv->records = $data;
 
-	    foreach ($csv->records as &$record) {
-	      $record = (object) $record;
-	      $record->key = $record->{$this->record_key};
-	    }
+    	    foreach ($csv->records as &$record) {
+    	      $record = (object) $record;
+    	      $record->key = $record->{$this->record_key};
+    	    }
         }
         return $csv;
     }
