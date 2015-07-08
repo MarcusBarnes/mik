@@ -28,7 +28,7 @@ abstract class Writer
     {
         $this->settings = $settings['WRITER'];
         $this->outputDirectory = $this->settings['output_directory'];
-        if (isset($this->settings['WRITER']['metadata_filename'])) {
+        if (isset($this->settings['metadata_filename'])) {
           $this->metadataFileName = $this->settings['metadata_filename'];
         }
         
