@@ -51,9 +51,12 @@ $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
 $fileGetter = new $fileGetterClass($settings);
 
 // Create Islandora ingest packages.
+echo "Fetching $numRecs records, filitering them.\n";
+$records = $fetcher->getRecords($limit)->records;
+$numFilteredRecs = count($records);
 echo "Creating $numRecs Islandora ingest packages. Please be patient.\n";
 $record_num = 0;
-foreach ($fetcher->getRecords($limit)->records as $record) {
+foreach ($records as $record) {
       $record_key = $record->key;
       if (strlen($record_key) == 0) {
           continue;

@@ -16,9 +16,14 @@ class CdmCompound extends FetcherManipulator
      *    Document, Document-PDF, Document-EAD, Postcard,
      *    Picture Cube, Monograph.
      */
-    public function __construct($params)
+    public function __construct($settings)
     {
-        $this->type = $params[0];
+        $types = explode('|', $settings['MANIPULATORS']['fetchermanipulator']);
+        // Must be one of Document, Document-PDF, Document-EAD,
+        // Postcard, Picture Cube, Monograph.
+        $this->type = $types[1];
+        $this->alias = $settings['FETCHER']['alias'];
+        $this->ws_url = $settings['FETCHER']['ws_url'];
     }
 
     /**
@@ -30,9 +35,27 @@ class CdmCompound extends FetcherManipulator
      * @return array $records
      *   An array of records that pass the test.
      */
-    public function manipulate($records)
+    public function manipulate($all_records)
     {
-        // @todo: Add test logic.
-        return $records;
+        $filtered_records = array();
+        foreach ($all_records->records as $record) {
+          $structure = $this->getDocumentStructure($record->pointer);
+          if ($record->filetype == 'cpd' && $structure['type'] == 'Document-PDF') {
+              $filtered_records[] = $record;
+          }
+        }
+        return $filtered_records;
+    }
+
+    /**
+     * Gets a CONTENTdm compound document's structure.
+     */
+    public function getDocumentStructure($pointer)
+    {
+        $query_url = $this->ws_url . 'dmGetCompoundObjectInfo/' . $this->alias . '/' .
+            $pointer . '/json';
+        $item_structure = file_get_contents($query_url);
+        $item_structure = json_decode($item_structure, true);
+        return $item_structure;
     }
 }

@@ -73,11 +73,8 @@ class Cdm extends Fetcher
     {
         $this->settings = $settings['FETCHER'];
         $this->key = $this->settings['record_key'];
-        if (isset($settings['MANIPULATORS']['fetchermanipulator'])) {
-            $this->fetchermanipulator = $settings['MANIPULATORS']['fetchermanipulator'];
-        } else {
-            $this->fetchermanipulator = null;
-        }
+        $this->thumbnail = new \mik\filemanipulators\ThumbnailFromCdm($settings);
+        $this->fetchermanipulator = new \mik\fetchermanipulators\CdmCompound($settings);
     }
 
     /**
@@ -150,7 +147,6 @@ class Cdm extends Fetcher
         $qm = $this->browseQueryMap;
         $query = $this->settings['ws_url'] . 'dmQueryTotalRecs/'
           . $this->settings['alias'] . '|0/xml';
-        //return $query;
         // Query CONTENTdm and return records; if failure, log problem.
         if ($xml = file_get_contents($query, false, null)) {
             $doc = new \DomDocument('1.0');
@@ -192,43 +188,26 @@ class Cdm extends Fetcher
     *
     * @param int $limit
     *   The number of records to return.
-    *
+    
     * @return array The records.
     */
     public function getRecords($limit)
     {
         $records = $this->queryContentdm($limit);
         if ($this->fetchermanipulator) {
-            $records = $this->applyFetchermanipulator($records);
+            $filtered_records = $this->applyFetchermanipulator($records);
         }
-        return $records;
+        $filtered_records = $records;
+        return $filtered_records;
     }
 
     /**
-     * Applies fetchermanipulator listed in the config
+     * Applies fetchermanipulator listed in the config.
      */
     private function applyFetchermanipulator($records)
     {
-        $fetchermanipulatorClassAndParams = explode('|', $this->fetchermanipulator);
-        $fetchermanipulatorClassName = array_shift($fetchermanipulatorClassAndParams);
-        $fetchermanipulatorParams = $fetchermanipulatorClassAndParams;
-        $fetcherManipulatorClass = 'mik\\fetchermanipulators\\' . $fetchermanipulatorClassName;
-        $fetchermanipulator = new $fetcherManipulatorClass($fetchermanipulatorParams);
-        $records = $fetchermanipulator->manipulate($records);
-        return $records;
-
-/*
-        foreach ($this->metadatamanipulators as $metadatamanipulator) {
-            $metadatamanipulatorClassAndParams = explode('|', $metadatamanipulator);
-            $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
-            $manipulatorParams = $metadatamanipulatorClassAndParams;
-            $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
-            $metadatamanipulator = new $metdataManipulatorClass($manipulatorParams);
-            $xmlSnippet = $metadatamanipulator->manipulate($xmlSnippet);
-        }
-
-        return $xmlSnippet;
-*/
+        $filtered_records = $this->fetchermanipulator->manipulate($records);
+        return $filtered_records;
     }
 
 }
