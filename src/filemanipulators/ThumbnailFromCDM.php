@@ -10,9 +10,14 @@ class ThumbnailFromCdm extends FileManipulator
     public $settings;
 
     /**
-     * @var $alias - collection alias
+     * @var $alias - collection alias.
      */
     public $alias;
+
+    /**
+     * @var $wsUrl - web services URL.
+     */
+    public $wsUrl;
 
     /**
      * Create a new FileManipulator Instance

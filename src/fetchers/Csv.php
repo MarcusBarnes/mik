@@ -11,6 +11,12 @@ class Csv extends Fetcher
     public $settings;
 
     /**
+     * @var string $fetchermanipulator - the fetchermanipulor from config,
+     *   in the form fetchermanipulator_class_name|param_0|param_1|...|param_n
+     */
+    public $fetchermanipulator;
+
+    /**
      * Create a new CSV Fetcher Instance.
      * @param array $settings configuration settings.
      */
@@ -20,6 +26,15 @@ class Csv extends Fetcher
         $this->input_file = $this->settings['input_file'];
         $this->record_key = $this->settings['record_key'];
         $this->field_delimiter = $this->settings['field_delimiter'];
+
+        if (isset($settings['MANIPULATORS']['fetchermanipulator'])) {
+            $manipulator_setting_array = explode('|', $settings['MANIPULATORS']['fetchermanipulator']);
+            $manipulator_class = '\\mik\\fetchermanipulators\\' . $manipulator_setting_array[0];
+            $this->fetchermanipulator = new $manipulator_class($settings);
+        }
+        else {
+            $this->fetchermanipulator = null;
+        }
     }
 
     /**
@@ -33,37 +48,42 @@ class Csv extends Fetcher
     public function getRecords($limit = null)
     {
         // Use a static cache to avoid reading the CSV file multiple times.
-        static $csv;
-        if (!isset($csv)) {
-    	    $inputData = Reader::createFromPath($this->input_file);
-                $inputData->setDelimiter($this->field_delimiter);
-                $num_rows = count($inputData);
+        static $filtered_records;
+        if (!isset($filtered_records)) {
+    	    $inputCsv = Reader::createFromPath($this->input_file);
+                $inputCsv->setDelimiter($this->field_delimiter);
                 if (is_null($limit)) {
+                    // Get all records.
                     $limit = -1;
                 }
-    	    $data = $inputData
+    	    $records = $inputCsv   
     		->addFilter(function ($row, $index) {
-    	            return $index > 0; // Skip header row.
+                    // Skip header row.
+    	            return $index > 0;
     		})
     		->setLimit($limit)
     		->fetchAssoc();
 
-    	    $csv = new \stdClass;
-    	    $csv->records = $data;
-
-    	    foreach ($csv->records as &$record) {
+    	    foreach ($records as &$record) {
     	      $record = (object) $record;
     	      $record->key = $record->{$this->record_key};
     	    }
+
+            if ($this->fetchermanipulator) {
+                $filtered_records = $this->applyFetchermanipulator($records);
+            }
+            else {
+                $filtered_records = $records;
+            }
         }
-        return $csv;
+        return $filtered_records;
     }
 
     /**
      * Implements fetchers\Fetcher::getNumRecs.
      * 
      * Returns the number of records under consideration.
-     *    For CSV, this will be the number of rows of data with a unique index.
+     *    For CSV, this will be the number_format(number)ber of rows of data with a unique index.
      *
      * @return total number of records
      *
@@ -71,8 +91,8 @@ class Csv extends Fetcher
      */
     public function getNumRecs()
     {
-        $csv = $this->getRecords();
-        return count($csv);
+        $records = $this->getRecords();
+        return count($records);
     }
 
     /**
@@ -86,11 +106,20 @@ class Csv extends Fetcher
      */
     public function getItemInfo($record_key)
     {
-        $csv = $this->getRecords();
-        foreach ($csv->records as $record) {
+        $records = $this->getRecords();
+        foreach ($records as $record) {
           if (strlen($record->key) && $record->key == $record_key) {
             return $record;
           }
         }
     }
+
+    /**
+     * Applies the fetchermanipulator listed in the config.
+     */
+    private function applyFetchermanipulator($records)
+    {
+        $filtered_records = $this->fetchermanipulator->manipulate($records);
+        return $filtered_records;
+    }    
 }
