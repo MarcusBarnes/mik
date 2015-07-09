@@ -27,7 +27,11 @@ class ThumbnailFromCdm extends FileManipulator
     {
         $this->settings = $settings['FILE_GETTER'];
         $this->alias = $this->settings['alias'];
-        $this->wsUrl = $this->settings['ws_url'];
+        if (isset($this->settings['ws_url'])){
+	        $this->wsUrl = $this->settings['ws_url'];
+	    } else {
+	    	$this->wsUrl = null;	
+	    }
     }
 
     public function getImageScalingInfo($pointer)
