@@ -26,7 +26,11 @@ class ThumbnailFromCdm extends FileManipulator
     public function __construct($settings)
     {
         $this->settings = $settings['FILE_GETTER'];
-        $this->alias = $this->settings['alias'];
+        if (isset($this->settings['alias'])) {
+	        $this->alias = $this->settings['alias'];
+	    } else {
+	    	$this->alias = null;
+	    }
         if (isset($this->settings['ws_url'])){
 	        $this->wsUrl = $this->settings['ws_url'];
 	    } else {
