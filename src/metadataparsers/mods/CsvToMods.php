@@ -92,7 +92,7 @@ class CsvToMods extends Mods
                 // log mismatch between mapping file and source fields (e.g., CDM)
                 $logMessage = "Mappings file contains a row $csvFieldName that ";
                 $logMessage .= "is not in source CSV file.";
-                $this->log->addWarning('$logMessage');
+                $this->log->addWarning($logMessage, array('Source fieldname' => $csvFieldName));
                 continue;
             }
 
