@@ -70,9 +70,11 @@ Once MIK starts running, it will display its progress:
 
 ```
 ./mik --config=foo.ini
-Creating Islandora ingest packages. Please be patient.
+Creating 10 Islandora ingest packages. Please be patient.
 ===================================================>                          56%
 ```
+
+and when finished will tell you where your ingest packages have been saved and where your log file is.
 
 ## Current status
 

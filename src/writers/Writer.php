@@ -16,7 +16,7 @@ abstract class Writer
     public $outputDirectory;
 
     /**
-     * @var string $metadataFileName - file name for metadata file to be written
+     * @var string $metadataFileName - file name for metadata file to be written.
      */
     public $metadataFileName;
 
@@ -31,7 +31,6 @@ abstract class Writer
         if (isset($this->settings['metadata_filename'])) {
           $this->metadataFileName = $this->settings['metadata_filename'];
         }
-        
     }
 
     /**
@@ -50,20 +49,29 @@ abstract class Writer
     }
 
     /**
-     *  Write metedata file in the appropriate location.
-     *  This method is meant to be overridden in child classes.
+     *  Write metedata file to the appropriate location.
+     *
+     * @param string $metadata
+     *   The XML file that is to be written.
+     *
+     * @param string $path
+     *   The absolute path to write the metadata file to.
      */
-    public function writeMetadataFile($metadata, $path)
-    {
-        $filename = $this->metadataFileName;
-        if ($path !='') {
-            $filecreationStatus = file_put_contents($path .'/' . $filename, $metadata);
-            if ($filecreationStatus === false) {
-                echo "There was a problem exporting the metadata to a file.\n";
-            } else {
-                // echo "Exporting metadata file.\n";
-            }
-        }
-    }
+    abstract public function writeMetadataFile($metadata, $path);
+
+     /**
+     * Write folders and files.
+     *
+     * @param string $metadata
+     *   The XML file that is to be written.
+     *
+     * @param array $pages
+     *   An array of page ...
+     *
+     * @param string $record_key
+     *   The unique key for this object.
+     *
+     */
+    abstract function writePackages($metadata, $pages, $record_key);
 
 }
