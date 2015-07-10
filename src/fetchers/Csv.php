@@ -11,10 +11,10 @@ class Csv extends Fetcher
     public $settings;
 
     /**
-     * @var string $fetchermanipulator - the fetchermanipulor from config,
+     * @var array $fetchermanipulators - the fetchermanipulors from config,
      *   in the form fetchermanipulator_class_name|param_0|param_1|...|param_n
      */
-    public $fetchermanipulator;
+    public $fetchermanipulators;
 
     /**
      * Create a new CSV Fetcher Instance.
@@ -23,17 +23,17 @@ class Csv extends Fetcher
     public function __construct($settings)
     {
         $this->settings = $settings['FETCHER'];
+        // We make a copy of all setting to pass to fetcher manipulators.
+        $this->all_settings = $settings;
         $this->input_file = $this->settings['input_file'];
         $this->record_key = $this->settings['record_key'];
         $this->field_delimiter = $this->settings['field_delimiter'];
 
-        if (isset($settings['MANIPULATORS']['fetchermanipulator'])) {
-            $manipulator_setting_array = explode('|', $settings['MANIPULATORS']['fetchermanipulator']);
-            $manipulator_class = '\\mik\\fetchermanipulators\\' . $manipulator_setting_array[0];
-            $this->fetchermanipulator = new $manipulator_class($settings);
+        if (isset($settings['MANIPULATORS']['fetchermanipulators'])) {
+            $this->fetchermanipulators = $settings['MANIPULATORS']['fetchermanipulators'];
         }
         else {
-            $this->fetchermanipulator = null;
+            $this->fetchermanipulators = null;
         }
     }
 
@@ -74,8 +74,8 @@ class Csv extends Fetcher
                 }
     	    }
 
-            if ($this->fetchermanipulator) {
-                $filtered_records = $this->applyFetchermanipulator($records);
+            if ($this->fetchermanipulators) {
+                $filtered_records = $this->applyFetchermanipulators($records);
             }
             else {
                 $filtered_records = $records;
@@ -122,9 +122,15 @@ class Csv extends Fetcher
     /**
      * Applies the fetchermanipulator listed in the config.
      */
-    private function applyFetchermanipulator($records)
+    private function applyFetchermanipulators($records)
     {
-        $filtered_records = $this->fetchermanipulator->manipulate($records);
-        return $filtered_records;
+        foreach ($this->fetchermanipulators as $manipulator) {
+            $manipulator_settings_array = explode('|', $manipulator);
+            $manipulator_class = '\\mik\\fetchermanipulators\\' . $manipulator_settings_array[0];
+            $fetchermanipulator = new $manipulator_class($this->all_settings,
+                $manipulator_settings_array);
+            $records = $fetchermanipulator->manipulate($records);
+        }
+        return $records;
     }    
 }
