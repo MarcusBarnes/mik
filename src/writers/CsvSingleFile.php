@@ -47,20 +47,56 @@ class CsvSingleFile extends Writer
     {
         // Create root output folder
         $this->createOutputDirectory();
-        $object_path = $this->outputDirectory . DIRECTORY_SEPARATOR;
-        $this->writeMetadataFile($metadata, $object_path . $record_id . '.xml');
+        $output_path = $this->outputDirectory . DIRECTORY_SEPARATOR;
+        $metadata_file_path = $output_path . $record_id . '.xml';
+
+        // The default is to overwrite the metadata file.
+        if ($this->overwrite_metadata_files) {
+            $this->writeMetadataFile($metadata, $metadata_file_path, true);
+        }
+        else {
+            // But if the config says not to, we log the existence of the file.
+            if (file_exists($metadata_file_path)) {
+                $this->log->addWarning("Metadata file already exists, not overwriting it",
+                    array('file' => $metadata_file_path));
+            }
+            else {
+                $this->writeMetadataFile($metadata, $metadata_file_path, true);
+            }
+        }
 
         // Retrieve the file associated with the document and write it to the
         // output folder, using the record number as the file basename.
         $source_file_path = $this->fileGetter->getFilePath($record_id);
         $source_file_extension = pathinfo($source_file_path, PATHINFO_EXTENSION);
-        $dest_file_path = $object_path . DIRECTORY_SEPARATOR . $record_id . '.' . $source_file_extension;
+        $content_file_path = $output_path . $record_id . '.' . $source_file_extension;
 
-        copy($source_file_path, $dest_file_path);
+        // The default is to overwrite the content file.
+        if ($this->overwrite_content_files) {
+            copy($source_file_path, $content_file_path);
+        }
+        else {
+            // But if the config says not to, we log the existence of the file.
+            if (file_exists($content_file_path)) {
+                $this->log->addWarning("Content file already exists, not overwriting it",
+                    array('file' => $content_file_path));
+            }
+            else {
+                copy($source_file_path, $content_file_path);
+            }
+        }
+
     }
 
-    public function writeMetadataFile($metadata, $path)
+    public function writeMetadataFile($metadata, $path, $overwrite = true)
     {
+        // file_put_contents() overwrites by default.
+        if (!$overwrite) {
+            $this->log->addWarning("Metadata file exists, and overwrite is set to false",
+                array('file' => $path));
+            return;
+        }
+
         // Add XML decleration
         $doc = new \DomDocument('1.0');
         $doc->loadXML($metadata);
@@ -70,7 +106,8 @@ class CsvSingleFile extends Writer
         if ($path !='') {
             $fileCreationStatus = file_put_contents($path, $metadata);
             if ($fileCreationStatus === false) {
-                echo "There was a problem exporting the metadata to a file.\n";
+                $this->log->addWarning("There was a problem writing the metadata to a file",
+                    array('file' => $path));
             } else {
                 $this->modsValidator->validate($path);
             }

@@ -2,6 +2,8 @@
 
 namespace mik\writers;
 
+use \Monolog\Logger;
+
 abstract class Writer
 {
     /**
@@ -10,7 +12,7 @@ abstract class Writer
     public $settings;
 
     /**
-     * @var string outputDirectory - output directory (where packages will be
+     * @var string $outputDirectory - output directory (where packages will be
      * written to)
      */
     public $outputDirectory;
@@ -21,16 +23,48 @@ abstract class Writer
     public $metadataFileName;
 
     /**
+     * @var bool $overwrite_metadata_files - Overwrite the metadata file if it exists.
+     */
+    public $overwrite_metadata_files;
+
+    /**
+     * @var bool $overwrite_content_files - Overwrite the content file if it exists.
+     */
+    public $overwrite_content_files;
+
+    /**
      * Create a new Writer Instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
     {
+        clearstatcache();
         $this->settings = $settings['WRITER'];
         $this->outputDirectory = $this->settings['output_directory'];
         if (isset($this->settings['metadata_filename'])) {
           $this->metadataFileName = $this->settings['metadata_filename'];
         }
+
+        // Default is to overwrite metadata and content files.
+        $this->overwrite_metadata_files = true;
+        if (isset($this->settings['overwrite_metadata_files'])) {
+            if ($this->settings['overwrite_metadata_files'] == false) {
+                $this->overwrite_metadata_files = false;
+            }
+        }
+        
+        $this->overwrite_content_files = true;
+        if (isset($this->settings['overwrite_content_files'])) {
+            if ($this->settings['overwrite_content_files'] == false) {
+                $this->overwrite_content_files = false;
+            }
+        }
+
+        // Set up logger.
+        $this->pathToLog = $settings['LOGGING']['path_to_log'];
+        $this->log = new \Monolog\Logger('writer');
+        $this->logStreamHandler= new \Monolog\Handler\StreamHandler($this->pathToLog, Logger::INFO);
+        $this->log->pushHandler($this->logStreamHandler);
     }
 
     /**
