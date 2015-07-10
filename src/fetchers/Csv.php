@@ -64,9 +64,14 @@ class Csv extends Fetcher
     		->setLimit($limit)
     		->fetchAssoc();
 
-    	    foreach ($records as &$record) {
-    	      $record = (object) $record;
-    	      $record->key = $record->{$this->record_key};
+    	    foreach ($records as $index => &$record) {
+                if (!is_null($record[$this->record_key]) || strlen($record[$this->record_key])) {
+                    $record = (object) $record;
+                    $record->key = $record->{$this->record_key};
+                }
+                else {
+                    unset($records[$index]);
+                }
     	    }
 
             if ($this->fetchermanipulator) {
