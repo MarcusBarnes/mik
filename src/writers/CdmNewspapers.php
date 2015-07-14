@@ -35,6 +35,11 @@ class CdmNewspapers extends Writer
      * @var $alias - collection alias
      */
     public $alias;
+   
+    /**
+     * @var string $metadataFileName - file name for metadata file to be written.
+     */
+    public $metadataFileName;
 
     /**
      * Create a new newspaper writer Instance
@@ -49,6 +54,11 @@ class CdmNewspapers extends Writer
         $this->thumbnail = new \mik\filemanipulators\ThumbnailFromCdm($settings);
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->cdmNewspapersFileGetter = new $fileGetterClass($settings);
+        if (isset($this->settings['metadata_filename'])) {
+          	$this->metadataFileName = $this->settings['metadata_filename'];
+        } else {
+           $this->metadataFileName = 'MODS.xml';
+        } 
     }
 
     /**
@@ -186,7 +196,15 @@ class CdmNewspapers extends Writer
         $doc->formatOutput = true;
         $metadata = $doc->saveXML();
 
-        parent::writeMetadataFile($metadata, $path);
+        $filename = $this->metadataFileName;
+        if ($path !='') {
+            $filecreationStatus = file_put_contents($path .'/' . $filename, $metadata);
+            if ($filecreationStatus === false) {
+                echo "There was a problem exporting the metadata to a file.\n";
+            } else {
+                // echo "Exporting metadata file.\n";
+            }
+        }
     }
     
 }
