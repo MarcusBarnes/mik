@@ -18,12 +18,12 @@ class CdmCompound extends FetcherManipulator
      *    Document, Document-PDF, Document-EAD, Postcard,
      *    Picture Cube, Monograph.
      */
-    public function __construct($settings)
+    public function __construct($settings, $manipulator_settings)
     {
-        $types = explode('|', $settings['MANIPULATORS']['fetchermanipulator']);
+        $manipulator_params = array_slice($manipulator_settings, 1);
         // Must be one of Document, Document-PDF, Document-EAD,
         // Postcard, Picture Cube, Monograph.
-        $this->type = $types[1];
+        $this->type = $manipulator_params[0];
         $this->alias = $settings['FETCHER']['alias'];
         $this->ws_url = $settings['FETCHER']['ws_url'];
     }
