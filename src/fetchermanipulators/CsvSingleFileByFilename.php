@@ -3,23 +3,33 @@
 namespace mik\fetchermanipulators;
 use League\CLImate\CLImate;
 
-class MjTest extends FetcherManipulator
+/**
+ * Fetcher manipulator that filters records based on a pattern in
+ * the file's name.
+ */
+
+class CsvSingleFileByFilename extends FetcherManipulator
 {
     /**
-     * Create a new MjTest fetchermanipulator Instance
+     * Create a new CsvSingleFileByFilename fetchermanipulator instance.
      *
-     * @param $settings array
-     *   The settings from the .ini file.
+     * @param array $settings
+     *   All of the settings from the .ini file.
+     *
+     * @param array $manipulator_settings
+     *   An array of all of the settings for the current manipulator,
+     *   with the manipulator class name in the first position and
+     *   the PHP regex pattern to match, without the leading and trailing
+     *   /, as the second member.
      */
     public function __construct($settings, $manipulator_settings)
     {
-        $manipulator_params = array_slice($manipulator_settings, 1);
-        $this->allowed_extensions = explode('|', $manipulator_params[0]);
+        $this->allowed_pattern = $manipulator_settings[1];
         $this->file_name_field = $settings['FILE_GETTER']['file_name_field'];
     }
 
     /**
-     * Filter on file extension.
+     * Filter on pattern in file name.
      *
      * @param array $records
      *   All of the records from the fetcher.
@@ -29,7 +39,7 @@ class MjTest extends FetcherManipulator
     public function manipulate($records)
     {
         $numRecs = count($records);
-        echo "Filtering $numRecs records through the MjTest manipulator.\n";
+        echo "Filtering $numRecs records through the Foo manipulator.\n";
         // Instantiate the progress bar.
         $climate = new \League\CLImate\CLImate;
         $progress = $climate->progress()->total($numRecs);
@@ -37,8 +47,8 @@ class MjTest extends FetcherManipulator
         $record_num = 0;
         $filtered_records = array();
         foreach ($records as $record) {
-            $ext = pathinfo($record->{$this->file_name_field}, PATHINFO_EXTENSION);
-            if (in_array($ext, $this->allowed_extensions)) {
+            $filename = pathinfo($record->{$this->file_name_field}, PATHINFO_FILENAME);
+            if (preg_match('/' . $this->allowed_pattern . '/', $filename)) {
                 $filtered_records[] = $record;
             }
             $record_num++;  

@@ -4,6 +4,13 @@ namespace mik\fetchermanipulators;
 use GuzzleHttp\Client;
 use League\CLImate\CLImate;
 
+/**
+ * @file
+ * Fetcher manipulator that filters records based on the docuement
+ * type expressed in the CONTENTdm object's .cpd file's <type>
+ * element.
+ */
+
 class CdmCompound extends FetcherManipulator
 {
 /**
@@ -12,18 +19,21 @@ class CdmCompound extends FetcherManipulator
     public $type;
 
     /**
-     * Create a new CdmCompound fetchermanipulator Instance
-     * @param array $params The CONTENTdm compound object type.
-     *    A single-member array containing one of these strings:
-     *    Document, Document-PDF, Document-EAD, Postcard,
-     *    Picture Cube, Monograph.
+     * Create a new CdmCompound fetchermanipulator Instance.
+     *
+     * @param array $settings
+     *   All of the settings from the .ini file.
+     *
+     * @param array $manipulator_settings
+     *   An array of all of the settings for the current manipulator,
+     *   with the manipulator class name in the first position and
+     *   the string indicating the document type to filter for in the
+     *   second. This string must be one of: Document, Document-PDF,
+     *   Document-EAD, Postcard, Picture Cube, Monograph.
      */
     public function __construct($settings, $manipulator_settings)
     {
-        $manipulator_params = array_slice($manipulator_settings, 1);
-        // Must be one of Document, Document-PDF, Document-EAD,
-        // Postcard, Picture Cube, Monograph.
-        $this->type = $manipulator_params[0];
+        $this->type = $manipulator_settings[1];
         $this->alias = $settings['FETCHER']['alias'];
         $this->ws_url = $settings['FETCHER']['ws_url'];
     }
