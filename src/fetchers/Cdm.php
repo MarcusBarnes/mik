@@ -94,39 +94,51 @@ class Cdm extends Fetcher
 
     /**
      * Query CONTENTdm with the values in the query map and return an array of records.
-     * @todo: account for CONTENTdm's limit of only returning 1024 records per query.
      */
     public function queryContentdm($limit)
     {
+        $totalRecs = $this->getNumRecs();
+        // Account for CONTENTdm's limit of only returning 1024 records per
+        // query. We add one chunk, then round down using sprintf().        
+        $num_chunks = $totalRecs / $this->chunk_size + 1; 
+        $num_chunks = sprintf('%d', $num_chunks);
+
         // Limit the number of records.
         if ($limit != null && $limit >= 0) {
+            // @todo: $limit must not exceed 1024.
             $this->chunk_size = $limit;
         }
 
         $qm = $this->browseQueryMap;
-        $query = $this->settings['ws_url'] . 'dmQuery/'. $this->settings['alias'] .
-            '/'. $qm['searchstrings'] . '/'. $qm['fields'] . '/'. $qm['sortby'] .
-            '/'. $this->chunk_size . '/'. $this->start_at . '/'. $qm['supress'] .
-            '/'. $qm['docptr'] . '/'.  $qm['suggest'] . '/'. $qm['facets'] .
-            '/' . $qm['format'];
+        $output = new \StdClass();
+        $output->records = array();
+        for ($processed_chunks = 1; $processed_chunks <= $num_chunks; $processed_chunks++) {
+            $query = $this->settings['ws_url'] . 'dmQuery/'. $this->settings['alias'] .
+                '/'. $qm['searchstrings'] . '/'. $qm['fields'] . '/'. $qm['sortby'] .
+                '/'. $this->chunk_size . '/'. $this->start_at . '/'. $qm['supress'] .
+                '/'. $qm['docptr'] . '/'.  $qm['suggest'] . '/'. $qm['facets'] .
+                '/' . $qm['format'];
 
-        // Query CONTENTdm and return records; if failure, log problem.
-        if ($json = file_get_contents($query, false, null)) {
-            $output = json_decode($json);
-            $output = $this->addKeyPropertyForRecords($output);
-            return $output;
-        } else {
-            $message = date('c') . "\t". 'Query failed:' . "\t" . $query . "\n";
-            // @todo: Log failure.
-            return false;
+            // Query CONTENTdm and return records; if failure, log problem.
+            if ($json = file_get_contents($query, false, null)) {
+                $chunk_output = json_decode($json);
+                $chunk_output = $this->addKeyPropertyForRecords($chunk_output);
+            } else {
+                $message = date('c') . "\t". 'Query failed:' . "\t" . $query . "\n";
+                // @todo: Log failure.
+                return false;
+            }
+            $output->records = array_merge($output->records, $chunk_output->records);
+            $this->start_at = $this->chunk_size * $processed_chunks + 1;
         }
+        return $output;
     }
     
     /**
      * Adds key property to record properties.
      * In the case of CONTENTdm, this will be the value of the pointer property.
      * @param $propertiesOfRecordsArray array
-     * @return array
+     * @return object
      */
     private function addKeyPropertyForRecords($propertiesOfRecordsObj)
     {
