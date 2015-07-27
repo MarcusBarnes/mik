@@ -26,6 +26,8 @@ class CsvSingleFileByFilename extends FetcherManipulator
     {
         $this->allowed_pattern = $manipulator_settings[1];
         $this->file_name_field = $settings['FILE_GETTER']['file_name_field'];
+        // To get the value of $onWindows.
+        parent::__construct();        
     }
 
     /**
@@ -41,8 +43,10 @@ class CsvSingleFileByFilename extends FetcherManipulator
         $numRecs = count($records);
         echo "Filtering $numRecs records through the Foo manipulator.\n";
         // Instantiate the progress bar.
-        $climate = new \League\CLImate\CLImate;
-        $progress = $climate->progress()->total($numRecs);
+        if (!$this->onWindows) {
+            $climate = new \League\CLImate\CLImate;
+            $progress = $climate->progress()->total($numRecs);
+        }
 
         $record_num = 0;
         $filtered_records = array();
@@ -52,8 +56,16 @@ class CsvSingleFileByFilename extends FetcherManipulator
                 $filtered_records[] = $record;
             }
             $record_num++;  
-            $progress->current($record_num);
+            if ($this->onWindows) {
+                print '.';
+            }
+            else {
+                $progress->current($record_num);
+            }
         }
+        if ($this->onWindows) {
+            print "\n";
+        }        
         return $filtered_records;
     }
 }

@@ -29,6 +29,8 @@ class CsvSingleFileByExtension extends FetcherManipulator
         // the classname of this class.
         $this->allowed_extensions = explode('|', $manipulator_settings[1]);
         $this->file_name_field = $settings['FILE_GETTER']['file_name_field'];
+        // To get the value of $onWindows.
+        parent::__construct();        
     }
 
     /**
@@ -46,8 +48,10 @@ class CsvSingleFileByExtension extends FetcherManipulator
         $numRecs = count($records);
         echo "Fetching $numRecs records, filitering them.\n";
         // Instantiate the progress bar.
-        $climate = new \League\CLImate\CLImate;
-        $progress = $climate->progress()->total($numRecs);
+        if (!$this->onWindows) {
+            $climate = new \League\CLImate\CLImate;
+            $progress = $climate->progress()->total($numRecs);
+        }
 
         $record_num = 0;
         $filtered_records = array();
@@ -58,8 +62,16 @@ class CsvSingleFileByExtension extends FetcherManipulator
                 $filtered_records[] = $record;
             }
             $record_num++;  
-            $progress->current($record_num);
+            if ($this->onWindows) {
+                print '.';
+            }
+            else {
+                $progress->current($record_num);
+            }
         }
+        if ($this->onWindows) {
+            print "\n";
+        }        
         return $filtered_records;
     }
 }

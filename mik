@@ -30,6 +30,14 @@ else {
     $limit = null;
 }
 
+// Determine whether we're running on Windows.
+if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    $onWindows = TRUE;
+}
+else {
+    $onWindows = FALSE;
+}
+
 // Instantiate a configuration.
 $mikConfig = new Config($configPath);
 $settings = $mikConfig->settings;
@@ -44,7 +52,9 @@ $numRecs = $fetcher->getNumRecs();
 
 // Instantiate the "ingest" progress bar.
 $climate = new League\CLImate\CLImate;
-$progress = $climate->progress()->total($numRecs);
+if (!$onWindows) {
+    $progress = $climate->progress()->total($numRecs);
+}
 
 // Instantiate fileGetter class.
 $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
@@ -76,7 +86,12 @@ foreach ($records as $record) {
       $writer->writePackages($metadata, $children, $record_key);
 
       $record_num++;  
-      $progress->current($record_num);
+      if ($onWindows) {
+          print '.';
+      }
+      else {
+          $progress->current($record_num);
+      }
 }
 
 echo "Done. Output packages are in " . $settings['WRITER']['output_directory'] .

@@ -13,7 +13,7 @@ use League\CLImate\CLImate;
 
 class CdmCompound extends FetcherManipulator
 {
-/**
+    /**
      * @var string $type - The CONTENTdm compound object type.
      */
     public $type;
@@ -36,6 +36,8 @@ class CdmCompound extends FetcherManipulator
         $this->type = $manipulator_settings[1];
         $this->alias = $settings['FETCHER']['alias'];
         $this->ws_url = $settings['FETCHER']['ws_url'];
+        // To get the value of $onWindows.
+        parent::__construct();
     }
 
     /**
@@ -51,9 +53,11 @@ class CdmCompound extends FetcherManipulator
     {
         $numRecs = count($all_records);
         echo "Fetching $numRecs records, filitering them.\n";
-        // Instantiate the progress bar.
-        $climate = new \League\CLImate\CLImate;
-        $progress = $climate->progress()->total($numRecs);
+        // Instantiate the progress bar if we're not running on Windows.
+        if (!$this->onWindows) {
+            $climate = new \League\CLImate\CLImate;
+            $progress = $climate->progress()->total($numRecs);
+        }
 
         $record_num = 0;
         $filtered_records = array();
@@ -62,8 +66,16 @@ class CdmCompound extends FetcherManipulator
             if ($record->filetype == 'cpd' && $structure['type'] == $this->type) {
                 $filtered_records[] = $record;
             }
-            $record_num++;  
-            $progress->current($record_num);
+            $record_num++;
+            if ($this->onWindows) {
+                print '.';
+            }
+            else {
+                $progress->current($record_num);
+            }
+        }
+        if ($this->onWindows) {
+            print "\n";
         }
         return $filtered_records;
     }
