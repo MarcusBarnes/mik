@@ -11,6 +11,8 @@ require 'vendor/autoload.php';
 use mik\config\Config;
 use League\CLImate\CLImate;
 
+use mik\exceptions\MikException;
+
 // Get command line options.
 // Assumes --longopts.
 // Required --config=path/to/config/ini_file
