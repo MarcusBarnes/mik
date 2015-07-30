@@ -53,4 +53,14 @@ abstract class Fetcher
      * @return array or object of record info.
      */
     abstract public function getItemInfo($recordKey);
+    
+    /**
+    * Return an object of records.
+    *
+    * @param $limit int
+    *   The number of records to get - CLI optional argument.
+    *
+    * @return object The records.
+    */
+    abstract public function getRecords($limit);
 }
