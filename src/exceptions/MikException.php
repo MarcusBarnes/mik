@@ -5,7 +5,7 @@ namespace mik\exceptions;
 /**
  * Custom MIK Exception class.
  */
-class MikException extends Exception
+class MikException extends \Exception
 {
 
 
