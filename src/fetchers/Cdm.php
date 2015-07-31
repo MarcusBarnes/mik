@@ -106,9 +106,20 @@ class Cdm extends Fetcher
         // Limit the number of records.
         if ($limit != null && $limit >= 0) {
             // @todo: $limit must not exceed 1024.
+            // chunk_size corresponds to the number of returned results from the
+            // query, with a maximum size of 1024.
             $this->chunk_size = $limit;
+            // $limit must not exceed 1024 for fetching data from CONTENTdm,
+            // so the number of chunks is 1.
+            $num_chunks = 1;
         }
-
+        
+        if($limit > 1024) {
+            echo "The optional limit argument must not exceed 1024 when fetching data from CONTENTdm.";
+            echo PHP_EOL . "Terminating MIK processing." . PHP_EOL;
+            exit();
+        }
+        
         $qm = $this->browseQueryMap;
         $output = new \StdClass();
         $output->records = array();
