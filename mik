@@ -63,7 +63,12 @@ $fileGetter = new $fileGetterClass($settings);
 // Create Islandora ingest packages.
 $records = $fetcher->getRecords($limit);
 $numFilteredRecs = count($records);
-echo "Creating $numRecs Islandora ingest packages. Please be patient.\n";
+
+if ($limit > 0 && $numFilteredRecs > $limit) {
+  echo "Creating $limit Islandora ingest packages. Please be patient.\n";
+} else {
+  echo "Creating $numFilteredRecs Islandora ingest packages. Please be patient.\n";
+}
 $record_num = 0;
 foreach ($records as $record) {
       $record_key = $record->key;
