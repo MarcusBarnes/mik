@@ -5,7 +5,7 @@ namespace mik\metadataparsers\mods;
 
 use mik\metadataparsers\MetadataParser;
 
-class Mods extends MetadataParser
+abstract class Mods extends MetadataParser
 {
     /**
      * @var array $collectionMappingArray - array containing the source
@@ -32,48 +32,12 @@ class Mods extends MetadataParser
         return $collectionMappingArray;
     }
 
-    public function createModsXML($collectionMappingArray, $sourceFieldValuesArray, $record_key)
-    {
-        $modsString = '';
-
-        $modsOpeningTag = '<mods xmlns="http://www.loc.gov/mods/v3" ';
-        $modsOpeningTag .= 'xmlns:mods="http://www.loc.gov/mods/v3" ';
-        $modsOpeningTag .= 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
-        $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
-
-        foreach ($collectionMappingArray as $key => $valueArray) {
-            $sourceFieldKey = $valueArray[0];
-            $fieldValue = $sourceFieldValuesArray[$sourceFieldKey];
-            $xmlSnippet = $valueArray[3];
-
-            if (is_array($fieldValue) && empty($fieldValue)) {
-                // This corresponds to having no value.
-                // Set field value to the empty string for use in preg_replace
-                $fieldValue = '';
-            }
-
-            if (!empty($xmlSnippet) & !is_array($fieldValue)) {
-
-                $pattern = '/%value%/';
-                $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
-
-                $modsOpeningTag .= $xmlSnippet;
-            } else {
-                // 
-            }
-        }
-
-        $modsString = $modsOpeningTag . '</mods>';
-
-        $doc = new DomDocument('1.0');
-        $doc->loadXML($mods_string);
-
-        $doc->formatOutput = true;
-
-        $modsxml = $doc->saveXML();
-        
-        return $modsxml;
-    }
+    /**
+     *  Create MODS XML
+     *  @param array $colletionMappyingArray collection mappings
+     *  @param array $objectInfo array of info. about the object that the MODS XML will be created for
+     */
+    abstract public function createModsXML($collectionMappingArray, $objectInfo);
 
     public function outputModsXML($modsxml, $outputPath = '')
     {

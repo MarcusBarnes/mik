@@ -12,6 +12,12 @@ class CdmToMods extends Mods
      * to MODS XML mapping.
      */
     public $collectionMappingArray;
+    
+    /**
+     *  @var array $CONTENTdmFieldValuesArray array with field values of proper name
+     *  as $keys rather than 'nick' keys.
+     */
+    public $CONTENTdmFieldValuesArray;
 
     /**
      * @var bool $include_migrated_from_uri
@@ -30,13 +36,13 @@ class CdmToMods extends Mods
 
     /**
      * @var array $metadatamanipulators - array of metadatamanipulors from config.
-     *   array values will be of the form 
+     *   array values will be of the form
      *   metadatamanipulator_class_name|param_0|param_1|...|param_n
      */
     public $metadatamanipulators;
     
     /**
-     * @var array $repeatableWrapperElements - array of wrapper elements 
+     * @var array $repeatableWrapperElements - array of wrapper elements
      *that can be repeated (not consolidated) set in the config.
      */
     public $repeatableWrapperElements;
@@ -106,9 +112,17 @@ class CdmToMods extends Mods
         return $CONTENTdmFieldValuesArray;
     }
 
-    public function createModsXML($collectionMappingArray, $CONTENTdmFieldValuesArray, $pointer)
+    /**
+     *  Create MODS XML
+     *  @param array $colletionMappyingArray collection mappings
+     *  @param array $objectInfo array of info. about the object that the MODS XML will be created for
+     */
+    public function createModsXML($collectionMappingArray, $objectInfo)
     {
- 
+        $CONTENTdmFieldValuesArray = $this->CONTENTdmFieldValuesArray;
+
+        $pointer = $objectInfo['pointer'];
+
         $modsString = '';
 
         $modsOpeningTag = '<mods xmlns="http://www.loc.gov/mods/v3" ';
@@ -195,9 +209,9 @@ class CdmToMods extends Mods
     }
 
     /**
-     *  Takes MODS XML string and returns an array the names 
+     *  Takes MODS XML string and returns an array the names
      *  of the child elements.
-     *  
+     *
      *  @param string $xmlString An MODS XML string.
      *
      *  @return array of unique child node names.
@@ -220,12 +234,12 @@ class CdmToMods extends Mods
     /**
      * Determine which child elements of MODS root element are wrapper elements:
      *  1) They have child elements of type XML_ELEMENT_NODE (Value: 1)
-     * 
+     *
      * @param $xml object MODS XML object
-     * 
+     *
      * @param $uniqueChildNodeNamesArray an array that lists the unique names of elements
      *    that are children of the root MOD element.
-     * 
+     *
      * @return arrry of XML elemets that are wrapper elements (children of root element).
      */
     private function determineRepeatedWrapperChildElements($xml, $uniqueChildNodeNamesArray)
@@ -258,7 +272,7 @@ class CdmToMods extends Mods
      *
      * @param array $wrapperElementArray An array of wrapper elements.
      *
-     * @return array An array of consolidated wrapper elements of type XML_ELEMENT_NODE 
+     * @return array An array of consolidated wrapper elements of type XML_ELEMENT_NODE
      */
     private function consolidateWrapperElements($wrapperElementArray)
     {
@@ -286,10 +300,10 @@ class CdmToMods extends Mods
     }
 
     /**
-     * Checks an XML string for common parent wrapper elements 
+     * Checks an XML string for common parent wrapper elements
      * and uses only one as appropriate.
-     * 
-     * @param string $modsXML 
+     *
+     * @param string $modsXML
      *     An XML snippet that can be turned into a valid XML document.
      *
      * @return string
@@ -348,7 +362,7 @@ class CdmToMods extends Mods
 
     /**
      * Applies metadatamanipulators listed in the config to provided XML snippet.
-     * @param string $xmlSnippet 
+     * @param string $xmlSnippet
      *     An XML snippet that can be turned into a valid XML document.
      * @return string
      *     XML snippet as string that whose nodes have been manipulated if applicable.
@@ -430,10 +444,10 @@ class CdmToMods extends Mods
     public function metadata($pointer)
     {
         $objectInfo = $this->fetcher->getItemInfo($pointer);
-        $CONTENTdmFieldValuesArray =
-          $this->createCONTENTdmFieldValuesArray($objectInfo);
+        $objectInfo['pointer'] = $pointer;
+        $this->CONTENTdmFieldValuesArray = $this->createCONTENTdmFieldValuesArray($objectInfo);
         $collectionMappingArray = $this->collectionMappingArray;
-        $metadata = $this->createModsXML($collectionMappingArray, $CONTENTdmFieldValuesArray, $pointer);
+        $metadata = $this->createModsXML($collectionMappingArray, $objectInfo);
         return $metadata;
     }
 }
