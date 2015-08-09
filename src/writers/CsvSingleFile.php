@@ -37,6 +37,7 @@ class CsvSingleFile extends Writer
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
         $this->output_directory = $settings['WRITER']['output_directory'];
+        $this->preserve_content_filenames = $settings['WRITER']['preserve_content_filenames'];
         $this->modsValidator = new \mik\filemanipulators\ValidateMods($settings);
     }
 
@@ -45,10 +46,25 @@ class CsvSingleFile extends Writer
      */
     public function writePackages($metadata, $pages, $record_id)
     {
+        // Whether to use record filename from csv as identifier vs. record_id
+        $preserve_content_filenames = $this->preserve_content_filenames;
+
         // Create root output folder
         $this->createOutputDirectory();
         $output_path = $this->outputDirectory . DIRECTORY_SEPARATOR;
-        $metadata_file_path = $output_path . $record_id . '.xml';
+
+        // Retrieve the file associated with the document and write it to the output
+        // folder using the filename or record_id identifier
+        $source_file_path = $this->fileGetter->getFilePath($record_id);
+        $source_file_name = pathinfo($source_file_path, PATHINFO_FILENAME);
+        $source_file_extension = pathinfo($source_file_path, PATHINFO_EXTENSION);
+        $identifier = ($preserve_content_filenames) ? $source_file_name : $record_id;
+
+        $content_file_path = $output_path . $identifier . '.' . $source_file_extension;
+        $metadata_file_path = $output_path . $identifier . '.xml';
+
+        // Do not overwrite if source and content file paths match
+        $enforce_metadata_only = $source_file_path == $content_file_path;
 
         // The default is to overwrite the metadata file.
         if ($this->overwrite_metadata_files) {
@@ -65,20 +81,18 @@ class CsvSingleFile extends Writer
             }
         }
 
-        // Retrieve the file associated with the document and write it to the
-        // output folder, using the record number as the file basename.
-        $source_file_path = $this->fileGetter->getFilePath($record_id);
-        $source_file_extension = pathinfo($source_file_path, PATHINFO_EXTENSION);
-        $content_file_path = $output_path . $record_id . '.' . $source_file_extension;
-
-        // The default is to overwrite the content file.
-        if ($this->overwrite_content_files) {
+        // The default is to overwrite the content file (but not if generating metadata only)
+        if ($this->overwrite_content_files && ! $enforce_metadata_only) {
             copy($source_file_path, $content_file_path);
         }
         else {
-            // But if the config says not to, we log the existence of the file.
+            // But if the config says not to, or source and content paths match,
+            // we log the existence of the file.
             if (file_exists($content_file_path)) {
-                $this->log->addWarning("Content file already exists, not overwriting it",
+                $warning = ($enforce_metadata_only) ?
+                    "Source and content paths match, generating metadata only" :
+                    "Content file already exists, not overwriting it" ;
+                $this->log->addWarning($warning,
                     array('file' => $content_file_path));
             }
             else {
