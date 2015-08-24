@@ -19,15 +19,18 @@ require 'vendor/autoload.php';
 use mik\config\Config;
 use League\CLImate\CLImate;
 
-use mik\exceptions\MikException;
+use mik\exceptions\MikErrorException;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
 
 // Converts all errors into Exceptions.
-// Extend ErrorException to MikErrorExcption class to include logging
-// and other features?
+// ToDo: MikErrorExcption class to include logging - good way to pass
+// path_to_log configuration setting?
 set_error_handler(
     create_function(
         '$severity, $message, $file, $line',
-        'throw new ErrorException($message, $severity, $severity, $file, $line);'
+        'throw new mik\exceptions\MikErrorException($message, $severity, $severity, $file, $line);'
     )
 );
 
@@ -58,12 +61,29 @@ else {
     $onWindows = FALSE;
 }
 
+// Set up logger ErrorException stream for main mik script.
+$pathToLog = '/Users/mbarnes/Sites/mik/log/mik.log';
+$log = new Logger('ErrorException');
+$logStreamHandler= new StreamHandler($pathToLog, Logger::ERROR);
+$log->pushHandler($logStreamHandler);
+// Add error-exceptions to the log using $log->addError('log message');
+
 // Instantiate a configuration.
 $mikConfig = new Config($configPath);
 $settings = $mikConfig->settings;
 if (isset($options['checkconfig'])) {
     $mikConfig->validate($options['checkconfig']);
 }
+
+// Set up logger ErrorException stream for main mik script.
+$pathToLog = $settings['LOGGING']['path_to_log'];
+$log = new Logger('ErrorException');
+$logStreamHandler= new StreamHandler($pathToLog, Logger::ERROR);
+$log->pushHandler($logStreamHandler);
+// Add error-exceptions to the log using 
+// $log->addError('log message');
+// or 
+// $log->addError('ErrorException', array('details'=>'file_get_contents failed'));
 
 // Fetch metadata records.
 $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];
@@ -103,7 +123,6 @@ foreach ($records as $record) {
           continue;
       }
 
-      
       // The metadata parser returns an XML file that can be passed on to
       // the metadata manipulater.
       try{
