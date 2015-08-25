@@ -95,8 +95,11 @@ try {
     $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
     $fileGetter = new $fileGetterClass($settings);
 } catch (Exception $exception) {
-    // log error-exceptions
-    continue;
+    $log->addError('ErrorException',
+          array(
+                'message'=>'problem instantiating fileGetterClass',
+                'details'=>$exception
+                ));
 }
 
 // Create Islandora ingest packages.
@@ -130,14 +133,24 @@ foreach ($records as $record) {
           $parser = new $metadtaClass($settings);
           $metadata = $parser->metadata($record_key) . "\n";
       } catch (Exception $excpetion) {
-          //log exception and continue to next record.
+          $log->addError('ErrorException',
+          array(
+                'message'=>'problem with metadataparser',
+                'record_key' => $record_key,
+                'details'=>$exception
+                ));
           continue;
       }      
 
       try {
           $children = $fileGetter->getChildren($record_key);
       } catch (Exception $excpetion) {
-          //log exception and continue to next record.
+          $log->addError('ErrorException',
+          array(
+                'message'=>'problem getting children of record',
+                'record_key' => $record_key,
+                'details'=>$exception
+                ));
           continue;
       } 
 
@@ -148,7 +161,12 @@ foreach ($records as $record) {
           $writer = new $writerClass($settings);
           $writer->writePackages($metadata, $children, $record_key);
       } catch (Exception $exception) {
-          // log exception and continue to the next record;
+          $log->addError('ErrorException',
+          array(
+                'message'=>'problem writing package',
+                'record_key' => $record_key,
+                'details'=>$exception
+                ));
           continue;
       }
 
