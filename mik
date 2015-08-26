@@ -61,13 +61,6 @@ else {
     $onWindows = FALSE;
 }
 
-// Set up logger ErrorException stream for main mik script.
-$pathToLog = '/Users/mbarnes/Sites/mik/log/mik.log';
-$log = new Logger('ErrorException');
-$logStreamHandler= new StreamHandler($pathToLog, Logger::ERROR);
-$log->pushHandler($logStreamHandler);
-// Add error-exceptions to the log using $log->addError('log message');
-
 // Instantiate a configuration.
 $mikConfig = new Config($configPath);
 $settings = $mikConfig->settings;
@@ -120,6 +113,8 @@ if ($limit > 0 && $numFilteredRecs > $limit) {
   echo "Creating $numFilteredRecs Islandora ingest packages. Please be patient.\n";
 }
 $record_num = 0;
+// add record_key of any record_key that causes an ErrorException for review.
+$problem_records_array = array();
 foreach ($records as $record) {
       $record_key = $record->key;
       if (strlen($record_key) == 0) {
@@ -139,6 +134,8 @@ foreach ($records as $record) {
                 'record_key' => $record_key,
                 'details'=>$exception
                 ));
+          
+          $problem_records_array[] = $record_key;
           continue;
       }      
 
@@ -151,6 +148,7 @@ foreach ($records as $record) {
                 'record_key' => $record_key,
                 'details'=>$exception
                 ));
+          $problem_records_array[] = $record_key;
           continue;
       } 
 
@@ -167,6 +165,7 @@ foreach ($records as $record) {
                 'record_key' => $record_key,
                 'details'=>$exception
                 ));
+          $problem_records_array[] = $record_key;
           continue;
       }
 
@@ -181,6 +180,17 @@ foreach ($records as $record) {
 
 echo "Done. Output packages are in " . $settings['WRITER']['output_directory'] .
     ". Log is at "  . $settings['LOGGING']['path_to_log'] . "\n";
-
+// giving  array $problem_records_array some values for development testing.
+$problem_records_array = array('1', '2', '3');
+if(count($problem_records_array)>0){
+  $path_to_log = $settings['LOGGING']['path_to_log'];
+  $log_directory = dirname($path_to_log);
+  $problem_records_log_filepath = $log_directory . DIRECTORY_SEPARATOR . 'problem_records.log';
+  echo "There were problems processing some records." . PHP_EOL;
+  echo "Please see $problem_records_log_filepath ";
+  echo "for the list of records that were not processed." . PHP_EOL;
+  $problem_records_data = implode("\n", $problem_records_array);
+  file_put_contents($problem_records_log_filepath,$problem_records_data);
+}
 
 restore_error_handler();
