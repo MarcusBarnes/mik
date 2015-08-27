@@ -127,7 +127,7 @@ foreach ($records as $record) {
           $metadtaClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
           $parser = new $metadtaClass($settings);
           $metadata = $parser->metadata($record_key) . "\n";
-      } catch (Exception $excpetion) {
+      } catch (Exception $exception) {
           $log->addError('ErrorException',
           array(
                 'message'=>'problem with metadataparser',
@@ -141,7 +141,7 @@ foreach ($records as $record) {
 
       try {
           $children = $fileGetter->getChildren($record_key);
-      } catch (Exception $excpetion) {
+      } catch (Exception $exception) {
           $log->addError('ErrorException',
           array(
                 'message'=>'problem getting children of record',
@@ -180,8 +180,7 @@ foreach ($records as $record) {
 
 echo "Done. Output packages are in " . $settings['WRITER']['output_directory'] .
     ". Log is at "  . $settings['LOGGING']['path_to_log'] . "\n";
-// giving  array $problem_records_array some values for development testing.
-$problem_records_array = array('1', '2', '3');
+
 if(count($problem_records_array)>0){
   $path_to_log = $settings['LOGGING']['path_to_log'];
   $log_directory = dirname($path_to_log);
