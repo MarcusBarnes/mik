@@ -50,12 +50,6 @@ $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];
 $fetcher = new $fetcherClass($settings);
 $numRecs = $fetcher->getNumRecs();
 
-// Instantiate the "ingest" progress bar.
-$climate = new League\CLImate\CLImate;
-if (!$onWindows) {
-    $progress = $climate->progress()->total($numRecs);
-}
-
 // Instantiate fileGetter class.
 $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
 $fileGetter = new $fileGetterClass($settings);
@@ -63,6 +57,14 @@ $fileGetter = new $fileGetterClass($settings);
 // Create Islandora ingest packages.
 $records = $fetcher->getRecords($limit);
 $numFilteredRecs = count($records);
+
+// Instantiate the "ingest" progress bar based on the limit or the number of filter records.
+$climate = new League\CLImate\CLImate;
+if (!$onWindows && isset($limit)) {
+    $progress = $climate->progress()->total($limit);
+} else if (!$onWindows) {
+    $progress = $climate->progress()->total($numFilteredRecs);
+}
 
 if ($limit > 0 && $numFilteredRecs > $limit) {
   echo "Creating $limit Islandora ingest packages. Please be patient.\n";
@@ -90,7 +92,7 @@ foreach ($records as $record) {
       $writer = new $writerClass($settings);
       $writer->writePackages($metadata, $children, $record_key);
 
-      $record_num++;  
+      $record_num++;
       if ($onWindows) {
           print '.';
       }
