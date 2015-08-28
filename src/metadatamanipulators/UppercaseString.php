@@ -9,11 +9,6 @@ namespace mik\metadatamanipulators;
 class UppercaseString extends MetadataManipulator
 {
     /**
-     * @var array $settings - configuration settings.
-     */
-    public $settings;
-    
-    /**
      * Upper-case the first character of a string.
      * @param string $input A string to upper case.
      *
@@ -21,7 +16,7 @@ class UppercaseString extends MetadataManipulator
      */
     public function __construct($settings = null, $input)
     {
-        $this->settings = $settings;
+        parent::__construct($settings);
 
         return $this->manipulate($input);
     }

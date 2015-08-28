@@ -8,12 +8,7 @@ namespace mik\metadatamanipulators;
  */
 class FilterDate extends MetadataManipulator
 {
-    /**
-     * @var array $settings - configuration settings.
-     */
-    public $settings;
-    
-    
+
     /**
      * Normalize a date.
      *
@@ -23,7 +18,7 @@ class FilterDate extends MetadataManipulator
      */
     public function __construct($settings = null, $input)
     {
-        $this->settings = $settings;
+        parent::__construct($settings);
 
         return $this->manipulate($input);
     }

@@ -10,23 +10,17 @@ namespace mik\metadatamanipulators;
 class FilterModsTopic extends MetadataManipulator
 {
     /**
-     * @var array $settings - configuration settings.
-     */
-    public $settings;
-
-    /**
      * @var string $topLevelNodeName - the name of the top level node of the snippet.
      */
-    
     private $topLevelNodeName;
-    
+
     /**
      * Create a new Metadata Instance
      */
     public function __construct($settings = null, $paramsArray)
     {
-        $this->settings = $settings;
-        
+        parent::__construct($settings);
+
         // FilterModsTopic expects only one parameter.
         if (count($paramsArray) == 1) {
             $this->topLevelNodeName = $paramsArray[0];
