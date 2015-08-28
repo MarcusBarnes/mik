@@ -39,23 +39,23 @@ abstract class Writer
     public function __construct($settings)
     {
         clearstatcache();
-        $this->settings = $settings['WRITER'];
-        $this->outputDirectory = $this->settings['output_directory'];
-        if (isset($this->settings['metadata_filename'])) {
-          $this->metadataFileName = $this->settings['metadata_filename'];
+        $this->settings = $settings;
+        $this->outputDirectory = $this->settings['WRITER']['output_directory'];
+        if (isset($this->settings['WRITER']['metadata_filename'])) {
+          $this->metadataFileName = $this->settings['WRITER']['metadata_filename'];
         }
 
         // Default is to overwrite metadata and content files.
         $this->overwrite_metadata_files = true;
-        if (isset($this->settings['overwrite_metadata_files'])) {
-            if ($this->settings['overwrite_metadata_files'] == false) {
+        if (isset($this->settings['WRITER']['overwrite_metadata_files'])) {
+            if ($this->settings['WRITER']['overwrite_metadata_files'] == false) {
                 $this->overwrite_metadata_files = false;
             }
         }
         
         $this->overwrite_content_files = true;
-        if (isset($this->settings['overwrite_content_files'])) {
-            if ($this->settings['overwrite_content_files'] == false) {
+        if (isset($this->settings['WRITER']['overwrite_content_files'])) {
+            if ($this->settings['WRITER']['overwrite_content_files'] == false) {
                 $this->overwrite_content_files = false;
             }
         }

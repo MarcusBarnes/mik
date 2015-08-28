@@ -9,14 +9,22 @@ namespace mik\metadatamanipulators;
 class FilterDate extends MetadataManipulator
 {
     /**
+     * @var array $settings - configuration settings.
+     */
+    public $settings;
+    
+    
+    /**
      * Normalize a date.
      *
      * @param string $input A date expressed as a string.
      *
      * @return string The normalized date, or FALSE if preg_replace fails.
      */
-    public function __construct($input)
+    public function __construct($settings = null, $input)
     {
+        $this->settings = $settings;
+
         return $this->manipulate($input);
     }
 

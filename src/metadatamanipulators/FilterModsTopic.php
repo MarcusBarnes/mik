@@ -10,7 +10,7 @@ namespace mik\metadatamanipulators;
 class FilterModsTopic extends MetadataManipulator
 {
     /**
-     * @var array $settings - configuration settings from confugration class.
+     * @var array $settings - configuration settings.
      */
     public $settings;
 
@@ -23,10 +23,12 @@ class FilterModsTopic extends MetadataManipulator
     /**
      * Create a new Metadata Instance
      */
-    public function __construct($paramsArray)
+    public function __construct($settings = null, $paramsArray)
     {
+        $this->settings = $settings;
+        
         // FilterModsTopic expects only one parameter.
-        if (count($paramsArray) == 1 ) {
+        if (count($paramsArray) == 1) {
             $this->topLevelNodeName = $paramsArray[0];
         } else {
           // log that the number of parameters does not meet the assumption for

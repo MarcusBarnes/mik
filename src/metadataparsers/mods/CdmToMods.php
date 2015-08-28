@@ -374,7 +374,7 @@ class CdmToMods extends Mods
             $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
             $manipulatorParams = $metadatamanipulatorClassAndParams;
             $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
-            $metadatamanipulator = new $metdataManipulatorClass($manipulatorParams);
+            $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams);
             $xmlSnippet = $metadatamanipulator->manipulate($xmlSnippet);
         }
 
