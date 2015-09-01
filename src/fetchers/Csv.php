@@ -47,6 +47,7 @@ class Csv extends Fetcher
     */
     public function getRecords($limit = null)
     {
+
         // Use a static cache to avoid reading the CSV file multiple times.
         static $filtered_records;
         if (!isset($filtered_records)) {

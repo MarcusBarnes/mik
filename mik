@@ -5,17 +5,31 @@
  * Main Move to Islandora Kit script.
  **/
 
+// Monolog requires that the date.timezone PHP setting be set else
+// it will create an E_WARNING, which will be turned into an excption 
+// in the set_error_handler function halting the program.
+// Provide a default timezone if date.timezone is null in the the PHP INI.
+if (null == ini_get('date.timezone')) {
+    date_default_timezone_set('America/Vancouver');
+};
+
 // Use composer to load vendor and project classes.
 require 'vendor/autoload.php';
 
 use mik\config\Config;
 use League\CLImate\CLImate;
 
+use mik\exceptions\MikErrorException;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
 // Get command line options.
 // Assumes --longopts.
 // Required --config=path/to/config/ini_file
-// Optional --limit=10 (where 10 is the number of input objects to process; if not set, processes all objects)
-//          --checkconfig=type (where type is one of 'snippets', 'urls', 'paths', or 'all'; just apply checks to configuration, do not process objects)
+// Optional --limit=10 (where 10 is the number of input objects to process; 
+// if not set, processes all objects)
+//          --checkconfig=type (where type is one of 'snippets', 'urls', 'paths', 
+//          or 'all'; just apply checks to configuration, do not process objects)
 $options = getopt('', array('config:', 'limit::', 'checkconfig::'));
 
 $configPath = $options['config'];
@@ -24,26 +38,36 @@ if (!file_exists($options['config'])) {
 }
 
 if (isset($options['limit'])) {
-    $limit = $options['limit'];
-}
-else {
+    $limit = (int) $options['limit'];
+} else {
     $limit = null;
-}
-
-// Determine whether we're running on Windows.
-if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-    $onWindows = TRUE;
-}
-else {
-    $onWindows = FALSE;
 }
 
 // Instantiate a configuration.
 $mikConfig = new Config($configPath);
 $settings = $mikConfig->settings;
+
+// Converts all errors into Exceptions.
+// Set here so that you can pass the configuration settings to the MIK Error Exception class.
+set_error_handler(
+    function ($settings, $severity, $file, $line, $message, $code) use ($settings) {
+        throw new mik\exceptions\MikErrorException($settings, $severity, $file, $line, $message, $code);
+    }
+);
+
 if (isset($options['checkconfig'])) {
     $mikConfig->validate($options['checkconfig']);
 }
+
+// Set up logger ErrorException stream for main mik script.
+$pathToLog = $settings['LOGGING']['path_to_log'];
+$log = new Logger('ErrorException');
+$logStreamHandler= new StreamHandler($pathToLog, Logger::ERROR);
+$log->pushHandler($logStreamHandler);
+// Add error-exceptions to the log using 
+// $log->addError('log message');
+// or 
+// $log->addError('ErrorException', array('details'=>'file_get_contents failed'));
 
 // Fetch metadata records.
 $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];
@@ -51,55 +75,125 @@ $fetcher = new $fetcherClass($settings);
 $numRecs = $fetcher->getNumRecs();
 
 // Instantiate fileGetter class.
-$fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
-$fileGetter = new $fileGetterClass($settings);
+try {
+    $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
+    $fileGetter = new $fileGetterClass($settings);
+} catch (Exception $exception) {
+    $log->addError(
+        'ErrorException',
+        array(
+          'message'=>'problem instantiating fileGetterClass',
+          'details'=>$exception
+        )
+    );
+}
 
-// Create Islandora ingest packages.
+// Create Islandora ingest packages and progress bar.
 $records = $fetcher->getRecords($limit);
 $numFilteredRecs = count($records);
+
+// Determine whether we're running on Windows.
+if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    $onWindows = true;
+} else {
+    $onWindows = false;
+}
 
 // Instantiate the "ingest" progress bar based on the limit or the number of filter records.
 $climate = new League\CLImate\CLImate;
 if (!$onWindows && isset($limit)) {
     $progress = $climate->progress()->total($limit);
-} else if (!$onWindows) {
+} elseif (!$onWindows) {
     $progress = $climate->progress()->total($numFilteredRecs);
 }
 
 if ($limit > 0 && $numFilteredRecs > $limit) {
-  echo "Creating $limit Islandora ingest packages. Please be patient.\n";
+    echo "Creating $limit Islandora ingest packages. Please be patient.\n";
 } else {
-  echo "Creating $numFilteredRecs Islandora ingest packages. Please be patient.\n";
+    echo "Creating $numFilteredRecs Islandora ingest packages. Please be patient.\n";
 }
 $record_num = 0;
+// add record_key of any record_key that causes an ErrorException for review.
+$problem_records_array = array();
 foreach ($records as $record) {
-      $record_key = $record->key;
-      if (strlen($record_key) == 0) {
-          continue;
-      }
+    $record_key = $record->key;
+    if (strlen($record_key) == 0) {
+        continue;
+    }
 
-      // The metadata parser returns an XML file that can be passed on to
-      // the metadata manipulater.
-      $metadtaClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
-      $parser = new $metadtaClass($settings);
-      $metadata = $parser->metadata($record_key) . "\n";
+    // The metadata parser returns an XML file that can be passed on to
+    // the metadata manipulater.
+    try {
+        $metadtaClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
+        $parser = new $metadtaClass($settings);
+        $metadata = $parser->metadata($record_key) . "\n";
+    } catch (Exception $exception) {
+        $log->addError(
+            'ErrorException',
+            array(
+                'message'=>'problem with metadataparser',
+                'record_key' => $record_key,
+                'details'=>$exception
+                )
+        );
+        $problem_records_array[] = $record_key;
+        continue;
+    }
 
-      $children = $fileGetter->getChildren($record_key);
+    try {
+        $children = $fileGetter->getChildren($record_key);
+    } catch (Exception $exception) {
+        $log->addError(
+            'ErrorException',
+            array(
+                'message'=>'problem getting children of record',
+                'record_key' => $record_key,
+                'details'=>$exception
+                )
+        );
+        $problem_records_array[] = $record_key;
+        continue;
+    }
 
-      // The writer writes metadata XML files and associated content files (files retrieved,
-      // modfied, or generated by the file getters and manipulaters) to their output location.
-      $writerClass = 'mik\\writers\\' . $settings['WRITER']['class'];
-      $writer = new $writerClass($settings);
-      $writer->writePackages($metadata, $children, $record_key);
+    // The writer writes metadata XML files and associated content files (files retrieved,
+    // modfied, or generated by the file getters and manipulaters) to their output location.
+    try {
+        $writerClass = 'mik\\writers\\' . $settings['WRITER']['class'];
+        $writer = new $writerClass($settings);
+        $writer->writePackages($metadata, $children, $record_key);
+    } catch (Exception $exception) {
+        $log->addError(
+            'ErrorException',
+            array(
+                'message'=>'problem writing package',
+                'record_key' => $record_key,
+                'details'=>$exception
+                )
+        );
+        $problem_records_array[] = $record_key;
+        continue;
+    }
 
-      $record_num++;
-      if ($onWindows) {
-          print '.';
-      }
-      else {
-          $progress->current($record_num);
-      }
+    $record_num++;
+    if ($onWindows) {
+        print '.';
+    } else {
+        $progress->current($record_num);
+    }
 }
 
 echo "Done. Output packages are in " . $settings['WRITER']['output_directory'] .
     ". Log is at "  . $settings['LOGGING']['path_to_log'] . "\n";
+
+if (count($problem_records_array)>0) {
+    $path_to_log = $settings['LOGGING']['path_to_log'];
+    $log_directory = dirname($path_to_log);
+    $problem_records_log_filepath = $log_directory . DIRECTORY_SEPARATOR . 'problem_records.log';
+    echo "There were problems processing some records." . PHP_EOL;
+    echo "Please see $problem_records_log_filepath ";
+    echo "for the list of records that were not processed." . PHP_EOL;
+    $problem_records_data = implode("\n", $problem_records_array);
+    file_put_contents($problem_records_log_filepath, $problem_records_data);
+}
+
+restore_error_handler();
