@@ -118,9 +118,10 @@ $problem_records_array = array();
 // Set up logger to log the problem record_keys as they occur.
 $logDirectory = dirname($pathToLog);
 $problemRecordsLogFilepath = $logDirectory . DIRECTORY_SEPARATOR . 'problem_records.log';
-$logProblemRecords = new Logger('');
-$logProblemRecordsStreamHandler = new StreamHandler($problemRecordsLogFilepath, Logger::ERROR);
+$logProblemRecords = new Logger('ProblemRecords');
+$logProblemRecordsStreamHandler = new StreamHandler($problemRecordsLogFilepath);
 $logProblemRecords->pushHandler($logProblemRecordsStreamHandler);
+$logProblemRecords->addInfo('Initializing log', array('configuration' => $settings['CONFIG']));
 
 $record_num = 0;
 foreach ($records as $record) {
