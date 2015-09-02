@@ -112,9 +112,17 @@ if ($limit > 0 && $numFilteredRecs > $limit) {
 } else {
     echo "Creating $numFilteredRecs Islandora ingest packages. Please be patient.\n";
 }
-$record_num = 0;
+
 // add record_key of any record_key that causes an ErrorException for review.
 $problem_records_array = array();
+// Set up logger to log the problem record_keys as they occur.
+$logDirectory = dirname($pathToLog);
+$problemRecordsLogFilepath = $logDirectory . DIRECTORY_SEPARATOR . 'problem_records.log';
+$logProblemRecords = new Logger('');
+$logProblemRecordsStreamHandler = new StreamHandler($problemRecordsLogFilepath, Logger::ERROR);
+$logProblemRecords->pushHandler($logProblemRecordsStreamHandler);
+
+$record_num = 0;
 foreach ($records as $record) {
     $record_key = $record->key;
     if (strlen($record_key) == 0) {
@@ -137,6 +145,7 @@ foreach ($records as $record) {
                 )
         );
         $problem_records_array[] = $record_key;
+        $logProblemRecords->addError($record_key);
         continue;
     }
 
@@ -152,6 +161,7 @@ foreach ($records as $record) {
                 )
         );
         $problem_records_array[] = $record_key;
+        $logProblemRecords->addError($record_key);
         continue;
     }
 
@@ -171,6 +181,7 @@ foreach ($records as $record) {
                 )
         );
         $problem_records_array[] = $record_key;
+        $logProblemRecords->addError($record_key);
         continue;
     }
 
@@ -186,14 +197,9 @@ echo "Done. Output packages are in " . $settings['WRITER']['output_directory'] .
     ". Log is at "  . $settings['LOGGING']['path_to_log'] . "\n";
 
 if (count($problem_records_array)>0) {
-    $path_to_log = $settings['LOGGING']['path_to_log'];
-    $log_directory = dirname($path_to_log);
-    $problem_records_log_filepath = $log_directory . DIRECTORY_SEPARATOR . 'problem_records.log';
     echo "There were problems processing some records." . PHP_EOL;
-    echo "Please see $problem_records_log_filepath ";
-    echo "for the list of records that were not processed." . PHP_EOL;
-    $problem_records_data = implode("\n", $problem_records_array);
-    file_put_contents($problem_records_log_filepath, $problem_records_data);
+    echo "Please see $problemRecordsLogFilepath ";
+    echo "for the log of records that were not processed." . PHP_EOL;
 }
 
 restore_error_handler();
