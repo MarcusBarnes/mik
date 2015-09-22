@@ -1,11 +1,9 @@
 <?php
-// src/metadatamanipulators/SplitModsNames.php
+// src/metadatamanipulators/FixModsNames.php
 
 namespace mik\metadatamanipulators;
 
 use \Monolog\Logger;
-use \Monolog\Formatter\NormalizerFormatter;
-
 
 /**
  * SplitModsNames - Takes the MODS namePart element and splits out the names
@@ -13,7 +11,7 @@ use \Monolog\Formatter\NormalizerFormatter;
  * then splits each name into namePart elements of type 'family' and 'given'
  * based on order.
  */
-class SplitModsNames extends MetadataManipulator
+class FixModsNames extends MetadataManipulator
 {
     /**
      * @var array $settings - configuration settings from confugration class.
@@ -38,6 +36,7 @@ class SplitModsNames extends MetadataManipulator
         $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
             Logger::INFO);
         $this->log->pushHandler($this->logStreamHandler);
+        $this->breakOnCharacter = $paramsArray[0];
     }
 
     /**
@@ -100,7 +99,7 @@ class SplitModsNames extends MetadataManipulator
             // Return the $input unmodified.
             $output = $input;
         } else {
-            $output = $this->splitNamePart($input);
+            $output = $this->splitNamePart($input, $this->breakOnCharacter);
         }
 
         return $output;
@@ -127,13 +126,26 @@ class SplitModsNames extends MetadataManipulator
             // Get all namePart children.
             $namePartNodes = $nameNode->getElementsByTagName('namePart');
             foreach ($namePartNodes as $namePartNode) {
-                $this->log->addInfo("SplitModsName", array('namePart value' => $namePartNode->nodeValue));
-                $processedName = $this->processName($namePartNode->nodeValue);
-                $this->log->addInfo("SplitModsName", array('processed value' => $processedName));
-
                 // If the namePart node value contains a semicolon, split the value,
                 // delete the original namePart node, and add a namePart node for
-                // each of the values from the split value.
+                // each of the values from the split value. If the value of namePart
+                // doesn't contain $breakOnCharacter, just process it.
+                // if (preg_match("/$breakOnCharacter/", $namePartNode->nodeValue)) {
+                if (preg_match("/;/", $namePartNode->nodeValue)) {
+                    // 1) Process each of the names and put them in a array.
+                    // 2) Grab all the attributes of the original <namePart> element
+                    // (assumption being that each name in its value will get
+                    // the same attributes). What do we do with any "type" attributes?
+                    // Presumably we will be repopulating those......
+                    // 3) Delete the original <namePart> node.
+                    // 4) For each name in the array, append a <namePart> node child 
+                    // to the original <name> element.
+                } else {
+                    $processedName = $this->processName($namePartNode->nodeValue);
+                    $this->log->addInfo("SplitModsName",
+                        array('namePart value' => $namePartNode->nodeValue,
+                            'processed value' => $processedName));
+                }
             }
         }
 
@@ -181,6 +193,9 @@ class SplitModsNames extends MetadataManipulator
 
     /**
      * Process a name string, i.e., invert it according to some rules.
+     *
+     * Broken out into its own function so more complex rules can be
+     * added later if necessary.
      *
      * @param string $name The name as it appears in the input metadata.
      *
