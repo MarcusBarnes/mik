@@ -125,6 +125,7 @@ class CdmNewspapers extends Writer
             $jpg_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'JPEG.jpg';
             file_put_contents($jpg_output_file_path, $jpg_content);
 
+
             // For each page, we need two files that can't be downloaded from CONTENTdm: PDF.pdf and MODS.xml.
 
             // Create OBJ file for page.
@@ -139,6 +140,12 @@ class CdmNewspapers extends Writer
                 // log
                 echo "obj_content = false : $pathToFile\n";
             }
+        }
+        if ($this->cdmNewspapersFileGetter->cpd_filename) {
+            $cpd_content = $this->cdmNewspapersFileGetter->getCpdFile($record_key);
+            $cpd_output_file_path = $issueObjectPath  . DIRECTORY_SEPARATOR .
+                $this->cdmNewspapersFileGetter->cpd_filename . '.xml';
+            file_put_contents($cpd_output_file_path, $cpd_content);
         }
     }
 
