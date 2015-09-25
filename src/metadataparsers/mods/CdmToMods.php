@@ -223,19 +223,16 @@ class CdmToMods extends Mods
         $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
 
         $modsOpeningTag .= '<titleInfo><title>' . $page_title . '</title></titleInfo>';
-
-
-        /*
+ 
         $includeMigratedFromUri = $this->includeMigratedFromUri;
         $collectionAlias = $this->alias;
         if ($includeMigratedFromUri == true) {
             $CONTENTdmItemUrl = '<identifier type="uri" invalid="yes" ';
             $CONTENTdmItemUrl .= 'displayLabel="Migrated From">';
             $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection/';
-            $CONTENTdmItemUrl .= $$this->alias. '/id/'. $page_pointer .'</identifier>';
+            $CONTENTdmItemUrl .= $collectionAlias . '/id/'. $page_pointer .'</identifier>';
             $modsOpeningTag .= $CONTENTdmItemUrl;
         }
-        */
 
         $modsString = $modsOpeningTag . '</mods>';
 
