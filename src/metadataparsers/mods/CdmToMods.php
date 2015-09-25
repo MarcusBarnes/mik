@@ -209,6 +209,46 @@ class CdmToMods extends Mods
     }
 
     /**
+     * Creates basic page level mods for compounds items such as newspapers and books.
+     * @param string $page_pointer CONTENTdm page level pointer.
+     * @param string $page_title title for the page.
+     */
+    public function createPageLevelModsXML($page_pointer, $page_title)
+    {
+        $modsString = '';
+
+        $modsOpeningTag = '<mods xmlns="http://www.loc.gov/mods/v3" ';
+        $modsOpeningTag .= 'xmlns:mods="http://www.loc.gov/mods/v3" ';
+        $modsOpeningTag .= 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
+        $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
+
+        $modsOpeningTag .= '<titleInfo><title>' . $page_title . '</title></titleInfo>';
+
+
+        /*
+        $includeMigratedFromUri = $this->includeMigratedFromUri;
+        $collectionAlias = $this->alias;
+        if ($includeMigratedFromUri == true) {
+            $CONTENTdmItemUrl = '<identifier type="uri" invalid="yes" ';
+            $CONTENTdmItemUrl .= 'displayLabel="Migrated From">';
+            $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection/';
+            $CONTENTdmItemUrl .= $$this->alias. '/id/'. $page_pointer .'</identifier>';
+            $modsOpeningTag .= $CONTENTdmItemUrl;
+        }
+        */
+
+        $modsString = $modsOpeningTag . '</mods>';
+
+        $doc = new \DomDocument('1.0');
+        $doc->loadXML($modsString, LIBXML_NSCLEAN);
+        $doc->formatOutput = true;
+        $modsxml = $doc->saveXML();
+        
+        return $modsxml;
+    }
+
+
+    /**
      *  Takes MODS XML string and returns an array the names
      *  of the child elements.
      *

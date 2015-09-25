@@ -23,6 +23,7 @@ use mik\exceptions\MikErrorException;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
+echo "Commencing MIK." . PHP_EOL;
 // Get command line options.
 // Assumes --longopts.
 // Required --config=path/to/config/ini_file

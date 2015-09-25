@@ -42,6 +42,11 @@ class CdmNewspapers extends Writer
     public $metadataFileName;
 
     /**
+     * @var object metadataparser - metadata parser object
+     */
+    public $metadataParser;
+
+    /**
      * Create a new newspaper writer Instance
      * @param array $settings configuration settings.
      */
@@ -59,6 +64,12 @@ class CdmNewspapers extends Writer
         } else {
            $this->metadataFileName = 'MODS.xml';
         } 
+        
+        $metadtaClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
+        $this->metadataParser = new $metadtaClass($settings);
+
+        //$metadataParserClass =  'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
+        //$this->metadataParser = new $metadataParserClass($settings);
     }
 
     /**
@@ -139,6 +150,10 @@ class CdmNewspapers extends Writer
                 // log
                 echo "obj_content = false : $pathToFile\n";
             }
+
+            // Write outut page level MODS.XML
+            $page_title = 'Page ' . $page_number;
+            $this->writePageLevelMetadaFile($page_pointer, $page_title, $page_dir);
         }
     }
 
@@ -198,13 +213,42 @@ class CdmNewspapers extends Writer
 
         $filename = $this->metadataFileName;
         if ($path !='') {
-            $filecreationStatus = file_put_contents($path .'/' . $filename, $metadata);
+            $filecreationStatus = file_put_contents($path . DIRECTORY_SEPARATOR . $filename, $metadata);
             if ($filecreationStatus === false) {
                 echo "There was a problem exporting the metadata to a file.\n";
             } else {
                 // echo "Exporting metadata file.\n";
             }
         }
+    }
+
+    public function writePageLevelMetadaFile($page_pointer, $page_title, $page_dir)
+    {
+        $metadata = $this->metadataParser->createPageLevelModsXML($page_pointer, $page_title);
+        //$metadata = '<mods>'. gettype($this->metadataParser) . '</mods>';
+        //$metadata = '<mods></mods>';
+
+        // Add XML decleration
+        $doc = new \DomDocument('1.0');
+        $doc->loadXML($metadata);
+        $doc->formatOutput = true;
+        $metadata = $doc->saveXML();
+
+        $filename = $this->metadataFileName;
+        if($page_dir != '') {
+            
+            $filecreationStatus = file_put_contents($page_dir . DIRECTORY_SEPARATOR . $filename, $metadata);
+            
+            if ($filecreationStatus === false) {
+                echo "There was a problem exporting the metadata to a file.\n";
+                return false;
+            } else {
+                // echo "Exporting metadata file.\n";
+                return true;
+            }
+            
+        }
+        
     }
     
 }
