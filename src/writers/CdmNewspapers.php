@@ -142,8 +142,21 @@ class CdmNewspapers extends Writer
             // Create OBJ file for page.
             $filekey = $page_number - 1;
             $pathToFile = $OBJFilesArray[$filekey];
+
+            $pathToPageOK = $this->cdmNewspapersFileGetter
+                 ->checkNewspaperPageFilePath($pathToFile, $page_number);
+
+            if ($pathToPageOK){
+                $obj_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.tiff';
+                // assumes that the source destination is on a l
+                copy($pathToFile, $obj_output_file_path);
+            }
+
+            /* 
+            // file_get_contents and file_put_contents may cause memory 
+            // issues for larger files.  May need to stream files.     
             $obj_content = $this->cdmNewspapersFileGetter
-                 ->getPageOBJfileContent($pathToFile, $page_number);
+                 ->getPageOBJfileContent($pathToFile, $page_number);        
             if ($obj_content != false) {
                 $obj_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.tiff';
                 file_put_contents($obj_output_file_path, $obj_content);
@@ -151,6 +164,7 @@ class CdmNewspapers extends Writer
                 // log
                 echo "obj_content = false : $pathToFile\n";
             }
+            */
 
             // Write outut page level MODS.XML
             $page_title = 'Page ' . $page_number;

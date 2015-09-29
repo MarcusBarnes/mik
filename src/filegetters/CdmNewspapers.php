@@ -115,6 +115,7 @@ class CdmNewspapers extends FileGetter
 
         $key = DIRECTORY_SEPARATOR . $issueDate . DIRECTORY_SEPARATOR;
         return $this->OBJFilePaths[$key];
+        
     }
 
     private function getIssueMasterFiles($pathToIssue, $allowedFileTypes = array('tiff', 'tif'))
@@ -243,6 +244,22 @@ class CdmNewspapers extends FileGetter
 
         return $obj_content;
 
+    }
+   
+    public function checkNewspaperPageFilePath($pathToFile, $page_number)
+    {
+        // Check path page tiffs should be in the format yyyy-mm-dd-pp.
+        // @ToDo - move this method to FileGetter parent class
+        // to be extended in child classes such as CdmNewspapers
+
+        $regex_pattern = '%[/\\\\][0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9]*' . $page_number . '%';
+        $result = preg_match($regex_pattern, $pathToFile);
+        if ($result === 1) {
+            return true;
+        } else {
+            return false;
+        }
+        
     }
 
     public function getCpdFile($pointer)
