@@ -26,8 +26,10 @@ abstract class MetadataManipulator
     /**
      * Create a new Metadata Instance
      * @param array $settings configuration settings.
+     * @param array $paramsArray array of manipulator paramaters provided in the configuration
+     * @param string $record_key the record_key (CONTENTdm pointer, CSV row id)
      */
-    public function __construct($settings)
+    public function __construct($settings, $paramsArray, $record_key)
     {
         $this->settings = $settings;
     }

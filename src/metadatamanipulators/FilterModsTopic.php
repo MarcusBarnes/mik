@@ -17,9 +17,9 @@ class FilterModsTopic extends MetadataManipulator
     /**
      * Create a new Metadata Instance
      */
-    public function __construct($settings = null, $paramsArray)
+    public function __construct($settings = null, $paramsArray, $record_key)
     {
-        parent::__construct($settings);
+        parent::__construct($settings, $paramsArray, $record_key);
 
         // FilterModsTopic expects only one parameter.
         if (count($paramsArray) == 1) {

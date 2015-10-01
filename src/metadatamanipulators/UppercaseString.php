@@ -14,9 +14,9 @@ class UppercaseString extends MetadataManipulator
      *
      * @return array The modified string, or FALSE if ucfirst fails.
      */
-    public function __construct($settings = null, $input)
+    public function __construct($settings = null, $input, $record_key)
     {
-        parent::__construct($settings);
+        parent::__construct($settings, $paramsArray, $record_key);
 
         return $this->manipulate($input);
     }
