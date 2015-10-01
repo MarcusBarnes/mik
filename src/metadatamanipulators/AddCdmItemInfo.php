@@ -21,17 +21,31 @@ class AddCdmItemInfo extends MetadataManipulator
     /**
      * General manipulate wrapper method.
      *
+     *  @param string $input XML snippett to be manipulated.
+     *
      * @return string
      *     Manipulated XML snippet
      */
-    public function manipulate($input = '')
+    public function manipulate($input)
     {
-        // Define the XML we want to add to the MODS document.
+        // Grab the MODS so we can get the value of the identifier element,
+        // which contains the URL with the alias and pointer.
+        $xml = new \DomDocument();
+        $xml->loadxml($input);
+        // Has not been added to the MODS yet....
+        $identifierNode = $xml->getElementsByTagName('identifier')->item(0);
+
+        // Define the XML fragment we want to add to the MODS document.
         $now = date("Y-m-d H:i:s");
         $output = '';
-        $output .= '<extension><cdmiteminfo source="Exported from CONTNETdm ';
+        $output .= '<extension><cdmiteminfo source="Exported from CONTENTdm ';
         $output .= $now;
-        $output .= '"></cdmiteminfo></extension>';
+        $output .= '"><![CDATA[';
+        // This is where we'd insert the JSON from a call to dmGetItemInfo
+        // specific to the current object. The following is an abbreviated
+        // sample of that JSON.
+        $output .= '{"title":"Stanley Park, Vancouver, Canada"}';
+        $output .= ']]></cdmiteminfo></extension>';
 
         return $output;
     }
