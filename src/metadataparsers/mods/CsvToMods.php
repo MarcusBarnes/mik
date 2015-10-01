@@ -39,6 +39,9 @@ class CsvToMods extends Mods
         parent::__construct($settings);
 
         $this->fetcher = new \mik\fetchers\Csv($settings);
+
+        $this->record_key = $this->fetcher->record_key;
+
         $this->mappingCSVpath = $this->settings['METADATA_PARSER']['mapping_csv_path'];
 
         if (isset($this->settings['METADATA_PARSER']['repeatable_wrapper_elements'])) {
@@ -74,6 +77,9 @@ class CsvToMods extends Mods
      */
     public function createModsXML($collectionMappingArray, $objectInfo)
     {
+        $record_key_column = $this->record_key;
+        $record_key = $objectInfo->$record_key_column;
+        
         $modsString = '';
 
         $modsOpeningTag = '<mods xmlns="http://www.loc.gov/mods/v3" ';
@@ -105,7 +111,7 @@ class CsvToMods extends Mods
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
                 if (isset($this->metadatamanipulators)) {
-                    $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet);
+                    $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $record_key);
                 }
 
                 $modsOpeningTag .= $xmlSnippet;
@@ -300,14 +306,14 @@ class CsvToMods extends Mods
      * @return string
      *     XML snippet as string that whose nodes have been manipulated if applicable.
      */
-    private function applyMetadatamanipulators($xmlSnippet)
+    private function applyMetadatamanipulators($xmlSnippet, $record_key)
     {
         foreach ($this->metadatamanipulators as $metadatamanipulator) {
             $metadatamanipulatorClassAndParams = explode('|', $metadatamanipulator);
             $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
             $manipulatorParams = $metadatamanipulatorClassAndParams;
             $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
-            $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams);
+            $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams,  $record_key);
             $xmlSnippet = $metadatamanipulator->manipulate($xmlSnippet);
         }
 
