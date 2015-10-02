@@ -11,11 +11,18 @@ namespace mik\metadatamanipulators;
 class AddCdmItemInfo extends MetadataManipulator
 {
     /**
+     * @var string $record_key - the unique identifier for the metadata
+     *    record being manipulated.
+     */
+    private $record_key;
+
+    /**
      * Create a new Metadata Instance
      */
-    public function __construct($settings = null, $paramsArray)
+    public function __construct($settings = null, $paramsArray, $record_key)
     {
-        parent::__construct($settings);
+        $this->settings = $settings;
+        $this->record_key = $record_key;
     }
 
     /**
@@ -28,26 +35,38 @@ class AddCdmItemInfo extends MetadataManipulator
      */
     public function manipulate($input)
     {
-        // Grab the MODS so we can get the value of the identifier element,
-        // which contains the URL with the alias and pointer.
-        $xml = new \DomDocument();
-        $xml->loadxml($input);
-        // Has not been added to the MODS yet....
-        $identifierNode = $xml->getElementsByTagName('identifier')->item(0);
 
-        // Define the XML fragment we want to add to the MODS document.
-        $now = date("Y-m-d H:i:s");
-        $output = '';
-        $output .= '<extension><cdmiteminfo source="Exported from CONTENTdm ';
-        $output .= $now;
-        $output .= '"><![CDATA[';
-        // This is where we'd insert the JSON from a call to dmGetItemInfo
-        // specific to the current object. The following is an abbreviated
-        // sample of that JSON.
-        $output .= '{"title":"Stanley Park, Vancouver, Canada"}';
-        $output .= ']]></cdmiteminfo></extension>';
+        $dom = new \DomDocument();
+        $dom->loadxml($input, LIBXML_NSCLEAN);
 
-        return $output;
+        $xpath = new \DOMXPath($dom);
+
+        if ($xpath->evaluate('boolean(//extension/cdmiteminfo)')) {
+          // return $input;
+        }
+
+        $timestamp = date("Y-m-d H:i:s");
+
+        // Retrieve the JSON metadata from a call to dmGetItemInfo specific
+        // to the current object.
+        $item_info_url = $this->settings['METADATA_PARSER']['ws_url'] .
+            'dmGetItemInfo/' . $this->settings['METADATA_PARSER']['alias'] .
+            '/' . $this->record_key . '/json';
+        $item_info .= file_get_contents($item_info_url);
+
+        // Define the extension element we want to add to the MODS document.
+        $extension = $dom->createElement('extension');
+        $cdmiteminfo = $dom->createElement('cdmiteminfo');
+        $cdata = $dom->createCDATASection('$item_info');
+        $cdmiteminfo->appendChild($cdata);
+        $now = $dom->createAttribute('source');
+        $now->value = 'Exported from CONTENDM ' . $timestamp;
+        $cdmiteminfo->appendChild($now);
+        $extension->appendChild($cdmiteminfo);
+        $dom->appendChild($extension);
+
+        return $dom->saveXML($dom->documentElement);
+
     }
 
 }
