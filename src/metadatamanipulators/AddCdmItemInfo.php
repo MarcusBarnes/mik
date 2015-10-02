@@ -42,7 +42,7 @@ class AddCdmItemInfo extends MetadataManipulator
         $xpath = new \DOMXPath($dom);
 
         if ($xpath->evaluate('boolean(//extension/cdmiteminfo)')) {
-          // return $input;
+          return $input;
         }
 
         $timestamp = date("Y-m-d H:i:s");
@@ -52,12 +52,12 @@ class AddCdmItemInfo extends MetadataManipulator
         $item_info_url = $this->settings['METADATA_PARSER']['ws_url'] .
             'dmGetItemInfo/' . $this->settings['METADATA_PARSER']['alias'] .
             '/' . $this->record_key . '/json';
-        $item_info .= file_get_contents($item_info_url);
+        $item_info = file_get_contents($item_info_url);
 
         // Define the extension element we want to add to the MODS document.
         $extension = $dom->createElement('extension');
         $cdmiteminfo = $dom->createElement('cdmiteminfo');
-        $cdata = $dom->createCDATASection('$item_info');
+        $cdata = $dom->createCDATASection($item_info);
         $cdmiteminfo->appendChild($cdata);
         $now = $dom->createAttribute('source');
         $now->value = 'Exported from CONTENDM ' . $timestamp;
