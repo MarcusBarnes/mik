@@ -177,7 +177,7 @@ class CdmToMods extends Mods
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
                 if (isset($this->metadatamanipulators)) {
-                    $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet);
+                    $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $pointer);
                 }
                 $modsOpeningTag .= $xmlSnippet;
             } else {
@@ -404,14 +404,14 @@ class CdmToMods extends Mods
      * @return string
      *     XML snippet as string that whose nodes have been manipulated if applicable.
      */
-    private function applyMetadatamanipulators($xmlSnippet)
+    private function applyMetadatamanipulators($xmlSnippet, $record_key)
     {
         foreach ($this->metadatamanipulators as $metadatamanipulator) {
             $metadatamanipulatorClassAndParams = explode('|', $metadatamanipulator);
             $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
             $manipulatorParams = $metadatamanipulatorClassAndParams;
             $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
-            $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams);
+            $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams, $record_key);
             $xmlSnippet = $metadatamanipulator->manipulate($xmlSnippet);
         }
 

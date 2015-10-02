@@ -17,6 +17,11 @@ class Csv extends Fetcher
     public $fetchermanipulators;
 
     /**
+     * @var string $record_key - the key for the column representing unique row ids.
+     */
+    public $record_key;
+
+    /**
      * Create a new CSV Fetcher Instance.
      * @param array $settings configuration settings.
      */
@@ -110,11 +115,11 @@ class Csv extends Fetcher
      *
      * @return object The record.
      */
-    public function getItemInfo($record_key)
+    public function getItemInfo($recordKey)
     {
         $records = $this->getRecords();
         foreach ($records as $record) {
-          if (strlen($record->key) && $record->key == $record_key) {
+          if (strlen($record->key) && $record->key == $recordKey) {
             return $record;
           }
         }

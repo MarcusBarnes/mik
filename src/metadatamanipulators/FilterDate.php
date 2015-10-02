@@ -16,7 +16,7 @@ class FilterDate extends MetadataManipulator
      *
      * @return string The normalized date, or FALSE if preg_replace fails.
      */
-    public function __construct($settings = null, $input)
+    public function __construct($settings = null, $input, $record_key)
     {
         parent::__construct($settings);
 
