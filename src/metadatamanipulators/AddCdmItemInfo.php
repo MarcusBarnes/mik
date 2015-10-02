@@ -3,6 +3,7 @@
 
 namespace mik\metadatamanipulators;
 use GuzzleHttp\Client;
+use \Monolog\Logger;
 
 /**
  * AddCdmItemInfo - Adds the raw (JSON) metadata for an item from CONTENTdm
@@ -27,6 +28,13 @@ class AddCdmItemInfo extends MetadataManipulator
     {
         parent::__construct($settings, $paramsArray, $record_key);
         $this->record_key = $record_key;
+
+        // Set up logger.
+        $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
+        $this->log = new \Monolog\Logger('config');
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
+            Logger::INFO);
+        $this->log->pushHandler($this->logStreamHandler);
     }
 
     /**
@@ -50,14 +58,14 @@ class AddCdmItemInfo extends MetadataManipulator
         $cdmiteminfos = $xpath->query("//extension/cdmiteminfo");
 
         if ($cdmiteminfos->length === 1) {
-          // Add the 'source' attribute to the first cdmiteminfo element.
-          $timestamp = date("Y-m-d H:i:s");
           $cdmiteminfo = $cdmiteminfos->item(0);
           // Check to see if the <cdmiteminfo> element has a 'source'
           // attribute, and if so, just return the fragment.
           if ($cdmiteminfo->hasAttribute('source')) {
               return $input;
           }
+          // Add the 'source' attribute to the first cdmiteminfo element.
+          $timestamp = date("Y-m-d H:i:s");
           $now = $dom->createAttribute('source');
           $now->value = 'Exported from CONTENTdm ' . $timestamp;
           $cdmiteminfo->appendChild($now);
@@ -68,8 +76,15 @@ class AddCdmItemInfo extends MetadataManipulator
               'dmGetItemInfo/' . $this->settings['METADATA_PARSER']['alias'] .
               '/' . $this->record_key . '/json';
           $client = new Client();
-          $response = $client->get($item_info_url);
+          try {
+              $response = $client->get($item_info_url);
+          } catch (TransferException $te) {
+              $this->log->addInfo("AddCdmItemInfo",
+                  array('Guzzle error' => $te->getMessage()));
+              return $input;
+          }
           $item_info = $response->getBody();
+          // Add the output of dmGetItemInfo to <cdmiteminfo> as CDATA.
           $cdata = $dom->createCDATASection($item_info);
           $cdmiteminfo->appendChild($cdata);
           return $dom->saveXML($dom->documentElement);
