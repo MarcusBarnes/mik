@@ -6,12 +6,18 @@ use GuzzleHttp\Client;
 use \Monolog\Logger;
 
 /**
- * AddCdmItemInfo - Adds the raw (JSON) metadata for an item from CONTENTdm
+ * AddCdmItemInfo - Adds the raw JSON metadata for an item from CONTENTdm
  * to an <extension> element in the MODS document. This manipulator is
- * probably specific to Simon Fraser University Library's use case.
+ * probably specific to Simon Fraser University Library's use case although
+ * may it serve as an example of a metadta manipulator that adds content to
+ * MODS XML documents.
  *
- * Note that your mappings file must contain a row to  add the following
- * element to your MODS: '<extension><cdmiteminfo></cdmiteminfo></extension>'.
+ * Note that your mappings file must contain a row that adds the following
+ * element to your MODS: '<extension><cdmiteminfo></cdmiteminfo></extension>'
+ * This manipulator doesn't add the <extension> fragment, it only populates
+ * it with data from an external source.
+ *
+ * This metadata manipulator takes no configuration parameters.
  */
 class AddCdmItemInfo extends MetadataManipulator
 {
@@ -40,13 +46,16 @@ class AddCdmItemInfo extends MetadataManipulator
     /**
      * General manipulate wrapper method.
      *
-     *  @param string $input XML fragment to be manipulated. We are only
-     *     interested in <extension><cdmiteminfo> fragment added in the
-     *     mappings file.
+     *  @param string $input The XML fragment to be manipulated. We are only
+     *     interested in the <extension><cdmiteminfo> fragment added in the
+     *     MIK mappings file.
      *
      * @return string
-     *     Manipulated XML fragment, or the original input XML if the
-     *     input is not the fragment we are interested in. 
+     *     One of the manipulated XML fragment, the original input XML if the
+     *     input is not the fragment we are interested in, or an empty string,
+     *     which as the effect of removing the empty <extension><cdmiteminfo>
+     *     fragement from our MODS (if there was an error, for example, we don't
+     *     want empty extension elements in our MODS documents).
      */
     public function manipulate($input)
     {
@@ -62,9 +71,7 @@ class AddCdmItemInfo extends MetadataManipulator
           // Check to see if the <cdmiteminfo> element has a 'source'
           // attribute, and if so, just return the fragment.
           if ($cdmiteminfo->hasAttribute('source')) {
-              // We return an empty string in order to remove the
-              // empty <extension><cdmiteminfo> fragement from our MODS.
-              return '';
+              return $input;
           }
           // Add the 'source' attribute to the first cdmiteminfo element.
           $timestamp = date("Y-m-d H:i:s");
@@ -80,12 +87,23 @@ class AddCdmItemInfo extends MetadataManipulator
           $client = new Client();
           try {
               $response = $client->get($item_info_url);
-          } catch (TransferException $te) {
+          } catch (Exception $e) {
               $this->log->addInfo("AddCdmItemInfo",
-                  array('Guzzle error' => $te->getMessage()));
+                  array('HTTP request error' => $e->getMessage()));
               return '';
           }
           $item_info = $response->getBody();
+
+          // CONTENTdm returns a 200 OK with its error messages, so we can't rely
+          // on catching all 'errors' with the above try/catch block. Instead, we
+          // check to see if the string 'dmcreated' (one of the metadata fields
+          // returned for every object) is in the response body. If it's not,
+          // assume CONTENTdm has returned an error of some sort, log it, and
+          // return.
+          if (!preg_match('/dmcreated/', $item_info)) {
+              $this->log->addInfo("AddCdmItemInfo", array('CONTENTdm internal error' => $item_info));
+              return '';
+          }          
           // If the CONTENTdm metadata contains the CDATA end delimiter, log and return.
           if (preg_match('/\]\]>/', $item_info)) {
               $message = "CONTENTdm metadata for object " . $this->settings['METADATA_PARSER']['alias'] .
@@ -93,13 +111,16 @@ class AddCdmItemInfo extends MetadataManipulator
               $this->log->addInfo("AddCdmItemInfo", array('CONTENTdm metadata warning' => $message));
               return '';
           }
-          // Add the output of dmGetItemInfo to <cdmiteminfo> as CDATA.
+
+          // If we've made it this far, add the output of dmGetItemInfo to
+          // <cdmiteminfo> as CDATA and return the modified XML fragment.
           $cdata = $dom->createCDATASection($item_info);
           $cdmiteminfo->appendChild($cdata);
           return $dom->saveXML($dom->documentElement);
         }
         else {
-            // If current fragment is not <extension><cdmiteminfo>, return it.
+            // If current fragment is not <extension><cdmiteminfo>, return it
+            // unmodified.
             return $input;
         }
     }
