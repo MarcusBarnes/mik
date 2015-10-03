@@ -9,13 +9,15 @@ use \Monolog\Logger;
  * AddCdmItemInfo - Adds the raw JSON metadata for an item from CONTENTdm
  * to an <extension> element in the MODS document. This manipulator is
  * probably specific to Simon Fraser University Library's use case although
- * may it serve as an example of a metadta manipulator that adds content to
+ * it my serve as an example of a metadta manipulator that adds content to
  * MODS XML documents.
  *
- * Note that your mappings file must contain a row that adds the following
- * element to your MODS: '<extension><cdmiteminfo></cdmiteminfo></extension>'
- * This manipulator doesn't add the <extension> fragment, it only populates
- * it with data from an external source.
+ * Note that this manipulator doesn't add the <extension> fragment, it
+ * only populates it with data from an external source. The mappings file
+ * must contain a row that adds the following element to your MODS:
+ * '<extension><cdmiteminfo></cdmiteminfo></extension>', e.g.,
+ * null1,<extension><cdmiteminfo></cdmiteminfo></extension>.
+ *
  *
  * This metadata manipulator takes no configuration parameters.
  */
@@ -28,7 +30,7 @@ class AddCdmItemInfo extends MetadataManipulator
     private $record_key;
 
     /**
-     * Create a new Metadata Instance
+     * Create a new metadata manipulator Instance.
      */
     public function __construct($settings = null, $paramsArray, $record_key)
     {
@@ -66,6 +68,8 @@ class AddCdmItemInfo extends MetadataManipulator
         $xpath = new \DOMXPath($dom);
         $cdmiteminfos = $xpath->query("//extension/cdmiteminfo");
 
+        // There should only be one <cdmiteminfo> fragment in the incoming
+        // XML. If there is 0 or more than 1, return the original.
         if ($cdmiteminfos->length === 1) {
           $cdmiteminfo = $cdmiteminfos->item(0);
           // Check to see if the <cdmiteminfo> element has a 'source'
@@ -112,8 +116,8 @@ class AddCdmItemInfo extends MetadataManipulator
               return '';
           }
 
-          // If we've made it this far, add the output of dmGetItemInfo to
-          // <cdmiteminfo> as CDATA and return the modified XML fragment.
+          // If we've made it this far, add the output of dmGetItemInfo to <cdmiteminfo> as
+          // CDATA and return the modified XML fragment.
           $cdata = $dom->createCDATASection($item_info);
           $cdmiteminfo->appendChild($cdata);
           return $dom->saveXML($dom->documentElement);
