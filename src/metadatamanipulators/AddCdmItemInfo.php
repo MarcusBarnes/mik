@@ -53,8 +53,8 @@ class AddCdmItemInfo extends MetadataManipulator
         $dom = new \DomDocument();
         $dom->loadxml($input, LIBXML_NSCLEAN);
 
+        // Test to see if the current fragment is <extension><cdmiteminfo>.
         $xpath = new \DOMXPath($dom);
-
         $cdmiteminfos = $xpath->query("//extension/cdmiteminfo");
 
         if ($cdmiteminfos->length === 1) {
@@ -62,7 +62,9 @@ class AddCdmItemInfo extends MetadataManipulator
           // Check to see if the <cdmiteminfo> element has a 'source'
           // attribute, and if so, just return the fragment.
           if ($cdmiteminfo->hasAttribute('source')) {
-              return $input;
+              // We return an empty string in order to remove the
+              // empty <extension><cdmiteminfo> fragement from our MODS.
+              return '';
           }
           // Add the 'source' attribute to the first cdmiteminfo element.
           $timestamp = date("Y-m-d H:i:s");
@@ -81,15 +83,23 @@ class AddCdmItemInfo extends MetadataManipulator
           } catch (TransferException $te) {
               $this->log->addInfo("AddCdmItemInfo",
                   array('Guzzle error' => $te->getMessage()));
-              return $input;
+              return '';
           }
           $item_info = $response->getBody();
+          // If the CONTENTdm metadata contains the CDATA end delimiter, log and return.
+          if (preg_match('/\]\]>/', $item_info)) {
+              $message = "CONTENTdm metadata for object " . $this->settings['METADATA_PARSER']['alias'] .
+                  '/' . $this->record_key . ' contains the CDATA end delimiter ]]>'; 
+              $this->log->addInfo("AddCdmItemInfo", array('CONTENTdm metadata warning' => $message));
+              return '';
+          }
           // Add the output of dmGetItemInfo to <cdmiteminfo> as CDATA.
           $cdata = $dom->createCDATASection($item_info);
           $cdmiteminfo->appendChild($cdata);
           return $dom->saveXML($dom->documentElement);
         }
         else {
+            // If current fragment is not <extension><cdmiteminfo>, return it.
             return $input;
         }
     }
