@@ -46,7 +46,7 @@ class CsvSingleFileByExtension extends FetcherManipulator
     {
         // var_dump($records);
         $numRecs = count($records);
-        echo "Fetching $numRecs records, filitering them.\n";
+        echo "Fetching $numRecs records, filtering them.\n";
         // Instantiate the progress bar.
         if (!$this->onWindows) {
             $climate = new \League\CLImate\CLImate;

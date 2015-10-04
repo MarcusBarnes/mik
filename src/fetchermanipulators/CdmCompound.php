@@ -52,7 +52,7 @@ class CdmCompound extends FetcherManipulator
     public function manipulate($all_records)
     {
         $numRecs = count($all_records);
-        echo "Fetching $numRecs records, filitering them.\n";
+        echo "Fetching $numRecs records, filtering them.\n";
         // Instantiate the progress bar if we're not running on Windows.
         if (!$this->onWindows) {
             $climate = new \League\CLImate\CLImate;
