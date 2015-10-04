@@ -49,13 +49,13 @@ class AddContentdmData extends MetadataManipulator
      * General manipulate wrapper method.
      *
      *  @param string $input The XML fragment to be manipulated. We are only
-     *     interested in the <extension><cdmiteminfo> fragment added in the
+     *     interested in the <extension><CONTENTdmData> fragment added in the
      *     MIK mappings file.
      *
      * @return string
      *     One of the manipulated XML fragment, the original input XML if the
      *     input is not the fragment we are interested in, or an empty string,
-     *     which as the effect of removing the empty <extension><cdmiteminfo>
+     *     which as the effect of removing the empty <extension><CONTENTdmData>
      *     fragement from our MODS (if there was an error, for example, we don't
      *     want empty extension elements in our MODS documents).
      */
