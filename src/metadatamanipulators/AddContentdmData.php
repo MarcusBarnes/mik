@@ -16,7 +16,7 @@ use \Monolog\Logger;
  * only populates it with data from CONTENTdm. The mappings file
  * must contain a row that adds the following element to your MODS:
  * '<extension><CONTENTdmData></CONTENTdmData></extension>', e.g.,
- * null1,<extension><CONTENTdmData></CONTENTdmData></extension>.
+ * null5,<extension><CONTENTdmData></CONTENTdmData></extension>.
  *
  * This metadata manipulator takes no configuration parameters.
  */
@@ -88,7 +88,12 @@ class AddContentdmData extends MetadataManipulator
           $mimetype = $dom->createAttribute('mimetype');
           $mimetype->value = 'application/json';
           $dmGetItemInfo->appendChild($mimetype);          
-          $item_info = $this->getCdmData($this->alias, $this->record_key, 'dmGetItemInfo', 'json');
+          $source_url = $this->settings['METADATA_PARSER']['ws_url'] .
+              'dmGetItemInfo/' . $this->alias . '/' . $this->record_key . '/json';
+          $source = $dom->createAttribute('source');
+          $source->value = $source_url;          
+          $dmGetItemInfo->appendChild($source);
+          $item_info = $this->getCdmData($this->alias, $this->record_key, 'dmGetItemInfo', 'json');          
           // CONTENTdm returns a 200 OK with its error messages, so we can't rely
           // on catching all 'errors' with the above try/catch block. Instead, we
           // check to see if the string 'dmcreated' (one of the metadata fields
@@ -121,7 +126,12 @@ class AddContentdmData extends MetadataManipulator
           $dmGetCompoundObjectInfo->appendChild($now);
           $mimetype = $dom->createAttribute('mimetype');
           $mimetype->value = 'text/xml';
-          $dmGetCompoundObjectInfo->appendChild($mimetype);          
+          $dmGetCompoundObjectInfo->appendChild($mimetype);
+          $source = $dom->createAttribute('source');
+          $source_url = $this->settings['METADATA_PARSER']['ws_url'] .
+              'dmGetCompoundObjectInfo/' . $this->alias . '/' . $this->record_key . '/xml';
+          $source->value = $source_url;
+          $dmGetCompoundObjectInfo->appendChild($source);   
           $compound_object_info = $this->getCdmData($this->alias, $this->record_key,
               'dmGetCompoundObjectInfo', 'xml');
           // Only add the <dmGetCompoundObjectInfo> element if the object is compound.
@@ -138,7 +148,12 @@ class AddContentdmData extends MetadataManipulator
           $GetParent->appendChild($now);
           $mimetype = $dom->createAttribute('mimetype');
           $mimetype->value = 'text/xml';
-          $GetParent->appendChild($mimetype);          
+          $GetParent->appendChild($mimetype);
+          $source = $dom->createAttribute('source');
+          $source_url = $this->settings['METADATA_PARSER']['ws_url'] .
+              'GetParent/' . $this->alias . '/' . $this->record_key . '/xml';
+          $source->value = $source_url;
+          $GetParent->appendChild($source);                  
           $parent_info = $this->getCdmData($this->alias, $this->record_key,
               'GetParent', 'xml');
           // Only add the <GetParent> element if the object has a parent
