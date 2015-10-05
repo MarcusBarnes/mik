@@ -170,12 +170,7 @@ class CdmNewspapers extends Writer
             $page_title = 'Page ' . $page_number;
             $this->writePageLevelMetadaFile($page_pointer, $page_title, $page_dir);
         }
-        if ($this->cdmNewspapersFileGetter->cpd_filename) {
-            $cpd_content = $this->cdmNewspapersFileGetter->getCpdFile($record_key);
-            $cpd_output_file_path = $issueObjectPath  . DIRECTORY_SEPARATOR .
-                $this->cdmNewspapersFileGetter->cpd_filename . '.xml';
-            file_put_contents($cpd_output_file_path, $cpd_content);
-        }
+        
     }
 
     /**
