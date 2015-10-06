@@ -213,7 +213,7 @@ class CdmToMods extends Mods
      * @param string $page_pointer CONTENTdm page level pointer.
      * @param string $page_title title for the page.
      */
-    public function createPageLevelModsXML($page_pointer, $page_title)
+    public function createPageLevelModsXML($page_pointer, $page_title, $xmlSnippet = '<extension><CONTENTdmData></CONTENTdmData></extension>')
     {
         $modsString = '';
 
@@ -233,6 +233,11 @@ class CdmToMods extends Mods
             $CONTENTdmItemUrl .= $collectionAlias . '/id/'. $page_pointer .'</identifier>';
             $modsOpeningTag .= $CONTENTdmItemUrl;
         }
+
+        if (isset($this->metadatamanipulators)) {
+            $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $page_pointer);
+        }
+        $modsOpeningTag .= $xmlSnippet;
 
         $modsString = $modsOpeningTag . '</mods>';
 
