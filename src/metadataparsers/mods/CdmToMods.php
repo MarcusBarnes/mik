@@ -293,7 +293,7 @@ class CdmToMods extends Mods
             $nodeListObj = $xml->getElementsByTagName($nodeName);
             if ($nodeListObj->length >= 2 && !in_array($nodeName, $this->repeatableWrapperElements)) {
                 foreach ($nodeListObj as $node) {
-                    if ($node->hasChildNodes() && !$node->hasAttributes()) {
+                    if ($node->hasChildNodes() /*&& !$node->hasAttributes()*/) {
                         foreach ($node->childNodes as $childNode) {
                             if ($childNode->nodeType == XML_ELEMENT_NODE) {
                                 $wrapperDomNodes[] = $node;
@@ -320,25 +320,85 @@ class CdmToMods extends Mods
     {
         $consolidatedWrapperElementsArray = array();
         $elementNameTrackingArray = array();
+        $elementSignatureTrackingArray = array();
         foreach ($wrapperElementArray as $wrapperElement) {
-            if ($wrapperElement->hasAttributes()) {
-                // if the wrapper element has attributes, we will
-                // not consolidate and repeat it.
-                $consolidatedWrapperElementsArray[] = $wrapperElement;
+            $name = $wrapperElement->nodeName;
+            $attributesNodeMap = $wrapperElement->attributes;
+            //echo "Node $name has attributes: " . PHP_EOL;
+            $length = $attributesNodeMap->length;
+            for($i=0; $i < $length; ++$i){
+               $attributeItem = $attributesNodeMap->item($i);
+               //var_dump($attributeItem);
+               $attributeName = $attributeItem->name;
+               $attributeValue = $attributeItem->value;
+               //echo " * \"$attributeName\" = $attributeValue " . PHP_EOL;
+            }
+
+            $elementName = $wrapperElement->nodeName;
+            // store elements attributes (with values) in hashed array
+            // array('attributeName' =? 'attributeValue')
+            $elementAttributesMap = array();
+            $attributesNodeMap = $wrapperElement->attributes;
+            $len = $attributesNodeMap->length;
+            for($i = 0 ; $i < $len; ++$i) {
+                $attributeItem = $attributesNodeMap->item($i);
+                $attributeName = $attributeItem->name;
+                $attributeValue = $attributeItem->value;
+                $elementAttributesMap[$attributeName] = $attributeValue;
+            }
+            //var_dump($elementAttributesMap);
+            // dev - rather than just check element name, check element name
+            // and element attributes.
+            $elementSignature = array($elementName, $elementAttributesMap);
+            
+            if (in_array($elementSignature, $elementSignatureTrackingArray)) {
+                // $elementName is already in the tracking array
+                // push the element's childnodes to the end of the array.
+                $keyFromSignature = $this->signatureToString($elementSignature); 
+                array_push($elementNameTrackingArray[$keyFromSignature], $wrapperElement->childNodes);
             } else {
-                $elementName = $wrapperElement->nodeName;
-                if (array_key_exists($elementName, $elementNameTrackingArray)) {
-                    // $elementName is already in the tracking array
-                    // push the element's childnodes to the end of the array.
-                    array_push($elementNameTrackingArray[$elementName], $wrapperElement->childNodes);
-                } else {
-                    // $elementName is not in the tracking array, add it.
-                    $elementNameTrackingArray[$elementName] = array($wrapperElement->childNodes);
-                }
+                // $elementSignature is not in the tracking array, add it.
+                array_push($elementSignatureTrackingArray, $elementSignature);
+
+                $keyFromSignature = $this->signatureToString($elementSignature);   
+                 // $elementName is not in the tracking array, add it.
+                $elementNameTrackingArray[$keyFromSignature] = array($wrapperElement->childNodes);
             }
         }
+        //var_dump($elementSignatureTrackingArray);
+        //var_dump($elementNameTrackingArray);
+        //exit();
 
         return $elementNameTrackingArray;
+    }
+
+
+    /**
+     * Turns an signature to a string for use 
+     */
+    private function signatureToString($elementSignature)
+    {   
+
+
+        $signatureString = $elementSignature[0];
+
+        $attributesKeyValuesArray = $elementSignature[1];
+
+        //echo count($attributesKeyValuesArray);
+        //var_dump($attributesKeyValuesArray);
+        
+        if(count($attributesKeyValuesArray) > 0){
+
+            $signatureString .=  "?";
+
+            foreach($attributesKeyValuesArray as $key => $value) {
+
+               $signatureString .= $key . "=" . $value . "|";
+            }
+        }
+        
+        return $signatureString;  
+        
     }
 
     /**
@@ -366,10 +426,11 @@ class CdmToMods extends Mods
         //  1) They have child elements of type XML_ELEMENT_NODE (Value: 1)
         $wrapperElementArray =
           $this->determineRepeatedWrapperChildElements($xml, $uniqueChildNodeNamesArray);
-
+        //var_dump($wrapperElementArray);
         // @ToDo: Verify that wrapper elements don't have different attributes.
 
         // remove repeated wrapper nodes.
+        
         foreach ($wrapperElementArray as $wrapperElement) {
             $nodeName = $wrapperElement->nodeName;
             $deleteThisNode = $xml->getElementsByTagName($nodeName)->item('0');
@@ -379,7 +440,7 @@ class CdmToMods extends Mods
                 $xml->saveXML($parentNode);
             }
         }
-
+        
         // consolidate nodes with one wrapper
         $consolidatedRepeatedWrapperElements =
           $this->consolidateWrapperElements($wrapperElementArray);
@@ -387,19 +448,65 @@ class CdmToMods extends Mods
         // Add nodes back into $xml document.
         $modsElement = $xml->getElementsByTagName('mods')->item(0);
         foreach ($consolidatedRepeatedWrapperElements as $key => $valueArray) {
+            //var_dump($key);
+            // $elementSignature array(elementName, array(attributeName=>attributeKey))
+            $elementSignature = $this->elementSignatureFromString($key);
+            $elementName = $elementSignature[0];
+            $elementAttributes = $elementSignature[1];
+
             //$wrapperElement = $xml->createElement($key);
-            $wrapperElement = $xml->createElementNS('http://www.loc.gov/mods/v3', $key);
+            $wrapperElement = $xml->createElementNS('http://www.loc.gov/mods/v3', $elementName);
+            if(!empty($elementAttributes)){
+                // add attributes and values
+                foreach($elementAttributes as $key => $value) {
+                    $wrapperElement->setAttribute($key, $value);
+                }
+
+            }
+
             foreach ($valueArray as $nodes) {
                 foreach ($nodes as $node) {
                     $wrapperElement->appendChild($node);
                 }
             }
             $modsElement->appendChild($wrapperElement);
+            
         }
+        //exit();
 
         $xmlString = $xml->saveXML();
         return $xmlString;
 
+    }
+
+    /**
+     * Turn elementSignatureString into element name and attributes (with values)
+     * @param string $elementSignatureString example elementName?attribute0=value0|attribute1=value1|attribute2=value2
+     * @return array [elementNmae, array(attribute0=>value0, attribute1=value1, attribute2=value2, )]
+     */
+    private function elementSignatureFromString($elementSignatureString){
+
+            $elementNameAttributesArray = explode('?', $elementSignatureString);
+
+            $elementName = $elementNameAttributesArray[0];
+            
+            $elementAttributeKeyValueArray = array();
+            if(count($elementNameAttributesArray) > 1){
+                // element has attributes.
+                $elementAttributesArray = explode('|', $elementNameAttributesArray[1]);
+                // remove empty, false, or null values from the array.
+                $elementAttributesArray = array_filter($elementAttributesArray);
+                foreach($elementAttributesArray as $attributeValue){
+                    $attributeValuePair = explode('=', $attributeValue);
+                    $attributeName = $attributeValuePair[0];
+                    $attributeValue = $attributeValuePair[1];
+                    $elementAttributeKeyValueArray[$attributeName] = $attributeValue;
+
+                }
+            }
+             
+            return array($elementName, $elementAttributeKeyValueArray);
+    
     }
 
     /**
