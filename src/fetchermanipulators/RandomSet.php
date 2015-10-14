@@ -61,7 +61,7 @@ class RandomSet extends FetcherManipulator
         }
 
         $randomSet = $this->getRandomSet($numRecs);
-        var_dump($randomSet);
+
         $record_num = 0;
         $filtered_records = array();
         foreach ($all_records as $record) {
@@ -79,6 +79,7 @@ class RandomSet extends FetcherManipulator
         if ($this->onWindows) {
             print "\n";
         }
+
         return $filtered_records;
     }
 
@@ -93,15 +94,58 @@ class RandomSet extends FetcherManipulator
      */
     public function getRandomSet($numRecs)
     {
-        $ret = array();
-        for ($i = 1; $i <= $this->setSize; $i++) {
-            $selected = rand(0, $numRecs);
-            if (!in_array($selected, $ret)) {
-                $ret[] = $selected;
+        if ($this->setSize >= $numRecs) {
+            $this->setSize = $numRecs;
+        }
+
+        $randomSet = array();
+        $discards = array();
+        for ($i = 0; $i < $this->setSize; ++$i) {
+            $selected = mt_rand(0, $numRecs - 1);
+            if (!in_array($selected, $randomSet)) {
+                $randomSet[] = $selected;
             }
         }
-        sort($ret, SORT_NUMERIC);
-        return $ret;
+        // If the number of randomly chosen records is less than
+        // the number required to be in $randomSet, choose the
+        // shortfail from the records that are not in $randomSet.
+        if (count($randomSet) < $this->setSize) {
+            $shortfall = $this->setSize - count($randomSet);
+            // Get an array of the auto-incremented record numbers of
+            // all the items that didn't make it into $randomSet.
+            $unchosen_record_nums = array_diff(range(0, $numRecs - 1), $randomSet);
+            // Now we have a list of record numbers that we can draw from
+            // if we need some extras for making up a full $set. We
+            // reset the indexes of this array before we pass it off
+            // to getExtraRandom().
+            $unchosen_record_nums = array_values($unchosen_record_nums);            
+            $extras = $this->getExtraRandom($unchosen_record_nums, $shortfall);
+            sort($randomSet, SORT_NUMERIC);
+            $randomSet = array_merge($randomSet, $extras);
+        }
+        sort($randomSet, SORT_NUMERIC);
+        return $randomSet;
+    }
+
+    /**
+     * Generates a unique set of integers randomly
+     * selected from $discards.
+     *
+     * @param array $discards
+     *   Array containing the integers between 1 and
+     *   $numRecs not selected in getRandomSet().
+     * @param int $quantity
+     *   The number of elements from $notSelected to
+     *   return.
+     * @return array
+     *   The list of integers randomly selected from
+     *   $discards.
+     */
+    public function getExtraRandom($discards, $quantity)
+    {
+        shuffle($discards);
+        $flipped_discards = array_flip($discards);
+        return (array) array_rand($flipped_discards, $quantity);
     }    
 
 }
