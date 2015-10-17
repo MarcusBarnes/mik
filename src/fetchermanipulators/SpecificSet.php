@@ -2,6 +2,7 @@
 
 namespace mik\fetchermanipulators;
 use League\CLImate\CLImate;
+use \Monolog\Logger;
 
 /**
  * @file
@@ -46,6 +47,12 @@ class SpecificSet extends FetcherManipulator
         $this->pathToInputFile = $manipulator_settings[1];
         // To get the value of $onWindows.
         parent::__construct();
+        // Set up logger.
+        $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
+        $this->log = new \Monolog\Logger('config');
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
+            Logger::INFO);
+        $this->log->pushHandler($this->logStreamHandler);        
     }
 
     /**
@@ -59,7 +66,7 @@ class SpecificSet extends FetcherManipulator
     public function manipulate($all_records)
     {
         $numRecs = count($all_records);
-        echo "Filtering $numRecs records through the SpecificSet manipulator.\n";
+        echo "Filtering $numRecs records through the SpecificSet fetcher manipulator.\n";
         // Instantiate the progress bar if we're not running on Windows.
         if (!$this->onWindows) {
             $climate = new \League\CLImate\CLImate;
@@ -90,7 +97,7 @@ class SpecificSet extends FetcherManipulator
     }
 
     /**
-     * Retrieves a list of object identifiers from a
+     * Retrieves a list of object record keys from a
      * text file.
      *
      * @return array
@@ -99,7 +106,9 @@ class SpecificSet extends FetcherManipulator
     public function getSpecificSet()
     {
         if (!file_exists($this->pathToInputFile)) {
-            // @todo: Log the fact that the file is not found.
+            $this->log->addInfo("SpecificSet", array(
+                'Input file not found' => $this->pathToInputFile)
+            );
             return array();
         }
         $record_keys = file($this->pathToInputFile);
