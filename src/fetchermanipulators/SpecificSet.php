@@ -44,9 +44,10 @@ class SpecificSet extends FetcherManipulator
      */
     public function __construct($settings, $manipulator_settings)
     {
+        $this->settings = $settings;
         $this->pathToInputFile = $manipulator_settings[1];
         // To get the value of $onWindows.
-        parent::__construct();
+        parent::__construct($settings);
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
         $this->log = new \Monolog\Logger('config');
