@@ -41,7 +41,7 @@ class CsvSingleFileByFilename extends FetcherManipulator
     public function manipulate($records)
     {
         $numRecs = count($records);
-        echo "Filtering $numRecs records through the Foo manipulator.\n";
+        echo "Filtering $numRecs records through the CsvSingleFileByFilename fetcher manipulator.\n";
         // Instantiate the progress bar.
         if (!$this->onWindows) {
             $climate = new \League\CLImate\CLImate;
