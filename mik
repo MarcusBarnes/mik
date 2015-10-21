@@ -4,6 +4,8 @@
 /**
  * Main Move to Islandora Kit script.
  **/
+// Basic wallclock timing
+$time_start = microtime(true);
 
 // Monolog requires that the date.timezone PHP setting be set else
 // it will create an E_WARNING, which will be turned into an excption 
@@ -65,6 +67,12 @@ $pathToLog = $settings['LOGGING']['path_to_log'];
 $log = new Logger('ErrorException');
 $logStreamHandler= new StreamHandler($pathToLog, Logger::ERROR);
 $log->pushHandler($logStreamHandler);
+
+// Set up logger addInfo stream for main mik script.
+$logInfo = new Logger('Info');
+$logInfoStreamHandler = new StreamHandler($pathToLog, Logger::INFO);
+$logInfo->pushHandler($logInfoStreamHandler);
+
 // Add error-exceptions to the log using 
 // $log->addError('log message');
 // or 
@@ -205,3 +213,9 @@ if (count($problem_records_array)>0) {
 }
 
 restore_error_handler();
+// Basic wallclock timing
+$time_end = microtime(true);
+$time = $time_end - $time_start;
+$timeMessage =  "Completed in " . $time/60 . " minutes." . PHP_EOL;
+echo $timeMessage;
+$logInfo->addInfo($timeMessage);
