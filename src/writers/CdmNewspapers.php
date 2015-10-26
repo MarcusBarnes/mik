@@ -106,7 +106,10 @@ class CdmNewspapers extends Writer
 
             // Write out $page_object_info['full'], which we'll use as the OCR datastream.
             $ocr_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OCR.txt';
-            file_put_contents($ocr_output_file_path, $page_object_info['full']);
+            if (isset($page_object_info['full'])) {
+                $ocr_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OCR.txt';
+                file_put_contents($ocr_output_file_path, $page_object_info['full']);
+            }
 
             // Retrieve the file associated with the child-level object. In the case of
             // the Chinese Times and some other newspapers, this is a JPEG2000 file.
