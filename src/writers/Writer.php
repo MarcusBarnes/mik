@@ -33,6 +33,11 @@ abstract class Writer
     public $overwrite_content_files;
 
     /**
+     * @var array $datastreams - array of expected datastreams; empty if no datastreams 
+     * in the config were set.
+     */ 
+    public $datastreams = array();
+    /**
      * Create a new Writer Instance
      * @param array $settings configuration settings.
      */
@@ -43,6 +48,10 @@ abstract class Writer
         $this->outputDirectory = $this->settings['WRITER']['output_directory'];
         if (isset($this->settings['WRITER']['metadata_filename'])) {
           $this->metadataFileName = $this->settings['WRITER']['metadata_filename'];
+        }
+
+        if (isset($this->settings['WRITER']['datastreams'])) {
+            $this->datastreams = $this->settings['WRITER']['datastreams'];
         }
 
         // Default is to overwrite metadata and content files.

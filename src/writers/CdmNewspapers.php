@@ -92,6 +92,7 @@ class CdmNewspapers extends Writer
             // Create subdirectory for each page of newspaper issue
             $page_object_info = $this->fetcher->getItemInfo($page_pointer);
             $page_dir = $issueObjectPath  . DIRECTORY_SEPARATOR . $page_number;
+            
             // Create a directory for each day of the newspaper.
             if (!file_exists($page_dir)) {
                 mkdir($page_dir, 0777, true);
@@ -103,20 +104,32 @@ class CdmNewspapers extends Writer
 
             print "Exporting files for issue " . $this->issueDate
               . ', page ' . $page_number . "\n";
+            
+            // If there were no datastreams explicitly set in the configuration,
+            // set flag so that all datastreams in the writer class are run.
+            // $this->datareams is an empty array by default.
+            $no_datastreams_setting_flag = false;
+            if (count($this->datastreams) == 0) {
+               $no_datastreams_setting_flag = true;
+            }
 
             // Write out $page_object_info['full'], which we'll use as the OCR datastream.
             $ocr_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OCR.txt';
-            if (isset($page_object_info['full'])) {
+            $OCR_expected = in_array('OCR', $this->datastreams);
+            if ($OCR_expected xor $no_datastreams_setting_flag) {
                 $ocr_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OCR.txt';
                 file_put_contents($ocr_output_file_path, $page_object_info['full']);
             }
 
             // Retrieve the file associated with the child-level object. In the case of
             // the Chinese Times and some other newspapers, this is a JPEG2000 file.
-            $jp2_content = $this->cdmNewspapersFileGetter
-                ->getChildLevelFileContent($page_pointer, $page_object_info);
-            $jp2_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'JP2.jp2';
-            file_put_contents($jp2_output_file_path, $jp2_content);
+            $JP2_expected = in_array('JP2', $this->datastreams);
+            if ($JP2_expected xor $no_datastreams_setting_flag) {
+                $jp2_content = $this->cdmNewspapersFileGetter
+                    ->getChildLevelFileContent($page_pointer, $page_object_info);
+                $jp2_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'JP2.jp2';
+                file_put_contents($jp2_output_file_path, $jp2_content);
+            }
 
             // @ToDo: Determine if it's better to use $image_info as a parameter
             // in getThumbnailcontent and getPreviewJPGContent - as this
@@ -127,51 +140,48 @@ class CdmNewspapers extends Writer
             // which should be 200 pixels high. The filename should be TN.jpg.
             // See http://www.contentdm.org/help6/custom/customize2aj.asp for CONTENTdm API docs.
             // Based on a target height of 200 pixels, get the scale value.
-            $thumbnail_content = $this->cdmNewspapersFileGetter
+            $TN_expected = in_array('TN', $this->datastreams);
+            if ($TN_expected xor $no_datastreams_setting_flag) {
+                $thumbnail_content = $this->cdmNewspapersFileGetter
                                       ->getThumbnailcontent($page_pointer);
-            $thumbnail_output_file_path = $page_dir . DIRECTORY_SEPARATOR .'TN.jpg';
-            file_put_contents($thumbnail_output_file_path, $thumbnail_content);
+                $thumbnail_output_file_path = $page_dir . DIRECTORY_SEPARATOR .'TN.jpg';
+                file_put_contents($thumbnail_output_file_path, $thumbnail_content);
+            }
 
             // Get a JPEG to use as the Islandora preview image,
             //which should be 800 pixels high. The filename should be JPG.jpg.
-            $jpg_content = $this->cdmNewspapersFileGetter
+            $JPEG_expected = in_array('JPEG', $this->datastreams);
+            if ($JPEG_expected xor $no_datastreams_setting_flag) {
+                $jpg_content = $this->cdmNewspapersFileGetter
                                 ->getPreviewJPGContent($page_pointer);
-            $jpg_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'JPEG.jpg';
-            file_put_contents($jpg_output_file_path, $jpg_content);
+                $jpg_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'JPEG.jpg';
+                file_put_contents($jpg_output_file_path, $jpg_content);
+            }
 
+            $OBJ_expected = in_array('OBJ', $this->datastreams);
+            if ($OBJ_expected xor $no_datastreams_setting_flag) {
+                // Create OBJ file for page.
+                $filekey = $page_number - 1;
+                $pathToFile = $OBJFilesArray[$filekey];
+
+                $pathToPageOK = $this->cdmNewspapersFileGetter
+                   ->checkNewspaperPageFilePath($pathToFile, $page_number);
+
+                if ($pathToPageOK){
+                    $obj_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.tiff';
+                    // assumes that the source destination is on a l
+                    copy($pathToFile, $obj_output_file_path);
+                }
+            }
 
             // For each page, we need two files that can't be downloaded from CONTENTdm: PDF.pdf and MODS.xml.
-
-            // Create OBJ file for page.
-            $filekey = $page_number - 1;
-            $pathToFile = $OBJFilesArray[$filekey];
-
-            $pathToPageOK = $this->cdmNewspapersFileGetter
-                 ->checkNewspaperPageFilePath($pathToFile, $page_number);
-
-            if ($pathToPageOK){
-                $obj_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.tiff';
-                // assumes that the source destination is on a l
-                copy($pathToFile, $obj_output_file_path);
-            }
-
-            /* 
-            // file_get_contents and file_put_contents may cause memory 
-            // issues for larger files.  May need to stream files.     
-            $obj_content = $this->cdmNewspapersFileGetter
-                 ->getPageOBJfileContent($pathToFile, $page_number);        
-            if ($obj_content != false) {
-                $obj_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.tiff';
-                file_put_contents($obj_output_file_path, $obj_content);
-            } else {
-                // log
-                echo "obj_content = false : $pathToFile\n";
-            }
-            */
-
+            
             // Write outut page level MODS.XML
-            $page_title = 'Page ' . $page_number;
-            $this->writePageLevelMetadaFile($page_pointer, $page_title, $page_dir);
+            $MODS_expected = in_array('MODS', $this->datastreams);
+            if ($MODS_expected xor $no_datastreams_setting_flag) {
+                $page_title = 'Page ' . $page_number;
+                $this->writePageLevelMetadaFile($page_pointer, $page_title, $page_dir);
+            }
         }
         
     }
