@@ -41,6 +41,13 @@ class CdmNewspapers extends FileGetter
     private $thumbnail;
 
     /**
+     * @var array allowed_file_extensions_for_OBJ - array of file extensions when searching for Master files (for OBJ datastreams).
+     * This helps handle the situaiton where the same file types are given different file extensions due to OS or applicatoin differences.
+     * For example, tiff and tif for normal tiff files.
+     */
+    public $allowed_file_extensions_for_OBJ = array('tiff', 'tif');
+
+    /**
      * Create a new CONTENTdm Fetcher Instance
      * @param array $settings configuration settings.
      */
@@ -49,6 +56,11 @@ class CdmNewspapers extends FileGetter
         $this->settings = $settings['FILE_GETTER'];
         $this->utilsUrl = $this->settings['utils_url'];
         $this->alias = $this->settings['alias'];
+        
+        if (isset($this->settings['allowed_file_extensions_for_OBJ'])) {
+            $this->allowed_file_extensions_for_OBJ = $this->settings['allowed_file_extensions_for_OBJ'];
+        }
+
         //$this->inputDirectory = $this->settings['input_directory'];
         $this->inputDirectories = $this->settings['input_directories'];
         
@@ -56,7 +68,7 @@ class CdmNewspapers extends FileGetter
         $potentialObjFiles = array();
         foreach ($this->inputDirectories as $inputDirectory) {
             $potentialObjFilesPart = $this
-                ->getIssueMasterFiles($inputDirectory);
+                ->getIssueMasterFiles($inputDirectory, $this->allowed_file_extensions_for_OBJ );
             $potentialObjFiles = array_merge($potentialObjFiles, $potentialObjFilesPart);
         }
         $this->OBJFilePaths = $this->determineObjItems($potentialObjFiles);
@@ -110,7 +122,7 @@ class CdmNewspapers extends FileGetter
         
     }
 
-    private function getIssueMasterFiles($pathToIssue, $allowedFileTypes = array('tiff', 'tif'))
+    private function getIssueMasterFiles($pathToIssue, $allowedFileTypes)
     {
         $potentialFilesArray = array();
 
