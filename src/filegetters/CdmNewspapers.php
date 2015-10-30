@@ -41,12 +41,6 @@ class CdmNewspapers extends FileGetter
     private $thumbnail;
 
     /**
-     * @var string $cpd_filename - filename for the .cpd file.
-     * If not defined in .ini file, do not retrieve the file.
-     */
-    public $cpd_filename;
-
-    /**
      * Create a new CONTENTdm Fetcher Instance
      * @param array $settings configuration settings.
      */
@@ -57,9 +51,7 @@ class CdmNewspapers extends FileGetter
         $this->alias = $this->settings['alias'];
         //$this->inputDirectory = $this->settings['input_directory'];
         $this->inputDirectories = $this->settings['input_directories'];
-        if (isset($this->settings['cpd_filename']) && strlen($this->settings['cpd_filename'])) {
-            $this->cpd_filename = $this->settings['cpd_filename'];
-        }
+        
         // interate over inputDirectories to create $potentialObjFiles array.
         $potentialObjFiles = array();
         foreach ($this->inputDirectories as $inputDirectory) {
@@ -260,15 +252,6 @@ class CdmNewspapers extends FileGetter
             return false;
         }
         
-    }
-
-    public function getCpdFile($pointer)
-    {
-        $ws_url = $this->settings['ws_url'];
-        $alias = $this->alias;
-        $query_url = $ws_url . 'dmGetCompoundObjectInfo/' . $alias . '/' .  $pointer . '/xml';
-        $cpd_content = file_get_contents($query_url);
-        return $cpd_content;
     }
 
 }
