@@ -37,6 +37,14 @@ abstract class Writer
      * in the config were set.
      */ 
     public $datastreams = array();
+
+    /** 
+     * @var $OBJ_file_extension - the file extension to use for the OBJ datastream.
+     * Default to using TIFF for newspaper OBJ files if not stated explicitily in the 
+     * configuration settings. (See the constructor.)
+     */ 
+    public $OBJ_file_extension;
+
     /**
      * Create a new Writer Instance
      * @param array $settings configuration settings.
@@ -52,6 +60,10 @@ abstract class Writer
 
         if (isset($this->settings['WRITER']['datastreams'])) {
             $this->datastreams = $this->settings['WRITER']['datastreams'];
+        }
+
+        if (isset($this->settings['WRITER']['OBJ_file_extension'])){
+            $this->OBJ_file_extension = $this->settings['WRITER']['OBJ_file_extension'];
         }
 
         // Default is to overwrite metadata and content files.

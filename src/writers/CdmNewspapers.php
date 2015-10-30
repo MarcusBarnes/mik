@@ -65,11 +65,14 @@ class CdmNewspapers extends Writer
            $this->metadataFileName = 'MODS.xml';
         } 
         
+        // If OBJ_file_extension was not set in the configuration, default to tiff.
+        if(!isset($this->OBJ_file_extension)) {
+            $this->OBJ_file_extension = 'tiff';
+        }
+        
         $metadtaClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
         $this->metadataParser = new $metadtaClass($settings);
 
-        //$metadataParserClass =  'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
-        //$this->metadataParser = new $metadataParserClass($settings);
     }
 
     /**
@@ -168,7 +171,7 @@ class CdmNewspapers extends Writer
                    ->checkNewspaperPageFilePath($pathToFile, $page_number);
 
                 if ($pathToPageOK){
-                    $obj_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.tiff';
+                    $obj_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.' . $this->OBJ_file_extension;
                     // assumes that the source destination is on a l
                     copy($pathToFile, $obj_output_file_path);
                 }
