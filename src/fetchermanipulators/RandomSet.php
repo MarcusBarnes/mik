@@ -53,7 +53,7 @@ class RandomSet extends FetcherManipulator
     public function manipulate($all_records)
     {
         $numRecs = count($all_records);
-        echo "Fetching $numRecs records, filtering them.\n";
+        echo "Filtering $numRecs records through the RandomSet fetcher manipulator.\n";
         // Instantiate the progress bar if we're not running on Windows.
         if (!$this->onWindows) {
             $climate = new \League\CLImate\CLImate;
