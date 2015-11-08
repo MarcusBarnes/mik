@@ -54,8 +54,7 @@ class AddUuidToMods extends MetadataManipulator
 
         // Test to see if the current fragment is <identifier type="uuid">.
         $xpath = new \DOMXPath($dom);
-        $uuid_identifiers = $xpath->query("//identifier[@type='uuid'");
-
+        $uuid_identifiers = $xpath->query("//identifier[@type='uuid']");
         // There should only be one <identifier type="uuid"> fragment in the
         // incoming XML. If there is 0 or more than 1, return the original.
         if ($uuid_identifiers->length === 1) {
@@ -64,7 +63,9 @@ class AddUuidToMods extends MetadataManipulator
                 $uuid4 = Uuid::uuid4();
                 $uuid4_string = $uuid4->toString();
             } catch (UnsatisfiedDependencyException $e) {
-                // @todo: Log error and return $input.
+                // Log error and return $input.
+                $this->log->addError("AddUuidToMods",
+                    array('UUID generation error' => $e->getMessage()));
             }
             $uuid_identifier->nodeValue = $uuid4_string;
 
