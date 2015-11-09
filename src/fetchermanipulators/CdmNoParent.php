@@ -7,21 +7,18 @@ use \Monolog\Logger;
 
 /**
  * @file
- * Fetcher manipulator that filters for objects that have a parent.
- * Only objects that have no parent are included in the fetch.
- */
+ * Fetcher manipulator that filters for objects that do not have a parent.
+ *
+ * Only objects that have no parent and that are not compound objects
+ * are included in the fetch. For CONTENTdm fetches, we alreadt supress
+ * child objects in the query to get all objects, so the separate check
+ * here for GetParent is probably redundant.
+ */ 
 
 class CdmNoParent extends FetcherManipulator
 {
-
     /**
-     * @var string $record_key - the unique identifier for the metadata
-     *    record being manipulated.
-     */
-    private $record_key;
-
-    /**
-     * Create a new CdmSingleFileByExtension fetchermanipulator Instance.
+     * Create a new CdmNoParent fetchermanipulator Instance.
      *
      * @param array $settings
      *   All of the settings from the .ini file.
@@ -34,6 +31,7 @@ class CdmNoParent extends FetcherManipulator
      */
     public function __construct($settings, $manipulator_settings)
     {
+        $this->settings = $settings;
         $this->alias = $this->settings['METADATA_PARSER']['alias'];
 
         // To get the value of $onWindows.
@@ -48,9 +46,8 @@ class CdmNoParent extends FetcherManipulator
     }
 
     /**
-     * Tests each record to see if the extension of the file named in
-     * the 'find' field has an extension matching any in the list of
-     * extensions defined as manipulator paramters.
+     * Tests each record to see if the 'filetype' propery is not 'cpd',
+     * and then tests to see whether the object has no parent.
      *
      * @param array $all_records
      *   All of the records from the fetcher.
@@ -70,12 +67,16 @@ class CdmNoParent extends FetcherManipulator
 
         $record_num = 0;
         $filtered_records = array();
-        foreach ($all_records as $record) {
-            if (property_exists($record, 'find') &&
-                is_string($record->dmrecord) && strlen($record->dmrecord)) {
-                $pointer = $record->dmrecord;
-                // We want only the records for Cdm objects that have no parent.
-                if (!$this->getParent($pointer)) {
+        foreach ($all_records as $record) {  
+            if (property_exists($record, 'key') &&
+                property_exists($record, 'filetype') &&
+                is_string($record->filetype) &&
+                // We want only the records for Cdm objects that are not compound.
+                $record->filetype != 'cpd') {
+                $pointer = $record->key;
+
+                // And that have no parent.
+                if (!$this->getCdmParent($pointer)) {
                     $filtered_records[] = $record;
                 }
                 $record_num++;
@@ -94,19 +95,20 @@ class CdmNoParent extends FetcherManipulator
     }
 
     /**
-     * Fetch the output of the CONTENTdm web API GetParent function
+     * Get the output of the CONTENTdm web API GetParent function
      * for the current object.
      *
      * @param string $pointer
      *   The CONTENTdm pointer for the current object.
      *
      * @return string|false
-     *   The output of the CONTENTdm API request, in the format specified,
+     *   The output of the CONTENTdm GetParent API request,
      *   or false if the parent is -1 (no parent).
      */
     private function getCdmParent($pointer)
     {
-          // Use Guzzle to fetch the output of the call to dmGetItemInfo
+
+          // Use Guzzle to fetch the output of the call to GetParent
           // for the current object.
           $url = $this->settings['METADATA_PARSER']['ws_url'] .
               'GetParent/' . $this->alias . '/' . $pointer . '/json';
@@ -114,12 +116,13 @@ class CdmNoParent extends FetcherManipulator
           try {
               $response = $client->get($url);
           } catch (Exception $e) {
-              $this->log->addInfo("AddContentdmData",
+              $this->log->addInfo("CdmNoParent",
                   array('HTTP request error' => $e->getMessage()));
-              return '';
+              return true;
           }
           $body = $response->getBody();
-          $parent_info = json_decode($body, true);
+          $parent_info = json_decode($body, true);       
+
           if ($parent_info['parent'] == '-1') {
               return false;
           }
