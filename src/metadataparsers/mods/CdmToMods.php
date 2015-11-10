@@ -236,8 +236,17 @@ class CdmToMods extends Mods
 
         if (isset($this->metadatamanipulators)) {
             $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $page_pointer);
+            $modsOpeningTag .= $xmlSnippet;
         }
-        $modsOpeningTag .= $xmlSnippet;
+
+        if (in_array('AddUuidToMods', $this->metadatamanipulators)) {
+            
+            $xmlSnippet = "<identifier type='uuid'/>";
+            // Add the abililty to apply known metadata manipulator when conditionally used?
+            $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $page_pointer);
+            $modsOpeningTag .= $xmlSnippet;
+        }
+        
 
         $modsString = $modsOpeningTag . '</mods>';
 
