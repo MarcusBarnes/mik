@@ -46,18 +46,56 @@ function islandora_sp_basic_image($options) {
     // print_r($options);
 	$files = explode(',', $options['files']);
 	// Get a list of all of the first required file.
-	$pattern = $options['dir'] . DIRECTORY_SEPARATOR . trim($files[0]);
-    $first_files = glob($pattern);
+	$first_file_pattern = $options['dir'] . DIRECTORY_SEPARATOR . trim($files[0]);
+    $first_files = glob($first_file_pattern);
     if (!count($first_files)) {
-        exit("Can't find any files in " . $options['dir'] . " matching the pattern " . $pattern . "\n");
+        exit("Can't find any files in " . $options['dir'] . " matching the pattern " . $first_file_pattern . "\n");
     }
 
     // Check 1: If we haven't exited, confirm that the directory contains the
     // same number of files for each of the entries in $options['files'].
+    $file_counts = array($files[0] => count($first_files));
+    array_shift($files);
+    foreach ($files as $file) {
+	    $pattern = $options['dir'] . DIRECTORY_SEPARATOR . trim($file);
+        $file_list = glob($pattern);
+        $file_counts[$file] = count($file_list);
+    }
 
+    // To see if each file has the same count, reduce the number of counts
+    // and if we have one value, we're good. If we don't, we have a mismatch.
+    $totals = array_values($file_counts);
+    $totals = array_unique($totals);
+    if (count($totals) != 1) {
+      $nums_match = 'No';
+    }
+    else {
+       $nums_match = 'Yes';
+    }
 
-    // Check 2: Get all other files in $options['files']
+    // Check 2: Get all other files in $options['files']	
     // and match each one to each entry in $first_files.
+    $extensions = array();
+    foreach ($files as $file) {
+    	$extensions[] = pathinfo($file, PATHINFO_EXTENSION);
+    }
+    foreach ($first_files as $file) {
+    	$filename = pathinfo($file, PATHINFO_FILENAME);
+    	foreach ($extensions as $ext) {
+            $file_to_check = $filename . '.' . $ext;
+            $full_path = $options['dir'] . DIRECTORY_SEPARATOR . $file_to_check;
+            if (file_exists($full_path)) {
+                $correspond = 'Yes';
+            }
+            else {
+            	$correspond = 'No';
+            }
+        }
+     }
+
+    // @todo: $correspond evaluates to Yes if each first file has a corresponding
+    // other file, but not if there are extra other files. 
+    print "Numbers of file types match: $nums_match.\nAll files correspond: $correspond.\n";
 }
 
 function islandora_sp_large_image_cmodel($options) {
