@@ -4,6 +4,11 @@
  * Script to verify that the files expected in MIK output are present.
  */
 
+if (count($argv) == 1) {
+    print "Enter 'php " . $argv[0] . " help' to see more info.\n";
+    exit;
+}
+
 if (trim($argv[1]) == 'help') {
 	print "A script to verify that the files in MIK output are present.\n\n";
 	print "Example usage: php check_files.php --cmodel=islandora:sp_basic_image --dir=/tmp/mik_output --files=*.jpg,*.xml\n\n";
@@ -77,6 +82,44 @@ function islandora_single_file_cmodels($options) {
     print "Number of " . $options['files'] . " files matches: $groups_match\n";
 }
 
+/**
+ * Example: php check_files.php --cmodel=islandora:newspaperIssueCModel --dir=/media/mark/KINGSTON/Ctimes --files=JP2.jp2,OBJ.tiff
+ */
 function islandora_newspaper_issue_cmodel($options) {
-    print_r($options);
+    if (!array_key_exists('files', $options)) {
+        exit("The --files options is required.\n");
+    }
+    $file_patterns = explode(',', $options['files']);
+
+    $all_issue_level_dirs = array();
+    if ($issues_handle = opendir($options['dir'])) {
+        while (false !== ($issues_dir = readdir($issues_handle))) {
+            if ($issues_dir != "." && $issues_dir != "..") {
+                $all_issue_level_dirs[] = $options['dir'] . DIRECTORY_SEPARATOR . $issues_dir . "\n";
+            }
+        }
+        closedir($issues_handle);
+    }
+
+    foreach ($all_issue_level_dirs as &$issue_dir) {
+        $issue_dir = trim($issue_dir);
+        // Test for existence of MODS.xml.
+        $mods_path = trim($issue_dir) . DIRECTORY_SEPARATOR . 'MODS.xml';
+        if (!file_exists($mods_path)) {
+            print "$mods_path does not exist\n";
+        }
+        // Get all the page-level directories in $issue_dir.
+        $page_dirs_pattern = trim($issue_dir) . DIRECTORY_SEPARATOR . "*";
+        $page_dirs = glob($page_dirs_pattern, GLOB_ONLYDIR);
+        // Now check for the existence of each of the specified files.
+        foreach ($page_dirs as $page_dir) {
+            foreach ($file_patterns as $file_pattern) {
+                $path_to_file = $page_dir . DIRECTORY_SEPARATOR . $file_pattern;
+                if (!file_exists($path_to_file)) {
+                    print "$path_to_file does not exist\n";
+                }
+            }
+
+        }
+    }
 }
