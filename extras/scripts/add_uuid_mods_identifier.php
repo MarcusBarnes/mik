@@ -3,6 +3,8 @@
 /**
  * Script to add to a MODS document an <identifier> element containing a UUID.
  * If there are no <identifier> elements, adds one.
+ *
+ * Calls the Linux shell to generate the UUID, so won't work on Windows.
  */
 
 $mods_XML_path = trim($argv[1]);
@@ -40,6 +42,6 @@ file_put_contents($mods_XML_path, $mods_xml);
  * Gets the UUID by calling 'uuidgen' via the shell.
  */
 function get_uuid() {
-  $uuid = `uuidgen`;
-  return trim($uuid);
+    $uuid = `uuidgen`;
+    return trim($uuid);
 }
