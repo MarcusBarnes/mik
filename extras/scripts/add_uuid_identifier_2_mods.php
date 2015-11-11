@@ -26,7 +26,7 @@ $uuid_identifier = $dom->createElement('identifier', get_uuid());
 $uuid_identifier->appendChild($type);
 
 // Figure out where to add it. If one ore more <identifier> elements
-// exist in the document, add the new one before the first exisint one.
+// exist in the document, add the new one before the first existing one.
 if ($identifiers->length) {
     $dom->documentElement->insertBefore($uuid_identifier, $identifiers->item(0));
 }
