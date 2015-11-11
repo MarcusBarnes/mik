@@ -19,19 +19,20 @@ if (trim($argv[1]) == 'help') {
 }
 
 $options = getopt('', array('cmodel:', 'dir:', 'files::', 'log::'));
-$options['log_path'] = (!array_key_exists('log', $options)) ?
+$options['log'] = (!array_key_exists('log', $options)) ?
     './mik_check_files.log' : $options['log'];
 
 switch ($options['cmodel']) {
     case 'islandora:sp_basic_image':
-        islandora_sp_basic_image($options);
-        break;
     case 'islandora:sp_large_image_cmodel':
-        islandora_sp_large_image_cmodel($options);
-        break;        
+    case 'islandora:sp_pdf':
+    case 'islandora:sp-audioCModel':
+    case 'islandora:sp_videoCModel':
+        islandora_single_file_cmodels($options);
+        break;
     case 'islandora:newspaperIssueCModel':
         islandora_newspaper_issue_cmodel($options);
-        break;        
+        break; 
     default:
         exit("Sorry, the content model " . $options['cmodel'] . " is not registered with this script.\n");
 }
@@ -40,68 +41,40 @@ switch ($options['cmodel']) {
   * Content model specific validation functions.
   */
 
-function islandora_sp_basic_image($options) {
-	$options['files'] = (!array_key_exists('files', $options)) ?
-	    '*.jpg, *.xml' : $options['files'];
-    // print_r($options);
-	$files = explode(',', $options['files']);
-	// Get a list of all of the first required file.
-	$first_file_pattern = $options['dir'] . DIRECTORY_SEPARATOR . trim($files[0]);
-    $first_files = glob($first_file_pattern);
-    if (!count($first_files)) {
-        exit("Can't find any files in " . $options['dir'] . " matching the pattern " . $first_file_pattern . "\n");
-    }
+function islandora_single_file_cmodels($options) {
+	if (!array_key_exists('files', $options)) {
+        exit("The --files options is required.\n");
+	}
+	$file_patterns = explode(',', $options['files']);
 
-    // Check 1: If we haven't exited, confirm that the directory contains the
-    // same number of files for each of the entries in $options['files'].
-    $file_counts = array($files[0] => count($first_files));
-    array_shift($files);
-    foreach ($files as $file) {
-	    $pattern = $options['dir'] . DIRECTORY_SEPARATOR . trim($file);
-        $file_list = glob($pattern);
-        $file_counts[$file] = count($file_list);
+    // Confirm that the directory contains the same number
+    // of files for each of the entries in $options['files'].
+    $all_file_pattern_counts = array();
+    $all_file_pattern_globs = array();
+    foreach ($file_patterns as $file_pattern) {
+        $glob_pattern = $options['dir'] . DIRECTORY_SEPARATOR . trim($file_pattern);
+        $file_list = glob($glob_pattern);
+        sort($file_list, SORT_NATURAL);
+        $all_file_pattern_globs[$file_pattern] = $file_list;
+        $all_file_pattern_counts[$file_pattern] = count($file_list);
     }
 
     // To see if each file has the same count, reduce the number of counts
     // and if we have one value, we're good. If we don't, we have a mismatch.
-    $totals = array_values($file_counts);
-    $totals = array_unique($totals);
-    if (count($totals) != 1) {
-      $nums_match = 'No';
+    $all_file_pattern_totals = array();
+    foreach ($all_file_pattern_counts as $pattern => $count) {
+        $all_file_pattern_totals[] = $count;
+    }
+    $all_file_pattern_totals = array_unique($all_file_pattern_totals);
+    if (count($all_file_pattern_totals) != 1) {
+      $groups_match = 'No. Lists of all the file patterns has been written to ' . $options['log'];
+      $file_lists = var_export($all_file_pattern_globs, true);
+      file_put_contents($options['log'], $file_lists);
     }
     else {
-       $nums_match = 'Yes';
+       $groups_match = 'Yes';
     }
-
-    // Check 2: Get all other files in $options['files']	
-    // and match each one to each entry in $first_files.
-    $extensions = array();
-    foreach ($files as $file) {
-    	$extensions[] = pathinfo($file, PATHINFO_EXTENSION);
-    }
-    foreach ($first_files as $file) {
-    	$filename = pathinfo($file, PATHINFO_FILENAME);
-    	foreach ($extensions as $ext) {
-            $file_to_check = $filename . '.' . $ext;
-            $full_path = $options['dir'] . DIRECTORY_SEPARATOR . $file_to_check;
-            if (file_exists($full_path)) {
-                $correspond = 'Yes';
-            }
-            else {
-            	$correspond = 'No';
-            }
-        }
-     }
-
-    // @todo: $correspond evaluates to Yes if each first file has a corresponding
-    // other file, but not if there are extra other files. 
-    print "Numbers of file types match: $nums_match.\nAll files correspond: $correspond.\n";
-}
-
-function islandora_sp_large_image_cmodel($options) {
-	$options['files'] = (!array_key_exists('files', $options)) ?
-	    'OBJ.tif, MODS.xml' : $options['files'];
-    print_r($options);
+    print "Number of " . $options['files'] . " files matches: $groups_match\n";
 }
 
 function islandora_newspaper_issue_cmodel($options) {
