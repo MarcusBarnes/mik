@@ -10,8 +10,8 @@ if (count($argv) == 1) {
 }
 
 if (trim($argv[1]) == 'help') {
-	print "A script to verify that the files in MIK output are present.\n\n";
-	print "Example usage: php check_files.php --cmodel=islandora:sp_basic_image --dir=/tmp/mik_output --files=*.jpg,*.xml\n\n";
+    print "A script to verify that the files in MIK output are present.\n\n";
+    print "Example usage: php check_files.php --cmodel=islandora:sp_basic_image --dir=/tmp/mik_output --files=*.jpg,*.xml\n\n";
     print "Options:\n";
     print "    --cmodel : An Islandora content model PID. Required.\n";
     print "    --dir : The directory containing the files you want to check, without the trailing slash. Required.\n";
