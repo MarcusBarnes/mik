@@ -19,10 +19,12 @@ if (trim($argv[1]) == 'help') {
         models where the filenames are variable, use a * to indicate the filename (e.g., '*.jpg, *.xml').\n";
     print "    --log : The path to the log file containing reports of missing files. Optional (default
         is ./mik_check_files.log).\n";
+    print "    --issue_level_metadata : Used only with the islandora:newspaperIssueCModel content model.
+         The name of the metadata file to check existence of at the issue level (default is MODS.xml).\n";
     exit;
 }
 
-$options = getopt('', array('cmodel:', 'dir:', 'files:', 'log::'));
+$options = getopt('', array('cmodel:', 'dir:', 'files:', 'log::', 'issue_level_metadata::'));
 $options['log'] = (!array_key_exists('log', $options)) ?
     './mik_check_files.log' : $options['log'];
 
@@ -90,6 +92,8 @@ function islandora_single_file_cmodels($options) {
  */
 function islandora_newspaper_issue_cmodel($options) {
     $file_patterns = explode(',', $options['files']);
+    $options['issue_level_metadata'] = (!array_key_exists('issue_level_metadata', $options)) ?
+        'MODS.xml' : $options['issue_level_metadata'];
 
     $all_issue_level_dirs = array();
     $files_missing = false;
@@ -98,7 +102,7 @@ function islandora_newspaper_issue_cmodel($options) {
             if ($issues_dir != "." && $issues_dir != "..") {
                 $issue_dir = trim($options['dir'] . DIRECTORY_SEPARATOR . $issues_dir);
                 // Test for existence of MODS.xml.
-                $mods_path = $issue_dir . DIRECTORY_SEPARATOR . 'MODS.xml';
+                $mods_path = $issue_dir . DIRECTORY_SEPARATOR . $options['issue_level_metadata'];
                 if (!file_exists($mods_path)) {
                     error_log("$mods_path does not exist\n", 3, $options['log']);
                     $files_missing = true;
