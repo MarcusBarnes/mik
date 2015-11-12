@@ -43,9 +43,12 @@ switch ($options['cmodel']) {
 }
 
 /**
-  * Content model specific validation functions.
-  */
-
+ * Checks that each all files identifed in $files['files'] exist for each
+ * object in $options['dir'].
+ *
+ * Example: php check_files.php --cmodel=islandora:sp_basic_image --dir=/path/to/mikoutput
+ *     --files=*.jpg,*.xml
+ */
 function islandora_single_file_cmodels($options) {
 	if (!array_key_exists('files', $options)) {
         exit("The --files options is required.\n");
@@ -74,7 +77,7 @@ function islandora_single_file_cmodels($options) {
     if (count($all_file_pattern_totals) != 1) {
       $groups_match = 'No. Lists of all the file patterns has been written to ' . $options['log'];
       $file_lists = var_export($all_file_pattern_globs, true);
-      file_put_contents($options['log'], $file_lists);
+      error_log($file_lists . "\n", 3, $options['log']);
     }
     else {
        $groups_match = 'Yes';
@@ -83,7 +86,12 @@ function islandora_single_file_cmodels($options) {
 }
 
 /**
- * Example: php check_files.php --cmodel=islandora:newspaperIssueCModel --dir=/media/mark/KINGSTON/Ctimes --files=JP2.jp2,OBJ.tiff
+ * Checks the existence of MODS.xml for each issue in $options['dir'], and
+ * for the existence of the files listed in $options['files'] for each page.
+ * Does not check for the existence of extra files.
+ *
+ * Example: php check_files.php --cmodel=islandora:newspaperIssueCModel --dir=/path/to/mikoutput
+ *    --files=JP2.jp2,JPEG.jpg,MODS.xml,OBJ.tiff,OCR.txt,TN.jpg
  */
 function islandora_newspaper_issue_cmodel($options) {
     if (!array_key_exists('files', $options)) {
@@ -92,34 +100,40 @@ function islandora_newspaper_issue_cmodel($options) {
     $file_patterns = explode(',', $options['files']);
 
     $all_issue_level_dirs = array();
+    $files_missing = false;
     if ($issues_handle = opendir($options['dir'])) {
         while (false !== ($issues_dir = readdir($issues_handle))) {
             if ($issues_dir != "." && $issues_dir != "..") {
-                $all_issue_level_dirs[] = $options['dir'] . DIRECTORY_SEPARATOR . $issues_dir . "\n";
+                $issue_dir = trim($options['dir'] . DIRECTORY_SEPARATOR . $issues_dir);
+                // Test for existence of MODS.xml.
+                $mods_path = $issue_dir . DIRECTORY_SEPARATOR . 'MODS.xml';
+                if (!file_exists($mods_path)) {
+                    print "$mods_path does not exist\n";
+                }
+                // Get all the page-level directories in $issue_dir.
+                $page_dirs_pattern = trim($issue_dir) . DIRECTORY_SEPARATOR . "*";
+                $page_dirs = glob($page_dirs_pattern, GLOB_ONLYDIR);
+                // Now check for the existence of each of the specified files.
+                foreach ($page_dirs as $page_dir) {
+                    foreach ($file_patterns as $file_pattern) {
+                        $path_to_file = $page_dir . DIRECTORY_SEPARATOR . $file_pattern;
+                        if (!file_exists($path_to_file)) {
+                            error_log("$path_to_file does not exist\n", 3, $options['log']);
+                            $files_missing = true;
+                        }
+                    }
+
+                }
             }
         }
         closedir($issues_handle);
     }
-
-    foreach ($all_issue_level_dirs as &$issue_dir) {
-        $issue_dir = trim($issue_dir);
-        // Test for existence of MODS.xml.
-        $mods_path = trim($issue_dir) . DIRECTORY_SEPARATOR . 'MODS.xml';
-        if (!file_exists($mods_path)) {
-            print "$mods_path does not exist\n";
-        }
-        // Get all the page-level directories in $issue_dir.
-        $page_dirs_pattern = trim($issue_dir) . DIRECTORY_SEPARATOR . "*";
-        $page_dirs = glob($page_dirs_pattern, GLOB_ONLYDIR);
-        // Now check for the existence of each of the specified files.
-        foreach ($page_dirs as $page_dir) {
-            foreach ($file_patterns as $file_pattern) {
-                $path_to_file = $page_dir . DIRECTORY_SEPARATOR . $file_pattern;
-                if (!file_exists($path_to_file)) {
-                    print "$path_to_file does not exist\n";
-                }
-            }
-
-        }
+    if ($files_missing) {
+        print "Some newspaper issues in " . $options['dir'] . " are missing one of " .
+            $options['files'] . ". Details are in " . $options['log'] . "\n";
+    }
+    else {
+        print "All newspaper issues in " . $options['dir'] . " have the files " .
+            $options['files'] . "\n";
     }
 }
