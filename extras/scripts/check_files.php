@@ -100,7 +100,8 @@ function islandora_newspaper_issue_cmodel($options) {
                 // Test for existence of MODS.xml.
                 $mods_path = $issue_dir . DIRECTORY_SEPARATOR . 'MODS.xml';
                 if (!file_exists($mods_path)) {
-                    print "$mods_path does not exist\n";
+                    error_log("$mods_path does not exist\n", 3, $options['log']);
+                    $files_missing = true;
                 }
                 // Get all the page-level directories in $issue_dir.
                 $page_dirs_pattern = trim($issue_dir) . DIRECTORY_SEPARATOR . "*";
