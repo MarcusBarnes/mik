@@ -15,15 +15,14 @@ if (trim($argv[1]) == 'help') {
     print "Options:\n";
     print "    --cmodel : An Islandora content model PID. Required.\n";
     print "    --dir : The directory containing the files you want to check, without the trailing slash. Required.\n";
-    print "    --files : A comma-separated list of files that need to be present. Optional
-        (defaults vary by content model). For content models where the filenames are variable,
-        use a * to indicate the filename (e.g., '*.jpg, *.xml').\n";
-    print "    --log : The path to the log file containing reports of missing files. Optional
-        (default is ./mik_check_files.log).\n";
+    print "    --files : A comma-separated list of files that need to be present. Required. For content
+        models where the filenames are variable, use a * to indicate the filename (e.g., '*.jpg, *.xml').\n";
+    print "    --log : The path to the log file containing reports of missing files. Optional (default
+        is ./mik_check_files.log).\n";
     exit;
 }
 
-$options = getopt('', array('cmodel:', 'dir:', 'files::', 'log::'));
+$options = getopt('', array('cmodel:', 'dir:', 'files:', 'log::'));
 $options['log'] = (!array_key_exists('log', $options)) ?
     './mik_check_files.log' : $options['log'];
 
@@ -50,9 +49,6 @@ switch ($options['cmodel']) {
  *     --files=*.jpg,*.xml
  */
 function islandora_single_file_cmodels($options) {
-	if (!array_key_exists('files', $options)) {
-        exit("The --files options is required.\n");
-	}
 	$file_patterns = explode(',', $options['files']);
 
     // Confirm that the directory contains the same number
@@ -94,9 +90,6 @@ function islandora_single_file_cmodels($options) {
  *    --files=JP2.jp2,JPEG.jpg,MODS.xml,OBJ.tiff,OCR.txt,TN.jpg
  */
 function islandora_newspaper_issue_cmodel($options) {
-    if (!array_key_exists('files', $options)) {
-        exit("The --files options is required.\n");
-    }
     $file_patterns = explode(',', $options['files']);
 
     $all_issue_level_dirs = array();
