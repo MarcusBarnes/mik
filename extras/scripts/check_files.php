@@ -45,11 +45,10 @@ switch ($options['cmodel']) {
  * Checks that each all files identifed in $files['files'] exist for each
  * object in $options['dir'].
  *
- * Example: php check_files.php --cmodel=islandora:sp_basic_image --dir=/path/to/mikoutput
- *     --files=*.jpg,*.xml
+ * Example: php check_files.php --cmodel=islandora:sp_basic_image --dir=/path/to/mikoutput --files=*.jpg,*.xml
  */
 function islandora_single_file_cmodels($options) {
-	$file_patterns = explode(',', $options['files']);
+    $file_patterns = explode(',', $options['files']);
 
     // Confirm that the directory contains the same number
     // of files for each of the entries in $options['files'].
