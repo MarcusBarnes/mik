@@ -42,7 +42,7 @@ switch ($options['cmodel']) {
 }
 
 /**
- * Checks that each all files identifed in $files['files'] exist for each
+ * Checks that each all files identifed in $options['files'] exist for each
  * object in $options['dir'].
  *
  * Example: php check_files.php --cmodel=islandora:sp_basic_image --dir=/path/to/mikoutput --files=*.jpg,*.xml
