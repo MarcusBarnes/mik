@@ -16,6 +16,7 @@
         "league/csv":"~7.1",
         "league/climate":"~3.1",
         "guzzlehttp/guzzle": "~6.0",
-        "ramsey/uuid": "~3.0"
+        "ramsey/uuid": "~3.0",
+        "cocur/background-process": "^0.5.0"
     }
 }

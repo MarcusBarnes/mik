@@ -20,6 +20,7 @@ require 'vendor/autoload.php';
 
 use mik\config\Config;
 use League\CLImate\CLImate;
+use Cocur\BackgroundProcess\BackgroundProcess;
 
 use mik\exceptions\MikErrorException;
 use Monolog\Logger;
@@ -200,6 +201,15 @@ foreach ($records as $record) {
         print '.';
     } else {
         $progress->current($record_num);
+    }
+
+    // Run anypost-write hooks.
+    if (isset($settings['WRITER']['postwritehooks'])) {
+        foreach ($settings['WRITER']['postwritehooks'] as $hook) {
+          $cmd = "$hook $record_key";
+          $process = new BackgroundProcess($cmd);
+          $process->run();
+        }
     }
 }
 
