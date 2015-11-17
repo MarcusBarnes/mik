@@ -203,10 +203,12 @@ foreach ($records as $record) {
         $progress->current($record_num);
     }
 
-    // Run anypost-write hooks.
+    // Run any post-write hooks. Convert $settings into JSON
+    // for passing to hook scripts.
     if (isset($settings['WRITER']['postwritehooks'])) {
+        $config = json_encode($settings);
         foreach ($settings['WRITER']['postwritehooks'] as $hook) {
-          $cmd = "$hook $record_key";
+          $cmd = "$hook $record_key " . "'" . $config . "'";
           $process = new BackgroundProcess($cmd);
           $process->run();
         }
@@ -229,3 +231,4 @@ $time = $time_end - $time_start;
 $timeMessage =  "Completed in " . $time/60 . " minutes." . PHP_EOL;
 echo $timeMessage;
 $logInfo->addInfo($timeMessage);
+
