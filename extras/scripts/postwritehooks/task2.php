@@ -1,12 +1,14 @@
 <?php
 
 /**
- * All post-write hook scripts get the record key as the first parameter and
- * a JSON representation of the MIK .ini file as the second.
+ * All post-write hook scripts get the record key as the first parameter, a JSON representation
+ * of a list of children record keys as the second, and a JSON representation of the MIK .ini
+ * file as the second.
  */
 
 $record_key = trim($argv[1]);
-$config_json = trim($argv[2]);
+$children_record_keys_json = $argv[2];
+$config_json = trim($argv[3]);
 $config = json_decode($config_json, true);
 
 $path_to_file = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . $record_key . '.xml';

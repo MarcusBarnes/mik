@@ -203,12 +203,13 @@ foreach ($records as $record) {
         $progress->current($record_num);
     }
 
-    // Run any post-write hooks. Convert $settings into JSON
-    // for passing to hook scripts.
+    // Run any post-write hooks. Convert $children and $settings
+    // into JSON for passing to hook scripts.
     if (isset($settings['WRITER']['postwritehooks'])) {
         $config = json_encode($settings);
+        $children_record_ids = json_encode($children);
         foreach ($settings['WRITER']['postwritehooks'] as $hook) {
-          $cmd = "$hook $record_key " . "'" . $config . "'";
+          $cmd = "$hook $record_key " . "'" . $children_record_ids . "' '" . $config . "'";
           $process = new BackgroundProcess($cmd);
           $process->run();
         }
