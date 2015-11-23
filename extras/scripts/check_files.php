@@ -94,9 +94,9 @@ function islandora_newspaper_issue_cmodel($options) {
     $file_patterns = explode(',', $options['files']);
     $options['issue_level_metadata'] = (!array_key_exists('issue_level_metadata', $options)) ?
         'MODS.xml' : $options['issue_level_metadata'];
-
     $all_issue_level_dirs = array();
     $files_missing = false;
+    $pages_missing = false;
     if ($issues_handle = opendir($options['dir'])) {
         while (false !== ($issues_dir = readdir($issues_handle))) {
             if ($issues_dir != "." && $issues_dir != "..") {
@@ -107,9 +107,24 @@ function islandora_newspaper_issue_cmodel($options) {
                     error_log("$mods_path does not exist\n", 3, $options['log']);
                     $files_missing = true;
                 }
+
                 // Get all the page-level directories in $issue_dir.
                 $page_dirs_pattern = trim($issue_dir) . DIRECTORY_SEPARATOR . "*";
                 $page_dirs = glob($page_dirs_pattern, GLOB_ONLYDIR);
+
+                // Count the number of page_dirs against expected number from MODS.XML 
+
+                $expectedNumPageDirs = expectedNumPageDirFromModsXML($mods_path);
+                $numPageDirs = count($page_dirs);
+                //echo "The number of page directories is $numPageDirs." . PHP_EOL;
+                //echo "Th number of expected pages is $expectedNumPageDirs." . PHP_EOL;
+                if($expectedNumPageDirs != $numPageDirs){
+                    $error_msg = "The number of directories for newspaper pages ($numPageDirs) ";
+                    $error_msg .= " does not match the expected number ($expectedNumPageDirs)\n";
+                    error_log($error_msg, 3, $options['log']);
+                    $pages_missing = true;
+                }
+
                 // Now check for the existence of each of the specified files.
                 foreach ($page_dirs as $page_dir) {
                     foreach ($file_patterns as $file_pattern) {
@@ -133,4 +148,26 @@ function islandora_newspaper_issue_cmodel($options) {
         print "All newspaper issues in " . $options['dir'] . " have the files " .
             $options['files'] . "\n";
     }
+
+    if($pages_missing) {
+        print "There is a mismatch between the number of newspaper pages in " . $options['dir'] 
+            . " and the number of newspaper pages expected based on the CPD.XML contained in the issue level MODS XML." 
+            . " Details are in " . $options['log'] . "\n";
+    } else {
+        print "The number of expected newspaper pages are present.\n";
+    }
+}
+
+/**
+ * Determines the expected number of pages in an issue by checking the CDP JSON data stored
+ * in the issue-level MODS.xml
+ */
+function expectedNumPageDirFromModsXML($mods_path) {
+
+    $xml = simplexml_load_file($mods_path);
+    $resultString = $xml->extension->CONTENTdmData->dmGetCompoundObjectInfo->__toString();
+    $xmlElement = simplexml_load_string($resultString);
+    $pages = $xmlElement->page;
+
+    return count($pages);
 }
