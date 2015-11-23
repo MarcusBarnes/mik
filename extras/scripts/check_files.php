@@ -113,11 +113,8 @@ function islandora_newspaper_issue_cmodel($options) {
                 $page_dirs = glob($page_dirs_pattern, GLOB_ONLYDIR);
 
                 // Count the number of page_dirs against expected number from MODS.XML 
-
                 $expectedNumPageDirs = expectedNumPageDirFromModsXML($mods_path);
                 $numPageDirs = count($page_dirs);
-                //echo "The number of page directories is $numPageDirs." . PHP_EOL;
-                //echo "Th number of expected pages is $expectedNumPageDirs." . PHP_EOL;
                 if($expectedNumPageDirs != $numPageDirs){
                     $error_msg = "The number of directories for newspaper pages ($numPageDirs) ";
                     $error_msg .= " does not match the expected number ($expectedNumPageDirs)\n";
@@ -159,7 +156,7 @@ function islandora_newspaper_issue_cmodel($options) {
 }
 
 /**
- * Determines the expected number of pages in an issue by checking the CDP JSON data stored
+ * Determines the expected number of pages in an issue by checking the CDP data stored
  * in the issue-level MODS.xml
  */
 function expectedNumPageDirFromModsXML($mods_path) {
@@ -168,6 +165,5 @@ function expectedNumPageDirFromModsXML($mods_path) {
     $resultString = $xml->extension->CONTENTdmData->dmGetCompoundObjectInfo->__toString();
     $xmlElement = simplexml_load_string($resultString);
     $pages = $xmlElement->page;
-
     return count($pages);
 }
