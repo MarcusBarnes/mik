@@ -9,14 +9,16 @@
 require 'vendor/autoload.php';
 
 // The full path to the FITS executable on your system.
-$path_to_fits = '/usr/local/fits/fits.sh';
+$path_to_fits = '/home/mark/Documents/hacking/fits/fits-0.8.10/fits.sh';
 // This should be consistent with your Islandora FITS admin settings.
 $fits_output_filename = 'TECHMD.xml';
 // Filename of the page-level TIFFs.
-$obj_filename = 'OBJ.tif';
+$obj_filename = 'OBJ.tiff';
+$item_info_field_for_issues = 'date';
 
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use GuzzleHttp\Client;
 
 // Get the incoming parameters.
 $record_key = trim($argv[1]);
@@ -26,7 +28,7 @@ $config = json_decode($config_json, true);
 $children_record_keys = json_decode($children_record_keys_json);
 
 // Set up logging.
-$log = new Logger('postwritehooks/generatee_fits.php');
+$log = new Logger('postwritehooks/generate_fits.php');
 $log->pushHandler(new StreamHandler($config['LOGGING']['path_to_log'], Logger::INFO));
 
 if (!file_exists($path_to_fits)) {
@@ -34,18 +36,43 @@ if (!file_exists($path_to_fits)) {
 }
 
 if (count($children_record_keys)) {
-  $sequence = 0;
+  $page_sequence = 0;
   foreach ($children_record_keys as $child_record_key) {
-    $sequence++;
+    $page_sequence++;
+    $issue_dir = get_issue_dir($record_key, $item_info_field_for_issues, $config);
     $path_to_page_dir = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
-      $record_key . DIRECTORY_SEPARATOR . $sequence;
+      $issue_dir . DIRECTORY_SEPARATOR . $page_sequence;
     $path_to_obj = $path_to_page_dir . DIRECTORY_SEPARATOR . $obj_filename;
     $path_to_fits_output = $path_to_page_dir . DIRECTORY_SEPARATOR . $fits_output_filename;
 
-    $cmd = "$path_to_fits -i $path_to_obj -o $path_to_fits_output";
+    $cmd = "$path_to_fits -i $path_to_obj -x -o $path_to_fits_output";
     exec($cmd, $output, $return_var);
     if ($return_var) {
       $log->addWarning("FITS output not generated", array('OBJ file' => $path_to_obj));
     }
+  }
+}
+
+function get_issue_dir($record_key, $item_info_field_for_issues, $config) {
+  // Use Guzzle to fetch the output of the call to GetParent
+  // for the current object.
+  $url = $config['METADATA_PARSER']['ws_url'] .
+    'dmGetItemInfo/' . $config['METADATA_PARSER']['alias'] . '/' . $record_key. '/json';
+  $client = new Client();
+  try {
+    $response = $client->get($url);
+  } catch (Exception $e) {
+    $this->log->addInfo("CdmNoParent",
+      array('HTTP request error' => $e->getMessage()));
+    return true;
+  }
+  $body = $response->getBody();
+  $item_info = json_decode($body, true);
+
+  if (is_string($item_info_field_for_issues) && strlen($item_info[$item_info_field_for_issues])) {
+    return $item_info[$item_info_field_for_issues];
+  }
+  else {
+    return false;
   }
 }
