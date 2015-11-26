@@ -88,6 +88,10 @@ class CdmNewspapers extends Writer
         // filegetter for OBJ.tiff files for newspaper issue pages
         $OBJFilesArray = $this->cdmNewspapersFileGetter
                  ->getIssueLocalFilesForOBJ($this->issueDate);
+        // Array of paths to tiffs for OBJ for newspaper issue pages may not be sorted
+        // on some systems.  Sort.
+        sort($OBJFilesArray);
+
         $page_number = 0;
         foreach ($pages as $page_pointer) {
             $page_number++;
@@ -160,7 +164,7 @@ class CdmNewspapers extends Writer
                 $jpg_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'JPEG.jpg';
                 file_put_contents($jpg_output_file_path, $jpg_content);
             }
-
+            
             $OBJ_expected = in_array('OBJ', $this->datastreams);
             if ($OBJ_expected xor $no_datastreams_setting_flag) {
                 // Create OBJ file for page.
