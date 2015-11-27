@@ -116,7 +116,8 @@ function islandora_newspaper_issue_cmodel($options) {
                 $expectedNumPageDirs = expectedNumPageDirFromModsXML($mods_path);
                 $numPageDirs = count($page_dirs);
                 if($expectedNumPageDirs != $numPageDirs){
-                    $error_msg = "The number of directories for newspaper pages ($numPageDirs) ";
+                    $error_msg = "For issue $issue_dir, ";
+                    $error_msg .= "the number of directories for newspaper pages ($numPageDirs) ";
                     $error_msg .= " does not match the expected number ($expectedNumPageDirs)\n";
                     error_log($error_msg, 3, $options['log']);
                     $pages_missing = true;
@@ -126,7 +127,7 @@ function islandora_newspaper_issue_cmodel($options) {
                 foreach ($page_dirs as $page_dir) {
                     foreach ($file_patterns as $file_pattern) {
                         $path_to_file = $page_dir . DIRECTORY_SEPARATOR . $file_pattern;
-                        if (!file_exists($path_to_file)) {
+                        if (!file_exists($path_to_file) && !is_dir($path_to_file) && $path_to_file != $options['log']) {
                             error_log("$path_to_file does not exist\n", 3, $options['log']);
                             $files_missing = true;
                         }
