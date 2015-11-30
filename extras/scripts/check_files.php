@@ -28,6 +28,9 @@ $options = getopt('', array('cmodel:', 'dir:', 'files:', 'log::', 'issue_level_m
 $options['log'] = (!array_key_exists('log', $options)) ?
     './mik_check_files.log' : $options['log'];
 
+// Append a timestamp to the log.
+error_log("Log produced by " . $argv[0] . " on " . date('l jS \of F Y h:i:s A') . "\n", 3, $options['log']);
+
 // Check to see if the specified directory exists and if not, exit.
 if (!file_exists($options['dir'])) {
     print "Sorry, " . $options['dir'] . " does not appear to exist.\n";
