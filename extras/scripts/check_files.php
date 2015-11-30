@@ -28,6 +28,12 @@ $options = getopt('', array('cmodel:', 'dir:', 'files:', 'log::', 'issue_level_m
 $options['log'] = (!array_key_exists('log', $options)) ?
     './mik_check_files.log' : $options['log'];
 
+// Check to see if the specified directory exists and if not, exit.
+if (!file_exists($options['dir'])) {
+    print "Sorry, " . $options['dir'] . " does not appear to exist.\n";
+    exit;
+}
+
 switch ($options['cmodel']) {
     case 'islandora:sp_basic_image':
     case 'islandora:sp_large_image_cmodel':
@@ -97,15 +103,40 @@ function islandora_newspaper_issue_cmodel($options) {
     $all_issue_level_dirs = array();
     $files_missing = false;
     $pages_missing = false;
+    $extra_files_in_issues_dir = false;
+    $extra_files_in_issue_dir = false;
+    $extra_files_in_pages_dir = false;    
     if ($issues_handle = opendir($options['dir'])) {
         while (false !== ($issues_dir = readdir($issues_handle))) {
+            // Check to make sure that there are no files in the issues directory.
+            if (is_file($options['dir'] . DIRECTORY_SEPARATOR . $issues_dir)) {
+                error_log($options['dir'] . DIRECTORY_SEPARATOR . $issues_dir . " should not exist.\n", 3, $options['log']);
+                $extra_files_in_issues_dir = true;
+            }
+
             if ($issues_dir != "." && $issues_dir != "..") {
                 $issue_dir = trim($options['dir'] . DIRECTORY_SEPARATOR . $issues_dir);
                 // Test for existence of MODS.xml.
-                $mods_path = $issue_dir . DIRECTORY_SEPARATOR . $options['issue_level_metadata'];
-                if (!file_exists($mods_path)) {
-                    error_log("$mods_path does not exist\n", 3, $options['log']);
-                    $files_missing = true;
+                if (is_dir($issue_dir)) {
+                    $mods_path = $issue_dir . DIRECTORY_SEPARATOR . $options['issue_level_metadata'];
+                    if (!file_exists($mods_path)) {
+                        error_log("$mods_path does not exist.\n", 3, $options['log']);
+                        $files_missing = true;
+                    }
+                }
+
+                // Check for files other than MODS.xml in $issue_dir.
+                if (is_dir($issue_dir)) {
+                    $issue_dir_contents = scandir($issue_dir);
+                    foreach ($issue_dir_contents as $issue_dir_file) {
+                        $issue_level_metadata_file = $issue_dir . DIRECTORY_SEPARATOR . $options['issue_level_metadata'];
+                        if (is_file($issue_dir . DIRECTORY_SEPARATOR . $issue_dir_file) &&
+                                ($issue_dir . DIRECTORY_SEPARATOR . $issue_dir_file != $issue_level_metadata_file)) {
+                            error_log($issue_dir . DIRECTORY_SEPARATOR . $issue_dir_file .
+                                " should not exist.\n", 3, $options['log']);
+                            $extra_files_in_issue_dir = true;
+                        }
+                    }
                 }
 
                 // Get all the page-level directories in $issue_dir.
@@ -115,7 +146,7 @@ function islandora_newspaper_issue_cmodel($options) {
                 // Count the number of page_dirs against expected number from MODS.XML 
                 $expectedNumPageDirs = expectedNumPageDirFromModsXML($mods_path);
                 $numPageDirs = count($page_dirs);
-                if($expectedNumPageDirs != $numPageDirs){
+                if ($expectedNumPageDirs != $numPageDirs) {
                     $error_msg = "For issue $issue_dir, ";
                     $error_msg .= "the number of directories for newspaper pages ($numPageDirs) ";
                     $error_msg .= " does not match the expected number ($expectedNumPageDirs)\n";
@@ -128,32 +159,67 @@ function islandora_newspaper_issue_cmodel($options) {
                     foreach ($file_patterns as $file_pattern) {
                         $path_to_file = $page_dir . DIRECTORY_SEPARATOR . $file_pattern;
                         if (!file_exists($path_to_file) && !is_dir($path_to_file) && $path_to_file != $options['log']) {
-                            error_log("$path_to_file does not exist\n", 3, $options['log']);
+                            error_log("$path_to_file does not exist.\n", 3, $options['log']);
                             $files_missing = true;
                         }
                     }
 
+                    // Check for extraneous files in the page directory.
+                    $page_dir_contents = scandir($page_dir);
+                    // Remove . and ..
+                    $page_dir_contents = array_slice($page_dir_contents, 2);
+                    foreach ($page_dir_contents as $page_dir_file) {
+                        if (!in_array($page_dir_file, $file_patterns)) {
+                            error_log($page_dir . DIRECTORY_SEPARATOR . $page_dir_file . 
+                                " should not exist.\n", 3, $options['log']);
+                            $extra_files_in_pages_dir = true;
+                        }
+                    }
                 }
             }
         }
         closedir($issues_handle);
+        clearstatcache();
     }
+
+    if ($extra_files_in_issues_dir) {
+        print "Files exist in ". $options['dir'] . " that should not be present.\n";
+    }
+    else {
+        print "There are no unexpected files in " . $options['dir'] . ".\n";
+    }
+
+    if ($extra_files_in_issue_dir) {
+        print "Files exist in one or more issue-level directories that should not be present.\n";
+    }
+    else {
+        print "There are no unexpected files in any issue-level directories.\n";
+    }
+
+    if ($extra_files_in_pages_dir) {
+        print "Files exist in one or more newspaper page directories that should not be present.\n";
+    }
+    else {
+        print "There are no unexpected files in any newspaper page directories.\n";
+    }
+
     if ($files_missing) {
         print "Some newspaper issues in " . $options['dir'] . " are missing one of " .
-            $options['files'] . ". Details are in " . $options['log'] . "\n";
+            $options['files'] . ".\n";
     }
     else {
         print "All newspaper issues in " . $options['dir'] . " have the files " .
-            $options['files'] . "\n";
+            $options['files'] . ".\n";
     }
 
-    if($pages_missing) {
+    if ($pages_missing) {
         print "There is a mismatch between the number of newspaper pages in " . $options['dir'] 
-            . " and the number of newspaper pages expected based on the CPD.XML contained in the issue level MODS XML." 
-            . " Details are in " . $options['log'] . "\n";
+            . " and the number of newspaper pages expected based on the CPD.XML contained in the issue level MODS XML.\n"; 
     } else {
-        print "The number of expected newspaper pages are present.\n";
+        print "All of expected newspaper pages are present.\n";
     }
+
+    print "More detail may be available in " . $options['log'] . ".\n";
 }
 
 /**
@@ -161,10 +227,11 @@ function islandora_newspaper_issue_cmodel($options) {
  * in the issue-level MODS.xml
  */
 function expectedNumPageDirFromModsXML($mods_path) {
-
-    $xml = simplexml_load_file($mods_path);
-    $resultString = $xml->extension->CONTENTdmData->dmGetCompoundObjectInfo->__toString();
-    $xmlElement = simplexml_load_string($resultString);
-    $pages = $xmlElement->page;
-    return count($pages);
+    if (file_exists($mods_path)) {
+        $xml = simplexml_load_file($mods_path);
+        $resultString = $xml->extension->CONTENTdmData->dmGetCompoundObjectInfo->__toString();
+        $xmlElement = simplexml_load_string($resultString);
+        $pages = $xmlElement->page;
+        return count($pages);
+    }
 }
