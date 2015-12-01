@@ -17,10 +17,9 @@ use Monolog\Handler\StreamHandler;
 use GuzzleHttp\Client;
 
 $record_key = trim($argv[1]);
-$children_record_keys_json = trim($argv[2]);
-$config_json = trim($argv[3]);
-$config = json_decode($config_json, true);
-$children_record_keys = json_decode($children_record_keys_json);
+$children_record_keys = explode(',', $argv[2]);
+$config_path = trim($argv[3]);
+$config = parse_ini_file($config_path, true);
 
 $mods_filename = 'MODS.xml';
 // The CONTENTdm 'nick' for the field that contains the data used

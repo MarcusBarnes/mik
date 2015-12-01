@@ -27,10 +27,9 @@ use GuzzleHttp\Client;
 
 // Get the parameters passed in from MIK.
 $record_key = trim($argv[1]);
-$children_record_keys_json = trim($argv[2]);
-$children_record_keys = json_decode($children_record_keys_json);
-$config_json = trim($argv[3]);
-$config = json_decode($config_json, true);
+$children_record_keys = explode(',', $argv[2]);
+$config_path = trim($argv[3]);
+$config = parse_ini_file($config_path, true);
 
 // Set up logging.
 $log = new Logger('postwritehooks/generate_fits.php');

@@ -1,18 +1,19 @@
 <?php
 
 /**
- * All post-write hook scripts get the record key as the first parameter, a JSON representation
- * of a list of children record keys as the second, and a JSON representation of the MIK .ini
- * file as the second.
+ * All post-write hook scripts get the record key as the first parameter, a comma-
+ * separated list of children record keys as the second, and the path to the MIK .ini
+ * file as the third.
  *
- * This is a sample script that only writes some data to a file.
+ * This is a sample script that writes some data to a file.
  */
 
 $record_key = trim($argv[1]);
-$children_record_keys_json = trim($argv[2]);
-$config_json = trim($argv[3]);
-$config = json_decode($config_json, true);
-$children_record_keys = json_decode($children_record_keys_json);
+$children_record_keys_string = trim($argv[2]);
+$children_record_keys = explode(',', $children_record_keys_string);
+$config_path = trim($argv[3]);
+
+$config = parse_ini_file($config_path, true);
 
 // Write some data from the parameters to a file.
 file_put_contents('/tmp/task1.txt', "Record key from task1.php: $record_key\n", FILE_APPEND);

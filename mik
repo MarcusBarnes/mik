@@ -206,10 +206,18 @@ foreach ($records as $record) {
     // Run any post-write hooks. Convert $children and $settings
     // into JSON for passing to hook scripts.
     if (isset($settings['WRITER']['postwritehooks'])) {
-        $config = json_encode($settings);
-        $children_record_ids = json_encode($children);
+        $config_path = realpath($configPath);
+        if (count($children)) {
+            $children_record_ids = implode(',', $children);
+        }
+        else {
+            // If there are no children record IDs, pass a null
+            // string as a placeholder.
+            $children_record_ids = 'null';
+        }
         foreach ($settings['WRITER']['postwritehooks'] as $hook) {
-          $cmd = "$hook $record_key " . "'" . $children_record_ids . "' '" . $config . "'";
+          $cmd = "$hook $record_key $children_record_ids $config_path";
+          var_dump($cmd);
           $process = new BackgroundProcess($cmd);
           $process->run();
         }
