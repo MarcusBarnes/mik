@@ -46,6 +46,8 @@ class SpecificSet extends FetcherManipulator
     {
         $this->settings = $settings;
         $this->pathToInputFile = $manipulator_settings[1];
+        // $this->exclude = (isset($manipulator_settings[2]) && $manipulator_settings[2] == 'exclude') ? true : false;
+        $this->exclude = true;
         // To get the value of $onWindows.
         parent::__construct($settings);
         // Set up logger.
@@ -79,9 +81,20 @@ class SpecificSet extends FetcherManipulator
         $record_num = 0;
         $filtered_records = array();
         foreach ($all_records as $record) {
-            if (in_array($record->key, $specificSet)) {
-                $filtered_records[] = $record;
+            // If we're in 'exclude' mode, keep records that are not listed
+            // in the input file.
+            if ($this->exclude) {
+                if (!in_array($record->key, $specificSet)) {
+                    $filtered_records[] = $record;
+                }
             }
+            // Keep records that are listed in the input file.
+            else {
+                if (in_array($record->key, $specificSet)) {
+                    $filtered_records[] = $record;
+                }
+            }
+
             $record_num++;
             if ($this->onWindows) {
                 print '.';

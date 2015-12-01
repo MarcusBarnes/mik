@@ -4,20 +4,32 @@
  * Script to add to a MODS document an <identifier> element containing a UUID.
  * If there are no <identifier> elements, adds one.
  *
- * Calls the Linux shell to generate the UUID, so won't work on Windows.
+ * Calls the Linux shell to generate the UUID, so won't work on Windows
+ * (but could be modified to do so).
  */
 
 $mods_XML_path = trim($argv[1]);
 
-// Make a backup copy of the MODS file.
-rename($mods_XML_path, $mods_XML_path . '.bak');
-
 $dom = new DOMDocument;
 $dom->preserveWhiteSpace = false;
 $dom->formatOutput = true;
-$dom->load($mods_XML_path . '.bak');
+$dom->load($mods_XML_path);
 
-$identifiers = $dom->getElementsByTagName('identifier');
+// Check to see if we already have an identifier element with type
+// 'uuid' and if so, exit.
+$xpath = new \DOMXPath($dom);
+$existing_uuid_identifiers = $xpath->query("//mods:identifier[@type='uuid']");
+if ($existing_uuid_identifiers->length > 0) {
+    exit;
+} 
+
+// If there were none, continue.
+
+// Make a backup copy of the MODS file.
+if (!copy($mods_XML_path, $mods_XML_path . '.bak')) {
+    print "Could not copy $mods_XML_path to $mods_XML_path.bak\n";
+    exit(1);
+}
 
 // Build the <identifier> element we are adding.
 $type = $dom->createAttribute('type');
@@ -27,6 +39,7 @@ $uuid_identifier->appendChild($type);
 
 // Figure out where to add it. If one ore more <identifier> elements
 // exist in the document, add the new one before the first existing one.
+$identifiers = $dom->getElementsByTagName('identifier');
 if ($identifiers->length) {
     $dom->documentElement->insertBefore($uuid_identifier, $identifiers->item(0));
 }
