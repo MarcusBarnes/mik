@@ -27,6 +27,13 @@ use \Monolog\Logger;
  * processed by MIK. Since the speicifc set is by definition a
  * limit on how many records are processed, the --limit parameter
  * is not usually used in conjuction with this manipulator.
+ *
+ * This fetcher manipulator can also be used in 'exclude' mode,
+ * where the identifiers in the input file are excluded from
+ * the fetcher. This may be useful if you want to process all
+ * but a specific set of objects. To use 'exclude' mode, append
+ * '|exclude' to the end of the path to the input file, e.g.,
+ * fetchermanipulators[] = "SpecificSet|/tmp/record_ids.txt|exclude".
  */
 
 class SpecificSet extends FetcherManipulator
@@ -45,9 +52,15 @@ class SpecificSet extends FetcherManipulator
     public function __construct($settings, $manipulator_settings)
     {
         $this->settings = $settings;
-        $this->pathToInputFile = $manipulator_settings[1];
-        // $this->exclude = (isset($manipulator_settings[2]) && $manipulator_settings[2] == 'exclude') ? true : false;
-        $this->exclude = true;
+        if (preg_match('/\|/', $manipulator_settings[1])) {
+            $parameters = explode('|', $manipulator_settings[1]);
+        }
+        else {
+            $parameters = array($manipulator_settings[1]);
+        }
+        var_dump($parameters);
+        $this->pathToInputFile = $parameters[0];
+        $this->exclude = (isset($parameters[1]) && $parameters[1] == 'exclude') ? true : false;
         // To get the value of $onWindows.
         parent::__construct($settings);
         // Set up logger.

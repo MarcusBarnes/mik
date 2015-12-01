@@ -217,7 +217,6 @@ foreach ($records as $record) {
         }
         foreach ($settings['WRITER']['postwritehooks'] as $hook) {
           $cmd = "$hook $record_key $children_record_ids $config_path";
-          var_dump($cmd);
           $process = new BackgroundProcess($cmd);
           $process->run();
         }
