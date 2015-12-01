@@ -92,13 +92,18 @@ class CdmNewspapers extends Writer
         // on some systems.  Sort.
         sort($OBJFilesArray);
 
-        $page_number = 0;
+        $sub_dir_num = 0;
         foreach ($pages as $page_pointer) {
-            $page_number++;
+            $sub_dir_num++;
 
             // Create subdirectory for each page of newspaper issue
             $page_object_info = $this->fetcher->getItemInfo($page_pointer);
-            $page_dir = $issueObjectPath  . DIRECTORY_SEPARATOR . $page_number;
+            $filekey = $sub_dir_num - 1;
+            $pathToFile = $OBJFilesArray[$filekey];
+            // Infer the numbered directory name from the OBJ file name.
+            $directoryNumber = $this->directoryNameFromFileName($pathToFile);
+            
+            $page_dir = $issueObjectPath  . DIRECTORY_SEPARATOR . $directoryNumber;
             
             // Create a directory for each day of the newspaper.
             if (!file_exists($page_dir)) {
@@ -110,7 +115,7 @@ class CdmNewspapers extends Writer
             }
 
             print "Exporting files for issue " . $this->issueDate
-              . ', page ' . $page_number . "\n";
+              . ', page ' . $directoryNumber . "\n";
             
             // If there were no datastreams explicitly set in the configuration,
             // set flag so that all datastreams in the writer class are run.
@@ -168,11 +173,11 @@ class CdmNewspapers extends Writer
             $OBJ_expected = in_array('OBJ', $this->datastreams);
             if ($OBJ_expected xor $no_datastreams_setting_flag) {
                 // Create OBJ file for page.
-                $filekey = $page_number - 1;
-                $pathToFile = $OBJFilesArray[$filekey];
+                //$filekey = $page_number - 1;
+                //$pathToFile = $OBJFilesArray[$filekey];
 
                 $pathToPageOK = $this->cdmNewspapersFileGetter
-                   ->checkNewspaperPageFilePath($pathToFile, $page_number);
+                   ->checkNewspaperPageFilePath($pathToFile, $sub_dir_num);
 
                 if ($pathToPageOK){
                     $obj_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.' . $this->OBJ_file_extension;
@@ -186,11 +191,26 @@ class CdmNewspapers extends Writer
             // Write outut page level MODS.XML
             $MODS_expected = in_array('MODS', $this->datastreams);
             if ($MODS_expected xor $no_datastreams_setting_flag) {
-                $page_title = 'Page ' . $page_number;
+                $page_title = 'Page ' . $directoryNumber;
                 $this->writePageLevelMetadaFile($page_pointer, $page_title, $page_dir);
             }
         }
         
+    }
+    
+    /**
+     * Infer the numbered name for the newspaper issue page subdirectory from the OJB file name.
+     */
+    public function directoryNameFromFileName($pathToOBJfile) {
+    
+          $path_parts = pathinfo($pathToOBJfile);
+          //1988-07-13-01           
+          $filename = $path_parts['filename'];
+          $regex = '%[0-9]*$%';
+          preg_match($regex, $filename, $matches);
+          // remove possible left zero padded number.
+          $pageNumber = ltrim($matches[0]);
+          return $pageNumber;
     }
 
     /**
