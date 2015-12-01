@@ -58,7 +58,6 @@ class SpecificSet extends FetcherManipulator
         else {
             $parameters = array($manipulator_settings[1]);
         }
-        var_dump($parameters);
         $this->pathToInputFile = $parameters[0];
         $this->exclude = (isset($parameters[1]) && $parameters[1] == 'exclude') ? true : false;
         // To get the value of $onWindows.

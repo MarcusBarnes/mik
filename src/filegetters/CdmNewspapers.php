@@ -2,6 +2,8 @@
 
 namespace mik\filegetters;
 
+use GuzzleHttp\Client;
+
 class CdmNewspapers extends FileGetter
 {
     /**
@@ -57,6 +59,10 @@ class CdmNewspapers extends FileGetter
         $this->utilsUrl = $this->settings['utils_url'];
         $this->alias = $this->settings['alias'];
         
+        if (!isset($this->settings['http_timeout'])) {
+            $this->settings['http_timeout'] = 60;
+        }
+
         if (isset($this->settings['allowed_file_extensions_for_OBJ'])) {
             $this->allowed_file_extensions_for_OBJ = $this->settings['allowed_file_extensions_for_OBJ'];
         }
@@ -95,7 +101,12 @@ class CdmNewspapers extends FileGetter
         $alias = $this->settings['alias'];
         $ws_url = $this->settings['ws_url'];
         $query_url = $ws_url . 'dmGetCompoundObjectInfo/' . $alias . '/' .  $pointer . '/json';
-        $item_structure = file_get_contents($query_url);
+
+        // $item_structure = file_get_contents($query_url);
+        $client = new Client();
+        $response = $client->get($query_url, ['timeout' => $this->settings['http_timeout'], 'connect_timeout' => $this->settings['http_timeout']]);
+        $item_structure = $response->getBody();
+
         $item_structure = json_decode($item_structure, true);
         
         // @ToDo - deal with different item structures.
@@ -195,7 +206,14 @@ class CdmNewspapers extends FileGetter
         $get_image_url_thumbnail = $this->utilsUrl . 'ajaxhelper/?CISOROOT=' .
           ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer .
           '&action=2&DMSCALE=' . $scale. '&DMWIDTH='. $thumbnail_height . 'DMHEIGHT=' . $new_height;
-        $thumbnail_content = file_get_contents($get_image_url_thumbnail);
+        // $thumbnail_content = file_get_contents($get_image_url_thumbnail);
+
+        $client = new Client();
+        $response = $client->get($get_image_url_thumbnail,
+            ['timeout' => $this->settings['http_timeout'],
+            'connect_timeout' => $this->settings['http_timeout']]
+        );
+        $thumbnail_content = $response->getBody();
 
         return $thumbnail_content;
     }
@@ -212,7 +230,14 @@ class CdmNewspapers extends FileGetter
           . ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer
           . '&action=2&DMSCALE=' . $scale. '&DMWIDTH=' . $jpeg_height
           . '&DMHEIGHT=' . $new_height;
-        $jpg_content = file_get_contents($get_image_url_jpg);
+        // $jpg_content = file_get_contents($get_image_url_jpg);
+
+        $client = new Client();
+        $response = $client->get($get_image_url_jpg,
+            ['timeout' => $this->settings['http_timeout'],
+            'connect_timeout' => $this->settings['http_timeout']]
+        );
+        $jpg_content = $response->getBody();
 
         return $jpg_content;
     }
@@ -224,7 +249,13 @@ class CdmNewspapers extends FileGetter
         $get_file_url = $this->utilsUrl .'getfile/collection/'
             . $this->alias . '/id/' . $page_pointer . '/filename/'
             . $page_object_info['find'];
-        $content = file_get_contents($get_file_url);
+        // $content = file_get_contents($get_file_url);
+        $client = new Client();
+        $response = $client->get($get_file_url,
+            ['timeout' => $this->settings['http_timeout'],
+            'connect_timeout' => $this->settings['http_timeout']]
+        );
+        $content = $response->getBody();
         
         return $content;
     }
