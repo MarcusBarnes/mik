@@ -14,6 +14,10 @@ use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
  * row that adds the following element to your MODS:
  * null5,<identifier type="uuid"></identifier>.
  *
+ * Also, if an <identifier> elememt with type 'uuid' already exists,
+ * this manipulator adds an additional one, since we are processing
+ * indiviual <identifer> elments, not the entire document.
+ *
  * This metadata manipulator takes no configuration parameters.
  */
 class AddUuidToMods extends MetadataManipulator
@@ -42,10 +46,7 @@ class AddUuidToMods extends MetadataManipulator
      *
      * @return string
      *     One of the manipulated XML fragment, the original input XML if the
-     *     input is not the fragment we are interested in, or an empty string,
-     *     which as the effect of removing the empty <identifier type="uuid">
-     *     fragement from our MODS (if there was an error, for example, we don't
-     *     want empty identifier elements in our MODS documents).
+     *     input is not the fragment we are interested in.
      */
     public function manipulate($input)
     {
@@ -55,25 +56,39 @@ class AddUuidToMods extends MetadataManipulator
         // Test to see if the current fragment is <identifier type="uuid">.
         $xpath = new \DOMXPath($dom);
         $uuid_identifiers = $xpath->query("//identifier[@type='uuid']");
-        // There should only be one <identifier type="uuid"> fragment in the
-        // incoming XML. If there is 0 or more than 1, return the original.
+        // There should only be one <identifier type="uuid"/> fragment in the
+        // incoming XML, defined in the mappings file. If there is 0, return
+        // the original.
         if ($uuid_identifiers->length === 1) {
             $uuid_identifier = $uuid_identifiers->item(0);
-            try {
-                $uuid4 = Uuid::uuid4();
-                $uuid4_string = $uuid4->toString();
-            } catch (UnsatisfiedDependencyException $e) {
-                // Log error and return $input.
+            // If our incoming fragment is already a valid UUID v4, return it as
+            // is. Note that if a identifier with type "uuid" already exists, this
+            // manipulator will add a new one, since we are processing the MODS
+            // on an element by element basis, not the entire MODS document.
+            if (strlen($uuid_identifier->nodeValue) &&
+                preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i', $uuid_identifier->nodeValue)) {
                 $this->log->addError("AddUuidToMods",
-                    array('UUID generation error' => $e->getMessage()));
+                    array('UUID already present' => $uuid_identifier->nodeValue));
+                return $input;
             }
-            $uuid_identifier->nodeValue = $uuid4_string;
-
-            return $dom->saveXML($dom->documentElement);
+            // If our incoming fragment is the template element from the mappings file,
+            // populate it and return it.
+            else {
+                try {
+                    $uuid4 = Uuid::uuid4();
+                    $uuid4_string = $uuid4->toString();
+                } catch (UnsatisfiedDependencyException $e) {
+                    // Log error and return $input.
+                    $this->log->addError("AddUuidToMods",
+                        array('UUID generation error' => $e->getMessage()));
+                }
+                $uuid_identifier->nodeValue = $uuid4_string;
+                return $dom->saveXML($dom->documentElement);
+            }
         }
         else {
             // If current fragment is not <identifier type="uuid">,
-            // return it unmodified.
+            // with or without a valid UUID v4 as a value, return it unmodified.
             return $input;
         }
     }
