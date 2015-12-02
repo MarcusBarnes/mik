@@ -104,7 +104,10 @@ class CdmNewspapers extends FileGetter
 
         // $item_structure = file_get_contents($query_url);
         $client = new Client();
-        $response = $client->get($query_url, ['timeout' => $this->settings['http_timeout'], 'connect_timeout' => $this->settings['http_timeout']]);
+        $response = $client->get($query_url,
+            ['timeout' => $this->settings['http_timeout'], 
+            'connect_timeout' => $this->settings['http_timeout']]
+        );
         $item_structure = $response->getBody();
 
         $item_structure = json_decode($item_structure, true);
@@ -208,12 +211,17 @@ class CdmNewspapers extends FileGetter
           '&action=2&DMSCALE=' . $scale. '&DMWIDTH='. $thumbnail_height . 'DMHEIGHT=' . $new_height;
         // $thumbnail_content = file_get_contents($get_image_url_thumbnail);
 
-        $client = new Client();
-        $response = $client->get($get_image_url_thumbnail,
-            ['timeout' => $this->settings['http_timeout'],
-            'connect_timeout' => $this->settings['http_timeout']]
-        );
-        $thumbnail_content = $response->getBody();
+        try {
+            $client = new Client();
+            $response = $client->get($get_image_url_thumbnail,
+                ['timeout' => $this->settings['http_timeout'],
+                'connect_timeout' => $this->settings['http_timeout']]
+            );
+            $thumbnail_content = $response->getBody();
+        }
+        catch (RequestException $e) {
+            // @todo: Bubble up MIK exception here.
+        } 
 
         return $thumbnail_content;
     }
