@@ -69,21 +69,33 @@ class AddUuidToMods extends MetadataManipulator
                 preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i', $uuid_identifier->nodeValue)) {
                 $this->log->addError("AddUuidToMods",
                     array('UUID already present' => $uuid_identifier->nodeValue));
+
+                // If the MODS contains a valid UUID, add a flag to the
+                // session to we can avoid adding a second one later.
+                $uuid_already_present = true;
+                $this->writeSession(serialize($uuid_already_present));
+
                 return $input;
             }
             // If our incoming fragment is the template element from the mappings file,
             // populate it and return it.
             else {
-                try {
-                    $uuid4 = Uuid::uuid4();
-                    $uuid4_string = $uuid4->toString();
-                } catch (UnsatisfiedDependencyException $e) {
-                    // Log error and return $input.
-                    $this->log->addError("AddUuidToMods",
-                        array('UUID generation error' => $e->getMessage()));
+                // Only add a new identifier containing a UUID if there
+                // is no flag in the session indicating we've alredy found one
+                // in the MODS document.
+                $session = $this->readSession();
+                if (!unserialize($session)) {
+                    try {
+                        $uuid4 = Uuid::uuid4();
+                        $uuid4_string = $uuid4->toString();
+                    } catch (UnsatisfiedDependencyException $e) {
+                        // Log error and return $input.
+                        $this->log->addError("AddUuidToMods",
+                            array('UUID generation error' => $e->getMessage()));
+                    }
+                    $uuid_identifier->nodeValue = $uuid4_string;
+                    return $dom->saveXML($dom->documentElement);
                 }
-                $uuid_identifier->nodeValue = $uuid4_string;
-                return $dom->saveXML($dom->documentElement);
             }
         }
         else {

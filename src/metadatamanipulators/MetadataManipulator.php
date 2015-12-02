@@ -19,7 +19,7 @@ namespace mik\metadatamanipulators;
 abstract class MetadataManipulator
 {
     /**
-     * @var array $settings - configuration settings from confugration class.
+     * @var array $settings - configuration settings from configuration class.
      */
     public $settings;
 
@@ -32,6 +32,9 @@ abstract class MetadataManipulator
     public function __construct($settings, $paramsArray, $record_key)
     {
         $this->settings = $settings;
+        // 0 is a valid record key; we need to eplicitly type cast it to a string.
+        $this->session_file_path = $this->settings['FILE_GETTER']['temp_directory'] .
+            DIRECTORY_SEPARATOR . (string) $record_key . '.dat';
     }
 
     /**
@@ -43,4 +46,40 @@ abstract class MetadataManipulator
      *     Manipulated string
      */
     abstract public function manipulate($input);
+
+    /**
+     * Write out the "session" data.
+     *
+     * @param mixed $data The data the metadata manipulator wants
+     *    to save between invocations of itself.
+     * @param bool $append
+     *    A flag indicating whether the data should overwrite the
+     *    existing session data (the default) or append to it (true).
+     * @return bool
+     *    Returns true is file_get_contents succeeds, false if
+     *    it fails.
+     */
+    public function writeSession($data, $append = false) {
+        if ($append) {
+            if (file_put_contents($this->session_file_path, $data, FILE_APPEND)) {
+                return true;
+            }
+        }
+        else {
+            if (file_put_contents($this->session_file_path, $data)) {
+                return true;
+            }
+        }
+    }
+
+    /**
+     * Retrieve the "session" data.
+     *
+     * @return mixed
+     *     The contents of the session file for the current object.
+     *     Returns false if file_get_contents() fails.
+     */
+    public function readSession() {
+        return file_get_contents($this->session_file_path);
+    }    
 }
