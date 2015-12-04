@@ -108,7 +108,8 @@ function islandora_newspaper_issue_cmodel($options) {
     $pages_missing = false;
     $extra_files_in_issues_dir = false;
     $extra_files_in_issue_dir = false;
-    $extra_files_in_pages_dir = false;    
+    $extra_files_in_pages_dir = false;
+    $bad_ocr_encoding = false;
     if ($issues_handle = opendir($options['dir'])) {
         while (false !== ($issues_dir = readdir($issues_handle))) {
             // Check to make sure that there are no files in the issues directory.
@@ -178,6 +179,14 @@ function islandora_newspaper_issue_cmodel($options) {
                             $extra_files_in_pages_dir = true;
                         }
                     }
+
+                    // Check each OCR.txt file to ensure it's encoded in UTF-8.
+                    $path_to_ocr_file = $page_dir . DIRECTORY_SEPARATOR . 'OCR.txt';
+                    $ocr_content = file_get_contents($path_to_ocr_file);
+                    if (!mb_check_encoding($ocr_content, 'UTF-8')) {
+                        error_log("$path_to_ocr_file is not valid UTF-8\n", 3, $options['log']);
+                        $bad_ocr_encoding  = true;
+                    }
                 }
             }
         }
@@ -220,6 +229,13 @@ function islandora_newspaper_issue_cmodel($options) {
             . " and the number of newspaper pages expected based on the CPD.XML contained in the issue level MODS XML.\n"; 
     } else {
         print "All of expected newspaper pages are present.\n";
+    }
+
+    if ($bad_ocr_encoding) {
+        print "Some OCR.txt files in " . $options['dir'] . " appear not to be valid UTF-8.\n";
+    }
+    else {
+        print "All OCR.txt files in " . $options['dir'] . " appear to be valid UTF-8.\n";
     }
 
     print "More detail may be available in " . $options['log'] . ".\n";
