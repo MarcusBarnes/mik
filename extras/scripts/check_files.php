@@ -195,28 +195,28 @@ function islandora_newspaper_issue_cmodel($options) {
     }
 
     if ($extra_files_in_issues_dir) {
-        print "Files exist in ". $options['dir'] . " that should not be present.\n";
+        print "** Files exist in ". $options['dir'] . " that should not be present.\n";
     }
     else {
         print "There are no unexpected files in " . $options['dir'] . ".\n";
     }
 
     if ($extra_files_in_issue_dir) {
-        print "Files exist in one or more issue-level directories that should not be present.\n";
+        print "** Files exist in one or more issue-level directories that should not be present.\n";
     }
     else {
         print "There are no unexpected files in any issue-level directories.\n";
     }
 
     if ($extra_files_in_pages_dir) {
-        print "Files exist in one or more newspaper page directories that should not be present.\n";
+        print "** Files exist in one or more newspaper page directories that should not be present.\n";
     }
     else {
         print "There are no unexpected files in any newspaper page directories.\n";
     }
 
     if ($files_missing) {
-        print "Some newspaper issues in " . $options['dir'] . " are missing one of " .
+        print "** Some newspaper issues in " . $options['dir'] . " are missing one of " .
             $options['files'] . ".\n";
     }
     else {
@@ -225,14 +225,14 @@ function islandora_newspaper_issue_cmodel($options) {
     }
 
     if ($pages_missing) {
-        print "There is a mismatch between the number of newspaper pages in " . $options['dir'] 
+        print "** There is a mismatch between the number of newspaper pages in " . $options['dir'] 
             . " and the number of newspaper pages expected based on the CPD.XML contained in the issue level MODS XML.\n"; 
     } else {
         print "All of expected newspaper pages are present.\n";
     }
 
     if ($bad_ocr_encoding) {
-        print "Some OCR.txt files in " . $options['dir'] . " appear not to be valid UTF-8.\n";
+        print "** Some OCR.txt files in " . $options['dir'] . " appear not to be valid UTF-8.\n";
     }
     else {
         print "All OCR.txt files in " . $options['dir'] . " appear to be valid UTF-8.\n";
