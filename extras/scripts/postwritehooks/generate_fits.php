@@ -40,19 +40,33 @@ if (!file_exists($path_to_fits)) {
 }
 
 if (count($children_record_keys)) {
-  $page_sequence = 0;
   foreach ($children_record_keys as $child_record_key) {
-    $page_sequence++;
-    $issue_dir = get_issue_dir($record_key, $item_info_field_for_issues, $config);
-    $path_to_page_dir = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
-      $issue_dir . DIRECTORY_SEPARATOR . $page_sequence;
-    $path_to_obj = $path_to_page_dir . DIRECTORY_SEPARATOR . $obj_filename;
-    $path_to_fits_output = $path_to_page_dir . DIRECTORY_SEPARATOR . $fits_output_filename;
-
-    $cmd = "$path_to_fits -i $path_to_obj -o $path_to_fits_output";
-    exec($cmd, $output, $return_var);
-    if ($return_var) {
-      $log->addWarning("FITS output not generated", array('OBJ file' => $path_to_obj));
+    if (!$issue_dir = get_issue_dir_name($record_key, $item_info_field_for_issues, $config)) {
+      $log->addWarning("FITS output not generated because issue directory not retrievable from CONTENTdm",
+        array('Issue dir' => $record_key));
+      exit;
+    }
+    $path_to_issue_dir = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . $issue_dir;
+    $page_dirs = glob($path_to_issue_dir . DIRECTORY_SEPARATOR . '*', GLOB_ONLYDIR);
+    foreach ($page_dirs as $path_to_page_dir) {
+      $path_to_obj = $path_to_page_dir . DIRECTORY_SEPARATOR . $obj_filename;
+      if (file_exists($path_to_obj)) {
+        $path_to_fits_output = $path_to_page_dir . DIRECTORY_SEPARATOR . $fits_output_filename;
+        $cmd = "$path_to_fits -i $path_to_obj -o $path_to_fits_output";
+        exec($cmd, $output, $return_var);
+        if ($return_var) {
+          $log->addWarning("FITS output not generated due to error with FITS",
+            array('FITS return value' => $return_var, 'OBJ file' => $path_to_obj));
+        }
+        else {
+          $log->addInfo("FITS output generated",
+            array('OBJ file' => $path_to_obj, 'FITS output' => $path_to_fits_output));
+        }
+      }
+      else {
+        $log->addWarning("FITS output not generated because OBJ file not found",
+          array('OBJ file' => $path_to_obj));
+      }
     }
   }
 }
@@ -75,7 +89,7 @@ if (count($children_record_keys)) {
  *   The value of the CONTENTdm field specified in $item_info_field_for_issues,
  *   or false if the field is not populated for this object.
  */
-function get_issue_dir($record_key, $item_info_field_for_issues, $config) {
+function get_issue_dir_name($record_key, $item_info_field_for_issues, $config) {
   // Use Guzzle to fetch the output of the call to GetParent
   // for the current object.
   $url = $config['METADATA_PARSER']['ws_url'] .
