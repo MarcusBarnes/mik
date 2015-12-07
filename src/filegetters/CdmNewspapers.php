@@ -60,6 +60,7 @@ class CdmNewspapers extends FileGetter
         $this->alias = $this->settings['alias'];
         
         if (!isset($this->settings['http_timeout'])) {
+            // Seconds.
             $this->settings['http_timeout'] = 60;
         }
 
@@ -102,15 +103,21 @@ class CdmNewspapers extends FileGetter
         $ws_url = $this->settings['ws_url'];
         $query_url = $ws_url . 'dmGetCompoundObjectInfo/' . $alias . '/' .  $pointer . '/json';
 
-        // $item_structure = file_get_contents($query_url);
         $client = new Client();
-        $response = $client->get($query_url,
-            ['timeout' => $this->settings['http_timeout'], 
-            'connect_timeout' => $this->settings['http_timeout']]
-        );
-        $item_structure = $response->getBody();
-
-        $item_structure = json_decode($item_structure, true);
+        try {
+            $response = $client->get($query_url,
+                ['timeout' => $this->settings['http_timeout'], 
+                'connect_timeout' => $this->settings['http_timeout']]
+            );
+            $item_structure = $response->getBody();
+            $item_structure = json_decode($item_structure, true);
+        }
+        catch (RequestException $e) {
+            echo $e->getRequest();
+            if ($e->hasResponse()) {
+                echo $e->getResponse();
+            }
+        }
         
         // @ToDo - deal with different item structures.
         if (isset($item_structure['page'])) {
@@ -209,7 +216,6 @@ class CdmNewspapers extends FileGetter
         $get_image_url_thumbnail = $this->utilsUrl . 'ajaxhelper/?CISOROOT=' .
           ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer .
           '&action=2&DMSCALE=' . $scale. '&DMWIDTH='. $thumbnail_height . 'DMHEIGHT=' . $new_height;
-        // $thumbnail_content = file_get_contents($get_image_url_thumbnail);
 
         try {
             $client = new Client();
@@ -220,7 +226,10 @@ class CdmNewspapers extends FileGetter
             $thumbnail_content = $response->getBody();
         }
         catch (RequestException $e) {
-            // @todo: Bubble up MIK exception here.
+            echo $e->getRequest();
+            if ($e->hasResponse()) {
+                echo $e->getResponse();
+            }
         } 
 
         return $thumbnail_content;
@@ -238,16 +247,22 @@ class CdmNewspapers extends FileGetter
           . ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer
           . '&action=2&DMSCALE=' . $scale. '&DMWIDTH=' . $jpeg_height
           . '&DMHEIGHT=' . $new_height;
-        // $jpg_content = file_get_contents($get_image_url_jpg);
 
         $client = new Client();
-        $response = $client->get($get_image_url_jpg,
-            ['timeout' => $this->settings['http_timeout'],
-            'connect_timeout' => $this->settings['http_timeout']]
-        );
-        $jpg_content = $response->getBody();
-
-        return $jpg_content;
+        try {
+            $response = $client->get($get_image_url_jpg,
+                ['timeout' => $this->settings['http_timeout'],
+                'connect_timeout' => $this->settings['http_timeout']]
+            );
+            $jpg_content = $response->getBody();
+            return $jpg_content;
+        }
+        catch (RequestException $e) {
+            echo $e->getRequest();
+            if ($e->hasResponse()) {
+                echo $e->getResponse();
+            }
+        }        
     }
 
     public function getChildLevelFileContent($page_pointer, $page_object_info)
@@ -257,15 +272,22 @@ class CdmNewspapers extends FileGetter
         $get_file_url = $this->utilsUrl .'getfile/collection/'
             . $this->alias . '/id/' . $page_pointer . '/filename/'
             . $page_object_info['find'];
-        // $content = file_get_contents($get_file_url);
+
         $client = new Client();
-        $response = $client->get($get_file_url,
-            ['timeout' => $this->settings['http_timeout'],
-            'connect_timeout' => $this->settings['http_timeout']]
-        );
-        $content = $response->getBody();
-        
-        return $content;
+        try {
+            $response = $client->get($get_file_url,
+                ['timeout' => $this->settings['http_timeout'],
+                'connect_timeout' => $this->settings['http_timeout']]
+            );
+            $content = $response->getBody();
+            return $content;
+        }
+        catch (RequestException $e) {
+            echo $e->getRequest();
+            if ($e->hasResponse()) {
+                echo $e->getResponse();
+            }
+        }        
     }
 
     public function getPageOBJfileContent($pathToFile, $page_number)
