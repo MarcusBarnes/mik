@@ -103,6 +103,9 @@ class CdmNewspapers extends Writer
             // Infer the numbered directory name from the OBJ file name.
             $directoryNumber = $this->directoryNameFromFileName($pathToFile);
             
+            // left trim leading left zero padded numbers
+            $directoryNumber = ltrim($directoryNumber, "0");
+            
             $page_dir = $issueObjectPath  . DIRECTORY_SEPARATOR . $directoryNumber;
             
             // Create a directory for each day of the newspaper.
