@@ -46,7 +46,7 @@ class FilterModsTopic extends MetadataManipulator
 
         $subjectNode = $xml->getElementsByTagName($this->topLevelNodeName)->item(0);
 
-        if (!isset($subjectNode) ) {
+        if(!isset($subjectNode) ) {
             // This metadatamanipulator does not apply to this input.
             // return the $input unmodified.
             $output = $input;
@@ -78,15 +78,16 @@ class FilterModsTopic extends MetadataManipulator
         $xml->loadxml($xmlsnippet, LIBXML_NSCLEAN);
 
         $topicNode = $xml->getElementsByTagName('topic')->item(0);
-
+        
         if (!is_object($topicNode)) {
 
             $xmlstring = $xmlsnippet;
 
         } else {
 
+            $topicNodeAttrributes = $topicNode->attributes;
+            
             $topictext = $topicNode->nodeValue;
-
             $topics = explode($breakOnCharacter, $topictext);
 
             // remove old topic node.
@@ -98,6 +99,11 @@ class FilterModsTopic extends MetadataManipulator
             foreach ($topics as $topic) {
                 $topic = trim($topic);
                 $newtopicElement = $xml->createElement('topic');
+                foreach($topicNodeAttrributes as $atttribute){
+                    $name = $atttribute->name;
+                    $value = $atttribute->value;
+                    $newtopicElement->setAttribute($name, $value);
+                }
                 $topictextNode = $xml->createTextNode($topic);
                 $newtopicElement->appendChild($topictextNode);
                 $subjectNode->appendChild($newtopicElement);
