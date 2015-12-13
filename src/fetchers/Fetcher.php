@@ -46,6 +46,9 @@ abstract class Fetcher
     /**
      * Returns a hashed array or object containing a record's information.
      *
+     * Also caches a serialized version of the raw (from source) record to disk
+     * in a directory as defined in the [FETCHER] temp_directory configuration settings.
+     *
      * @param string $recordKey the unique record_key
      *      For CONTENTdm, this will be the item pointer
      *      For CSV, this will the the unique id assisgned to a row of data.

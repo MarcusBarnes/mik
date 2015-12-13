@@ -117,11 +117,18 @@ class Csv extends Fetcher
      */
     public function getItemInfo($recordKey)
     {
-        $records = $this->getRecords();
-        foreach ($records as $record) {
-          if (strlen($record->key) && $record->key == $recordKey) {
-            return $record;
-          }
+        $raw_metadata_cache = $this->settings['temp_directory'] . DIRECTORY_SEPARATOR . $recordKey . '.metadata';
+        if (!file_exists($raw_metadata_cache)) {
+            $records = $this->getRecords();
+            foreach ($records as $record) {
+                if (strlen($record->key) && $record->key == $recordKey) {
+                    file_put_contents($raw_metadata_cache, serialize($record));
+                    return $record;
+                }
+            }
+        }
+        else {
+            return unserialize(file_get_contents($raw_metadata_cache));
         }
     }
 
