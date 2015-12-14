@@ -34,7 +34,6 @@ class CdmSingleFileVanpunk extends Filegettermanipulator
               array('Incorrect number of parameters' => count($paramsArray)));
         }
     }
-
   
     /*
      * Generates possible filepaths for master files.

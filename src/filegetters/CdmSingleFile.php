@@ -2,6 +2,7 @@
 
 namespace mik\filegetters;
 use GuzzleHttp\Client;
+use mik\exceptions\MikErrorException;
 
 class CdmSingleFile extends FileGetter
 {
@@ -116,6 +117,8 @@ class CdmSingleFile extends FileGetter
                 }
             }
         }
+        // Throw an exception if no master file was found.
+        throw new \mik\exceptions\MikErrorException('WARNING', 'src/filegetters/CdmSingleFile.php', __LINE__, "No master file found for pointer $pointer", 1, $this->settings);
         return false;
     }
 
