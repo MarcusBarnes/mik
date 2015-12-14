@@ -98,8 +98,6 @@ class CdmSingleFile extends FileGetter
      */
     public function getMasterFilePath($pointer)
     {
-        // $potentialFilesArray = array();
-
         // Loop through all applicable filegettermanipulators to
         // determine possible locations for the file.
         foreach ($this->filegettermanipulators as $fmanipulator) {
