@@ -63,6 +63,18 @@ class CdmSingleFile extends Writer
         else {
           // @todo: Log failure.
         }
+
+        // Retrieve the master file associated with the document and write it to the
+        // output folder, using the CONTENTdm pointer as the file basename.
+        $master_file_path = $this->cdmSingleFileFileGetter->getMasterFilePath($record_id);
+        $source_file_extension = pathinfo($master_file_path, PATHINFO_EXTENSION);
+        if ($master_file_path) {
+          $output_file_path = $object_path . $record_id . '.' . $source_file_extension;
+          copy($master_file_path, $output_file_path);
+        }
+        else {
+          // @todo: Log failure.
+        }
     }
 
     public function writeMetadataFile($metadata, $path)
