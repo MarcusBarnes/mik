@@ -138,12 +138,24 @@ class SpecificSet extends FetcherManipulator
             );
             return array();
         }
+
         $record_keys = file($this->pathToInputFile);
+        $record_keys = array_filter($record_keys, array($this, 'remove_comments'));
+
         foreach ($record_keys as &$id) {
             $id = trim($id);
         }
 
         return $record_keys;
+    }
+
+    /**
+     * Callback function that removes elements from an array
+     * that start with '#'.
+     */
+    private function remove_comments($item)
+    {
+        return !preg_match('/^#/', $item);
     }
 
 }
