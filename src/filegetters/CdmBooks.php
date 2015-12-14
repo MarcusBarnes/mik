@@ -62,6 +62,8 @@ class CdmBooks extends FileGetter
                 ->getBookMasterFiles($inputDirectory);
             $potentialObjFiles = array_merge($potentialObjFiles, $potentialObjFilesPart);
         }
+        //var_dump($potentialObjFiles);
+        //exit();
         $this->OBJFilePaths = $this->determineObjItems($potentialObjFiles);
         // information and methods for thumbnail minipulation
         $this->thumbnail = new \mik\filemanipulators\ThumbnailFromCdm($settings);
@@ -134,12 +136,15 @@ class CdmBooks extends FileGetter
 
     private function determineObjItems($arrayOfFilesToPreserve)
     {
-        // For newspaper issues
-
-        # This regex will look for a pattern like /yyyy-mm-dd/ in the path that
-        # represents the issue date for the newspaper.
-        # Assumes publication frequency of at most one issue daily.
-        # One can use \d character class for digits 0-9
+        // For book pages
+        
+        /*
+            This regex will looks for a pattern like book_nick001 in the path for the files
+            of a particular book.
+            
+            @ToDo - what reasonable assumptions about input_directory structure are
+            reasonable to make to make this more general when processing more than one book.
+        */
         $regex_pattern = '%[/\\\\][0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][/\\\\]%';
 
         $dateForIdentifierArray = array();
