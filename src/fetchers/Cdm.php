@@ -201,12 +201,19 @@ class Cdm extends Fetcher
      */
     public function getItemInfo($pointer)
     {
+        $raw_metadata_cache = $this->settings['temp_directory'] . DIRECTORY_SEPARATOR . $pointer . '.metadata';
         $wsUrl = $this->settings['ws_url'];
         $alias = $this->settings['alias'];
         $queryUrl = $wsUrl . 'dmGetItemInfo/' . $alias . '/' .
           $pointer . '/json';
-        $response = file_get_contents($queryUrl);
-        $itemInfo = json_decode($response, true);
+        if (!file_exists($raw_metadata_cache)) {
+            $response = file_get_contents($queryUrl);
+            $itemInfo = json_decode($response, true);
+            file_put_contents($raw_metadata_cache, serialize($itemInfo));
+        }
+        else {
+            $itemInfo = unserialize(file_get_contents($raw_metadata_cache));
+        }
         if (is_array($itemInfo)) {
             return $itemInfo;
         } else {

@@ -2,6 +2,7 @@
 
 namespace mik\filegetters;
 use GuzzleHttp\Client;
+use mik\exceptions\MikErrorException;
 
 class CdmSingleFile extends FileGetter
 {
@@ -21,16 +22,28 @@ class CdmSingleFile extends FileGetter
     public $alias;
 
     /**
+     * @var array $filegettermanipulators - array of filegettermanipulors from config.
+     *   array values will be of the form
+     *   filegettermanipulator_class_name|param_0|param_1|...|param_n
+     */
+    public $filegettermanipulators;
+
+    /**
      * Create a new CONTENTdm Fetcher Instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FILE_GETTER'];
-        $this->utilsUrl = $this->settings['utils_url'];
-        $this->alias = $this->settings['alias'];
+        $this->settings = $settings;
+        $this->utilsUrl = $this->settings['FILE_GETTER']['utils_url'];
+        $this->alias = $this->settings['FILE_GETTER']['alias'];
         $this->temp_directory = (!isset($settings['FILE_GETTER']['temp_directory'])) ?
           '/tmp' : $settings['FILE_GETTER']['temp_directory'];
+        if (isset($settings['MANIPULATORS']['filegettermanipulators'])) {
+            $this->filegettermanipulators = $settings['MANIPULATORS']['filegettermanipulators'];
+        } else {
+            $this->filegettermanipulators = null;
+        }
     }
 
     /**
@@ -73,4 +86,39 @@ class CdmSingleFile extends FileGetter
           return false;
         }
     }
+
+    /**
+     * Retrives the master file (corresponding to the OBJ datastream) for the current object.
+     *
+     * @param string $pointer
+     *  The CONTENTdm pointer of the object.
+     *
+     * @return mixed
+     *  The path to the file, or false.
+     */
+    public function getMasterFilePath($pointer)
+    {
+        // Loop through all applicable filegettermanipulators to
+        // determine possible locations for the file.
+        foreach ($this->filegettermanipulators as $fmanipulator) {
+            $filegettermanipulatorClassAndParams = explode('|', $fmanipulator);
+            $filegettermanipulatorClassName = array_shift($filegettermanipulatorClassAndParams);
+            $manipulatorParams = $filegettermanipulatorClassAndParams;
+            $filegetterManipulatorClass = 'mik\\filegettermanipulators\\' . $filegettermanipulatorClassName;
+            $filegettermanipulator = new $filegetterManipulatorClass($this->settings, $manipulatorParams, $pointer);
+            if ($potentialFilesArray = $filegettermanipulator->getMasterFilePaths()) {
+                foreach ($potentialFilesArray as $potentialMasterFilePath) {
+                    // Take the path to the first file that exists.
+                    if (file_exists($potentialMasterFilePath)) {
+                        return $potentialMasterFilePath;
+                    }
+                }
+            }
+        }
+        // Throw an exception if no master file was found.
+        throw new \mik\exceptions\MikErrorException('WARNING', 'src/filegetters/CdmSingleFile.php', __LINE__, "No master file found for pointer $pointer", 1, $this->settings);
+        return false;
+    }
+
 }
+
