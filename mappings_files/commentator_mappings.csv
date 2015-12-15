@@ -1,0 +1,15 @@
+"Title","<titleInfo><nonSort>The</nonSort><title>commentator</title></titleInfo>",  
+"Other title","<titleInfo type='alternative'><title>Mine, mill, commentator</title></titleInfo>",
+"Language","<language><languageTerm type='text'>English</languageTerm><languageTerm type='code' authority='iso639-2b'>eng</languageTerm></language>",
+"Subject","<subject authority='lsch'><topic>Labor unions--Newspapers</topic></subject>"
+"Publisher","<originInfo><place><placeTerm type='code' authority='marccountry'>bcc</placeTerm><placeTerm type='text'>Trail, B.C.</placeTerm></place><publisher>%value</publisher></originInfo>",
+"Date","<originInfo><dateIssued encoding='w3cdtf' keyDate='yes'>%value%</dateIssued></originInfo>",
+"Type","<genre authority='lcgft'>newspapers</genre>",
+"Rights","<accessCondition type='use and reproduction'>%value%</accessCondition>"
+"Identifier","<identifier type='local'>%value%</identifier>",
+"null0","<titleInfo type='alternative'><title>Local 480's mine - mill commentator</title></titleInfo>",
+"null1","<subject authority='lsch'><topic>Labor unions--British Columbia--Trail--Newspapers</topic></subject>",
+"null2","<subject authority='lsch'><geographic>British Columbia--Newspapers</geographic></subject>",
+"null3","<subject authority='lsch'><geographic>Trail (B.C.)--Newspapers</geographic></subject>",
+"null4","<extension><CONTENTdmData></CONTENTdmData></extension>",
+"null5","<typeOfResource>text</typeOfResource>",

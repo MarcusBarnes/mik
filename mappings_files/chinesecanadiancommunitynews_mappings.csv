@@ -1,0 +1,18 @@
+"Title","<titleInfo><title>Chinese Canadian Community News</title></titleInfo>",
+"題名","<titleInfo type='transliterated' lang='chi'><title>Jia hua qiao bao</title></titleInfo>",
+"Date","<originInfo><dateIssued encoding='w3cdtf' keyDate='yes'>%value%</dateIssued></originInfo>",
+"Subject","<subject authority='lcsh'><topic>Chinese Canadians--Newspapers</topic></subject>",
+"主題詞","<subject lang='chi' script='Hant'>%value%</subject>",
+"Language","<language><languageTerm type='text'>Chinese</languageTerm><languageTerm type='code' authority='iso639-2b'>chi</languageTerm></language>",
+"Publisher","<originInfo><place><placeTerm type='code' authority='marccountry'>onc</placeTerm><placeTerm type='text'>Ottawa, Ontario</placeTerm></place><publisher>Chinese-Canadian Community Association of Ottawa</publisher></originInfo>",
+"Rights","<accessCondition type='use and reproduction'>%value%</accessCondition>",
+"Type","<genre authority='lcgft'>newspapers</genre>",
+"null0","<typeOfResource>text</typeOfResource>",
+"null1","<titleInfo type='alternative' lang='chi' script='Hant'><title>加華僑報</title></titleInfo>",
+"null2","<note type='language'>Chinese title romanized</note>",
+"null3","<subject authority='lcsh'><topic>Chinese--Newspapers</topic></subject>",
+"null4","<subject authority='lcsh'><topic>Chinese Canadians--Ontario--Ottawa--Newspapers</topic></subject>",
+"null5","<subject authority='lcsh'><topic>Chinese--Ontario--Ottawa--Newspapers</topic></subject>"
+"null6","<subject authority='lcsh'><geographic>Ontario--Newspapers</geographic></subject>"
+"null7","<subject authority='lcsh'><geographic>Ottawa (Ont.)--Newspapers</geographic></subject>",
+"null8","<extension><CONTENTdmData></CONTENTdmData></extension>",

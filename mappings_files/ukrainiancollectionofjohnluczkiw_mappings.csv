@@ -1,0 +1,14 @@
+Title,<titleInfo><title>%value%</title></titleInfo>,
+Creator,<name authority="lcsh" type="personal" role="creator"><namePart>%value%</namePart></name>
+Subject,<subject><topic>%value%</topic></subject>,
+Date,<originInfo><dateIssued encoding="w3cdtf" keyDate="yes">%value%</dateIssued></originInfo>
+Language,<language><languageTerm type="text">Ukrainian</languageTerm><languageTerm type ="code" authority="iso639-2b">%value%</languageTerm></language>
+Identifier,<identifier type="local">%value%</identifier>,
+Rights,<accessCondition type="use and reproduction">%value%</accessCondition>,
+Type,<genre authority="marcgt">newspaper</genre>,
+Extent,<physicalDescription><extent>%value%</extent></physicalDescription>,
+Description,<abstract>%value%</abstract>,
+Place of publication,<originInfo><publisher>%value%</publisher></originInfo>,
+Publisher,<originInfo><publisher>%value%</publisher></originInfo>,
+null0,<extension><CONTENTdmData></CONTENTdmData></extension>,
+null1,<typeOfResource>text</typeOfResource>,
