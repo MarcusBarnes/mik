@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 // mik.php
+
 /**
  * Main Move to Islandora Kit script.
  **/
@@ -203,8 +204,7 @@ foreach ($records as $record) {
         $progress->current($record_num);
     }
 
-    // Run any post-write hooks. Convert $children and $settings
-    // into JSON for passing to hook scripts.
+    // Run any post-write hooks.
     if (isset($settings['WRITER']['postwritehooks'])) {
         $config_path = realpath($configPath);
         if (count($children)) {
