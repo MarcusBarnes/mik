@@ -3,6 +3,8 @@
 namespace mik\filegetters;
 
 use GuzzleHttp\Client;
+use mik\exceptions\MikErrorException;
+use Monolog\Logger;
 
 class CdmNewspapers extends FileGetter
 {
@@ -68,10 +70,9 @@ class CdmNewspapers extends FileGetter
             $this->allowed_file_extensions_for_OBJ = $this->settings['allowed_file_extensions_for_OBJ'];
         }
 
-        //$this->inputDirectory = $this->settings['input_directory'];
         $this->inputDirectories = $this->settings['input_directories'];
         
-        // interate over inputDirectories to create $potentialObjFiles array.
+        // Interate over inputDirectories to create $potentialObjFiles array.
         $potentialObjFiles = array();
         foreach ($this->inputDirectories as $inputDirectory) {
             $potentialObjFilesPart = $this
@@ -81,6 +82,13 @@ class CdmNewspapers extends FileGetter
         $this->OBJFilePaths = $this->determineObjItems($potentialObjFiles);
         // information and methods for thumbnail minipulation
         $this->thumbnail = new \mik\filemanipulators\ThumbnailFromCdm($settings);
+
+        // Set up logger.
+        $this->pathToLog = $settings['LOGGING']['path_to_log'];
+        $this->log = new \Monolog\Logger('CdmNewspapers filegetter');
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
+            Logger::ERROR);
+        $this->log->pushHandler($this->logStreamHandler);
     }
 
     /**
@@ -113,9 +121,9 @@ class CdmNewspapers extends FileGetter
             $item_structure = json_decode($item_structure, true);
         }
         catch (RequestException $e) {
-            echo $e->getRequest();
+            $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request error' => $e->getRequest()));
             if ($e->hasResponse()) {
-                echo $e->getResponse();
+                $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request response' => $e->getResponse()));
             }
         }
         
@@ -226,9 +234,9 @@ class CdmNewspapers extends FileGetter
             $thumbnail_content = $response->getBody();
         }
         catch (RequestException $e) {
-            echo $e->getRequest();
+            $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request error' => $e->getRequest()));
             if ($e->hasResponse()) {
-                echo $e->getResponse();
+                $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request response' => $e->getResponse()));
             }
         } 
 
@@ -258,9 +266,9 @@ class CdmNewspapers extends FileGetter
             return $jpg_content;
         }
         catch (RequestException $e) {
-            echo $e->getRequest();
+            $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request error' => $e->getRequest()));
             if ($e->hasResponse()) {
-                echo $e->getResponse();
+                $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request response' => $e->getResponse()));
             }
         }        
     }
@@ -283,9 +291,9 @@ class CdmNewspapers extends FileGetter
             return $content;
         }
         catch (RequestException $e) {
-            echo $e->getRequest();
+            $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request error' => $e->getRequest()));
             if ($e->hasResponse()) {
-                echo $e->getResponse();
+                $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request response' => $e->getResponse()));
             }
         }        
     }
