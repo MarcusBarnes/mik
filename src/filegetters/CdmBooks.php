@@ -70,16 +70,6 @@ class CdmBooks extends FileGetter
     }
 
     /**
-    * Return an array of records.
-    *
-    * @return array The records.
-    */
-    public function getRecords()
-    {
-        return array(1, 2, 3, 4, 5);
-    }
-
-    /**
      * Gets a compound item's children pointers. $alias needs to include the leading '/'.
      * @ToDo - clerify whether this method should be part of filegetters or fetchers.
      */
@@ -144,9 +134,12 @@ class CdmBooks extends FileGetter
             
             @ToDo - what reasonable assumptions about input_directory structure are
             reasonable to make to make this more general when processing more than one book.
+            
+            Pattern assumption:  ../record_pointer/file
         */
-        $regex_pattern = '%[/\\\\][0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][/\\\\]%';
+        $regex_pattern = '%[/\\\\]record_pointer_pattern[/\\\\]%';
 
+        /*
         $dateForIdentifierArray = array();
         foreach ($arrayOfFilesToPreserve as $path) {
             //print $path . "\n";
@@ -174,7 +167,10 @@ class CdmBooks extends FileGetter
                 $dictOfItems[$dateIdentifier] = $tempItemList;
             }
         }
-        return $dictOfItems;
+        
+        */
+        return $arrayOfFilesToPreserve;
+        //return $dictOfItems;
     }
 
     public function getThumbnailcontent($page_pointer, $thumbnail_height = 200)
