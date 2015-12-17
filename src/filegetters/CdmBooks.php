@@ -227,8 +227,9 @@ class CdmBooks extends FileGetter
         // @ToDo - move this method to FileGetter parent class
         // to be extended in child classes such as CdmNewspapers
 
-        $regex_pattern = '%[/\\\\][0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9]*' . $page_number . '%';
-        $result = preg_match($regex_pattern, $pathToFile);
+        //$regex_pattern = '%[/\\\\][0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9]*' . $page_number . '%';
+        //$result = preg_match($regex_pattern, $pathToFile);
+        $result = 1;
         if ($result === 1) {
             // file_get_contents returns false on failure.
             $obj_content = file_get_contents($pathToFile);
