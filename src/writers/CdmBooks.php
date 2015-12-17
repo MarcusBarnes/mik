@@ -177,7 +177,7 @@ class CdmBooks extends Writer
                 //$pathToFile = $OBJFilesArray[$filekey];
 
                 $pathToPageOK = $this->cdmNewspapersFileGetter
-                   ->checkNewspaperPageFilePath($pathToFile, $sub_dir_num);
+                   ->checkBookPageFilePath($pathToFile, $sub_dir_num);
 
                 if ($pathToPageOK){
                     $obj_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.' . $this->OBJ_file_extension;
