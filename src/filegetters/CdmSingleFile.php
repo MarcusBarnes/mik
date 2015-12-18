@@ -1,8 +1,13 @@
 <?php
 
 namespace mik\filegetters;
+
 use GuzzleHttp\Client;
 use mik\exceptions\MikErrorException;
+<<<<<<< HEAD
+=======
+use Monolog\Logger;
+>>>>>>> issue-3
 
 class CdmSingleFile extends FileGetter
 {
@@ -39,11 +44,19 @@ class CdmSingleFile extends FileGetter
         $this->alias = $this->settings['FILE_GETTER']['alias'];
         $this->temp_directory = (!isset($settings['FILE_GETTER']['temp_directory'])) ?
           '/tmp' : $settings['FILE_GETTER']['temp_directory'];
-        if (isset($settings['MANIPULATORS']['filegettermanipulators'])) {
-            $this->filegettermanipulators = $settings['MANIPULATORS']['filegettermanipulators'];
-        } else {
-            $this->filegettermanipulators = null;
+
+        if (!isset($this->settings['http_timeout'])) {
+            // Seconds.
+            $this->settings['http_timeout'] = 60;
         }
+
+        // Set up logger.
+        $this->pathToLog = $settings['LOGGING']['path_to_log'];
+        $this->log = new \Monolog\Logger('CdmSingleFile filegetter');
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
+            Logger::ERROR);
+        $this->log->pushHandler($this->logStreamHandler);
+
     }
 
     /**
@@ -74,16 +87,27 @@ class CdmSingleFile extends FileGetter
         // Create a new Guzzle client to fetch the file as a stream,
         // which will allow us to handle large files.
         $client = new Client();
-        $response = $client->get($get_file_url, ['stream' => true]);
-        $body = $response->getBody();
-        while (!$body->eof()) {
-          file_put_contents($temp_file_path, $body->read(2048), FILE_APPEND);
+        try {
+            $response = $client->get($get_file_url, ['stream' => true,
+                'timeout' => $this->settings['http_timeout'],
+                'connect_timeout' => $this->settings['http_timeout']]
+            );
+            $body = $response->getBody();
+            while (!$body->eof()) {
+                file_put_contents($temp_file_path, $body->read(2048), FILE_APPEND);
+            }
+            if (file_exists($temp_file_path)) {
+                return $temp_file_path;
+            }
+            else {
+                return false;
+            }
         }
-        if (file_exists($temp_file_path)) {
-          return $temp_file_path;
-        }
-        else {
-          return false;
+        catch (RequestException $e) {
+            $this->log->addError("CdmSingleFile Guzzle error", array('HTTP request error' => $e->getRequest()));
+            if ($e->hasResponse()) {
+                $this->log->addError("CdmSingleFile Guzzle error", array('HTTP request response' => $e->getResponse()));
+            }
         }
     }
 

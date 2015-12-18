@@ -2,6 +2,10 @@
 
 namespace mik\filegetters;
 
+use GuzzleHttp\Client;
+use mik\exceptions\MikErrorException;
+use Monolog\Logger;
+
 class CdmNewspapers extends FileGetter
 {
     /**
@@ -57,14 +61,18 @@ class CdmNewspapers extends FileGetter
         $this->utilsUrl = $this->settings['utils_url'];
         $this->alias = $this->settings['alias'];
         
+        if (!isset($this->settings['http_timeout'])) {
+            // Seconds.
+            $this->settings['http_timeout'] = 60;
+        }
+
         if (isset($this->settings['allowed_file_extensions_for_OBJ'])) {
             $this->allowed_file_extensions_for_OBJ = $this->settings['allowed_file_extensions_for_OBJ'];
         }
 
-        //$this->inputDirectory = $this->settings['input_directory'];
         $this->inputDirectories = $this->settings['input_directories'];
         
-        // interate over inputDirectories to create $potentialObjFiles array.
+        // Interate over inputDirectories to create $potentialObjFiles array.
         $potentialObjFiles = array();
         foreach ($this->inputDirectories as $inputDirectory) {
             $potentialObjFilesPart = $this
@@ -74,6 +82,13 @@ class CdmNewspapers extends FileGetter
         $this->OBJFilePaths = $this->determineObjItems($potentialObjFiles);
         // information and methods for thumbnail minipulation
         $this->thumbnail = new \mik\filemanipulators\ThumbnailFromCdm($settings);
+
+        // Set up logger.
+        $this->pathToLog = $settings['LOGGING']['path_to_log'];
+        $this->log = new \Monolog\Logger('CdmNewspapers filegetter');
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
+            Logger::ERROR);
+        $this->log->pushHandler($this->logStreamHandler);
     }
 
     /**
@@ -95,8 +110,22 @@ class CdmNewspapers extends FileGetter
         $alias = $this->settings['alias'];
         $ws_url = $this->settings['ws_url'];
         $query_url = $ws_url . 'dmGetCompoundObjectInfo/' . $alias . '/' .  $pointer . '/json';
-        $item_structure = file_get_contents($query_url);
-        $item_structure = json_decode($item_structure, true);
+
+        $client = new Client();
+        try {
+            $response = $client->get($query_url,
+                ['timeout' => $this->settings['http_timeout'], 
+                'connect_timeout' => $this->settings['http_timeout']]
+            );
+            $item_structure = $response->getBody();
+            $item_structure = json_decode($item_structure, true);
+        }
+        catch (RequestException $e) {
+            $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request error' => $e->getRequest()));
+            if ($e->hasResponse()) {
+                $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request response' => $e->getResponse()));
+            }
+        }
         
         // @ToDo - deal with different item structures.
         if (isset($item_structure['page'])) {
@@ -195,7 +224,21 @@ class CdmNewspapers extends FileGetter
         $get_image_url_thumbnail = $this->utilsUrl . 'ajaxhelper/?CISOROOT=' .
           ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer .
           '&action=2&DMSCALE=' . $scale. '&DMWIDTH='. $thumbnail_height . 'DMHEIGHT=' . $new_height;
-        $thumbnail_content = file_get_contents($get_image_url_thumbnail);
+
+        try {
+            $client = new Client();
+            $response = $client->get($get_image_url_thumbnail,
+                ['timeout' => $this->settings['http_timeout'],
+                'connect_timeout' => $this->settings['http_timeout']]
+            );
+            $thumbnail_content = $response->getBody();
+        }
+        catch (RequestException $e) {
+            $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request error' => $e->getRequest()));
+            if ($e->hasResponse()) {
+                $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request response' => $e->getResponse()));
+            }
+        } 
 
         return $thumbnail_content;
     }
@@ -212,9 +255,22 @@ class CdmNewspapers extends FileGetter
           . ltrim($this->alias, '/') . '&CISOPTR=' . $page_pointer
           . '&action=2&DMSCALE=' . $scale. '&DMWIDTH=' . $jpeg_height
           . '&DMHEIGHT=' . $new_height;
-        $jpg_content = file_get_contents($get_image_url_jpg);
 
-        return $jpg_content;
+        $client = new Client();
+        try {
+            $response = $client->get($get_image_url_jpg,
+                ['timeout' => $this->settings['http_timeout'],
+                'connect_timeout' => $this->settings['http_timeout']]
+            );
+            $jpg_content = $response->getBody();
+            return $jpg_content;
+        }
+        catch (RequestException $e) {
+            $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request error' => $e->getRequest()));
+            if ($e->hasResponse()) {
+                $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request response' => $e->getResponse()));
+            }
+        }        
     }
 
     public function getChildLevelFileContent($page_pointer, $page_object_info)
@@ -224,9 +280,22 @@ class CdmNewspapers extends FileGetter
         $get_file_url = $this->utilsUrl .'getfile/collection/'
             . $this->alias . '/id/' . $page_pointer . '/filename/'
             . $page_object_info['find'];
-        $content = file_get_contents($get_file_url);
-        
-        return $content;
+
+        $client = new Client();
+        try {
+            $response = $client->get($get_file_url,
+                ['timeout' => $this->settings['http_timeout'],
+                'connect_timeout' => $this->settings['http_timeout']]
+            );
+            $content = $response->getBody();
+            return $content;
+        }
+        catch (RequestException $e) {
+            $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request error' => $e->getRequest()));
+            if ($e->hasResponse()) {
+                $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request response' => $e->getResponse()));
+            }
+        }        
     }
 
     public function getPageOBJfileContent($pathToFile, $page_number)
