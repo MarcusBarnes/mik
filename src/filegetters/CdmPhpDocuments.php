@@ -114,9 +114,9 @@ class CdmPhpDocuments extends FileGetter
             }
         }
         catch (RequestException $e) {
-            $this->log->addError("CdmSingleFile Guzzle error", array('HTTP request error' => $e->getRequest()));
+            $this->log->addError("CdmPhpDocuments Guzzle error", array('HTTP request error' => $e->getRequest()));
             if ($e->hasResponse()) {
-                $this->log->addError("CdmSingleFile Guzzle error", array('HTTP request response' => $e->getResponse()));
+                $this->log->addError("CdmPhpDocuments Guzzle error", array('HTTP request response' => $e->getResponse()));
             }
         }
     }
