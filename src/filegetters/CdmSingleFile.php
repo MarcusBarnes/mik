@@ -4,10 +4,7 @@ namespace mik\filegetters;
 
 use GuzzleHttp\Client;
 use mik\exceptions\MikErrorException;
-<<<<<<< HEAD
-=======
 use Monolog\Logger;
->>>>>>> issue-3
 
 class CdmSingleFile extends FileGetter
 {
