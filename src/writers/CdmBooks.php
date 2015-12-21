@@ -82,7 +82,7 @@ class CdmBooks extends Writer
     {
         // Create root output folder
         $this->createOutputDirectory();
-        $issueObjectPath = $this->createIssueDirectory($metadata);
+        $issueObjectPath = $this->createIssueDirectory($record_key);
         $this->writeMetadataFile($metadata, $issueObjectPath);
         
         // filegetter for OBJ.tiff files for monograph pages
@@ -91,6 +91,7 @@ class CdmBooks extends Writer
         // Array of paths to tiffs for OBJ for newspaper issue pages may not be sorted
         // on some systems.  Sort.
         sort($OBJFilesArray);
+        var_dump(
 
         $sub_dir_num = 0;
         foreach ($pages as $page_pointer) {
@@ -221,37 +222,9 @@ class CdmBooks extends Writer
         parent::createOutputDirectory();
     }
 
-    public function createIssueDirectory($metadata)
+    public function createIssueDirectory($record_key)
     {
-        //value of dateIssued isuse is the the title for the directory
-        
-        $doc = new \DomDocument('1.0');
-        $doc->loadXML($metadata);
-        $nodes = $doc->getElementsByTagName('dateIssued');
-        // There may be more than one 'dateIssued' node
-        // use the one with keyDate and metadataminipulator to
-        // manipulate date to yyyy-mm-dd format.
-        if ($nodes->length == 1) {
-            $this->issueDate = trim($nodes->item(0)->nodeValue);
-        } else {
-            foreach ($nodes as $item) {
-                foreach ($item->attributes as $attribute) {
-                    if ($attribute->name == 'keyDate' &&  $attribute->nodeValue == 'yes') {
-                        $this->issueDate = $item->nodeValue;
-                    }
-                }
-            }
-            
-        }
-        
-        //$doc->formatOutput = true;
-
-        //$modsxml = $doc->saveXML();
-        // Create a directory for each day of the newspaper by getting
-        // the date value from the issue's metadata.
-        //$issue_object_info = get_item_info($results_record['collection'], $results_record['pointer']);
-        
-        $issueObjectPath = $this->outputDirectory . DIRECTORY_SEPARATOR . $this->issueDate;
+        $issueObjectPath = $this->outputDirectory . DIRECTORY_SEPARATOR . $record_key;
         if (!file_exists($issueObjectPath)) {
             mkdir($issueObjectPath);
             // return issue_object_path for use when writing files.
