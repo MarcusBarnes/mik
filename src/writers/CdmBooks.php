@@ -85,9 +85,9 @@ class CdmBooks extends Writer
         $issueObjectPath = $this->createIssueDirectory($metadata);
         $this->writeMetadataFile($metadata, $issueObjectPath);
         
-        // filegetter for OBJ.tiff files for newspaper issue pages
+        // filegetter for OBJ.tiff files for monograph pages
         $OBJFilesArray = $this->cdmNewspapersFileGetter
-                 ->getIssueLocalFilesForOBJ($this->issueDate);
+                 ->getIssueLocalFilesForOBJ($record_key);
         // Array of paths to tiffs for OBJ for newspaper issue pages may not be sorted
         // on some systems.  Sort.
         sort($OBJFilesArray);

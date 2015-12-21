@@ -94,13 +94,14 @@ class CdmBooks extends FileGetter
         return $children_pointers;
     }
 
-    public function getIssueLocalFilesForOBJ($issueDate)
+    public function getIssueLocalFilesForOBJ($record_key)
     {
         // Get the paths to the master files (typically .TIFFs)
         // to use for the OBJ.tiff of each newspaper page.
-        // Deal on an issue-by-issue bassis.
-
-        $key = DIRECTORY_SEPARATOR . $issueDate . DIRECTORY_SEPARATOR;
+        // Deal on an book-by-book bassis.
+        //var_dump($this->OBJFilePaths);
+        //exit();
+        $key = $record_key;
         return $this->OBJFilePaths[$key];
         
     }
