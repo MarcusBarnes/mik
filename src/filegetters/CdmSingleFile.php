@@ -42,6 +42,12 @@ class CdmSingleFile extends FileGetter
         $this->temp_directory = (!isset($settings['FILE_GETTER']['temp_directory'])) ?
           '/tmp' : $settings['FILE_GETTER']['temp_directory'];
 
+        if (isset($settings['MANIPULATORS']['filegettermanipulators'])) {
+            $this->filegettermanipulators = $settings['MANIPULATORS']['filegettermanipulators'];
+        } else {
+            $this->filegettermanipulators = null;
+        }
+
         if (!isset($this->settings['http_timeout'])) {
             // Seconds.
             $this->settings['http_timeout'] = 60;
