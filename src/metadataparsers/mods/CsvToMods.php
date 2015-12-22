@@ -91,6 +91,9 @@ class CsvToMods extends Mods
             $csvFieldName = $fieldMappings[0];
             if (property_exists($objectInfo, $csvFieldName)) {
                 $fieldValue = $objectInfo->$csvFieldName;
+                if (!strlen($fieldValue)) {
+                    continue;
+                }
             } elseif (preg_match("/(null)\d+/i", $field)) {
                 // special source field name for mappings to static snippets
                 $fiedlValue = '';
@@ -105,6 +108,7 @@ class CsvToMods extends Mods
             // Special characters in metadata field values need to be encoded or
             // metadata creation may break.
             $fieldValue = htmlspecialchars($fieldValue, ENT_NOQUOTES|ENT_XML1);
+            $fieldValue = trim($fieldValue);
 
             $xmlSnippet = $fieldMappings[1];
             if (!empty($xmlSnippet)) {
