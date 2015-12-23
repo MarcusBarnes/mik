@@ -95,13 +95,14 @@ class CsvToMods extends Mods
                     continue;
                 }
             } elseif (preg_match("/(null)\d+/i", $field)) {
-                // special source field name for mappings to static snippets
+                // Special source field name for mappings to static snippets
                 $fiedlValue = '';
             } else {
-                // log mismatch between mapping file and source fields (e.g., CDM)
-                $logMessage = "Mappings file contains a row $csvFieldName that ";
-                $logMessage .= "is not in source CSV file.";
-                $this->log->addWarning($logMessage, array('Source fieldname' => $csvFieldName));
+                // Log mismatch between mapping file and source fields (e.g., CDM)
+                $logMessage = "Mappings file contains a row that ";
+                $logMessage .= "is not in source CSV row for this object.";
+                $this->log->addWarning($logMessage, array('Record key' => $record_key,
+                    'Missing field in metadata' => $csvFieldName));
                 continue;
             }
 
