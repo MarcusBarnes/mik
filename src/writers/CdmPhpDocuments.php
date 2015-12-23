@@ -43,21 +43,38 @@ class CdmPhpDocuments extends Writer
      */
     public function writePackages($metadata, $pages, $record_id)
     {
-        // Create root output folder
+
+        // If there were no datastreams explicitly set in the configuration,
+        // set flag so that all datastreams in the writer class are run.
+        // $this->datastreams is an empty array by default.
+        $no_datastreams_setting_flag = false;
+        if (count($this->datastreams) == 0) {
+              $no_datastreams_setting_flag = true;
+        }
+
+        // Create root output folder.
         $this->createOutputDirectory();
         $object_path = $this->outputDirectory . DIRECTORY_SEPARATOR;
-        $this->writeMetadataFile($metadata, $object_path . $record_id . '.xml');
+
+        $MODS_expected = in_array('MODS', $this->datastreams);
+        $DC_expected = in_array('DC', $this->datastreams);
+        if ($MODS_expected xor $DC_expected xor $no_datastreams_setting_flag) {        
+            $this->writeMetadataFile($metadata, $object_path . $record_id . '.xml');
+        }
 
         // Retrieve the PDF file associated with the document and write it to the
         // output folder, using the CONTENTdm pointer as the file basename.
-        $temp_file_path = $this->cdmPhpDocumentsFileGetter
-            ->getDocumentLevelPDFContent($record_id);
-        if ($temp_file_path) {
-          $pdf_output_file_path = $object_path . $record_id . '.pdf';
-          rename($temp_file_path, $pdf_output_file_path);
-        }
-        else {
-          // @todo: Log failure.
+        $OBJ_expected = in_array('OBJ', $this->datastreams);
+        if ($OBJ_expected xor $no_datastreams_setting_flag) {        
+            $temp_file_path = $this->cdmPhpDocumentsFileGetter
+                ->getDocumentLevelPDFContent($record_id);
+            if ($temp_file_path) {
+              $pdf_output_file_path = $object_path . $record_id . '.pdf';
+              rename($temp_file_path, $pdf_output_file_path);
+            }
+            else {
+              // @todo: Log failure.
+            }
         }
 
         // https://github.com/Islandora/islandora_batch only allows two files per
