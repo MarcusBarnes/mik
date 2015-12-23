@@ -57,16 +57,16 @@ class CsvSingleFile extends Writer
 
         // Retrieve the file associated with the document and write it to the output
         // folder using the filename or record_id identifier
-        // $source_file_path = $this->fileGetter->getFilePath($record_id);
-        // $source_file_name = pathinfo($source_file_path, PATHINFO_FILENAME);
-        // $source_file_extension = pathinfo($source_file_path, PATHINFO_EXTENSION);
+        $source_file_path = $this->fileGetter->getFilePath($record_id);
+        $source_file_name = pathinfo($source_file_path, PATHINFO_FILENAME);
+        $source_file_extension = pathinfo($source_file_path, PATHINFO_EXTENSION);
         $identifier = ($preserve_content_filenames) ? $source_file_name : $record_id;
 
-        // $content_file_path = $output_path . $identifier . '.' . $source_file_extension;
-        // $metadata_file_path = $output_path . $identifier . '.xml';
+        $content_file_path = $output_path . $identifier . '.' . $source_file_extension;
+        $metadata_file_path = $output_path . $identifier . '.xml';
 
         // Do not overwrite if source and content file paths match
-        // $enforce_metadata_only = $source_file_path == $content_file_path;
+        $enforce_metadata_only = $source_file_path == $content_file_path;
 
         $MODS_expected = in_array('MODS', $this->datastreams);
         $DC_expected = in_array('DC', $this->datastreams);
@@ -93,15 +93,6 @@ class CsvSingleFile extends Writer
         // that we only write the file if no datastream IDs are specified in the
         // datastreams[] configuration option.
         if ($no_datastreams_setting_flag) {
-
-            // Retrieve the file associated with the document and write it to the output
-            // folder using the filename or record_id identifier
-            $source_file_path = $this->fileGetter->getFilePath($record_id);
-            $source_file_name = pathinfo($source_file_path, PATHINFO_FILENAME);
-            $source_file_extension = pathinfo($source_file_path, PATHINFO_EXTENSION);
-            $identifier = ($preserve_content_filenames) ? $source_file_name : $record_id;
-            $content_file_path = $output_path . $identifier . '.' . $source_file_extension;
-
             // The default is to overwrite the content file (but not if generating metadata only)
             if ($this->overwrite_content_files && ! $enforce_metadata_only) {
                 copy($source_file_path, $content_file_path);
