@@ -91,8 +91,7 @@ class CdmBooks extends Writer
         // Array of paths to tiffs for OBJ for newspaper issue pages may not be sorted
         // on some systems.  Sort.
         sort($OBJFilesArray);
-        var_dump(
-
+        
         $sub_dir_num = 0;
         foreach ($pages as $page_pointer) {
             $sub_dir_num++;
@@ -104,8 +103,11 @@ class CdmBooks extends Writer
             // Infer the numbered directory name from the OBJ file name.
             $directoryNumber = $this->directoryNameFromFileName($pathToFile);
             
-            $page_dir = $issueObjectPath  . DIRECTORY_SEPARATOR . $directoryNumber;
+            // left trim leading left zero padded numbers
+            $directoryNumber = ltrim($directoryNumber, "0");
             
+            $page_dir = $issueObjectPath  . DIRECTORY_SEPARATOR . $directoryNumber;
+            //var_dump($page_dir);
             // Create a directory for each day of the newspaper.
             if (!file_exists($page_dir)) {
                 mkdir($page_dir, 0777, true);
@@ -115,7 +117,7 @@ class CdmBooks extends Writer
                 continue;
             }
 
-            print "Exporting files for issue " . $this->issueDate
+            print "Exporting files for record_key " . $record_key
               . ', page ' . $directoryNumber . "\n";
             
             // If there were no datastreams explicitly set in the configuration,
@@ -205,7 +207,7 @@ class CdmBooks extends Writer
     public function directoryNameFromFileName($pathToOBJfile) {
     
           $path_parts = pathinfo($pathToOBJfile);
-          //1988-07-13-01           
+          //book_name_string001           
           $filename = $path_parts['filename'];
           $regex = '%[0-9]*$%';
           preg_match($regex, $filename, $matches);

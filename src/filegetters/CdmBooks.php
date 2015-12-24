@@ -78,19 +78,32 @@ class CdmBooks extends FileGetter
         $alias = $this->settings['alias'];
         $ws_url = $this->settings['ws_url'];
         $query_url = $ws_url . 'dmGetCompoundObjectInfo/' . $alias . '/' .  $pointer . '/json';
+
         $item_structure = file_get_contents($query_url);
         $item_structure = json_decode($item_structure, true);
         
-        // @ToDo - deal with different item structures.
-        if (isset($item_structure['page'])) {
-            $children = $item_structure['page'];
-        } else {
-            return array();
+        /* CONTENTdm supports hierarchical books.  "Flatten" structure of hierarchical 
+           source books for importing into Islandora since Islandora's Book Solution Pack 
+           currently only supports flat books.
+        */
+        
+        if($item_structure['type'] == 'Monograph') {
+            // flatten document structure
+        } 
+                  
+        if($item_structure['type'] == 'Document') {
+                
+            if (isset($item_structure['page'])) {
+                $children = $item_structure['page'];
+            } else {
+                return array();
+            }
+            $children_pointers = array();
+            foreach ($children as $child) {
+                $children_pointers[] = $child['pageptr'];
+            }
         }
-        $children_pointers = array();
-        foreach ($children as $child) {
-            $children_pointers[] = $child['pageptr'];
-        }
+             
         return $children_pointers;
     }
 
@@ -99,9 +112,9 @@ class CdmBooks extends FileGetter
         // Get the paths to the master files (typically .TIFFs)
         // to use for the OBJ.tiff of each newspaper page.
         // Deal on an book-by-book bassis.
+        
         //var_dump($this->OBJFilePaths);
-        //exit();
-        $key = $record_key;
+        $key = DIRECTORY_SEPARATOR . $record_key . DIRECTORY_SEPARATOR;
         return $this->OBJFilePaths[$key];
         
     }
@@ -136,42 +149,35 @@ class CdmBooks extends FileGetter
             @ToDo - what reasonable assumptions about input_directory structure are
             reasonable to make to make this more general when processing more than one book.
             
-            Pattern assumption:  ../record_pointer/file
+            Pattern assumption:  ../record_pointer/file.extension
         */
-        $regex_pattern = '%[/\\\\]record_pointer_pattern[/\\\\]%';
+        $regex_pattern = '%[/\\\\][0-9]*[/\\\\]%';
 
-        /*
-        $dateForIdentifierArray = array();
+        $keyForIdentifierArray = array();
         foreach ($arrayOfFilesToPreserve as $path) {
             //print $path . "\n";
             preg_match($regex_pattern, $path, $matches);
             if ($matches) {
-                array_push($dateForIdentifierArray, $matches[0]);
+                array_push($keyForIdentifierArray, $matches[0]);
             }
         }
-        $dateForIdentifierArray = array_unique($dateForIdentifierArray);
+        $keyForIdentifierArray = array_unique($keyForIdentifierArray);
 
         $dictOfItems = array();
-        foreach ($dateForIdentifierArray as $dateIdentifier) {
+        foreach ($keyForIdentifierArray as $keyIdentifier) {
             $tempItemList = array();
-            //$pattern = "%" . $dateIdentifier ."%";
-            #special directories in
-            $specialDirectoryNameCases = array('Merged', 'JPG', 'Uncompressed TIFF');
             foreach ($arrayOfFilesToPreserve as $filepath) {
-                //if $dateIdentifier is in $specialDirectoryName Cases
-                if (stristr($filepath, $dateIdentifier)) {
+                if (stristr($filepath, $keyIdentifier)) {
                     array_push($tempItemList, $filepath);
                 }
             }
 
             if (count($tempItemList) > 0) {
-                $dictOfItems[$dateIdentifier] = $tempItemList;
+                $dictOfItems[$keyIdentifier] = $tempItemList;
             }
         }
         
-        */
-        return $arrayOfFilesToPreserve;
-        //return $dictOfItems;
+        return $dictOfItems;
     }
 
     public function getThumbnailcontent($page_pointer, $thumbnail_height = 200)
