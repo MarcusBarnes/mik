@@ -2,6 +2,9 @@
 
 namespace mik\writers;
 
+use mik\exceptions\MikErrorException;
+use Monolog\Logger;
+
 class CdmCompound extends Writer
 {
     /**
@@ -45,7 +48,6 @@ class CdmCompound extends Writer
      * @var string $parentObjectOutputPath - path to a child object's parent.
      */
     public $parentObjectOutputPath;
-
     /**
      * Create a new compound object writer instance
      * @param array $settings configuration settings.
@@ -58,6 +60,7 @@ class CdmCompound extends Writer
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->cdmCompoundFileGetter = new $fileGetterClass($settings);
         $this->cdmSingleFileGetterSettings = $settings;
+        $this->cdmSingleFileGetter = new \mik\filegetters\CdmSingleFile($this->cdmSingleFileGetterSettings);
         if (isset($this->settings['metadata_filename'])) {
           	$this->metadataFileName = $this->settings['metadata_filename'];
         } else {
@@ -66,6 +69,13 @@ class CdmCompound extends Writer
         
         $metadtaClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
         $this->metadataParser = new $metadtaClass($settings);
+
+        // Set up logger.
+        $this->pathToLog = $settings['LOGGING']['path_to_log'];
+        $this->log = new \Monolog\Logger('CdmCompound writer');
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
+            Logger::ERROR);
+        $this->log->pushHandler($this->logStreamHandler);        
     }
 
     /**
@@ -79,18 +89,43 @@ class CdmCompound extends Writer
         $this->writeMetadataFile($metadata, $this->parentObjectOutputPath);
 
         $object_structure = $this->cdmCompoundFileGetter->getDocumentStructure($record_key);
-        $object_structure_path = $this->settings['FILE_GETTER']['temp_directory'] . DIRECTORY_SEPARATOR . $record_key . '.cpd';
-        file_put_contents($object_structure_path, serialize($object_structure));
+        $object_structure_path = $this->settings['FILE_GETTER']['temp_directory'] . DIRECTORY_SEPARATOR .
+            $record_key . '.cpd';
+        file_put_contents($object_structure_path, $object_structure);
        
         foreach ($children as $child_pointer) {
             $childObjectPath = $this->createObjectOutputDirectory($child_pointer, true);
             // We can use the CdmSingleFile filegetter class since CONTENTdm
             // compound objects are made up of single file objects.
-            $this->cdmSingleFileGetter = new CdmSingleFile($this->cdmSingleFileGetterSettings);
+            // $this->cdmSingleFileGetter = new CdmSingleFile($this->cdmSingleFileGetterSettings);
+            $temp_file_path = $this->cdmSingleFileGetter->getFileContent($child_pointer);
 
-            $this->cdmSingleFileGetter->getFileContent($child_pointer);
+            try {
+                // Get the filename used by CONTENTdm (stored in the 'find' field)
+                // so we can grab the extension.
+                $item_info = $this->fetcher->getItemInfo($child_pointer);
+                $source_file_extension = pathinfo($item_info['find'], PATHINFO_EXTENSION);
+                // @todo: replace 'DSID' with the correct filename
+                $output_file_path = $childObjectPath . DIRECTORY_SEPARATOR . 'DSID' . '.' . $source_file_extension;
+                rename($temp_file_path, $output_file_path);
+            }
+            catch (Exception $e) {
+                $this->log->addError("CdmCommpound writer error",
+                    array('Error writing child content file' => $e->getMessage()));
+            }
+
+            // Write out the children's metadata file.
+            try {
+                $child_metadata = $this->metadataParser->metadata($child_pointer);
+                $this->writeMetadataFile($child_metadata, $childObjectPath);
+            }
+            catch (Exception $e) {
+              $this->log->addError("CdmCommpound writer error",
+                  array('Error writing child metadata file' => $e->getMessage()));
+            }            
 
         }
+
     }
     
     /**
@@ -115,11 +150,10 @@ class CdmCompound extends Writer
     public function createObjectOutputDirectory($pointer, $is_child = false)
     {
         if ($is_child) {
-            $path = $this->outputDirectory . DIRECTORY_SEPARATOR . $this->$pointer;
+            $path = $this->parentObjectOutputPath . DIRECTORY_SEPARATOR . $pointer;
         }
         else {
-            $path = $this->outputDirectory . DIRECTORY_SEPARATOR .
-                $this->parentObjectOutputPath . DIRECTORY_SEPARATOR . $pointer;
+            $path = $this->outputDirectory . DIRECTORY_SEPARATOR . $pointer;
         }
 
         if (!file_exists($path)) {
