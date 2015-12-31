@@ -89,8 +89,9 @@ class CdmCompound extends Writer
         $this->writeMetadataFile($metadata, $this->parentObjectOutputPath);
 
         $object_structure = $this->cdmCompoundFileGetter->getDocumentStructure($record_key);
-        $object_structure_path = $this->settings['FILE_GETTER']['temp_directory'] . DIRECTORY_SEPARATOR .
-            $record_key . '.cpd';
+        // $object_structure_path = $this->settings['FILE_GETTER']['temp_directory'] . DIRECTORY_SEPARATOR .
+            // $record_key . '.cpd';
+        $object_structure_path = $this->parentObjectOutputPath . DIRECTORY_SEPARATOR . 'stucture.cpd';        
         file_put_contents($object_structure_path, $object_structure);
        
         foreach ($children as $child_pointer) {

@@ -50,28 +50,11 @@ class CdmCompound extends FileGetter
     }
 
     /**
-     * Gets a compound item's children pointers.
+     * Gets a compound item's children pointers. 
      */
     public function getChildren($pointer)
     {
-        $alias = $this->settings['alias'];
-        $ws_url = $this->settings['ws_url'];
-        $query_url = $ws_url . 'dmGetCompoundObjectInfo/' . $alias . '/' .  $pointer . '/xml';
-
-        $client = new Client();
-        try {
-            $response = $client->get($query_url,
-                ['timeout' => $this->settings['http_timeout'],
-                'connect_timeout' => $this->settings['http_timeout']]
-            );
-            $item_structure = $response->getBody();
-        }
-        catch (RequestException $e) {
-            $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request error' => $e->getRequest()));
-            if ($e->hasResponse()) {
-                $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request response' => $e->getResponse()));
-            }
-        }
+        $item_structure = $this->getDocumentStructure($pointer);
 
         $children_pointers = array();
         if (strlen($item_structure)) {
@@ -96,19 +79,35 @@ class CdmCompound extends FileGetter
      */
     public function getDocumentStructure($pointer, $format = 'xml')
     {
+        $alias = $this->settings['alias'];
+        $ws_url = $this->settings['ws_url'];
+
         if ($format == 'json') {
-            $alias = $this->settings['alias'];
-            $ws_url = $this->settings['ws_url'];
             $query_url = $ws_url . 'dmGetCompoundObjectInfo/' . $alias . '/' .  $pointer . '/json';
-            $item_structure = file_get_contents($query_url);
-            $item_structure = json_decode($item_structure, true);
-            return $item_structure;
         }
         if ($format == 'xml') {
-            $alias = $this->settings['alias'];
-            $ws_url = $this->settings['ws_url'];
             $query_url = $ws_url . 'dmGetCompoundObjectInfo/' . $alias . '/' .  $pointer . '/xml';
-            $item_structure = file_get_contents($query_url);
+        }
+
+        $client = new Client();
+        try {
+            $response = $client->get($query_url,
+                ['timeout' => $this->settings['http_timeout'],
+                'connect_timeout' => $this->settings['http_timeout']]
+            );
+            $item_structure = $response->getBody();
+        }
+        catch (RequestException $e) {
+            $this->log->addError("CdmCompound Guzzle error", array('HTTP request error' => $e->getRequest()));
+            if ($e->hasResponse()) {
+                $this->log->addError("CdmCompound Guzzle error", array('HTTP request response' => $e->getResponse()));
+            }
+        }        
+
+        if ($format == 'json') {
+            return json_decode($item_structure, true);
+        }
+        if ($format == 'xml') {
             return $item_structure;
         }
         return false;
