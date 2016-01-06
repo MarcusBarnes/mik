@@ -86,51 +86,25 @@ class CdmBooks extends FileGetter
            source books for importing into Islandora since Islandora's Book Solution Pack 
            currently only supports flat books.
         */
-        //var_dump($item_structure);
-        //exit();
         if($item_structure['type'] == 'Monograph') {
             // flatten document structure 
             // hierarchy based on nodes
-            //echo "Number of Nodes: " . count($item_structure['node']) . "\n";
-            $children_pointers = array();
-            
+            $children_pointers = array();            
             // Iterator snippet below based on 
             // http://stackoverflow.com/a/1019534/850828
+            // @ToDo snippet produces duplicate pointers - why?
             $arrIt = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($item_structure));
             foreach ($arrIt as $sub) {
                 $subArray = $arrIt->getSubIterator();
                 if (isset($subArray['pageptr'] )) {
                     $children_pointers[] = $subArray['pageptr'];
                 }
-            }
-            
+            }            
             // remove duplicate pointers
-            $children_pointers = array_unique($children_pointers);
-            
+            $children_pointers = array_unique($children_pointers);            
             // reindex the array.
             $children_pointers = array_values($children_pointers);
             
-            /*
-            if (isset($item_structure['page'])) {
-                $children = $item_structure['page'];
-                var_dump($children);
-                foreach ($children as $child) {
-                    $children_pointers[] = $child['pageptr'];
-                }
-            }             
-            
-                              
-            foreach ($item_structure['node'] as $node) {
-                
-                if (isset($node['page'])) {
-                    echo count($node['page']);
-                    $children = $node['page'];
-                } 
-                foreach ($children as $child) {
-                    $children_pointers[] = $child['pageptr'];
-                }
-            }
-            */
         } 
                   
         if($item_structure['type'] == 'Document') {
@@ -155,8 +129,7 @@ class CdmBooks extends FileGetter
         // Get the paths to the master files (typically .TIFFs)
         // to use for the OBJ.tiff of each newspaper page.
         // Deal on an book-by-book bassis.
-        
-        //var_dump($this->OBJFilePaths);
+
         $key = DIRECTORY_SEPARATOR . $record_key . DIRECTORY_SEPARATOR;
         return $this->OBJFilePaths[$key];
         
@@ -188,9 +161,6 @@ class CdmBooks extends FileGetter
         /*
             This regex will looks for a pattern like book_nick001 in the path for the files
             of a particular book.
-            
-            @ToDo - what reasonable assumptions about input_directory structure are
-            reasonable to make to make this more general when processing more than one book.
             
             Pattern assumption:  ../record_pointer/file.extension
         */

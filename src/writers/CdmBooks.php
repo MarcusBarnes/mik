@@ -91,8 +91,7 @@ class CdmBooks extends Writer
         // Array of paths to tiffs for OBJ for newspaper issue pages may not be sorted
         // on some systems.  Sort.
         sort($OBJFilesArray);
-        //var_dump($pages);
-        //exit();
+
         $sub_dir_num = 0;
         foreach ($pages as $page_pointer) {
             $sub_dir_num++;
@@ -126,7 +125,7 @@ class CdmBooks extends Writer
                 continue;
             }
 
-            print "Exporting files for record_key " . $record_key
+            print "Exporting files for book " . $record_key
               . ', page ' . $directoryNumber . "\n";
             
             // If there were no datastreams explicitly set in the configuration,
@@ -203,9 +202,12 @@ class CdmBooks extends Writer
             // Write outut page level MODS.XML
             $MODS_expected = in_array('MODS', $this->datastreams);
             if ($MODS_expected xor $no_datastreams_setting_flag) {
-                $page_title = 'Page ' . $directoryNumber;
-                
-                //if(isset$page_object_info['title']
+
+                if(isset($page_object_info['title'])) {
+                    $page_title = $page_object_info['title'];
+                } else {
+                    $page_title = 'Page ' . $directoryNumber;
+                }
                 $this->writePageLevelMetadaFile($page_pointer, $page_title, $page_dir);
             }
         }
