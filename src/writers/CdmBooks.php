@@ -91,20 +91,29 @@ class CdmBooks extends Writer
         // Array of paths to tiffs for OBJ for newspaper issue pages may not be sorted
         // on some systems.  Sort.
         sort($OBJFilesArray);
-        
+        //var_dump($pages);
+        //exit();
         $sub_dir_num = 0;
         foreach ($pages as $page_pointer) {
             $sub_dir_num++;
 
             // Create subdirectory for each page of newspaper issue
             $page_object_info = $this->fetcher->getItemInfo($page_pointer);
+
             $filekey = $sub_dir_num - 1;
             $pathToFile = $OBJFilesArray[$filekey];
+            
             // Infer the numbered directory name from the OBJ file name.
             $directoryNumber = $this->directoryNameFromFileName($pathToFile);
             
             // left trim leading left zero padded numbers
             $directoryNumber = ltrim($directoryNumber, "0");
+            
+            // In some cases, the page numbering may start from zero in which
+            // case ltrim 0 will result in an empty string.
+            if($directoryNumber == '') {
+                $directoryNumber = '0';
+            }
             
             $page_dir = $issueObjectPath  . DIRECTORY_SEPARATOR . $directoryNumber;
             //var_dump($page_dir);
@@ -195,6 +204,8 @@ class CdmBooks extends Writer
             $MODS_expected = in_array('MODS', $this->datastreams);
             if ($MODS_expected xor $no_datastreams_setting_flag) {
                 $page_title = 'Page ' . $directoryNumber;
+                
+                //if(isset$page_object_info['title']
                 $this->writePageLevelMetadaFile($page_pointer, $page_title, $page_dir);
             }
         }
