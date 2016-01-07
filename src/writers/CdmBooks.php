@@ -135,13 +135,18 @@ class CdmBooks extends Writer
             if (count($this->datastreams) == 0) {
                $no_datastreams_setting_flag = true;
             }
-
+            
             // Write out $page_object_info['full'], which we'll use as the OCR datastream.
             $ocr_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OCR.txt';
             $OCR_expected = in_array('OCR', $this->datastreams);
             if ($OCR_expected xor $no_datastreams_setting_flag) {
-                $ocr_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OCR.txt';
-                file_put_contents($ocr_output_file_path, $page_object_info['full']);
+                $ocr_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OCR.txt';                
+                if(isset($page_object_info['full'])) {
+                    $ocr = $page_object_info['full'];
+                } elseif(isset($page_object_info['summar'])) {
+                    $ocr = $page_object_info['summar'];
+                }
+                file_put_contents($ocr_output_file_path, $ocr);
             }
 
             // Retrieve the file associated with the child-level object. In the case of
