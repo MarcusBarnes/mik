@@ -83,7 +83,9 @@ So far, we have "toolchains" (complete sets of MIK metadata parsers, file getter
 * CONTENTdm newspapers
 * CONTENTdm multi-file PDFs
 * CONTENTdm single-file objects
+* CONTENTdm books
 * CSV metadata and content files from a local filesystem
+
 
 We are now focusing on toolchains for remaining CONTENTdm object types.
 
