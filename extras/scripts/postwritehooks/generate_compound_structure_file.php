@@ -29,7 +29,7 @@ $log = new Logger('postwritehooks/validate_mods.php');
 $log->pushHandler(new StreamHandler($config['LOGGING']['path_to_log'], Logger::INFO));
 */
 
-$stylesheet = 'tree_to_compound_object.xsl';
+$stylesheet = 'extras/scripts/postwritehooks/tree_to_compound_object.xsl';
 
 
 /**
