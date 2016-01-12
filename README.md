@@ -2,15 +2,17 @@
 
 ## Overview
 
-The Move to Islandora Kit (MIK) converts source content files and accompanying metadata into ingest packages used by existing Islandora batch ingest modules, [Islandora Batch](https://github.com/Islandora/islandora_batch), [Islandora Newspaper Batch](https://github.com/discoverygarden/islandora_newspaper_batch), and [Islandora Book Batch](https://github.com/Islandora/islandora_book_batch). In other words, it doesn’t import objects into Islandora, it prepares content for importing into Islandora.
+The Move to Islandora Kit (MIK) converts source content files and accompanying metadata into ingest packages used by existing Islandora batch ingest modules, [Islandora Batch](https://github.com/Islandora/islandora_batch), [Islandora Newspaper Batch](https://github.com/discoverygarden/islandora_newspaper_batch), and [Islandora Book Batch](https://github.com/Islandora/islandora_book_batch). In other words, it doesn’t import objects into Islandora, it prepares content for importing into Islandora:
 
-MIK is designed to be extensible. The base classes that convert from the source metadata to XML files for importing into Islandora, and that convert the source content files into the required directory structure for importing, can be subclassed easily. We'll be documenting how to do this in the near future.
+![MIK overview](https://dl.dropboxusercontent.com/u/1015702/linked_to/MIK_overview_%20general.png)
 
-MIK is developed by staff at Simon Fraser University Library in support of their migration from CONTENTdm to Islandora, but its longer-term purpose is as a general toolkit for preparing content for importing content into Islandora.
+MIK is designed to be extensible. The base classes that convert the source metadata to XML files for importing into Islandora, and that convert the source content files into the required directory structure for importing, can be subclassed easily. MIK also uses plugins (known as "manipulators") and a set of "hook" scripts that allow functionality that can be turned off or on for specific jobs.
+
+MIK is developed by staff at Simon Fraser University Library in support of their migration from CONTENTdm to Islandora, but its longer-term purpose is as a general toolkit for preparing content for importing content into Islandora. So MIK should really stand for "Move [stuff into] Islandora Kit."
 
 ## Documentation
 
-We are continuing to improve our documentation, which is on the MIK [wiki](https://github.com/MarcusBarnes/mik/wiki). Please let us know if you have any suggestions or would like to assist.
+We are continuing to improve our documentation, which is on the MIK [wiki](https://github.com/MarcusBarnes/mik/wiki). Please let us know if you have any quetions, suggestions or you would like to assist.
 
 ## Troubleshooting and support
 
@@ -73,9 +75,9 @@ and when finished will tell you where your ingest packages have been saved and w
 
 ## Current status
 
-Until April 2016, when our migration from CONTENTdm to Islandora will be complete, we will be working on the 0.9 release of MIK. We aim for a 1.0 release of MIK in the summer of 2016. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is ready for production. 
+Until April 2016, when our migration from CONTENTdm to Islandora will be complete, we will be working on the 0.9 release of MIK. We aim for a 1.0 release of MIK in the summer of 2016. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is already being used in production. 
 
-So far, we have "toolchains" (complete sets of MIK metadata parsers, file getters, etc.) for creating Islandora import packages from the following:
+So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, file getters, etc.) for creating Islandora import packages from the following:
 
 * CONTENTdm
   * newspapers
