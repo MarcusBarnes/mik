@@ -107,7 +107,7 @@ We are focused on completing our migration in April, but once the dust settles, 
 * a toolchain to migrate from DSpace to Isandora
 * a toolchaing to generate Hydra import packages (yes, it's called Move to Islandora Kit but it's flexible enough to create other types of ingest packages)
 
-MIK is designed to be extensible. If you have an idea for a usefule manipulator or post-write hook script, please let us know.
+MIK is designed to be extensible. If you have an idea for a useful manipulator or post-write hook script, please let us know.
 
 README_DEV.md contains some inforation on coding standards, etc.
 
