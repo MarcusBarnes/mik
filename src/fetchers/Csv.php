@@ -32,7 +32,20 @@ class Csv extends Fetcher
         $this->all_settings = $settings;
         $this->input_file = $this->settings['input_file'];
         $this->record_key = $this->settings['record_key'];
-        $this->field_delimiter = $this->settings['field_delimiter'];
+        if (isset($settings['FETCHER']['field_delimiter'])) {
+            $this->field_delimiter = $this->settings['field_delimiter'];
+        }
+        else {
+            $this->field_delimiter = ',';
+        }
+        // Default enclosure is double quotation marks.
+        if (isset($settings['FETCHER']['field_enclosure'])) {
+            $this->field_enclosure = $settings['FETCHER']['field_enclosure'];
+        }
+        // Default escape character is \.
+        if (isset($settings['FETCHER']['escape_character'])) {
+            $this->escape_character = $settings['FETCHER']['escape_character'];
+        }
 
         if (isset($settings['MANIPULATORS']['fetchermanipulators'])) {
             $this->fetchermanipulators = $settings['MANIPULATORS']['fetchermanipulators'];
@@ -58,6 +71,12 @@ class Csv extends Fetcher
         if (!isset($filtered_records)) {
     	    $inputCsv = Reader::createFromPath($this->input_file);
                 $inputCsv->setDelimiter($this->field_delimiter);
+                if (isset($this->field_enclosure)) {
+                    $inputCsv->setEnclosure($this->field_enclosure);
+                }
+                if (isset($this->escape_character)) {
+                    $inputCsv->setEscape($this->escape_character);
+                }
                 if (is_null($limit)) {
                     // Get all records.
                     $limit = -1;
