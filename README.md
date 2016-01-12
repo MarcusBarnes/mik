@@ -87,7 +87,7 @@ So far, we have "toolchains" (complete sets of MIK metadata parsers, file getter
 * CONTENTdm
   * newspapers
   * multi-file PDFs
-  * single-file objects
+  * single-file objects (images, audio, etc.)
   * books
 * CSV
   * metadata and content files from a local filesystem for single-file objects
@@ -96,15 +96,18 @@ So far, we have "toolchains" (complete sets of MIK metadata parsers, file getter
 
 * Version 0.9
   * Toolchain for CONTENTdm generic (non-book and non-newspaper) compound objects
-  * Complete documentation
+  * Complete end-user documentation
 * Version 1.0
   * Toolchains for CSV newspapers, books, and generic compound objects
+  * Code cleanup
+  * Automated tests for CSV toolchains and possibly CONTENTdm toolchains
+  * Complete developer user documentation
 
 ## Development
 
 We are focused on completing our migration in April, but once the dust settles, we welcome community development partners. Some features that would be really great to see include:
 
-* a toolchain to migrate from DSpace to Isandora
+* a toolchain to migrate from DSpace to Islandora
 * a toolchaing to generate Hydra import packages (yes, it's called Move to Islandora Kit but it's flexible enough to create other types of ingest packages)
 
 MIK is designed to be extensible. If you have an idea for a useful manipulator or post-write hook script, please let us know.
