@@ -73,6 +73,8 @@ and when finished will tell you where your ingest packages have been saved and w
 
 ### 4. Load your content into Islandora.
 
+And you're done. In practice, you probably want to do some quality assurance on the Islandora ingest packages before you import them (and MIK provides some helper scripts to do that). If you're not happy with what MIK produced, you can always modify your configuration settings or your metadata mappings file and run MIK again.
+
 ## Current status
 
 Until April 2016, when our migration from CONTENTdm to Islandora will be complete, we will be working on the 0.9 release of MIK. We aim for a 1.0 release of MIK in the summer of 2016. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is already being used in production. 
