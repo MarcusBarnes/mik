@@ -26,38 +26,17 @@ More to come as Simon Fraser University completes its migration.
 
 ## Installation
 
-###  Requirements
-
-PHP 5.5.0 or higher.
-
-### Linux/OS X
-
-1. Clone this git repo.
-2. Change into the resulting directory and install Composer by running the following command: `curl -sS https://getcomposer.org/installer | php`
-3. Run the following command: `php composer.phar install`
-
-### Windows
-1. Install PHP and ensure that you can run `php -v` from a command prompt (you will need to adjust your PATH so it can find php.exe).
-2. Make sure the required extensions are enabled by adding these lines to your php.ini:
-
-  ```
-  extension_dir = "ext"
-  extension=php_openssl.dll
-  extension=php_mbstring.dll
-  ```
-3. Clone this git repo (or download the zip if you don't have git).
-4. Install composer using "Composer-Setup.exe" linked from the [Composer website](https://getcomposer.org/doc/00-intro.md).
-5. In the mik directory, run `composer install`
+It's easy. Instructions are [available on the wiki](https://github.com/MarcusBarnes/mik/wiki/Installation).
 
 ## Usage
 
-Typical workflow is to 1) configure your toolchain (defined below) by creating an .ini file, 2) check your configuration options and then 3) run MIK to perform the conversion of your source content into Islandora ingest packages.
+Typical workflow is to 1) configure your toolchain (defined below) by creating an .ini file, 2) check your configuration options and then 3) run MIK to perform the conversion of your source content into Islandora ingest packages. When MIK finishes running, you can import your content into Islandora using [Islandora Batch](https://github.com/Islandora/islandora_batch), [Islandora Newspaper Batch](https://github.com/discoverygarden/islandora_newspaper_batch), or [Islandora Book Batch](https://github.com/Islandora/islandora_book_batch). 
 
-### Configure your toolchain
+### 1. Configure your toolchain
 
-In a nutshell, this means create an .ini file for MIK. Details are provided on the [wiki](https://github.com/MarcusBarnes/mik/wiki). 
+In a nutshell, this means create an .ini file for MIK. Details are provided on the [wiki](https://github.com/MarcusBarnes/mik/wiki).
 
-### Check your configuration
+### 2. Check your configuration
 
 To check your configuration options, run MIK and include the `--checkconfig` option with a value of of 'snippets', 'urls', 'paths', or 'all':
 
@@ -66,7 +45,7 @@ To check your configuration options, run MIK and include the `--checkconfig` opt
 * `./mik --config=foo.ini --checkconfig=paths` checks to make sure that all the paths to files and directories in your configuration file exist (except for `[LOGGING] path_to_log`, which is created as needed)
 * `./mik --config=foo.ini --checkconfig=all` checks all of the above.
 
-### Convert your source content into Islandora ingest packages
+### 3. Convert your source content into Islandora ingest packages
 
 Once you have checked your configuration options, you can run MIK to perform the data conversion:
 
@@ -90,9 +69,11 @@ Creating 10 Islandora ingest packages. Please be patient.
 
 and when finished will tell you where your ingest packages have been saved and where your log file is.
 
+4. Load your content into Islandora.
+
 ## Current status
 
-Until April 2016, when our migration from CONTENTdm to Islandora will be complete, we will be working on the 0.9 release of MIK. We aim for a 1.0 release of the MIK in the summer of 2016. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is ready for production. 
+Until April 2016, when our migration from CONTENTdm to Islandora will be complete, we will be working on the 0.9 release of MIK. We aim for a 1.0 release of MIK in the summer of 2016. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is ready for production. 
 
 So far, we have "toolchains" (complete sets of MIK metadata parsers, file getters, etc.) for creating Islandora import packages from the following:
 
@@ -106,14 +87,13 @@ So far, we have "toolchains" (complete sets of MIK metadata parsers, file getter
 
 ## Roadmap
 
-* Version 0.9
+* Version 0.9 (- April 2016)
   * Toolchain for CONTENTdm generic (non-book and non-newspaper) compound objects
-  * Complete end-user documentation
-* Version 1.0
+  * Complete end-user and developer documentation
+* Version 1.0 (May - August 2016)
   * Toolchains for CSV newspapers, books, and generic compound objects
   * Code cleanup
   * Automated tests for CSV toolchains and possibly CONTENTdm toolchains
-  * Complete developer user documentation
 
 ## Development
 
