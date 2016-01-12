@@ -8,7 +8,9 @@ MIK is designed to be extensible. The base classes that convert from the source 
 
 MIK is developed by staff at Simon Fraser University Library in support of their migration from CONTENTdm to Islandora, but its longer-term purpose is as a general toolkit for preparing content for importing content into Islandora.
 
-Additional information is available on the MIK [wiki](https://github.com/MarcusBarnes/mik/wiki).
+## Documentation
+
+We are continuing to improve our documentation, which is on the MIK [wiki](https://github.com/MarcusBarnes/mik/wiki). Please let us know if you have any suggestions or would like to assist.
 
 ## Requirements
 
@@ -78,21 +80,35 @@ and when finished will tell you where your ingest packages have been saved and w
 
 ## Current status
 
-So far, we have "toolchains" (complete sets of MIK metadata parsers, file getters, etc.) for converting the following into Islandora import packages:
+Until April 2016, when our migration from CONTENTdm to Islandora will be complete, we will be working on the 0.9 release of MIK. We aim for a 1.0 release of the MIK in the summer of 2016. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and helper scripts. 0.9 is ready for production. 
 
-* CONTENTdm newspapers
-* CONTENTdm multi-file PDFs
-* CONTENTdm single-file objects
-* CONTENTdm books
-* CSV metadata and content files from a local filesystem
+So far, we have "toolchains" (complete sets of MIK metadata parsers, file getters, etc.) for converting the following into Islandora import packages from:
 
+* CONTENTdm
+** newspapers
+** multi-file PDFs
+** single-file objects
+** books
+* CSV
+** metadata and content files from a local filesystem for single-file objects
 
-We are now focusing on toolchains for remaining CONTENTdm object types.
+## Roadmap
+
+* Version 0.9
+** Toolchain for CONTENTdm generic (non-book and non-newspaper) compound objects
+** Complete documentation
+* Version 1.0
+** Toolchains for CSV newspapers, books, and generic compound objects
 
 ## Development
 
-See README_DEV.md for coding standards, etc.
+We are focused on completing our migration in April, but once the dust settles, we welcome community development partners. Some features that would be really great to see include:
+
+* a toolchain to migrate from DSpace to Isandora
+* a toolchaing to generate Hydra import packages (yes, it's called Move to Islandora Kit but it's flexible enough to create other types of ingest packages)
+
+README_DEV.md contains some inforation on coding standards, etc.
 
 ## Troubleshooting and support
 
-If you have a question, please open an issue.
+If you have a question, please open a Github issue.
