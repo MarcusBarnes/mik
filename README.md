@@ -85,20 +85,20 @@ Until April 2016, when our migration from CONTENTdm to Islandora will be complet
 So far, we have "toolchains" (complete sets of MIK metadata parsers, file getters, etc.) for converting the following into Islandora import packages from:
 
 * CONTENTdm
-** newspapers
-** multi-file PDFs
-** single-file objects
-** books
+  * newspapers
+  * multi-file PDFs
+  * single-file objects
+  * books
 * CSV
-** metadata and content files from a local filesystem for single-file objects
+  * metadata and content files from a local filesystem for single-file objects
 
 ## Roadmap
 
 * Version 0.9
-** Toolchain for CONTENTdm generic (non-book and non-newspaper) compound objects
-** Complete documentation
+  * Toolchain for CONTENTdm generic (non-book and non-newspaper) compound objects
+  * Complete documentation
 * Version 1.0
-** Toolchains for CSV newspapers, books, and generic compound objects
+  * Toolchains for CSV newspapers, books, and generic compound objects
 
 ## Development
 
@@ -106,6 +106,8 @@ We are focused on completing our migration in April, but once the dust settles, 
 
 * a toolchain to migrate from DSpace to Isandora
 * a toolchaing to generate Hydra import packages (yes, it's called Move to Islandora Kit but it's flexible enough to create other types of ingest packages)
+
+MIK is designed to be extensible. If you have an idea for a usefule manipulator or post-write hook script, please let us know.
 
 README_DEV.md contains some inforation on coding standards, etc.
 
