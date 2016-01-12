@@ -71,7 +71,7 @@ Creating 10 Islandora ingest packages. Please be patient.
 
 and when finished will tell you where your ingest packages have been saved and where your log file is.
 
-4. Load your content into Islandora.
+### 4. Load your content into Islandora.
 
 ## Current status
 
