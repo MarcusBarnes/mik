@@ -84,7 +84,7 @@ and when finished will tell you where your ingest packages have been saved and w
 
 ## Current status
 
-Until April 2016, when our migration from CONTENTdm to Islandora will be complete, we will be working on the 0.9 release of MIK. We aim for a 1.0 release of the MIK in the summer of 2016. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and helper scripts. 0.9 is ready for production. 
+Until April 2016, when our migration from CONTENTdm to Islandora will be complete, we will be working on the 0.9 release of MIK. We aim for a 1.0 release of the MIK in the summer of 2016. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. 0.9 is ready for production. 
 
 So far, we have "toolchains" (complete sets of MIK metadata parsers, file getters, etc.) for creating Islandora import packages from the following:
 
