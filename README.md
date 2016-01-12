@@ -16,11 +16,19 @@ We are continuing to improve our documentation, which is on the MIK [wiki](https
 
 If you have a question, please open a Github issue.
 
+## Islandora content that has been prepared using MIK
+
+* Some of Emily Carr University of Art and Design's collections in [Arca](http://arcabc.ca/) were migrated from CONTENTdm using MIK
+  * [Academic Calendars](http://arcabc.ca/islandora/object/ecuad:cals)
+  * [Wosk Masterworks Print Collection](arcabc.ca/islandora/object/ecuad:wosk)
+
+More to come as Simon Fraser University completes its migration.
+
+## Installation
+
 ###  Requirements
 
 PHP 5.5.0 or higher.
-
-## Installation
 
 ### Linux/OS X
 
