@@ -11,6 +11,7 @@
 
 // The full path to the FITS executable on your system.
 $path_to_fits = '/home/mark/Documents/hacking/fits/fits-0.8.10/fits.sh';
+// $path_to_fits = "C:\\fits-0.8.10\\fits.bat";
 // This should be consistent with your Islandora FITS admin settings.
 $fits_output_filename = 'TECHMD.xml';
 // Filename of the page-level TIFFs.
