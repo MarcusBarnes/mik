@@ -75,6 +75,9 @@ $logInfo = new Logger('Info');
 $logInfoStreamHandler = new StreamHandler($pathToLog, Logger::INFO);
 $logInfo->pushHandler($logInfoStreamHandler);
 
+$startTimeMessage =  "MIK started running " . date("F j, Y, g:i a") . PHP_EOL;
+$logInfo->addInfo($startTimeMessage);
+
 // Add error-exceptions to the log using 
 // $log->addError('log message');
 // or 
