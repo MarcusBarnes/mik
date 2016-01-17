@@ -2,9 +2,9 @@
 
 /**
  * Post-write hook script for MIK that validates MODS XML files.
- * Works for single-file Islandora import packages as well as newspaper
- * issue packages, and can be extended to handle the MODS.xml files
- * created by other MIK toolchains.
+ * Works for single-file CONTENTdm and CSV import packages as well as
+ * newspaper issue packages, and can be extended to handle the MODS.xml
+ * files created by other MIK toolchains.
  */
 
 require 'vendor/autoload.php';
@@ -36,13 +36,16 @@ switch ($config['WRITER']['class']) {
   case 'CdmNewspapers':
     cdm_newspapers_writer($record_key, $children_record_keys, $path_to_schema, $mods_filename, $item_info_field_for_issues, $config, $log);
     break;
+  case 'CsvSingleFile':
+    csv_single_file_writer($record_key, $path_to_schema, $config, $log);
+    break;
   default:
-    single_file_writer($record_key, $path_to_schema, $config, $log);
+    cdm_single_file_writer($record_key, $path_to_schema, $config, $log);
     break;
 }
 
 /**
- * Callback to validate the MODS file for each single-file object.
+ * Callback to validate the MODS file for each CONTENTdm single-file object.
  *
  * @param string $record_key
  *   The value of the record key (pointer) for the current newspaper parent object.
@@ -56,7 +59,7 @@ switch ($config['WRITER']['class']) {
  * @param object $log
  *   The Monolog logger object.
  */
-function single_file_writer($record_key, $path_to_schema, $config, $log) {
+function cdm_single_file_writer($record_key, $path_to_schema, $config, $log) {
   $path_to_mods = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
     $record_key . '.xml';
   validate_mods($path_to_schema, $path_to_mods, $log);
@@ -100,6 +103,42 @@ function cdm_newspapers_writer($record_key, $children_record_keys, $path_to_sche
 }
 
 /**
+ * Callback to validate the MODS file for each CSV single-file object.
+ *
+ * @param string $record_key
+ *   The value of the record key (pointer) for the current newspaper parent object.
+ *
+ * @param string $path_to_schema
+ *   The path to the MODS schema file.
+ *
+ * @param array $config
+ *   The MIK configuration settings.
+ *
+ * @param object $log
+ *   The Monolog logger object.
+ */
+function csv_single_file_writer($record_key, $path_to_schema, $config, $log) {
+  if (isset($config['WRITER']['preserve_content_filenames']) && $config['WRITER']['preserve_content_filenames']) {
+    // Get the value of [FILE_GETTER] file_name_field from the cached metadata
+    // and use it, minus the extension, as the MODS filename.
+    $file_name_field = $config['FILE_GETTER']['file_name_field'];
+    $raw_metadata_cache_path = $config['FETCHER']['temp_directory'] . DIRECTORY_SEPARATOR .
+      $record_key . '.metadata';
+    $raw_metadata_cache = file_get_contents($raw_metadata_cache_path);
+    $metadata = unserialize($raw_metadata_cache);
+    $filename = pathinfo($metadata->{$file_name_field}, PATHINFO_FILENAME);
+    $path_to_mods = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
+      $filename . '.xml';
+    validate_mods($path_to_schema, $path_to_mods, $log);
+  }
+  else {
+    $path_to_mods = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
+      $record_key . '.xml';
+    validate_mods($path_to_schema, $path_to_mods, $log);
+  }
+}
+
+/**
  * Validates the specified MODS XML file against the schema and logs
  * the result.
  *
@@ -124,7 +163,7 @@ function validate_mods($path_to_schema, $path_to_mods, $log) {
 }
 
 /**
- * Get the string identifying the issue-level directory where the
+ * Get the string identifying the newspaper issue-level directory where the
  * page-level subdirectories are within the output directory for
  * newspapers.
  *
