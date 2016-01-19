@@ -5,17 +5,17 @@ namespace mik\metadatamanipulators;
 use \Monolog\Logger;
 
 /**
- * FilterDate - Normalize an input date.
+ * FilterDate - Normalize a date from the source metadata for use
+ * within MODS' originInfo/dateIssued, dateCreated, dateCaptured,
+ * dateValid, dateModified, copyrightDate, and dateOther child elements.
+ *
+ * Applies to all MODS toolchains.
  */
 class FilterDate extends MetadataManipulator
 {
 
     /**
-     * Normalize a date.
-     *
-     * @param string $input A date expressed as a string.
-     *
-     * @return string The normalized date, or FALSE if preg_replace fails.
+     * Create a new metadata manipulator instance.
      */
     public function __construct($settings = null, $paramsArray, $record_key)
     {
@@ -30,10 +30,8 @@ class FilterDate extends MetadataManipulator
         $this->log->pushHandler($this->logStreamHandler);
 
         if (count($paramsArray) == 2) {
-            // $this->dateElement = $paramsArray[0];
-            // $this->patternToMatch = $paramsArray[1];
-            $this->dateField = $paramsArray[0];
-            $this->dateElementXPath = trim($paramsArray[1]);           
+            $this->sourceDateField = $paramsArray[0];
+            $this->destDateElement = $paramsArray[1];           
         } else {
             $this->log->addInfo("FilterDate", array('Wrong parameter count' => count($paramsArray)));
         }
@@ -54,37 +52,44 @@ class FilterDate extends MetadataManipulator
 
         // Test to see if the current fragment is the one identified in the config file.
         $xpath = new \DOMXPath($dom);
-        $date_created_elements = $xpath->query($this->dateElementXPath);
+        $date_elements = $xpath->query('/originInfo/' . $this->destDateElement);
 
-        if ($date_created_elements->length === 1) {
-            $this->log->addInfo("FilterDate", array('Incoming XML snippet' => $input));
+        // There should only be one target date element.
+        if ($date_elements->length === 1) {
             // Get the child node, which we will repopulate below if its value
             // matches our regex.
-            $date_created_element = $date_created_elements->item(0);
+            $date_element = $date_elements->item(0);
             // Get its parent so we can reconstruct it for sending back to the
             // metadata parser.
-            $origin_info_element = $date_created_element->parentNode;
-            // Get the raw metadata (in the CSV toolchain, it will be a serialized object) so
-            // we can make decisions based on any value in it.
-            $raw_metadata_cache_path = $this->settings['FETCHER']['temp_directory'] .
-                DIRECTORY_SEPARATOR . $this->record_key . '.metadata';
-            $raw_metadata_cache = file_get_contents($raw_metadata_cache_path);
-            $metadata = unserialize($raw_metadata_cache);
-            // See if the value of the field in the raw metadata matches our
+            $origin_info_element = $date_element->parentNode;
+
+            $source_date_field_value = $this->getSourceDateFieldValue();
+
+            // See if the value of the date field in the raw metadata matches our
             // pattern, and if it does, replace the value of the target MODS element
-            // with a fixed version of the date value.
-            $this->log->addInfo("FilterDate", array('Date value' => $metadata->{$this->dateField}));
+            // with a w3cdtf version of the date value.
             // Note: this logic is specific to dates that come in as \d\d-\d\d-\d\d\d\d.
-            if (preg_match('/(\d\d)\-(\d\d)\-(\d\d\d\d)/', $metadata->{$this->dateField}, $matches)) {
-                $this->log->addInfo("FilterDate", array('Message' => 'Match successful'));
-                $date_created_element->nodeValue = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
+            if (preg_match('/^(\d\d)\-(\d\d)\-(\d\d\d\d)$/', $source_date_field_value, $matches)) {
+                $date_element->nodeValue = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
                 // Reassemble the parent and child elements.
-                $origin_info_element->appendChild($date_created_element);
+                $origin_info_element->appendChild($date_element);
                 // Convert the back to the snippet and return it.
-                $this->log->addInfo("FilterDate", array('XML to return' => $dom->saveXML($origin_info_element)));
+                $this->log->addInfo("FilterDate",
+                    array(
+                        'Record key' => $this->record_key,
+                        'Source date value' => $source_date_field_value,                        
+                        'Normalized MODS XML element' => $dom->saveXML($origin_info_element),
+                        )
+                );
                 return $dom->saveXML($origin_info_element);
             }
             else {
+                $this->log->addWarning("FilterDate",
+                    array(
+                        'Record key' => $this->record_key,
+                        'Source date value does not match any pattern' => $source_date_field_value,                        
+                        )
+                );
                 return $input;
             }
         }
@@ -93,4 +98,28 @@ class FilterDate extends MetadataManipulator
             return $input;
         }
      }
+
+    /**
+     * Get the value of the source date field for the current object.
+     *
+     * @return string
+     *     The value of the source date field.
+     */
+     public function getSourceDateFieldValue()
+     {
+        // Get the raw metadata (in the CSV toolchain, it will be a serialized object) so
+        // we can make decisions based on any value in it.
+        $raw_metadata_cache_path = $this->settings['FETCHER']['temp_directory'] .
+            DIRECTORY_SEPARATOR . $this->record_key . '.metadata';
+        $raw_metadata_cache = file_get_contents($raw_metadata_cache_path);
+
+        if ($this->settings['FETCHER']['class'] == 'Csv') {
+            $metadata = unserialize($raw_metadata_cache);
+            return $metadata->{$this->sourceDateField};
+        }
+        if ($this->settings['FETCHER']['class'] == 'Cdm') {
+            $metadata = json_decode($raw_metadata_cache, true);
+            return $metadata[$this->sourceDateField];
+        }        
+     }     
 }
