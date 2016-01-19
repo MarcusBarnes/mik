@@ -31,7 +31,7 @@ class FilterDate extends MetadataManipulator
 
         if (count($paramsArray) == 2) {
             $this->sourceDateField = $paramsArray[0];
-            $this->destDateElement = $paramsArray[1];           
+            $this->destDateElement = $paramsArray[1];
         } else {
             $this->log->addInfo("FilterDate", array('Wrong parameter count' => count($paramsArray)));
         }
@@ -68,26 +68,41 @@ class FilterDate extends MetadataManipulator
             // See if the value of the date field in the raw metadata matches our
             // pattern, and if it does, replace the value of the target MODS element
             // with a w3cdtf version of the date value.
-            // Note: this logic is specific to dates that come in as \d\d-\d\d-\d\d\d\d.
+
+            // @todo: When 'ca.'' is present, add 'qualifier' attribute with values 'approximate',
+            // 'inferred', 'questionable'. Set a default (maybe configurable) date in this case?
+
+            // Check for dates in \d\d-\d\d-\d\d\d\d.
             if (preg_match('/^(\d\d)\-(\d\d)\-(\d\d\d\d)$/', $source_date_field_value, $matches)) {
                 $date_element->nodeValue = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
                 // Reassemble the parent and child elements.
                 $origin_info_element->appendChild($date_element);
                 // Convert the back to the snippet and return it.
-                $this->log->addInfo("FilterDate",
+                $this->logNormalization($source_date_field_value, $origin_info_element, $dom);
+                return $dom->saveXML($origin_info_element);
+            }
+            // Check for dates in \d\d\d\d \d\d \d\d.
+            elseif (preg_match('/^(\d\d\d\d)\s+(\d\d)\s+(\d\d)$/', $source_date_field_value, $matches)) {
+                $date_element->nodeValue = $matches[1] . '-' . $matches[2] . '-' . $matches[3];
+                $origin_info_element->appendChild($date_element);
+                $this->logNormalization($source_date_field_value, $origin_info_element, $dom);
+                return $dom->saveXML($origin_info_element);
+            }
+            // Check for date value that is empty or not string. Just log it.
+            elseif (!is_string($source_date_field_value) || !strlen($source_date_field_value)) {
+                $this->log->addWarning("FilterDate",
                     array(
                         'Record key' => $this->record_key,
-                        'Source date value' => $source_date_field_value,                        
-                        'Normalized MODS XML element' => $dom->saveXML($origin_info_element),
+                        'Message' => 'Source date value is empty or not a string'
                         )
                 );
-                return $dom->saveXML($origin_info_element);
+                return $input;
             }
             else {
                 $this->log->addWarning("FilterDate",
                     array(
                         'Record key' => $this->record_key,
-                        'Source date value does not match any pattern' => $source_date_field_value,                        
+                        'Source date value does not match any pattern' => $source_date_field_value,
                         )
                 );
                 return $input;
@@ -107,19 +122,50 @@ class FilterDate extends MetadataManipulator
      */
      public function getSourceDateFieldValue()
      {
-        // Get the raw metadata (in the CSV toolchain, it will be a serialized object) so
-        // we can make decisions based on any value in it.
         $raw_metadata_cache_path = $this->settings['FETCHER']['temp_directory'] .
             DIRECTORY_SEPARATOR . $this->record_key . '.metadata';
         $raw_metadata_cache = file_get_contents($raw_metadata_cache_path);
 
+        // Cached metadata for CSV toolchains is a serialized CSV object.
         if ($this->settings['FETCHER']['class'] == 'Csv') {
             $metadata = unserialize($raw_metadata_cache);
-            return $metadata->{$this->sourceDateField};
+            if (isset($metadata->{$this->sourceDateField})) {
+                return trim($metadata->{$this->sourceDateField});
+            }
         }
+        // Cached metadata for CDM toolchains is a serialized associative array.
+        // If the field is empty, its value is an empty array.
         if ($this->settings['FETCHER']['class'] == 'Cdm') {
-            $metadata = json_decode($raw_metadata_cache, true);
-            return $metadata[$this->sourceDateField];
-        }        
-     }     
+            $metadata = unserialize($raw_metadata_cache);
+            if (isset($metadata[$this->sourceDateField]) && is_string($metadata[$this->sourceDateField])) {
+                return trim($metadata[$this->sourceDateField]);
+            }
+        }
+        // If we haven't returned at this point, log failure.
+        $this->log->addWarning("FilterDate",array(
+            'Record key' => $this->record_key,
+            'Source date field not set' => $this->sourceDateField)
+        );
+     }
+
+    /**
+     * Write a successful normalization entry to the manipulator log.
+     *
+     * @param string
+     *     The value of the source date field.
+     * @param object
+     *     The target MODS DOM element.
+     * @param object
+     *     The DOM.
+     */
+     public function logNormalization($source_value, $element, $dom)
+     {
+         $this->log->addInfo("FilterDate",
+             array(
+                 'Record key' => $this->record_key,
+                 'Source date value' => $source_value,
+                 'Normalized MODS XML element' => $dom->saveXML($element),
+             )
+         );
+     }
 }
