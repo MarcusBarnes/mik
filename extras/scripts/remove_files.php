@@ -29,6 +29,9 @@ if (array_key_exists('l', $options)) {
 	if (file_exists($log_path) && !is_writable(dirname($log_path))) {
         exit("Exiting: Log file $log_path exists but is not writable.\n");
 	}
+	if(!file_exists($log_path)) {
+	    exit("Exiting: Log file $log_path does not exist.\n");
+	}
 }
 
 if (count($options) === 0) {
