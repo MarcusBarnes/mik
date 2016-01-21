@@ -68,7 +68,7 @@ class SpecificSet extends FetcherManipulator
         $this->log = new \Monolog\Logger('config');
         $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
             Logger::INFO);
-        $this->log->pushHandler($this->logStreamHandler);        
+        $this->log->pushHandler($this->logStreamHandler);
     }
 
     /**
@@ -128,7 +128,7 @@ class SpecificSet extends FetcherManipulator
      * text file.
      *
      * @return array
-     *   The list of random integers.
+     *   The list of record keys.
      */
     public function getSpecificSet()
     {
