@@ -52,8 +52,8 @@ if (count($children_record_keys)) {
     foreach ($page_dirs as $path_to_page_dir) {
       $path_to_obj = $path_to_page_dir . DIRECTORY_SEPARATOR . $obj_filename;
       if (file_exists($path_to_obj)) {
+        $path_to_fits_output = $path_to_page_dir . DIRECTORY_SEPARATOR . $fits_output_filename;
 				if (!file_exists($path_to_fits_output)) {
-					$path_to_fits_output = $path_to_page_dir . DIRECTORY_SEPARATOR . $fits_output_filename;
 					$cmd = "$path_to_fits -i $path_to_obj -xc -o $path_to_fits_output";
 					exec($cmd, $output, $return_var);
 					if ($return_var) {
