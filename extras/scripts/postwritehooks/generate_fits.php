@@ -10,8 +10,8 @@
  */
 
 // The full path to the FITS executable on your system.
-$path_to_fits = '/home/mark/Documents/hacking/fits/fits-0.8.10/fits.sh';
-// $path_to_fits = "C:\\fits-0.8.10\\fits.bat";
+// $path_to_fits = '/home/mark/Documents/hacking/fits/fits-0.8.10/fits.sh';
+$path_to_fits = "c:\\localapps\\FITS\\fits.bat";
 // This should be consistent with your Islandora FITS admin settings.
 $fits_output_filename = 'TECHMD.xml';
 // Filename of the page-level TIFFs.
@@ -52,18 +52,20 @@ if (count($children_record_keys)) {
     foreach ($page_dirs as $path_to_page_dir) {
       $path_to_obj = $path_to_page_dir . DIRECTORY_SEPARATOR . $obj_filename;
       if (file_exists($path_to_obj)) {
-        $path_to_fits_output = $path_to_page_dir . DIRECTORY_SEPARATOR . $fits_output_filename;
-        $cmd = "$path_to_fits -i $path_to_obj -o $path_to_fits_output";
-        exec($cmd, $output, $return_var);
-        if ($return_var) {
-          $log->addWarning("FITS output not generated due to error with FITS",
-            array('FITS return value' => $return_var, 'OBJ file' => $path_to_obj));
-        }
-        else {
-          $log->addInfo("FITS output generated",
-            array('OBJ file' => $path_to_obj, 'FITS output' => $path_to_fits_output));
-        }
-      }
+				if (!file_exists($path_to_fits_output)) {
+					$path_to_fits_output = $path_to_page_dir . DIRECTORY_SEPARATOR . $fits_output_filename;
+					$cmd = "$path_to_fits -i $path_to_obj -xc -o $path_to_fits_output";
+					exec($cmd, $output, $return_var);
+					if ($return_var) {
+						$log->addWarning("FITS output not generated due to error with FITS",
+							array('FITS return value' => $return_var, 'OBJ file' => $path_to_obj));
+					}
+					else {
+						$log->addInfo("FITS output generated",
+							array('OBJ file' => $path_to_obj, 'FITS output' => $path_to_fits_output));
+					}
+				}
+			}
       else {
         $log->addWarning("FITS output not generated because OBJ file not found",
           array('OBJ file' => $path_to_obj));
