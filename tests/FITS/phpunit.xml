@@ -9,7 +9,8 @@
 
     <php>
         <!-- Define the full path to fits.sh/fits/bat on your system here. -->
-        <var name="path_to_fits" value="/home/mark/Documents/hacking/fits/fits-0.8.10/fits.sh"/>
+        <!-- <var name="path_to_fits" value="/home/mark/Documents/hacking/fits/fits-0.8.10/fits.sh"/> -->
+        <var name="path_to_fits" value="C:\\localapps\\fits\\fits.bat"/>
     </php>
 
 </phpunit>
