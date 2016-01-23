@@ -4,19 +4,71 @@ namespace mik\fetchers;
 
 class CsvTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_fetcher_temp_dir";
+        @mkdir($this->path_to_temp_dir);
+    }
 
     public function testGetRecords()
     {
-        // We define settings here, not in a configuration file.
+        // Define settings here, not in a configuration file.
         $settings = array(
             'FETCHER' => array(
-                'input_file' => dirname(__FILE__) . '/assets/test.csv',
+                'input_file' => dirname(__FILE__) . '/assets/sample_metadata.csv',
                 'record_key' => 'ID',
-                'field_delimiter' => ',',
              )
         );
         $csv = new Csv($settings);
         $records = $csv->getRecords();
-        $this->assertCount(3, $records);
+        $this->assertCount(20, $records);
     }
+    
+    public function testGetNumRecs()
+    {
+        // Define settings here, not in a configuration file.
+        $settings = array(
+            'FETCHER' => array(
+                'input_file' => dirname(__FILE__) . '/assets/sample_metadata.csv',
+                'record_key' => 'ID',
+             )
+        );
+        $csv = new Csv($settings);
+        $num_records = $csv->getNumRecs();
+        $this->assertEquals(20, $num_records);
+    }
+
+    public function testGetItemInfo()
+    {
+        // Define settings here, not in a configuration file.
+        $settings = array(
+            'FETCHER' => array(
+                'input_file' => dirname(__FILE__) . '/assets/sample_metadata.csv',
+                'record_key' => 'ID',
+                'temp_directory' => $this->path_to_temp_dir,
+             )
+        );
+        $csv = new Csv($settings);
+        $record = $csv->getItemInfo('postcard_3');
+        $this->assertEquals('1947', $record->Date, "Record date is not 1947");
+    }
+
+    public function _testRandomSetFetcherManipulator()
+    {
+        // Define settings here, not in a configuration file.
+        $settings = array(
+            'FETCHER' => array(
+                'input_file' => dirname(__FILE__) . '/assets/sample_metadata.csv',
+                'record_key' => 'ID',
+             ),
+            'MANIPULATORS' => array(
+                'fetchermanipulators' => array('RandomSet|5'),
+             ),
+        );
+
+        $csv = new Csv($settings);
+        $records = $csv->getRecords();
+        $this->assertCount(5, $records, "Random set manipulator didn't work");
+    }
+
 }
