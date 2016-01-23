@@ -2,7 +2,7 @@
 
 namespace mik\fetchers;
 
-class CsvTest extends \PHPUnit_Framework_TestCase
+class CsvFetcher extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
@@ -26,7 +26,6 @@ class CsvTest extends \PHPUnit_Framework_TestCase
     
     public function testGetNumRecs()
     {
-        // Define settings here, not in a configuration file.
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/sample_metadata.csv',
@@ -40,7 +39,6 @@ class CsvTest extends \PHPUnit_Framework_TestCase
 
     public function testGetItemInfo()
     {
-        // Define settings here, not in a configuration file.
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/sample_metadata.csv',
@@ -55,7 +53,6 @@ class CsvTest extends \PHPUnit_Framework_TestCase
 
     public function _testRandomSetFetcherManipulator()
     {
-        // Define settings here, not in a configuration file.
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/sample_metadata.csv',
@@ -65,7 +62,6 @@ class CsvTest extends \PHPUnit_Framework_TestCase
                 'fetchermanipulators' => array('RandomSet|5'),
              ),
         );
-
         $csv = new Csv($settings);
         $records = $csv->getRecords();
         $this->assertCount(5, $records, "Random set manipulator didn't work");
