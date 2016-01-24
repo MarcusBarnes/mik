@@ -15,7 +15,7 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
         // Define settings here, not in a configuration file.
         $settings = array(
             'FETCHER' => array(
-                'input_file' => dirname(__FILE__) . '/assets/sample_metadata.csv',
+                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
                 'record_key' => 'ID',
              )
         );
@@ -28,7 +28,7 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
-                'input_file' => dirname(__FILE__) . '/assets/sample_metadata.csv',
+                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
                 'record_key' => 'ID',
              )
         );
@@ -41,7 +41,7 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
-                'input_file' => dirname(__FILE__) . '/assets/sample_metadata.csv',
+                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
                 'record_key' => 'ID',
                 'temp_directory' => $this->path_to_temp_dir,
              )
@@ -55,7 +55,7 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
-                'input_file' => dirname(__FILE__) . '/assets/sample_metadata.csv',
+                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
                 'record_key' => 'ID',
              ),
             'MANIPULATORS' => array(
