@@ -50,7 +50,7 @@ abstract class Fetcher
     public function createTempDirectory()
     {
         if (file_exists($this->tempDirectory)) {
-					  return true; // directory already exists.
+            return true; // directory already exists.
         } else {
             // mkdir returns true if successful; false otherwise.
             return mkdir($this->tempDirectory, 0777, true);

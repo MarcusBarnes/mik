@@ -7,7 +7,7 @@ class FetcherManipulatorTest extends \PHPUnit_Framework_TestCase
 	    protected function setUp()
     {
         $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_fetcher_temp_dir";
-				$this->path_to_log = $this->path_to_temp_dir . DIRECTORY_SEPARATOR . "mik.log";
+        $this->path_to_log = $this->path_to_temp_dir . DIRECTORY_SEPARATOR . "mik.log";
     }
 
     public function testRandomSetFetcherManipulator()
@@ -15,7 +15,7 @@ class FetcherManipulatorTest extends \PHPUnit_Framework_TestCase
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
-								'temp_directory' => $this->path_to_temp_dir,
+                'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
                 'use_cache' => false,
              ),
@@ -36,12 +36,12 @@ class FetcherManipulatorTest extends \PHPUnit_Framework_TestCase
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
-								'temp_directory' => $this->path_to_temp_dir,
+                'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
                 'use_cache' => false,
              ),
             'LOGGING' => array(
-						    'path_to_log' => $this->path_to_log,
+                'path_to_log' => $this->path_to_log,
                 'path_to_manipulator_log' => '',
              ),
             'MANIPULATORS' => array(
@@ -58,12 +58,12 @@ class FetcherManipulatorTest extends \PHPUnit_Framework_TestCase
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
-								'temp_directory' => $this->path_to_temp_dir,
+                'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
                 'use_cache' => false,
              ),
             'LOGGING' => array(
-					      'path_to_log' => $this->path_to_log,
+                'path_to_log' => $this->path_to_log,
                 'path_to_manipulator_log' => '',
              ),
             'MANIPULATORS' => array(
@@ -80,12 +80,12 @@ class FetcherManipulatorTest extends \PHPUnit_Framework_TestCase
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
-								'temp_directory' => $this->path_to_temp_dir,
+                'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
                 'use_cache' => false,
              ),
             'LOGGING' => array(
-						    'path_to_log' => $this->path_to_log,
+                'path_to_log' => $this->path_to_log,
                 'path_to_manipulator_log' => '',
              ),
             'MANIPULATORS' => array(
@@ -102,12 +102,12 @@ class FetcherManipulatorTest extends \PHPUnit_Framework_TestCase
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
-								'temp_directory' => $this->path_to_temp_dir,
+                'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
                 'use_cache' => false,
              ),
             'LOGGING' => array(
-						    'path_to_log' => $this->path_to_log,
+                'path_to_log' => $this->path_to_log,
                 'path_to_manipulator_log' => '',
              ),
             'MANIPULATORS' => array(
@@ -124,12 +124,12 @@ class FetcherManipulatorTest extends \PHPUnit_Framework_TestCase
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
-								'temp_directory' => $this->path_to_temp_dir,
+                'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
                 'use_cache' => false,
              ),
             'LOGGING' => array(
-						    'path_to_log' => $this->path_to_log,
+                'path_to_log' => $this->path_to_log,
                 'path_to_manipulator_log' => '',
              ),						 
             'FILE_GETTER' => array(
@@ -149,12 +149,12 @@ class FetcherManipulatorTest extends \PHPUnit_Framework_TestCase
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
-								'temp_directory' => $this->path_to_temp_dir,
+                'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
                 'use_cache' => false,
              ),
             'LOGGING' => array(
-						    'path_to_log' => $this->path_to_log,
+                'path_to_log' => $this->path_to_log,
                 'path_to_manipulator_log' => '',
              ),						 
             'FILE_GETTER' => array(

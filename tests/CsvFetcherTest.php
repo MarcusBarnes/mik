@@ -7,7 +7,7 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_fetcher_temp_dir";
-				$this->path_to_log = $this->path_to_temp_dir . DIRECTORY_SEPARATOR . "mik.log";
+        $this->path_to_log = $this->path_to_temp_dir . DIRECTORY_SEPARATOR . "mik.log";
     }
 
     public function testGetRecords()
@@ -16,7 +16,7 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
-								'temp_directory' => $this->path_to_temp_dir,
+                'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
              ),
             'LOGGING' => array(
@@ -33,7 +33,7 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
-								'temp_directory' => $this->path_to_temp_dir,
+                'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
              ),
             'LOGGING' => array(
