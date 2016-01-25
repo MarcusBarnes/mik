@@ -7,7 +7,7 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_fetcher_temp_dir";
-        @mkdir($this->path_to_temp_dir);
+				$this->path_to_log = $this->path_to_temp_dir . DIRECTORY_SEPARATOR . "mik.log";
     }
 
     public function testGetRecords()
@@ -16,8 +16,12 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
+								'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
-             )
+             ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+            ),
         );
         $csv = new Csv($settings);
         $records = $csv->getRecords();
@@ -29,8 +33,12 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
+								'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
-             )
+             ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+            ),
         );
         $csv = new Csv($settings);
         $num_records = $csv->getNumRecs();
@@ -44,7 +52,10 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
                 'record_key' => 'ID',
                 'temp_directory' => $this->path_to_temp_dir,
-             )
+             ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+            ),						 
         );
         $csv = new Csv($settings);
         $record = $csv->getItemInfo('postcard_3');
