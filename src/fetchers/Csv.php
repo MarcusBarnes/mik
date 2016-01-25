@@ -27,9 +27,7 @@ class Csv extends Fetcher
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FETCHER'];
-        // We make a copy of all setting to pass to fetcher manipulators.
-        $this->all_settings = $settings;
+        parent::__construct($settings);
         $this->input_file = $this->settings['input_file'];
         $this->record_key = $this->settings['record_key'];
         if (isset($settings['FETCHER']['field_delimiter'])) {
@@ -52,6 +50,14 @@ class Csv extends Fetcher
         }
         else {
             $this->fetchermanipulators = null;
+        }
+
+        try {
+            $this->createTempDirectory();
+        }
+        catch (Exception $e) {
+            $this->log->addError("CSV fetcher",
+                array('Cannot create temp_directory' => $e->getMessage()));
         }
 
         if (isset($settings['FETCHER']['use_cache'])) {

@@ -71,9 +71,7 @@ class Cdm extends Fetcher
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FETCHER'];
-        // We make a copy of all setting to pass to fetcher manipulators.
-        $this->all_settings = $settings;
+        parent::__construct($settings);
         $this->key = $this->settings['record_key'];
         $this->thumbnail = new \mik\filemanipulators\ThumbnailFromCdm($settings);
 
@@ -82,6 +80,11 @@ class Cdm extends Fetcher
         }
         else {
             $this->fetchermanipulators = null;
+        }
+
+        if (!$this->createTempDirectory()) {
+            $this->log->addError("Cdm fetcher",
+                array('Cannot create temp_directory' => $this->tempDirectory));
         }
     }
 
