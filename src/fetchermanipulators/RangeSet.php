@@ -84,7 +84,7 @@ class RangeSet extends FetcherManipulator
     public function manipulate($all_records)
     {
         $numRecs = count($all_records);
-        echo "Filtering $numRecs records through the SpecificSet fetcher manipulator.\n";
+        echo "Filtering $numRecs records through the RangeSet fetcher manipulator.\n";
         // Instantiate the progress bar if we're not running on Windows.
         if (!$this->onWindows) {
             $climate = new \League\CLImate\CLImate;
