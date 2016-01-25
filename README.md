@@ -97,7 +97,7 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
 * Version 1.0 (May - August 2016)
   * Toolchains for CSV newspapers, books, and generic compound objects
   * Code cleanup
-  * Automated tests for CSV toolchains and possibly CONTENTdm toolchains
+  * More automated tests
 
 ## Development
 
