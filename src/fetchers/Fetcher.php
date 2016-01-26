@@ -1,6 +1,9 @@
 <?php
 
 namespace mik\fetchers;
+
+use \Monolog\Logger;
+
 /**
  * Fetcher (abstract):
  *    Browse, read, and gather information about records 
@@ -29,7 +32,30 @@ abstract class Fetcher
      */
     public function __construct($settings)
     {
-        // $this->settings = $settings['FETCHER'];
+        $this->settings = $settings['FETCHER'];
+        $this->tempDirectory = $this->settings['temp_directory'];
+        // Make a copy of all setting to pass to fetcher manipulators.
+        $this->all_settings = $settings;
+
+        // Set up logger.
+        $this->pathToLog = $settings['LOGGING']['path_to_log'];
+        $this->log = new \Monolog\Logger('fetcher');
+        $this->logStreamHandler= new \Monolog\Handler\StreamHandler($this->pathToLog, Logger::INFO);
+        $this->log->pushHandler($this->logStreamHandler); 
+    }
+
+    /**
+     * Create the temp directory specified in the config file.
+     */
+    public function createTempDirectory()
+    {
+        if (!file_exists($this->tempDirectory)) {
+            // mkdir returns true if successful; false otherwise.
+            $result = mkdir($this->tempDirectory, 0777, true);
+        } else {
+            $result = true; // directory already exists.
+        }
+        return $result;
     }
 
     /**

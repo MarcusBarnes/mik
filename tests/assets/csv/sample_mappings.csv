@@ -1,0 +1,6 @@
+Title,<titleInfo><title>%value%</title></titleInfo>
+Date,<originInfo><dateIssued encoding='w3cdtf'>%value%</dateIssued></originInfo>
+Location,<subject><geographic>%value%</geographic></subject>
+Subjects,<subject authority='lcsh'><topic>%value%</topic></subject>
+Description,<abstract>%value%</abstract>
+null1,<identifier type='uuid'/>

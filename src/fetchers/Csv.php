@@ -27,9 +27,7 @@ class Csv extends Fetcher
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FETCHER'];
-        // We make a copy of all setting to pass to fetcher manipulators.
-        $this->all_settings = $settings;
+        parent::__construct($settings);
         $this->input_file = $this->settings['input_file'];
         $this->record_key = $this->settings['record_key'];
         if (isset($settings['FETCHER']['field_delimiter'])) {
@@ -53,6 +51,21 @@ class Csv extends Fetcher
         else {
             $this->fetchermanipulators = null;
         }
+
+        try {
+            $this->createTempDirectory();
+        }
+        catch (Exception $e) {
+            $this->log->addError("CSV fetcher",
+                array('Cannot create temp_directory' => $e->getMessage()));
+        }
+
+        if (isset($settings['FETCHER']['use_cache'])) {
+            $this->use_cache = $settings['FETCHER']['use_cache'];
+        }
+        else {
+            $this->use_cache = true;
+        }
     }
 
     /**
@@ -68,8 +81,8 @@ class Csv extends Fetcher
 
         // Use a static cache to avoid reading the CSV file multiple times.
         static $filtered_records;
-        if (!isset($filtered_records)) {
-    	    $inputCsv = Reader::createFromPath($this->input_file);
+        if (!isset($filtered_records) || $this->use_cache == false) {
+            $inputCsv = Reader::createFromPath($this->input_file);
                 $inputCsv->setDelimiter($this->field_delimiter);
                 if (isset($this->field_enclosure)) {
                     $inputCsv->setEnclosure($this->field_enclosure);
@@ -81,15 +94,15 @@ class Csv extends Fetcher
                     // Get all records.
                     $limit = -1;
                 }
-    	    $records = $inputCsv   
-    		->addFilter(function ($row, $index) {
+            $records = $inputCsv
+                ->addFilter(function ($row, $index) {
                     // Skip header row.
-    	            return $index > 0;
-    		})
-    		->setLimit($limit)
-    		->fetchAssoc();
+                    return $index > 0;
+            })
+            ->setLimit($limit)
+            ->fetchAssoc();
 
-    	    foreach ($records as $index => &$record) {
+            foreach ($records as $index => &$record) {
                 if (!is_null($record[$this->record_key]) || strlen($record[$this->record_key])) {
                     $record = (object) $record;
                     $record->key = $record->{$this->record_key};
@@ -97,7 +110,7 @@ class Csv extends Fetcher
                 else {
                     unset($records[$index]);
                 }
-    	    }
+            }
 
             if ($this->fetchermanipulators) {
                 $filtered_records = $this->applyFetchermanipulators($records);
@@ -111,7 +124,7 @@ class Csv extends Fetcher
 
     /**
      * Implements fetchers\Fetcher::getNumRecs.
-     * 
+     *
      * Returns the number of records under consideration.
      *    For CSV, this will be the number_format(number)ber of rows of data with a unique index.
      *
@@ -164,5 +177,5 @@ class Csv extends Fetcher
             $records = $fetchermanipulator->manipulate($records);
         }
         return $records;
-    }    
+    }
 }
