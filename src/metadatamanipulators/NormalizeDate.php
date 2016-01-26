@@ -33,7 +33,7 @@ class NormalizeDate extends MetadataManipulator
             $this->sourceDateField = $paramsArray[0];
             $this->destDateElement = $paramsArray[1];
         } else {
-            $this->log->addInfo("FilterDate", array('Wrong parameter count' => count($paramsArray)));
+            $this->log->addInfo("NormalizeDate", array('Wrong parameter count' => count($paramsArray)));
         }
     }
 
@@ -63,7 +63,7 @@ class NormalizeDate extends MetadataManipulator
             // metadata parser.
             $origin_info_element = $date_element->parentNode;
 
-            $source_date_field_value = $this->getSourceDateFieldValue();
+            $this->sourceDateFieldValue = $this->getSourceDateFieldValue();
 
             // See if the value of the date field in the raw metadata matches our
             // pattern, and if it does, replace the value of the target MODS element
@@ -73,24 +73,24 @@ class NormalizeDate extends MetadataManipulator
             // 'inferred', 'questionable'. Set a default (maybe configurable) date in this case?
 
             // Check for dates in \d\d-\d\d-\d\d\d\d.
-            if (preg_match('/^(\d\d)\-(\d\d)\-(\d\d\d\d)$/', $source_date_field_value, $matches)) {
+            if (preg_match('/^(\d\d)\-(\d\d)\-(\d\d\d\d)$/', $this->sourceDateFieldValue, $matches)) {
                 $date_element->nodeValue = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
                 // Reassemble the parent and child elements.
                 $origin_info_element->appendChild($date_element);
                 // Convert the back to the snippet and return it.
-                $this->logNormalization($source_date_field_value, $origin_info_element, $dom);
+                $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
                 return $dom->saveXML($origin_info_element);
             }
             // Check for dates in \d\d\d\d \d\d \d\d.
-            elseif (preg_match('/^(\d\d\d\d)\s+(\d\d)\s+(\d\d)$/', $source_date_field_value, $matches)) {
+            elseif (preg_match('/^(\d\d\d\d)\s+(\d\d)\s+(\d\d)$/', $this->sourceDateFieldValue, $matches)) {
                 $date_element->nodeValue = $matches[1] . '-' . $matches[2] . '-' . $matches[3];
                 $origin_info_element->appendChild($date_element);
-                $this->logNormalization($source_date_field_value, $origin_info_element, $dom);
+                $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
                 return $dom->saveXML($origin_info_element);
             }
             // Check for date value that is empty or not string. Just log it.
-            elseif (!is_string($source_date_field_value) || !strlen($source_date_field_value)) {
-                $this->log->addWarning("FilterDate",
+            elseif (!is_string($this->sourceDateFieldValue) || !strlen($this->sourceDateFieldValue)) {
+                $this->log->addWarning("NormalizeDate",
                     array(
                         'Record key' => $this->record_key,
                         'Message' => 'Source date value is empty or not a string'
@@ -99,10 +99,10 @@ class NormalizeDate extends MetadataManipulator
                 return $input;
             }
             else {
-                $this->log->addWarning("FilterDate",
+                $this->log->addWarning("NormalizeDate",
                     array(
                         'Record key' => $this->record_key,
-                        'Source date value does not match any pattern' => $source_date_field_value,
+                        'Source date value does not match any pattern' => $this->sourceDateFieldValue,
                         )
                 );
                 return $input;
@@ -142,7 +142,7 @@ class NormalizeDate extends MetadataManipulator
             }
         }
         // If we haven't returned at this point, log failure.
-        $this->log->addWarning("FilterDate",array(
+        $this->log->addWarning("NormalizeDate",array(
             'Record key' => $this->record_key,
             'Source date field not set' => $this->sourceDateField)
         );
@@ -160,7 +160,7 @@ class NormalizeDate extends MetadataManipulator
      */
      public function logNormalization($source_value, $element, $dom)
      {
-         $this->log->addInfo("FilterDate",
+         $this->log->addInfo("NormalizeDate",
              array(
                  'Record key' => $this->record_key,
                  'Source date value' => $source_value,

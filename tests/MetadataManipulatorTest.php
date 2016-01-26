@@ -28,7 +28,6 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
             ),
             'METADATA_PARSER' => array(
                 'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/sample_mappings.csv',
-                'repeatable_wrapper_elements' => array('subject'),
             ),
             'MANIPULATORS' => array(
                 'metadatamanipulators' => array('AddUuidToMods'),
@@ -44,6 +43,7 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.normalize_date.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
@@ -55,19 +55,22 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
             ),
             'METADATA_PARSER' => array(
                 'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/sample_mappings.csv',
-                'repeatable_wrapper_elements' => array('subject'),
             ),
             'MANIPULATORS' => array(
-                'metadatamanipulators' => array('NormalizeDate|Date|/originInfo/dateIssued'),
+                'metadatamanipulators' => array('NormalizeDate|Date|dateIssued'),
             ),
         );
+
         $parser = new CsvToMods($settings);
 
+        // Test for matches against dates like 24-12-1954.
         $mods = $parser->metadata('postcard_1');
         $this->assertRegExp('#<dateIssued\sencoding="w3cdtf">1954\-12\-24</dateIssued>#', $mods,
             "NormalizeDate metadata manipulator for (\d\d)\-(\d\d)\-(\d\d\d\d) did not work");
+
+        // Test for matches against dates like 1924 12 24.
         $mods = $parser->metadata('postcard_2');
-        $this->assertRegExp('#<dateIssued\sencoding="w3cdtf">1954\-12\-24</dateIssued>#', $mods,
+        $this->assertRegExp('#<dateIssued\sencoding="w3cdtf">1924\-12\-24</dateIssued>#', $mods,
             "NormalizeDate metadata manipulator for (\d\d\d\d)\s+(\d\d)\s+(\d\d) did not work");
     }
 }
