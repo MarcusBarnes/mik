@@ -1,17 +1,17 @@
 <?php
-// src/metadatamanipulators/FilterDate.php
+// src/metadatamanipulators/NormalizeDate.php
 
 namespace mik\metadatamanipulators;
 use \Monolog\Logger;
 
 /**
- * FilterDate - Normalize a date from the source metadata for use
+ * NormalizeDate - Normalize a date from the source metadata for use
  * within MODS' originInfo/dateIssued, dateCreated, dateCaptured,
  * dateValid, dateModified, copyrightDate, and dateOther child elements.
  *
  * Applies to all MODS toolchains.
  */
-class FilterDate extends MetadataManipulator
+class NormalizeDate extends MetadataManipulator
 {
 
     /**
