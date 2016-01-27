@@ -78,4 +78,32 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('#<dateIssued\sencoding="w3cdtf">1924\-12\-24</dateIssued>#', $mods,
             "NormalizeDate metadata manipulator for (\d\d\d\d)\s+(\d\d)\s+(\d\d) did not work");
     }
+
+    public function testAddCsvDataMetadataManipulator()
+    {
+        $settings = array(
+            'FETCHER' => array(
+                'class' => 'Csv',
+                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
+                'temp_directory' => $this->path_to_temp_dir,
+                'record_key' => 'ID',
+                'use_cache' => false,
+            ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+                'path_to_manipulator_log' => $this->path_to_manipulator_log,
+            ),
+            'METADATA_PARSER' => array(
+                'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/sample_mappings.csv',
+            ),
+            'MANIPULATORS' => array(
+                'metadatamanipulators' => array('AddCsvData'),
+            ),
+        );
+
+        $parser = new CsvToMods($settings);
+
+        $mods = $parser->metadata('postcard_20');
+        $this->assertRegExp('#<CSVRecord.*"Date":"1907"#', $mods, "AddCsvData metadata manipulator did not work");
+    }
 }

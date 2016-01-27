@@ -4,3 +4,4 @@ Location,<subject><geographic>%value%</geographic></subject>
 Subjects,<subject authority='lcsh'><topic>%value%</topic></subject>
 Description,<abstract>%value%</abstract>
 null1,<identifier type='uuid'/>
+null2,<extension><CSVData></CSVData></extension>
