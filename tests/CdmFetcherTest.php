@@ -4,7 +4,7 @@ namespace mik\fetchers;
 
 class CdmFetcher extends \PHPUnit_Framework_TestCase
 {
-	    protected function setUp()
+    protected function setUp()
     {
         $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_fetcher_temp_dir";
 	$this->path_to_log = $this->path_to_temp_dir . DIRECTORY_SEPARATOR . "mik.log";
