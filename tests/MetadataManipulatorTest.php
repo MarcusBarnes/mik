@@ -39,6 +39,11 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
             $mods, "AddUuidToMods metadata manipulator did not work");
     }
 
+    /**
+     * If you add additional regexes and logic to the NormalizeDate metadata manipulator,
+     * add corresponding tests as illustrated below. Additional rows of CSV metadata
+     * containing the bad test dates should be added to assets/csv/sample_metadata.normalize_date.csv.
+     */
     public function testNormalizeDateMetadataManipulator()
     {
         $settings = array(
