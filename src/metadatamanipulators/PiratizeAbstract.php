@@ -6,12 +6,11 @@ use GuzzleHttp\Client;
 use \Monolog\Logger;
 
 /**
- * PiratizeAbstract - converts MODS <abstract>s into pirate talk using
- * the http://isithackday.com/arrpi.php API. Really just a late-night
- * sample thrown toghether to illustrate how MIK can use an external
- * service to modify your scurvy metadata.
+ * PiratizeAbstract - converts MODS <abstract>s into pirate talk using the
+ * http://isithackday.com/arrpi.php API. Intended as an example to illustrate
+ * how MIK can use an external service to modify your scurvy metadata.
  *
- * Applies to all MODS toolchains.
+ * Applies to all MODS toolchains. Takes no prisoners, er, parameters rather.
  */
 class PiratizeAbstract extends MetadataManipulator
 {
@@ -48,35 +47,37 @@ class PiratizeAbstract extends MetadataManipulator
         $dom->loadxml($input, LIBXML_NSCLEAN);
 
         $abstracts = $dom->getElementsByTagName('abstract');
-        if ($abstracts->length) {
-            foreach ($abstracts as $abstract) {
-                // Use Guzzle to fetch piratized text.
-                $client = new Client();
-                try {
-                    $original_text = urlencode($abstract->nodeValue); 
-                    $query = "?text=$original_text&format=json";
-                    $response = $client->get($this->arrpiUrl . $query);
-                } catch (Exception $e) {
-                    $this->log->addWarning("PiratizeAbstract",
-                        array('HTTP request error' => $e->getMessage()));
-                    return $input;
-                }
-                $body = $response->getBody();
-                $translation = json_decode($body, true);
-                $abstract->nodeValue = urldecode($translation['translation']['pirate']);
-
-                if (urldecode($original_text) != $abstract->nodeValue) {
-                    $this->log->addInfo("PiratizeAbstract",
-                        array(
-                            'Record key' => $this->record_key,
-                            'Source abstract text' => urldecode($original_text),
-                            'Piratized abstract text' => $abstract->nodeValue,
-                        )
-                    );
-                }
-
-                return $dom->saveXML($dom->documentElement);
+        if ($abstracts->length == 1) {
+            $abstract = $abstracts->item(0);
+            // Use Guzzle to hit the API.
+            $client = new Client();
+            try {
+                $original_text = urlencode($abstract->nodeValue);
+                $query = "?text=$original_text&format=json";
+                $response = $client->get($this->arrpiUrl . $query);
+            // If there is a Guzzle error, log it and return the original snippet.
+            } catch (Exception $e) {
+                $this->log->addWarning("PiratizeAbstract",
+                    array('HTTP request error' => $e->getMessage()));
+                return $input;
             }
+            $body = $response->getBody();
+            $translation = json_decode($body, true);
+            $abstract->nodeValue = urldecode($translation['translation']['pirate']);
+
+            // Log any instances where the translation differs from the original text.
+            if (urldecode($original_text) != $abstract->nodeValue) {
+                $this->log->addInfo("PiratizeAbstract",
+                    array(
+                        'Record key' => $this->record_key,
+                        'Source abstract text' => urldecode($original_text),
+                        'Piratized abstract text' => $abstract->nodeValue,
+                    )
+                );
+            }
+
+            // We're done, so return the modified snippet.
+            return $dom->saveXML($dom->documentElement);
         }
         // If the current snippet isn't <abstract>, return the input snippet.
         else {
