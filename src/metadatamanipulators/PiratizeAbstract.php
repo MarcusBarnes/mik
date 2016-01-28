@@ -6,8 +6,10 @@ use GuzzleHttp\Client;
 use \Monolog\Logger;
 
 /**
- * Piratize - converts text into pirate talk.
- * curl "http://isithackday.com/arrpi.php?text=How%20are%you%doing?&format=json"
+ * PiratizeAbstract - converts MODS <abstract>s into pirate talk using
+ * the http://isithackday.com/arrpi.php API. Really just a late-night
+ * sample thrown toghether to illustrate how MIK can use an external
+ * service to modify your scurvy metadata.
  *
  * Applies to all MODS toolchains.
  */
@@ -34,7 +36,8 @@ class PiratizeAbstract extends MetadataManipulator
     /**
      * General manipulate wrapper method.
      *
-     * @param string $input An XML snippet to be manipulated.
+     * @param string $input An XML snippet to be manipulated. We are only interested
+     *    in <abstract> snippets.
      *
      * @return string
      *     Manipulated string
@@ -54,7 +57,7 @@ class PiratizeAbstract extends MetadataManipulator
                     $query = "?text=$original_text&format=json";
                     $response = $client->get($this->arrpiUrl . $query);
                 } catch (Exception $e) {
-                    $this->log->addInfo("AddContentdmData",
+                    $this->log->addWarning("PiratizeAbstract",
                         array('HTTP request error' => $e->getMessage()));
                     return $input;
                 }
@@ -75,6 +78,7 @@ class PiratizeAbstract extends MetadataManipulator
                 return $dom->saveXML($dom->documentElement);
             }
         }
+        // If the current snippet isn't <abstract>, return the input snippet.
         else {
             return $input;
         }
