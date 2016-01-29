@@ -105,7 +105,9 @@ class Config
             foreach ($section as $key => $value) {
                 if (preg_match('/_url$/', $key) && strlen($value)) {
                     // We need to make an exception for this option since
-                    // CONTENTdm returns a 404 even if the URL exists.
+                    // CONTENTdm returns a 404 even if the URL exists. Adding
+                    // 'getthumbnail' creates a URL that returns a useful
+                    // response code.
                     if ($key == 'utils_url') {
                         $value .= 'getthumbnail';
                     }
