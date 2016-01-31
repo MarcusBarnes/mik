@@ -15,7 +15,7 @@ class Config
      * @var Array that contains settings from parse_ini_file.
      */
     public $settings;
-    
+
     /**
      * Create a new Config instance.
      *
@@ -104,11 +104,21 @@ class Config
         foreach ($sections as $section) {
             foreach ($section as $key => $value) {
                 if (preg_match('/_url$/', $key) && strlen($value)) {
+                    // We need to make an exception for this option since
+                    // CONTENTdm returns a 404 even if the URL exists. Adding
+                    // 'getthumbnail' creates a URL that returns a useful
+                    // response code.
+                    if ($key == 'utils_url') {
+                        $value .= 'getthumbnail';
+                    }
                     try {
                         $response = $client->get($value);
                         $code = $response->getStatusCode();
                     }
                     catch (RequestException $e) {
+                        if ($key == 'utils_url') {
+                            $value = preg_replace('/getthumbnail$/', '', $value);
+                        }
                         exit("Error: The URL $value (defined in configuration setting $key) appears to be a bad URL (response code $code).\n");
                     }
                 }
