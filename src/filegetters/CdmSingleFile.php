@@ -40,7 +40,7 @@ class CdmSingleFile extends FileGetter
         $this->utilsUrl = $this->settings['FILE_GETTER']['utils_url'];
         $this->alias = $this->settings['FILE_GETTER']['alias'];
         $this->temp_directory = (!isset($settings['FILE_GETTER']['temp_directory'])) ?
-          '/tmp' : $settings['FILE_GETTER']['temp_directory'];
+            '/tmp' : $settings['FILE_GETTER']['temp_directory'];
 
         if (isset($settings['FILE_GETTER']['input_directories'])) {
             $this->input_directories = $settings['FILE_GETTER']['input_directories'];

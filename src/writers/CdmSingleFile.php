@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\writers;
+use Monolog\Logger;
 
 class CdmSingleFile extends Writer
 {
@@ -36,6 +37,13 @@ class CdmSingleFile extends Writer
         $this->alias = $settings['WRITER']['alias'];
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->cdmSingleFileFileGetter = new $fileGetterClass($settings);
+
+        // Set up logger.
+        $this->pathToLog = $settings['LOGGING']['path_to_log'];
+        $this->log = new \Monolog\Logger('CdmSingleFile writer');
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
+            Logger::ERROR);
+        $this->log->pushHandler($this->logStreamHandler);
     }
 
     /**
@@ -49,7 +57,7 @@ class CdmSingleFile extends Writer
         // $this->datastreams is an empty array by default.
         $no_datastreams_setting_flag = false;
         if (count($this->datastreams) == 0) {
-              $no_datastreams_setting_flag = true;
+            $no_datastreams_setting_flag = true;
         }
 
         // Create root output folder.
@@ -65,12 +73,12 @@ class CdmSingleFile extends Writer
         // Retrieve the file associated with the document from CONTENTdm and write
         // it to the output folder, using the CONTENTdm pointer as the file basename.
         // Note that since the filename of the file retrieved from CONTENTdm
-        // is the same as the object's pointer, we can't specify a DSID here like
-        // we do for MODS or OBJ. This means that we only write the file if no
-        // datastream IDs are specified in the datastreams[] configuration option
-        // or if OBJ is specified.
-        if (in_array('OBJ', $this->datastreams) || $no_datastreams_setting_flag) {
-            if (!$this->cdmSingleFileFileGetter->input_directories) {
+        // is the same as the object's pointer, we can't specify a DSID here
+        // such as MODS or OBJ. This means that we only write the file if no
+        // datastream IDs are specified in the datastreams[] configuration option or
+        // if OBJ (which is what the file that is not an .xml file is) is specified.
+        if (!$this->cdmSingleFileFileGetter->input_directories) {
+            if (in_array('OBJ', $this->datastreams) || $no_datastreams_setting_flag ) {
                 $temp_file_path = $this->cdmSingleFileFileGetter
                     ->getFileContent($record_id);
                 // Get the filename used by CONTENTdm (stored in the 'find' field)
@@ -82,16 +90,23 @@ class CdmSingleFile extends Writer
                   rename($temp_file_path, $output_file_path);
                 }
                 else {
-                  // @todo: Log failure.
+                    $this->log->addInfo("Cannot rename OBJ datastream file",
+                        array(
+                            'Record ID' => $record_id,
+                            'Temp file path' => $temp_file_path,
+                            'Output file path' => $output_file_path,
+                        )
+                    );
                 }
+                return true;
             }
         }
 
         // If one or more input directories are configured, retrieve the master file
         // associated with the document and write it to the output folder, using the
         // CONTENTdm pointer as the file basename.
-        if (in_array('OBJ', $this->datastreams) || $no_datastreams_setting_flag) {
-            if ($this->cdmSingleFileFileGetter->input_directories) {
+        if (count($this->cdmSingleFileFileGetter->input_directories) > 0) {
+            if (in_array('OBJ', $this->datastreams) || $no_datastreams_setting_flag) {
                 $master_file_path = $this->cdmSingleFileFileGetter->getMasterFilePath($record_id);
                 $source_file_extension = pathinfo($master_file_path, PATHINFO_EXTENSION);
                 if ($master_file_path) {
@@ -99,9 +114,16 @@ class CdmSingleFile extends Writer
                   copy($master_file_path, $output_file_path);
                 }
                 else {
-                  // @todo: Log failure.
+                    $this->log->addInfo("Cannot copy OBJ datastream file",
+                        array(
+                            'Record ID' => $record_id,
+                            'Master file path' => $master_file_path,
+                            'Output file path' => $output_file_path,
+                        )
+                    );
                 }
             }
+            return true;
         }
     }
 
