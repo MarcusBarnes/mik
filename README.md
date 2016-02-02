@@ -12,7 +12,7 @@ MIK is developed by staff at Simon Fraser University Library in support of their
 
 ## Documentation
 
-We are continuing to improve our documentation, which is on the MIK [wiki](https://github.com/MarcusBarnes/mik/wiki). Please let us know if you have any quetions, suggestions or you would like to assist.
+We are continuing to improve our documentation, which is on the [MIK wiki](https://github.com/MarcusBarnes/mik/wiki). Please let us know if you have any questions, suggestions or if you would like to assist.
 
 ## Troubleshooting and support
 
@@ -28,7 +28,7 @@ More to come as Simon Fraser University completes its migration.
 
 ## Installation
 
-It's easy. Instructions are [available on the wiki](https://github.com/MarcusBarnes/mik/wiki/Installation).
+Instructions are [available on the wiki](https://github.com/MarcusBarnes/mik/wiki/Installation).
 
 ## Usage
 
