@@ -42,6 +42,12 @@ class CdmSingleFile extends FileGetter
         $this->temp_directory = (!isset($settings['FILE_GETTER']['temp_directory'])) ?
           '/tmp' : $settings['FILE_GETTER']['temp_directory'];
 
+        if (isset($settings['FILE_GETTER']['input_directories'])) {
+            $this->input_directories = $settings['FILE_GETTER']['input_directories'];
+        } else {
+            $this->input_directories = false;
+        }
+
         if (isset($settings['MANIPULATORS']['filegettermanipulators'])) {
             $this->filegettermanipulators = $settings['MANIPULATORS']['filegettermanipulators'];
         } else {

@@ -8,14 +8,14 @@ class CdmSingleFile extends Writer
      * @var array $settings - configuration settings from confugration class.
      */
     public $settings;
-    
+
     /**
      * @var object $fetcher - fetcher class for item info methods.
      */
     private $fetcher;
-    
+
     /**
-     * @var object cdmSingleFileFileGetter - filegetter class for 
+     * @var object cdmSingleFileFileGetter - filegetter class for
      * getting files related to CDM single-file objects.
      */
     private $cdmSingleFileFileGetter;
@@ -45,7 +45,7 @@ class CdmSingleFile extends Writer
     {
 
         // If there were no datastreams explicitly set in the configuration,
-        // set flag so that all datastreams in the writer class are run.
+        // set flag so that all datastreams in the writer class are created.
         // $this->datastreams is an empty array by default.
         $no_datastreams_setting_flag = false;
         if (count($this->datastreams) == 0) {
@@ -62,41 +62,45 @@ class CdmSingleFile extends Writer
             $this->writeMetadataFile($metadata, $object_path . $record_id . '.xml');
         }
 
-        // Retrieve the file associated with the document and write it to the
-        // output folder, using the CONTENTdm pointer as the file basename.
-        // Note that since the datastream ID of the file retrieved from CONTENTdm
-        // varies, we can't specify one here like we do for MODS or OBJ. This means
-        // that we only write the file if no datastream IDs are specified in the
-        // datastreams[] configuration option.
-        if ($no_datastreams_setting_flag) {
-            $temp_file_path = $this->cdmSingleFileFileGetter
-                ->getFileContent($record_id);
-            // Get the filename used by CONTENTdm (stored in the 'find' field)
-            // so we can grab the extension.
-            $item_info = $this->fetcher->getItemInfo($record_id);
-            $source_file_extension = pathinfo($item_info['find'], PATHINFO_EXTENSION);
-            if ($temp_file_path) {
-              $output_file_path = $object_path . $record_id . '.' . $source_file_extension;
-              rename($temp_file_path, $output_file_path);
-            }
-            else {
-              // @todo: Log failure.
+        // Retrieve the file associated with the document from CONTENTdm and write
+        // it to the output folder, using the CONTENTdm pointer as the file basename.
+        // Note that since the filename of the file retrieved from CONTENTdm
+        // is the same as the object's pointer, we can't specify a DSID here like
+        // we do for MODS or OBJ. This means that we only write the file if no
+        // datastream IDs are specified in the datastreams[] configuration option
+        // or if OBJ is specified.
+        if (in_array('OBJ', $this->datastreams) || $no_datastreams_setting_flag) {
+            if (!$this->cdmSingleFileFileGetter->input_directories) {
+                $temp_file_path = $this->cdmSingleFileFileGetter
+                    ->getFileContent($record_id);
+                // Get the filename used by CONTENTdm (stored in the 'find' field)
+                // so we can grab the extension.
+                $item_info = $this->fetcher->getItemInfo($record_id);
+                $source_file_extension = pathinfo($item_info['find'], PATHINFO_EXTENSION);
+                if ($temp_file_path) {
+                  $output_file_path = $object_path . $record_id . '.' . $source_file_extension;
+                  rename($temp_file_path, $output_file_path);
+                }
+                else {
+                  // @todo: Log failure.
+                }
             }
         }
 
-        // Retrieve the master file associated with the document and write it to the
-        // output folder, using the CONTENTdm pointer as the file basename. Assumes
-        // that OBJ is not the datastream ID for the file retrieved from CONTENTdm.
-        $OBJ_expected = in_array('OBJ', $this->datastreams);
-        if ($OBJ_expected xor $no_datastreams_setting_flag) {
-            $master_file_path = $this->cdmSingleFileFileGetter->getMasterFilePath($record_id);
-            $source_file_extension = pathinfo($master_file_path, PATHINFO_EXTENSION);
-            if ($master_file_path) {
-              $output_file_path = $object_path . $record_id . '.' . $source_file_extension;
-              copy($master_file_path, $output_file_path);
-            }
-            else {
-              // @todo: Log failure.
+        // If one or more input directories are configured, retrieve the master file
+        // associated with the document and write it to the output folder, using the
+        // CONTENTdm pointer as the file basename.
+        if (in_array('OBJ', $this->datastreams) || $no_datastreams_setting_flag) {
+            if ($this->cdmSingleFileFileGetter->input_directories) {
+                $master_file_path = $this->cdmSingleFileFileGetter->getMasterFilePath($record_id);
+                $source_file_extension = pathinfo($master_file_path, PATHINFO_EXTENSION);
+                if ($master_file_path) {
+                  $output_file_path = $object_path . $record_id . '.' . $source_file_extension;
+                  copy($master_file_path, $output_file_path);
+                }
+                else {
+                  // @todo: Log failure.
+                }
             }
         }
     }
