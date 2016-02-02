@@ -161,6 +161,12 @@ class CdmNewspapers extends Writer
                                       ->getThumbnailcontent($page_pointer);
                 $thumbnail_output_file_path = $page_dir . DIRECTORY_SEPARATOR .'TN.jpg';
                 file_put_contents($thumbnail_output_file_path, $thumbnail_content);
+                if($sub_dir_num == 1){
+                    // Use the first thumbnail for the first page as thumbnail for the
+                    // entire newspaper issue.
+                    $issue_thumbnail_path = $issueObjectPath  . DIRECTORY_SEPARATOR . 'TN.jpg';
+                    copy($thumbnail_output_file_path, $issue_thumbnail_path);
+                }
             }
 
             // Get a JPEG to use as the Islandora preview image,
