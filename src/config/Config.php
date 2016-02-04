@@ -137,7 +137,7 @@ class Config
             foreach ($section as $key => $value) {
                 if (preg_match('/(_path|_directory)$/', $key) && strlen($value)) {
                     if (!file_exists($value)) {
-                        exit("Error: The path $value (defined in configuration setting $key) does not exist.\n");
+                        exit("The path $value (defined in configuration setting $key) does not exist but will be created for you.\n");
                     }
                 }
             }
