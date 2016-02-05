@@ -186,12 +186,15 @@ class CdmNewspapers extends Writer
                 //$pathToFile = $OBJFilesArray[$filekey];
 
                 $pathToPageOK = $this->cdmNewspapersFileGetter
-                   ->checkNewspaperPageFilePath($pathToFile, $sub_dir_num);
+                   ->checkNewspaperPageFilePath($pathToFile, $directoryNumber);
 
                 if ($pathToPageOK){
                     $obj_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.' . $this->OBJ_file_extension;
                     // assumes that the source destination is on a l
                     copy($pathToFile, $obj_output_file_path);
+                } else {
+                    // if the path to the page is NOT OK, throw an exception 
+                    throw new \Exception("The path $pathToFile for the OBJ file for page $directoryNumber did not pass the check.");
                 }
             }
 
