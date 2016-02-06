@@ -15,7 +15,7 @@
 
 // All files with names in this list will be deleted.
 $files_to_remove = array(
-    '.Thumbs.db',
+    'Thumbs.db',
     '.DS_Store',
 );
 
