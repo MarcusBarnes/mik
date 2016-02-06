@@ -16,6 +16,13 @@ if (null == ini_get('date.timezone')) {
     date_default_timezone_set('America/Vancouver');
 };
 
+// On Windows, causes 'Fatal Error Unable to reattach to base address'
+// errors when running background processes, and causes them to fail.
+// Harmess to disable on other OSs.
+if (ini_get('opcach.enabled_cli')) {
+    ini_set('opcach.enabled_cli', '0');
+}
+
 // Use composer to load vendor and project classes.
 require 'vendor/autoload.php';
 
