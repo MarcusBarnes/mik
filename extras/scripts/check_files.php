@@ -112,7 +112,8 @@ function islandora_newspaper_issue_cmodel($options) {
     $bad_ocr_encoding = false;
     if ($issues_handle = opendir($options['dir'])) {
         while (false !== ($issues_dir = readdir($issues_handle))) {
-            // Check to make sure that there are no files in the issues directory.
+            // Check to make sure that there are no files in the issues directory
+            // other than MODS.xml and TN.jpg.
             if (is_file($options['dir'] . DIRECTORY_SEPARATOR . $issues_dir)) {
                 error_log($options['dir'] . DIRECTORY_SEPARATOR . $issues_dir . " should not exist.\n", 3, $options['log']);
                 $extra_files_in_issues_dir = true;
@@ -122,23 +123,34 @@ function islandora_newspaper_issue_cmodel($options) {
                 $issue_dir = trim($options['dir'] . DIRECTORY_SEPARATOR . $issues_dir);
                 // Test for existence of MODS.xml.
                 if (is_dir($issue_dir)) {
-                    $mods_path = $issue_dir . DIRECTORY_SEPARATOR . $options['issue_level_metadata'];
-                    if (!file_exists($mods_path)) {
-                        error_log("$mods_path does not exist.\n", 3, $options['log']);
+                    $metadata_path = $issue_dir . DIRECTORY_SEPARATOR . $options['issue_level_metadata'];
+                    if (!file_exists($metadata_path)) {
+                        error_log("$metadata_path does not exist.\n", 3, $options['log']);
+                        $files_missing = true;
+                    }
+                    // Issue-level check for TN.jpg hard-coded for now.
+                    $tn_path = $issue_dir . DIRECTORY_SEPARATOR . 'TN.jpg';
+                    if (!file_exists($tn_path)) {
+                        error_log("$tn_path does not exist.\n", 3, $options['log']);
                         $files_missing = true;
                     }
                 }
 
-                // Check for files other than MODS.xml in $issue_dir.
+                // Check for files other than MODS.xml and TN.jpg in $issue_dir.
                 if (is_dir($issue_dir)) {
                     $issue_dir_contents = scandir($issue_dir);
                     foreach ($issue_dir_contents as $issue_dir_file) {
+                        // To whoever needs to debug or maintain this... please forgive me. I am not a monster.
                         $issue_level_metadata_file = $issue_dir . DIRECTORY_SEPARATOR . $options['issue_level_metadata'];
                         if (is_file($issue_dir . DIRECTORY_SEPARATOR . $issue_dir_file) &&
                                 ($issue_dir . DIRECTORY_SEPARATOR . $issue_dir_file != $issue_level_metadata_file)) {
-                            error_log($issue_dir . DIRECTORY_SEPARATOR . $issue_dir_file .
-                                " should not exist.\n", 3, $options['log']);
-                            $extra_files_in_issue_dir = true;
+                            $issue_level_tn_file = $issue_dir . DIRECTORY_SEPARATOR . 'TN.jpg';
+                            if (is_file($issue_dir . DIRECTORY_SEPARATOR . $issue_dir_file) &&
+                                ($issue_dir . DIRECTORY_SEPARATOR . $issue_dir_file != $issue_level_tn_file)) {
+                                error_log($issue_dir . DIRECTORY_SEPARATOR . $issue_dir_file .
+                                    " should not exist.\n", 3, $options['log']);
+                                $extra_files_in_issue_dir = true;
+                            }
                         }
                     }
                 }
@@ -147,7 +159,8 @@ function islandora_newspaper_issue_cmodel($options) {
                 $page_dirs_pattern = trim($issue_dir) . DIRECTORY_SEPARATOR . "*";
                 $page_dirs = glob($page_dirs_pattern, GLOB_ONLYDIR);
 
-                // Count the number of page_dirs against expected number from MODS.XML 
+                // Count the number of page_dirs against expected number from issue-level MODS.XML 
+                $mods_path = $issue_dir . DIRECTORY_SEPARATOR . $options['issue_level_metadata'];
                 $expectedNumPageDirs = expectedNumPageDirFromModsXML($mods_path);
                 $numPageDirs = count($page_dirs);
                 if ($expectedNumPageDirs != $numPageDirs) {
