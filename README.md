@@ -36,16 +36,15 @@ Typical workflow is to 1) configure your toolchain (defined below) by creating a
 
 ### 1. Configure your toolchain
 
-In a nutshell, this means create an .ini file for MIK. Details are provided on the [wiki](https://github.com/MarcusBarnes/mik/wiki).
+In a nutshell, this means create an .ini file for MIK. Details for available toolchaines are provided on the [wiki](https://github.com/MarcusBarnes/mik/wiki/Toolchains).
 
 ### 2. Check your configuration
 
-To check your configuration options, run MIK and include the `--checkconfig` option with a value of of 'snippets', 'urls', 'paths', or 'all':
+To check your configuration options, run MIK and include the `--checkconfig` option with a value 'all':
 
-* `./mik --config=foo.ini --checkconfig=snippets` checks your metadata mappings snippets for well formedness (not validity againt a schema).
-* `./mik --config=foo.ini --checkconfig=urls` checks all URLs in your config file to make sure they are accessible.
-* `./mik --config=foo.ini --checkconfig=paths` checks to make sure that all the paths to files and directories in your configuration file exist (except for `[LOGGING] path_to_log`, which is created as needed)
-* `./mik --config=foo.ini --checkconfig=all` checks all of the above.
+* `./mik --config=foo.ini --checkconfig=all`
+
+You can also check specific types of configuration values as described in this [Cookbook entry](https://github.com/MarcusBarnes/mik/wiki/Cookbook:-Check-your-MIK-configuration-values).
 
 ### 3. Convert your source content into Islandora ingest packages
 

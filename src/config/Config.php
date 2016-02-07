@@ -51,6 +51,7 @@ class Config
                 $this->checkMappingSnippets();
                 $this->checkPaths();
                 $this->checkUrls();
+                $this->checkAliases();
                 exit;
                 break;
             case 'snippets':
@@ -63,6 +64,10 @@ class Config
                 break;
             case 'paths':
                 $this->checkPaths();
+                exit;
+                break;
+            case 'aliases':
+                $this->checkAliases();
                 exit;
                 break;
         }
@@ -143,6 +148,31 @@ class Config
             }
         }
         print "Paths are OK\n";
+    }
+
+    /**
+     * Tests whether all CONTENTdm aliases are the same. See https://github.com/MarcusBarnes/mik/issues/146.
+     */
+    public function checkAliases()
+    {
+        $sections = array_values($this->settings);
+        $aliases = array();
+        foreach ($sections as $section) {
+            foreach ($section as $key => $value) {
+                if (preg_match('/^alias$/', $key) && strlen($value)) {
+                    $aliases[] = trim($value);
+                }
+            }
+        }
+
+        $aliases = array_unique($aliases);
+        if (count($aliases) > 1) {
+            $aliases_string = trim(implode(', ', $aliases));
+            exit("Error: The values for CONTENTdm 'alias' settings are not unique: $aliases_string.\n");
+        }
+        else {
+            print "CONTENTdm aliases are OK\n";
+        }
     }
 
 }
