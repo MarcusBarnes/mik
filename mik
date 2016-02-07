@@ -8,6 +8,13 @@
 // Basic wallclock timing
 $time_start = microtime(true);
 
+// Determine whether we're running on Windows.
+if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    $onWindows = true;
+} else {
+    $onWindows = false;
+}
+
 // Monolog requires that the date.timezone PHP setting be set else
 // it will create an E_WARNING, which will be turned into an excption 
 // in the set_error_handler function halting the program.
@@ -15,6 +22,13 @@ $time_start = microtime(true);
 if (null == ini_get('date.timezone')) {
     date_default_timezone_set('America/Vancouver');
 };
+
+// On Windows, opcache.enable_cli causes 'Fatal Error Unable to reattach
+// to base address' errors when running background processes, and causes
+// these processes to fail. Disable it at runtime.
+if ($onWindows) {
+    ini_set('opcache.enable_cli', '0');
+}
 
 // Use composer to load vendor and project classes.
 require 'vendor/autoload.php';
@@ -106,13 +120,6 @@ try {
 $records = $fetcher->getRecords($limit);
 $numFilteredRecs = count($records);
 
-// Determine whether we're running on Windows.
-if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-    $onWindows = true;
-} else {
-    $onWindows = false;
-}
-
 // Instantiate the "ingest" progress bar based on the limit or the number of filter records.
 $climate = new League\CLImate\CLImate;
 if (!$onWindows && isset($limit)) {
@@ -127,9 +134,8 @@ if ($limit > 0 && $numFilteredRecs > $limit) {
     echo "Creating $numFilteredRecs Islandora ingest packages. Please be patient.\n";
 }
 
-// add record_key of any record_key that causes an ErrorException for review.
-$problem_records_array = array();
 // Set up logger to log the problem record_keys as they occur.
+$problem_records_array = array();
 $logDirectory = dirname($pathToLog);
 $problemRecordsLogFilepath = $logDirectory . DIRECTORY_SEPARATOR . 'problem_records.log';
 $logProblemRecords = new Logger('ProblemRecords');
@@ -144,8 +150,8 @@ foreach ($records as $record) {
         continue;
     }
 
-    // The metadata parser returns an XML file that can be passed on to
-    // the metadata manipulater.
+    // Instantiate a metadata parser, which returns an XML file that can be passed
+    // on to the writer.
     try {
         $metadtaClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
         $parser = new $metadtaClass($settings);
