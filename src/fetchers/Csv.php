@@ -36,6 +36,7 @@ class Csv extends Fetcher
         else {
             $this->field_delimiter = ',';
         }
+
         // Default enclosure is double quotation marks.
         if (isset($settings['FETCHER']['field_enclosure'])) {
             $this->field_enclosure = $settings['FETCHER']['field_enclosure'];
@@ -52,10 +53,10 @@ class Csv extends Fetcher
             $this->fetchermanipulators = null;
         }
 
-				if (!$this->createTempDirectory()) {
-				    $this->log->addError("CSV fetcher",
+		if (!$this->createTempDirectory()) {
+		    $this->log->addError("CSV fetcher",
                 array('Cannot create temp_directory' => $e->getMessage()));
-				}
+		}
 
         if (isset($settings['FETCHER']['use_cache'])) {
             $this->use_cache = $settings['FETCHER']['use_cache'];
@@ -151,6 +152,7 @@ class Csv extends Fetcher
             $records = $this->getRecords();
             foreach ($records as $record) {
                 if (strlen($record->key) && $record->key == $recordKey) {
+                    $record = $this->removeEscape($record);
                     file_put_contents($raw_metadata_cache, serialize($record));
                     return $record;
                 }
@@ -175,4 +177,49 @@ class Csv extends Fetcher
         }
         return $records;
     }
+
+    /**
+     * Removes the CSV escape character from field values.
+     *
+     * See https://github.com/MarcusBarnes/mik/issues/129.
+     *
+     * @param $record object
+     *    The CSV record object.
+     * @return object
+     */
+    private function removeEscape($record)
+    {
+        // League\Csv\Reader defaults, which are not set
+        // explicitly in _construct.
+        if (isset($this->field_enclosure)) {
+            $enclosure = $this->field_enclosure;
+        }
+        else {
+            $enclosure = '"';
+        }
+        if (isset($this->escape_character)) {
+            $escape = $this->escape_character;
+        }
+        else {
+            $escape = '\\';
+        }
+
+        // Backslashes need to be scaped in regex patterns,
+        // as do ^ and $, etc.
+        $metachars = array('\\', '^', '$', '*', '.');
+        if (in_array($escape, $metachars)) {
+            $escape = '\\' . $escape;
+        }
+        if (in_array($enclosure, $metachars)) {
+            $enclosure = '\\' . $enclosure;
+        }
+
+        foreach ($record as $field_name => $field_value) {
+            $pattern = '/' . $escape . $enclosure . '/';
+            $field_value = preg_replace($pattern, $enclosure, $field_value);
+            $record->{$field_name} = $field_value;
+        }
+        return $record;
+    }
+
 }
