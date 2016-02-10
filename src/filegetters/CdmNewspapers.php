@@ -73,13 +73,10 @@ class CdmNewspapers extends FileGetter
         $this->inputDirectories = $this->settings['input_directories'];
         
         // Interate over inputDirectories to create $potentialObjFiles array.
-        $potentialObjFiles = array();
-        foreach ($this->inputDirectories as $inputDirectory) {
-            $potentialObjFilesPart = $this
-                ->getIssueMasterFiles($inputDirectory, $this->allowed_file_extensions_for_OBJ );
-            $potentialObjFiles = array_merge($potentialObjFiles, $potentialObjFilesPart);
-        }
+        $potentialObjFiles = $this->getMasterFiles($this->inputDirectories, $this->allowed_file_extensions_for_OBJ);
+
         $this->OBJFilePaths = $this->determineObjItems($potentialObjFiles);
+        
         // information and methods for thumbnail minipulation
         $this->thumbnail = new \mik\filemanipulators\ThumbnailFromCdm($settings);
 
@@ -151,23 +148,32 @@ class CdmNewspapers extends FileGetter
         
     }
 
-    private function getIssueMasterFiles($pathToIssue, $allowedFileTypes)
+    private function getMasterFiles($inputDirectories, $allowedFileTypes)
     {
-        $potentialFilesArray = array();
-
-        $iterator = new \RecursiveDirectoryIterator($pathToIssue);
-        $display = $allowedFileTypes;
-        $iteratorIterator = new \RecursiveIteratorIterator($iterator);
-
-        foreach ($iteratorIterator as $file) {
-
-            $file_parts = explode('.', $file);
-            if (in_array(strtolower(array_pop($file_parts)), $display)) {
-                $potentialFilesArray[] = $file->__toString();
+        // Use a static cache to avoid building the source path list
+        // multiple times.
+        static $potentialObjFiles;
+        if (!isset($potentialObjFiles)) {
+            $potentialObjFiles = array();
+            foreach($inputDirectories as $inputDirectory) {
+                $potentialFilesArray = array();
+                $iterator = new \RecursiveDirectoryIterator($inputDirectory);
+                $display = $allowedFileTypes;
+                $iteratorIterator = new \RecursiveIteratorIterator($iterator);
+                
+                foreach ($iteratorIterator as $file) {
+                    $file_parts = explode('.', $file);
+                    if (in_array(strtolower(array_pop($file_parts)), $display)) {
+                        $potentialFilesArray[] = $file->__toString();
+                    }
+                }
+                
+                $potentialObjFiles = array_merge($potentialObjFiles, $potentialFilesArray);           
             }
+            $potentialObjFiles = array_unique($potentialObjFiles);
         }
 
-        return $potentialFilesArray;
+        return $potentialObjFiles;
     }
 
     private function determineObjItems($arrayOfFilesToPreserve)
