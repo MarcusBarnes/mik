@@ -1,18 +1,19 @@
-"Title","<titleInfo><title>Canadian Jewish review</title></titleInfo>",
+"Title","<titleInfo><title>Canadian Jewish review</title></titleInfo>"
 "Language","<language><languageTerm type='text'>English</languageTerm><languageTerm type='code' authority='iso639-2b'>eng</languageTerm></language>",
-"Subject","<subject authority='lcsh'><topic>Jews, Canadian--Newspapers</topic></subject>",
+"Subject","<subject authority='lcsh'><topic>Jews, Canadian--Newspapers</topic></subject>"
 "Publisher","<originInfo><place><placeTerm type='code' authority='marccountry'>quc</placeTerm><placeTerm type='text'>Gardenvale, Quebec</placeTerm></place><publisher>Canadian Jewish Review</publisher></originInfo>",
-"Date","<originInfo><dateIssued encoding='w3cdtf' keyDate='yes'>%value%</dateIssued></originInfo>",
-"Type","<genre authority='lcgft'>newspapers</genre>",
-"Identifier","<identifier type='local'>%value%</identifier>",
-"Rights","<accessCondition type='use and reproduction'>%value%</accessCondition>",
-"null0","<typeOfResource>text</typeOfResource>",
-"null1","<note>Place of publication varies</note>",
+"Date","<originInfo><dateIssued encoding='w3cdtf' keyDate='yes'>%value%</dateIssued></originInfo>"
+"Type","<genre authority='lcgft'>newspapers</genre>"
+"Identifier","<identifier type='local'>%value%</identifier>"
+"Rights","<accessCondition type='use and reproduction'>%value%</accessCondition>"
+"null0","<typeOfResource>text</typeOfResource>"
+"null1","<note>Place of publication varies</note>"
 "null2","<subject authority='lcsh'><topic>Jews--Newspapers</topic></subject>"
 "null3","<subject authority='lcsh'><topic>Jews, Canadian--Quebec (Province)--Montreal--Newspapers</topic></subject>",
-"null4","<subject authority='lcsh'><topic>Jews, Canadian--Ontario--Toronto--Newspapers</topic></subject>",
-"null5","<subject authority='lcsh'><geographic>Montreal (Quebec)--Newspapers</geographic></subject>",
-"null6","<subject authority='lcsh'><geographic>Toronto (Ont.)--Newspapers</geographic></subject>",
-"null7","<subject authority='lcsh'><geographic>Ontario--Newspapers</geographic></subject>",
-"null8","<subject authority='lcsh'><geographic>Quebec (Province)--Newspapers</geographic></subject>",
-"null9","<extension><CONTENTdmData></CONTENTdmData></extension>",
+"null4","<subject authority='lcsh'><topic>Jews, Canadian--Ontario--Toronto--Newspapers</topic></subject>"
+"null5","<subject authority='lcsh'><geographic>Montreal (Quebec)--Newspapers</geographic></subject>"
+"null6","<subject authority='lcsh'><geographic>Toronto (Ont.)--Newspapers</geographic></subject>"
+"null7","<subject authority='lcsh'><geographic>Ontario--Newspapers</geographic></subject>"
+"null8","<subject authority='lcsh'><geographic>Quebec (Province)--Newspapers</geographic></subject>"
+"null9","<extension><CONTENTdmData></CONTENTdmData></extension>"
+"null10","<identifier type='uuid'/>"
