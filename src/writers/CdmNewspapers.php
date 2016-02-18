@@ -133,7 +133,13 @@ class CdmNewspapers extends Writer
             $OCR_expected = in_array('OCR', $this->datastreams);
             if ($OCR_expected xor $no_datastreams_setting_flag) {
                 $ocr_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OCR.txt';
-                file_put_contents($ocr_output_file_path, $page_object_info['full']);
+                if(isset($page_object_info['full'])){                
+                    file_put_contents($ocr_output_file_path, $page_object_info['full']);
+                } else if (isset($page_object_info['fullte'])) {
+                    file_put_contents($ocr_output_file_path, $page_object_info['fullte']);
+                } else {
+                    throw new \Exception("Problem creating OCR.txt.  Possibly unknown Cdm nick.cd ");
+                }
             }
 
             // Retrieve the file associated with the child-level object. In the case of
