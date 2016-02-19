@@ -5,6 +5,14 @@
  * Makes a backup copy of the MODS.xml file before modifying it.
  *
  * You should run this from the main MIK directory so the autoloading works.
+ *
+ * To check MODS.xml files for identifier elements like this:
+ *   <identifier type="uuid">8c1ecb63-9ee5-45f9-b708-0ac16e58faeb</identifier>
+ * and add one if it doesn not exist, run:
+ *    php add_uuid_identifier_2_mods.php /path/to/directory/containing/packages
+ *
+ * To remove all MODS.xml.bak files created by the previous command, run:
+ *     php add_uuid_identifier_2_mods.php /path/to/directory/containing/packages remove_backups
  */
  
 require 'vendor/autoload.php';
@@ -12,6 +20,11 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
 
 $dir = trim($argv[1]);
+
+if (isset($argv[2]) && $argv[2] == 'remove_backups') {
+  remove_backups($dir);
+	exit;
+}
 
 $directory_iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
 foreach ($directory_iterator as $filepath => $info) {
@@ -67,7 +80,7 @@ function add_uuid($mods_XML_path) {
 
     $mods_xml = $dom->saveXML();
     file_put_contents($mods_XML_path, $mods_xml);
-		print "identifier containing a UUID added. Original file is at $mods_XML_path . '.bak'." . PHP_EOL;
+		print "identifier containing a UUID added. Original file is at $mods_XML_path.bak." . PHP_EOL;
 }
 
 /**
@@ -77,4 +90,22 @@ function get_uuid() {
     $uuid4 = Uuid::uuid4();
     $uuid4_string = $uuid4->toString();
     return $uuid4_string;
+}
+
+/**
+ * Deletes .bak files created by this script.
+ */
+function remove_backups($dir) {
+$directory_iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
+foreach ($directory_iterator as $filepath => $info) {
+    if (preg_match('/MODS\.xml.bak$/', $filepath)) {
+			  if (file_exists($filepath)) {
+			      unlink($filepath);
+            print "Removing $filepath" . PHP_EOL;
+				}
+				else {
+					  print "$filepath not found" . PHP_EOL;
+				}
+    }
+}
 }
