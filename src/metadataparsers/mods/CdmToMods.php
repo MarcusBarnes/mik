@@ -79,6 +79,11 @@ class CdmToMods extends Mods
         } else {
             $this->metadatamanipulators = null;
         }
+				if (isset($this->settings['METADATA_PARSER']['namespaces'])) {
+				    $rhis->additionalNamespaces = $this->settings['METADATA_PARSER']['namespaces'];
+				} else {
+					$this->additionalNamespaces = NULL;
+				}
     }
 
     private function getMappingsArray($mappingCSVpath, $numOfFields = 3)
@@ -127,6 +132,12 @@ class CdmToMods extends Mods
 
         $modsOpeningTag = '<mods xmlns="http://www.loc.gov/mods/v3" ';
         $modsOpeningTag .= 'xmlns:mods="http://www.loc.gov/mods/v3" ';
+				if ($this->additionalNamespaces) {
+				    foreach ($this->additionalNamespaces as $additionalNamespace) {
+							  list($namespace, $uri) = explode(':', $additionalNamespace, 2);
+						    $modsOpeningTag .=  'xmlns:' . $namespace . '="' . $uri . '" ';
+						}
+				}
         $modsOpeningTag .= 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
         $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
         
