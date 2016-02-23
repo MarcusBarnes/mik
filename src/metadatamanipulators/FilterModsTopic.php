@@ -40,9 +40,9 @@ class FilterModsTopic extends MetadataManipulator
      */
     public function manipulate($input)
     {
-        // break topic metadata on ; into seperate topic elements.
+        // Break topic metadata on ; into seperate topic elements.
         $xml = new \DomDocument();
-        $xml->loadxml($input);
+        $xml->loadxml($input, LIBXML_NSCLEAN);
 
         $subjectNode = $xml->getElementsByTagName($this->topLevelNodeName)->item(0);
 
@@ -59,7 +59,7 @@ class FilterModsTopic extends MetadataManipulator
     }
 
     /**
-     * Break the MODS topic element text-node metadata on 
+     * Break the MODS topic element text-node metadata on
      * the specified character and put into seperate MODS topic elements.
      *
      * @param string $xmlsnippet The initial MODS topic element.
@@ -78,7 +78,7 @@ class FilterModsTopic extends MetadataManipulator
         $xml->loadxml($xmlsnippet, LIBXML_NSCLEAN);
 
         $topicNode = $xml->getElementsByTagName('topic')->item(0);
-        
+
         if (!is_object($topicNode)) {
 
             $xmlstring = $xmlsnippet;
@@ -86,7 +86,7 @@ class FilterModsTopic extends MetadataManipulator
         } else {
 
             $topicNodeAttrributes = $topicNode->attributes;
-            
+
             $topictext = $topicNode->nodeValue;
             $topics = explode($breakOnCharacter, $topictext);
 
@@ -94,7 +94,7 @@ class FilterModsTopic extends MetadataManipulator
             $topicNodeParent = $topicNode->parentNode;
             $topicNode->parentNode->removeChild($topicNode);
 
-            $subjectNode = $xml->getElementsByTagName($this->topLevelNodeName)->item(0);  
+            $subjectNode = $xml->getElementsByTagName($this->topLevelNodeName)->item(0);
 
             foreach ($topics as $topic) {
                 $topic = trim($topic);

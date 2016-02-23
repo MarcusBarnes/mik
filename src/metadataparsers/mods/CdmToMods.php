@@ -82,7 +82,7 @@ class CdmToMods extends Mods
         if (isset($this->settings['METADATA_PARSER']['namespaces'])) {
             $this->additionalNamespaces = $this->settings['METADATA_PARSER']['namespaces'];
         } else {
-            $this->additionalNamespaces = NULL;
+            $this->additionalNamespaces = null;
         }
     }
 
@@ -169,7 +169,7 @@ class CdmToMods extends Mods
             if (isset($valueArray[1])) {
                 $xmlSnippet = $valueArray[1];
             } else {
-                // If $valueArray[1] is not set, then there coule be
+                // If $valueArray[1] is not set, then there could be
                 // issues with the mappings file or there may be
                 // newline in the mappings file.
                 $xmlSnippet = '';
