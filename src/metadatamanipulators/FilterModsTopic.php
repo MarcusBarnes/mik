@@ -42,7 +42,7 @@ class FilterModsTopic extends MetadataManipulator
     {
         // Break topic metadata on ; into seperate topic elements.
         $xml = new \DomDocument();
-        $xml->loadxml($input, LIBXML_NSCLEAN);
+        $xml->loadxml($input);
 
         $subjectNode = $xml->getElementsByTagName($this->topLevelNodeName)->item(0);
 
