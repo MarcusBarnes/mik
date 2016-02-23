@@ -12,7 +12,7 @@ class CdmToMods extends Mods
      * to MODS XML mapping.
      */
     public $collectionMappingArray;
-    
+
     /**
      *  @var array $CONTENTdmFieldValuesArray array with field values of proper name
      *  as $keys rather than 'nick' keys.
@@ -40,13 +40,13 @@ class CdmToMods extends Mods
      *   metadatamanipulator_class_name|param_0|param_1|...|param_n
      */
     public $metadatamanipulators;
-    
+
     /**
      * @var array $repeatableWrapperElements - array of wrapper elements
      *that can be repeated (not consolidated) set in the config.
      */
     public $repeatableWrapperElements;
-    
+
     /**
      * @var object $fetcher fetcher object for access to public methods as needed.
      */
@@ -79,11 +79,11 @@ class CdmToMods extends Mods
         } else {
             $this->metadatamanipulators = null;
         }
-				if (isset($this->settings['METADATA_PARSER']['namespaces'])) {
-				    $rhis->additionalNamespaces = $this->settings['METADATA_PARSER']['namespaces'];
-				} else {
-					$this->additionalNamespaces = NULL;
-				}
+        if (isset($this->settings['METADATA_PARSER']['namespaces'])) {
+            $this->additionalNamespaces = $this->settings['METADATA_PARSER']['namespaces'];
+        } else {
+            $this->additionalNamespaces = NULL;
+        }
     }
 
     private function getMappingsArray($mappingCSVpath, $numOfFields = 3)
@@ -132,15 +132,15 @@ class CdmToMods extends Mods
 
         $modsOpeningTag = '<mods xmlns="http://www.loc.gov/mods/v3" ';
         $modsOpeningTag .= 'xmlns:mods="http://www.loc.gov/mods/v3" ';
-				if ($this->additionalNamespaces) {
-				    foreach ($this->additionalNamespaces as $additionalNamespace) {
-							  list($namespace, $uri) = explode(':', $additionalNamespace, 2);
-						    $modsOpeningTag .=  'xmlns:' . $namespace . '="' . $uri . '" ';
-						}
-				}
+        if ($this->additionalNamespaces) {
+            foreach ($this->additionalNamespaces as $additionalNamespace) {
+                list($namespace, $uri) = explode(':', $additionalNamespace, 2);
+                    $modsOpeningTag .=  'xmlns:' . $namespace . '="' . $uri . '" ';
+                }
+        }
         $modsOpeningTag .= 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
         $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
-        
+
         foreach ($collectionMappingArray as $key => $valueArray) {
             $CONTENTdmField = $valueArray[0];
             if (isset($CONTENTdmFieldValuesArray[$CONTENTdmField])) {
@@ -208,14 +208,14 @@ class CdmToMods extends Mods
         }
 
         $modsString = $modsOpeningTag . '</mods>';
-        
+
         $modsString = $this->oneParentWrapperElement($modsString);
 
         $doc = new \DomDocument('1.0');
         $doc->loadXML($modsString, LIBXML_NSCLEAN);
         $doc->formatOutput = true;
         $modsxml = $doc->saveXML();
-        
+
         return $modsxml;
     }
 
@@ -234,7 +234,7 @@ class CdmToMods extends Mods
         $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
 
         $modsOpeningTag .= '<titleInfo><title>' . $page_title . '</title></titleInfo>';
- 
+
         $includeMigratedFromUri = $this->includeMigratedFromUri;
         $collectionAlias = $this->alias;
         if ($includeMigratedFromUri == true) {
@@ -251,13 +251,13 @@ class CdmToMods extends Mods
         }
 
         if (in_array('AddUuidToMods', $this->metadatamanipulators)) {
-            
+
             $xmlSnippet = "<identifier type='uuid'/>";
             // Add the abililty to apply known metadata manipulator when conditionally used?
             $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $page_pointer);
             $modsOpeningTag .= $xmlSnippet;
         }
-        
+
 
         $modsString = $modsOpeningTag . '</mods>';
 
@@ -265,13 +265,13 @@ class CdmToMods extends Mods
         $doc->loadXML($modsString, LIBXML_NSCLEAN);
         $doc->formatOutput = true;
         $modsxml = $doc->saveXML();
-        
+
         return $modsxml;
     }
 
 
     /**
-     *  Takes MODS XML string and returns an array the unique element 
+     *  Takes MODS XML string and returns an array the unique element
      *  signature strings of the child elements.
      *
      *  @param string $xmlString An MODS XML string.
@@ -284,13 +284,13 @@ class CdmToMods extends Mods
         $xml->loadXML($xmlString);
 
         //$elementSignature = array($elementName, $elementAttributesMap);
-        //$this->signatureToString($elementSignature); 
+        //$this->signatureToString($elementSignature);
 
 
         $childNodesElementSignatureStringArray = array();
         foreach ($xml->documentElement->childNodes as $node) {
             $elementName = $node->nodeName;
-            
+
             $elementAttributesMap = array();
             $attributesNodeMap = $node->attributes;
             $len = $attributesNodeMap->length;
@@ -299,9 +299,9 @@ class CdmToMods extends Mods
                 $attributeName = $attributeItem->name;
                 $attributeValue = $attributeItem->value;
                 $elementAttributesMap[$attributeName] = $attributeValue;
-            }            
+            }
             $elementSignature = array($elementName, $elementAttributesMap);
-            
+
             $childNodesElementSignatureArray[] = $this->signatureToString($elementSignature);
         }
 
@@ -316,7 +316,7 @@ class CdmToMods extends Mods
      *
      * @param $xml object MODS XML object
      *
-     * @param $uniqueChildNodeSignatureArray an array that lists the unique element 
+     * @param $uniqueChildNodeSignatureArray an array that lists the unique element
      * signatures of children of the root MOD element.
      *
      * @return arrry of XML elemets that are wrapper elements (children of root element).
@@ -326,17 +326,17 @@ class CdmToMods extends Mods
         $wrapperDomNodes = array();
         // Grab the elements
         foreach ($uniqueChildNodeSignatureArray as $nodeSignatureString) {
-            
+
             // turn node signature string into parts element name + element attributes
             $nodeSignature = $this->elementSignatureFromString($nodeSignatureString);
-            
+
             $nodeName = $nodeSignature[0];
             $nodeAttributes = $nodeSignature[1];
             //DOMNodeList
             $nodeListObj = $xml->getElementsByTagName($nodeName);
             if ($nodeListObj->length >= 2 && !in_array($nodeName, $this->repeatableWrapperElements)) {
-                
-                // The element name appears more than once and 
+
+                // The element name appears more than once and
                 // is not set as an allowed repeatable wrapper element.
                 foreach ($nodeListObj as $node) {
                     if ($node->hasChildNodes() /*&& !$node->hasAttributes()*/) {
@@ -371,7 +371,7 @@ class CdmToMods extends Mods
             $name = $wrapperElement->nodeName;
             $attributesNodeMap = $wrapperElement->attributes;
             $length = $attributesNodeMap->length;
-            for($i=0; $i < $length; ++$i){            
+            for($i=0; $i < $length; ++$i){
                $attributeItem = $attributesNodeMap->item($i);
                $attributeName = $attributeItem->name;
                $attributeValue = $attributeItem->value;
@@ -392,17 +392,17 @@ class CdmToMods extends Mods
             // dev - rather than just check element name, check element name
             // and element attributes.
             $elementSignature = array($elementName, $elementAttributesMap);
-            
+
             if (in_array($elementSignature, $elementSignatureTrackingArray)) {
                 // $elementName is already in the tracking array
                 // push the element's childnodes to the end of the array.
-                $keyFromSignature = $this->signatureToString($elementSignature); 
+                $keyFromSignature = $this->signatureToString($elementSignature);
                 array_push($elementNameTrackingArray[$keyFromSignature], $wrapperElement->childNodes);
             } else {
                 // $elementSignature is not in the tracking array, add it.
                 array_push($elementSignatureTrackingArray, $elementSignature);
 
-                $keyFromSignature = $this->signatureToString($elementSignature);   
+                $keyFromSignature = $this->signatureToString($elementSignature);
                  // $elementName is not in the tracking array, add it.
                 $elementNameTrackingArray[$keyFromSignature] = array($wrapperElement->childNodes);
             }
@@ -413,15 +413,15 @@ class CdmToMods extends Mods
 
 
     /**
-     * Turns an signature to a string for use 
+     * Turns an signature to a string for use
      */
     private function signatureToString($elementSignature)
-    {   
+    {
 
         $signatureString = $elementSignature[0];
 
         $attributesKeyValuesArray = $elementSignature[1];
-        
+
         if(count($attributesKeyValuesArray) > 0){
 
             $signatureString .=  "?";
@@ -431,9 +431,9 @@ class CdmToMods extends Mods
                $signatureString .= $key . "=" . $value . "|";
             }
         }
-        
-        return $signatureString;  
-        
+
+        return $signatureString;
+
     }
 
     /**
@@ -455,7 +455,7 @@ class CdmToMods extends Mods
         $xml->loadXML($xmlString);
 
         // Unique names of element nodes that are children of MODS root element.
-        // array returned is is the list of unique child element signatures 
+        // array returned is is the list of unique child element signatures
         // (that is, keeps track of attributes)
         $uniqueChildNodeSignatureArray = $this->getChildNodesFromModsXMLString($xmlString);
 
@@ -464,7 +464,7 @@ class CdmToMods extends Mods
         $wrapperElementArray =
           $this->determineRepeatedWrapperChildElements($xml, $uniqueChildNodeSignatureArray);
 
-        // remove repeated wrapper nodes.        
+        // remove repeated wrapper nodes.
         foreach ($wrapperElementArray as $wrapperElement) {
             $deleteThisNode = $wrapperElement;
             if (isset($deleteThisNode->parentNode)) {
@@ -473,7 +473,7 @@ class CdmToMods extends Mods
                 $xml->saveXML($parentNode);
             }
         }
-        
+
         // consolidate nodes with one wrapper
         $consolidatedRepeatedWrapperElements =
           $this->consolidateWrapperElements($wrapperElementArray);
@@ -502,7 +502,7 @@ class CdmToMods extends Mods
                 }
             }
             $modsElement->appendChild($wrapperElement);
-            
+
         }
 
         $xmlString = $xml->saveXML();
@@ -520,7 +520,7 @@ class CdmToMods extends Mods
             $elementNameAttributesArray = explode('?', $elementSignatureString);
 
             $elementName = $elementNameAttributesArray[0];
-            
+
             $elementAttributeKeyValueArray = array();
             if(count($elementNameAttributesArray) > 1){
                 // element has attributes.
@@ -535,9 +535,9 @@ class CdmToMods extends Mods
 
                 }
             }
-             
+
             return array($elementName, $elementAttributeKeyValueArray);
-    
+
     }
 
     /**
