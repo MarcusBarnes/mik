@@ -177,6 +177,11 @@ foreach ($records as $record) {
         continue;
     }
 
+    // Slow down execution if configured to do so.
+    if (isset($settings['FETCHER']['sleep'])) {
+        sleep($settings['FETCHER']['sleep']);
+    }
+
     // Create metadata to return an XML file that can be passed
     // on to the writer.
     try {
