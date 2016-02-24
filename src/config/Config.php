@@ -104,6 +104,11 @@ class Config
      */
     public function checkUrls()
     {
+        // This check applies only to CONTENTdm toolchains.
+        if ($this->settings['FETCHER']['class'] != 'Cdm') {
+            return;
+        }
+
         $client = new Client();
         $sections = array_values($this->settings);
         foreach ($sections as $section) {
@@ -151,10 +156,17 @@ class Config
     }
 
     /**
-     * Tests whether all CONTENTdm aliases are the same. See https://github.com/MarcusBarnes/mik/issues/146.
+     * Tests whether all CONTENTdm aliases are the same.
+     *
+     * See https://github.com/MarcusBarnes/mik/issues/146.
      */
     public function checkAliases()
     {
+        // This check applies only to CONTENTdm toolchains.
+        if ($this->settings['FETCHER']['class'] != 'Cdm') {
+            return;
+        }
+
         $sections = array_values($this->settings);
         $aliases = array();
         foreach ($sections as $section) {
