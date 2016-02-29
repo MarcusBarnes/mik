@@ -22,8 +22,8 @@ use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
 $dir = trim($argv[1]);
 
 if (isset($argv[2]) && $argv[2] == 'remove_backups') {
-  remove_backups($dir);
-	exit;
+    remove_backups($dir);
+    exit;
 }
 
 $directory_iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
@@ -38,7 +38,7 @@ foreach ($directory_iterator as $filepath => $info) {
  * identifed in $mods_XML_path.
  */
 function add_uuid($mods_XML_path) {
-	  print "Processing $mods_XML_path...";
+    print "Processing $mods_XML_path...";
     $dom = new DOMDocument;
     $dom->preserveWhiteSpace = false;
     $dom->formatOutput = true;
@@ -49,7 +49,7 @@ function add_uuid($mods_XML_path) {
     $xpath = new \DOMXPath($dom);
     $existing_uuid_identifiers = $xpath->query("//mods:identifier[@type='uuid']");
     if ($existing_uuid_identifiers->length > 0) {
-			  print "already has one or more identifiers containing a UUID." . PHP_EOL;
+        print "already has one or more identifiers containing a UUID." . PHP_EOL;
         return;
     }
 
@@ -80,7 +80,7 @@ function add_uuid($mods_XML_path) {
 
     $mods_xml = $dom->saveXML();
     file_put_contents($mods_XML_path, $mods_xml);
-		print "identifier containing a UUID added. Original file is at $mods_XML_path.bak." . PHP_EOL;
+    print "identifier containing a UUID added. Original file is at $mods_XML_path.bak." . PHP_EOL;
 }
 
 /**
@@ -96,16 +96,16 @@ function get_uuid() {
  * Deletes .bak files created by this script.
  */
 function remove_backups($dir) {
-$directory_iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
-foreach ($directory_iterator as $filepath => $info) {
-    if (preg_match('/MODS\.xml.bak$/', $filepath)) {
-			  if (file_exists($filepath)) {
-			      unlink($filepath);
-            print "Removing $filepath" . PHP_EOL;
-				}
-				else {
-					  print "$filepath not found" . PHP_EOL;
-				}
+    $directory_iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
+    foreach ($directory_iterator as $filepath => $info) {
+        if (preg_match('/MODS\.xml.bak$/', $filepath)) {
+            if (file_exists($filepath)) {
+                unlink($filepath);
+                print "Removing $filepath" . PHP_EOL;
+            }
+            else {
+                print "$filepath not found" . PHP_EOL;
+            }
+        }
     }
-}
 }
