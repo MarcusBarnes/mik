@@ -260,21 +260,27 @@ class CdmNewspapers extends Writer
                 }
             }
             
-        }
-        
-        //$doc->formatOutput = true;
-
-        //$modsxml = $doc->saveXML();
-        // Create a directory for each day of the newspaper by getting
-        // the date value from the issue's metadata.
-        //$issue_object_info = get_item_info($results_record['collection'], $results_record['pointer']);
+        }    
         
         $issueObjectPath = $this->outputDirectory . DIRECTORY_SEPARATOR . $this->issueDate;
+                
+        // if the issue level directory already exists, we are dealing with a possible
+        // duplicate (or more) upload into CDM.  Create additional directories with
+        // #\d\d\d\d-\d\d\-\d\d\.\d# naming convention and log possible duplicate Cdm
+        // object so that the best choice(s) for the issue are selected during QA prior
+        // to batch ingest into Islandora or other systems.
+        $multipleIssueNumber = 0;
+        while(file_exists($issueObjectPath) == true) {
+            $multipleIssueNumber += 1;
+            $issueObjectPath = $issueObjectPath . "." . $multipleIssueNumber;
+        }
+        
         if (!file_exists($issueObjectPath)) {
             mkdir($issueObjectPath);
             // return issue_object_path for use when writing files.
             return $issueObjectPath;
         }
+        
     }
 
     public function writeMetadataFile($metadata, $path)
