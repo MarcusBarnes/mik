@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\writers;
+use Monolog\Logger;
 
 class CdmNewspapers extends Writer
 {
@@ -72,6 +73,13 @@ class CdmNewspapers extends Writer
         
         $metadtaClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
         $this->metadataParser = new $metadtaClass($settings);
+        
+        // Set up logger.
+        $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
+        $this->log = new \Monolog\Logger('config');
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
+            Logger::INFO);
+        $this->log->pushHandler($this->logStreamHandler);
 
     }
 
@@ -271,8 +279,15 @@ class CdmNewspapers extends Writer
         // to batch ingest into Islandora or other systems.
         $multipleIssueNumber = 0;
         while(file_exists($issueObjectPath) == true) {
+            $this->log->addInfo("CdmNewspaperWriter", array('Newspaper issue already exits in output directory:' => $issueObjectPath));
             $multipleIssueNumber += 1;
             $issueObjectPath = $issueObjectPath . "." . $multipleIssueNumber;
+            // log that the issue directory already exists and may indicate that the newspaper
+            // issue may already exit in the output directory or that more than one Cdm
+            // pointer refers to the same newspaper issue (multiple Cdm upload for same
+            // newspaper issue.
+            
+            
         }
         
         if (!file_exists($issueObjectPath)) {
