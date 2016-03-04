@@ -52,6 +52,7 @@ class Config
                 $this->checkPaths();
                 $this->checkUrls();
                 $this->checkAliases();
+                $this->checkInputDirectories();
                 exit;
                 break;
             case 'snippets':
@@ -68,6 +69,10 @@ class Config
                 break;
             case 'aliases':
                 $this->checkAliases();
+                exit;
+                break;
+            case 'input_directories';
+                $this->checkInputDirectories();
                 exit;
                 break;
         }
@@ -186,5 +191,26 @@ class Config
             print "CONTENTdm aliases are OK\n";
         }
     }
+    
+    /** 
+     * Checks for the existance of input_directories[] 
+     *
+     * See https://github.com/MarcusBarnes/mik/issues/169
+     */
+     public function checkInputDirectories()
+     {
+        $input_directories = $this->settings['FILE_GETTER']['input_directories'];
+        
+        foreach ($input_directories as $input_directory) {
+            
+            if (!file_exists(realpath($input_directory))) {
+                exit("Error: Can't find input directory $input_directory\n");
+            }
+        }
+        
+        print "Input directory paths are OK.\n";
+        
+        
+     }
 
 }
