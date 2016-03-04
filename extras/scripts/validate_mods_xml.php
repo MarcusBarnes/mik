@@ -10,10 +10,10 @@
  *
  * To validate all the .xml files in a directory and all descendent
  * directories, run:
- *   php validate_mods_recursive.php /path/to/dir
+ *   php validate_mods_xml.php /path/to/dir
  *
  * To validate a specific file, run:
- *   php validate_mods_recursive.php /path/to/file.xml
+ *   php validate_mods_xml.php /path/to/file.xml
  *
  * You may want to modify $path_to_schema and $filenames_to_skip
  * to suit your own needs.
