@@ -75,8 +75,8 @@ class CdmNewspapers extends Writer
         $this->metadataParser = new $metadtaClass($settings);
         
         // Set up logger.
-        $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
-        $this->log = new \Monolog\Logger('config');
+        $this->pathToLog = $this->settings['LOGGING']['path_to_log'];
+        $this->log = new \Monolog\Logger('Writer');
         $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
             Logger::INFO);
         $this->log->pushHandler($this->logStreamHandler);
@@ -90,7 +90,7 @@ class CdmNewspapers extends Writer
     {
         // Create root output folder
         $this->createOutputDirectory();
-        $issueObjectPath = $this->createIssueDirectory($metadata);
+        $issueObjectPath = $this->createIssueDirectory($metadata, $record_key);
         $this->writeMetadataFile($metadata, $issueObjectPath);
         
         // filegetter for OBJ.tiff files for newspaper issue pages
@@ -247,7 +247,7 @@ class CdmNewspapers extends Writer
         parent::createOutputDirectory();
     }
 
-    public function createIssueDirectory($metadata)
+    public function createIssueDirectory($metadata, $record_key)
     {
         //value of dateIssued isuse is the the title for the directory
         
@@ -279,15 +279,19 @@ class CdmNewspapers extends Writer
         // to batch ingest into Islandora or other systems.
         $multipleIssueNumber = 0;
         while(file_exists($issueObjectPath) == true) {
-            $this->log->addInfo("CdmNewspaperWriter", array('Newspaper issue already exits in output directory:' => $issueObjectPath));
-            $multipleIssueNumber += 1;
-            $issueObjectPath = $issueObjectPath . "." . $multipleIssueNumber;
             // log that the issue directory already exists and may indicate that the newspaper
             // issue may already exit in the output directory or that more than one Cdm
             // pointer refers to the same newspaper issue (multiple Cdm upload for same
-            // newspaper issue.
-            
-            
+            // newspaper issue.                    
+            $this->log->addInfo("CdmNewspaperWriter", 
+                array(
+                    'Newspaper issue already exits in output directory:' => $issueObjectPath,
+                    'pointer:' => $record_key
+                )
+            );
+                
+            $multipleIssueNumber += 1;
+            $issueObjectPath = $issueObjectPath . "." . $multipleIssueNumber;
         }
         
         if (!file_exists($issueObjectPath)) {
