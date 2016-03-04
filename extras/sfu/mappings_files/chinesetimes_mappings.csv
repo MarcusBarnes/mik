@@ -3,9 +3,10 @@
 "Date","<originInfo><dateIssued encoding='w3cdtf' keyDate='yes'>%value%</dateIssued></originInfo>",
 "日期","<originInfo><dateIssued lang='chi' script='Hant'>%value%</dateIssued></originInfo>",
 "主題詞","<subject lang='chi' script='Hant'><topic>%value%</topic></subject>",
+"Description","<abstract>%value%</abstract>"
 "Language","<language><languageTerm type='text'>Chinese</languageTerm><languageTerm type='code' authority='iso639-2b'>chi</languageTerm></language>",
 "Publisher","<originInfo><place><placeTerm type='code' authority='marccountry'>bcc</placeTerm><placeTerm type='text'>Vancouver, B.C.</placeTerm></place><publisher>Tai Hon Kong Bo Ltd.</publisher></originInfo>",
-"Rights","<accessCondition type='use and reproduction'>%value%</accessCondition>",
+"Rights","<accessCondition type='use and reproduction'>Copyright the Chinese Freemasons of Canada.</accessCondition>",
 "Type","<genre authority='lcgft'>newspapers</genre>",
 "Identifier","<identifier type='local'>%value%</identifier>",
 "null0","<titleInfo type='uniform' authority='naf' supplied='yes'><nonSort>The</nonSort><title>Chinese times (Vancouver, B.C.)</title></titleInfo>"

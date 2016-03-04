@@ -60,13 +60,15 @@ if (isset($argv[2]) && $argv[2] == 'remove_backups') {
 $num_files_replaced = 0;
 $directory_iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source_dir));
 foreach ($directory_iterator as $filepath => $info) {
-    $issue_level_mods_pattern = '#\d\d\d\d\-\d\d-\d\d' . DIRECTORY_SEPARATOR . 'MODS\.xml#';
+    $issue_level_mods_pattern = '#[/\\\\][0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][/\\\\]MODS\.xml$#'; 
     if (preg_match($issue_level_mods_pattern, $filepath)) {
         $source_path_parts = explode(DIRECTORY_SEPARATOR, $filepath);
         $source_path_parts = array_slice($source_path_parts, -2, 2);
         $dest_path = $dest_dir . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $source_path_parts);
-        if (make_backup($filepath, $dest_path)) {
-            copy_file($filepath, $dest_path);
+        if (file_exists($dest_path)) {
+            if (make_backup($filepath, $dest_path)) {
+                copy_file($filepath, $dest_path);
+            }
         }
     }
 }
