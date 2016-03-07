@@ -195,10 +195,12 @@ function islandora_newspaper_issue_cmodel($options) {
 
                     // Check each OCR.txt file to ensure it's encoded in UTF-8.
                     $path_to_ocr_file = $page_dir . DIRECTORY_SEPARATOR . 'OCR.txt';
-                    $ocr_content = file_get_contents($path_to_ocr_file);
-                    if (!mb_check_encoding($ocr_content, 'UTF-8')) {
-                        error_log("$path_to_ocr_file is not valid UTF-8\n", 3, $options['log']);
-                        $bad_ocr_encoding  = true;
+                    if (file_exists($path_to_ocr_file)) {
+                        $ocr_content = file_get_contents($path_to_ocr_file);
+                        if (!mb_check_encoding($ocr_content, 'UTF-8')) {
+                            error_log("$path_to_ocr_file is not valid UTF-8\n", 3, $options['log']);
+                            $bad_ocr_encoding  = true;
+                        }
                     }
                 }
             }
