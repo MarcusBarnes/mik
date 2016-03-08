@@ -115,10 +115,12 @@ function copy_file($source_path, $dest_path) {
  */
 function remove_backups($dir) {
     $directory_iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
+    $num_files_deleted = 0;
     foreach ($directory_iterator as $filepath => $info) {
         if (preg_match('/MODS\.xml.bak$/', $filepath)) {
             if (file_exists($filepath)) {
                 unlink($filepath);
+                $num_files_deleted++;
                 print "Removing $filepath" . PHP_EOL;
             }
             else {
@@ -126,4 +128,5 @@ function remove_backups($dir) {
             }
         }
     }
+    print $num_files_deleted . " MODS.xml.bak files removed." . PHP_EOL;
 }
