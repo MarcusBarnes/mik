@@ -174,8 +174,8 @@ class CdmToMods extends Mods
                     $fieldValue = '<![CDATA[' . $fieldValue . ']]>';
                 }
 
-                $pattern = '/%value%/';
-                $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
+                $stringToReplace = '%value%';
+                $xmlSnippet = str_replace($stringToReplace, $fieldValue, $xmlSnippet);
                 if (isset($this->metadatamanipulators)) {
                     $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $pointer);
                 }
