@@ -3,7 +3,7 @@
 "Subject","<subject authority='lcsh'><topic>South Asian Canadians--Newspapers</topic></subject>",
 "Language","<language><languageTerm type='text'>English</languageTerm><languageTerm type='code' authority='iso639-2b'>eng</languageTerm></language>",
 "Publisher","<originInfo><place><placeTerm type='code' authority='marccountry'>onc</placeTerm><placeTerm type='text'>Ottawa, Ontario</placeTerm></place><publisher>[Aleyamma Samuel?]</publisher></originInfo>",
-"Rights","<accessCondition type='use and reproduction'>%value%</accessCondition>",
+"Rights","<accessCondition type='use and reproduction'>Copyright the Multicultural History Society of Ontario.</accessCondition>",
 "Type","<genre authority='lcgft'>newspapers</genre>",
 "null0","<typeOfResource>text</typeOfResource>",
 "null1","<subject authority='lcsh'><topic>South Asians--Newspapers</topic></subject>",
@@ -12,3 +12,4 @@
 "null4","<subject authority='lcsh'><geographic>Ontario--Newspapers</geographic></subject>",
 "null5","<subject authority='lcsh'><geographic>Ottawa (Ont.)--Newspapers</geographic></subject>",
 "null6","<extension><CONTENTdmData></CONTENTdmData></extension>",
+"null5","<identifier type='uuid'/>"

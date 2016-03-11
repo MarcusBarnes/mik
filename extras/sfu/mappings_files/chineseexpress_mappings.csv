@@ -5,7 +5,7 @@
 "主題詞","<subject lang='chi' script='Hant'>%value%</subject>"
 "Language","<language><languageTerm type='text'>Chinese</languageTerm><languageTerm type='code' authority='iso639-2b'>chi</languageTerm></language>",
 "Publisher","<originInfo><place><placeTerm type='code' authority='marccountry'>onc</placeTerm><placeTerm type='text'>Toronto, Ont.</placeTerm></place><publisher>Chinese Express Co.</publisher></originInfo>",
-"Rights","<accessCondition type='use and reproduction'>%value%</accessCondition>",
+"Rights","<accessCondition type='use and reproduction'>Copyright the Multicultural History Society of Ontario.</accessCondition>",
 "Type","<genre authority='lcgft'>newspapers</genre>",			
 "null0","<typeOfResource>text</typeOfResource>",
 "null1","<titleInfo type='translated' lang='chi'><title>K'uai pao</title></titleInfo>",
@@ -15,4 +15,5 @@
 "null5","<subject authority='lcsh'><topic>Chinese--Ontario--Toronto--Newspapers</topic></subject>",
 "null6","<subject authority='lcsh'><geographic>Ontario--Newspapers</geographic></subject>",
 "null7","<subject authority='lcsh'><geographic>Toronto (Ont.)--Newspapers</geographic></subject>",
-"null8","<extension><CONTENTdmData></CONTENTdmData></extension>", 
+"null8","<extension><CONTENTdmData></CONTENTdmData></extension>",
+"null9","<identifier type='uuid'/>"

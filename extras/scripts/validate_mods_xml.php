@@ -25,7 +25,7 @@ $filenames_to_skip = array('TECHMD');
 // Only used if schema does not exist at $path_to_schema.
 $schema_url = 'http://www.loc.gov/standards/mods/v3/mods-3-5.xsd';
 // Relative to this script.
-$path_to_schema = 'mods-3-5.xsd';
+$path_to_schema = 'mods-3-5-local.xsd';
 
 $input_path = trim($argv[1]);
 $dir = trim($argv[1]);
