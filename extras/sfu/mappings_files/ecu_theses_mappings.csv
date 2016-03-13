@@ -1,0 +1,16 @@
+Name,"<name type=""personal""><namePart>%value%</namePart></name>"
+Title,<titleInfo><title>%value%</title></titleInfo>
+Degree,<extension><etd xmlns="http://www.ndltd.org/standards/metadata/etdms/1.0"><degree xmlns="http://www.ndltd.org/standards/metadata/etdms/1.0"><name xmlns="http://www.ndltd.org/standards/metadata/etdms/1.0">%value%</name></degree></etd></extension>
+null0,<extension><etd xmlns="http://www.ndltd.org/standards/metadata/etdms/1.0"><degree xmlns="http://www.ndltd.org/standards/metadata/etdms/1.0"><level xmlns="http://www.ndltd.org/standards/metadata/etdms/1.0">Master's Degree</level></degree></etd></extension>
+null7,<extension><etd xmlns="http://www.ndltd.org/standards/metadata/etdms/1.0"><degree xmlns="http://www.ndltd.org/standards/metadata/etdms/1.0"><discipline xmlns="http://www.ndltd.org/standards/metadata/etdms/1.0">Applied Arts</discipline></degree></etd></extension>
+Program,<name><affiliation>%value%</affiliation></name>
+Abstract,<abstract>%value%</abstract>
+Subject Keywords,<subject><topic>%value%</topic></subject>
+Date,"<originInfo><dateIssued encoding=""w3cdtf"" keyDate=""yes"">%value%</dateIssued></originInfo>"
+Rights,"<accessCondition type=""useAndReproduction"">%value%</accessCondition>"
+null1,"<originInfo><place><placeTerm type=""code"" authority=""marccountry"">bcc</placeTerm><placeTerm type=""text"">Vancouver (B.C.)</placeTerm></place><publisher>Emily Carr University of Art and Design</publisher></originInfo>"
+null2,<physicalDescription><reformattingQuality>access</reformattingQuality></physicalDescription>
+null3,<physicalDescription><digitalOrigin>born digital</digitalOrigin></physicalDescription>
+null4,"<note type=""statement of responsibility"">Personal, noncommercial use of this item is permitted.</note>"
+null5,"<name type='corporate' authority='lcnaf'><role><roleTerm authority=""marcrelator"" type=""text"">Degree granting institution</roleTerm></role><namePart>Emily Carr University of Art and Design</namePart><namePart>Graduate Studies</namePart></name>"
+null6,<genre>Dissertation/Thesis</genre>
