@@ -42,7 +42,7 @@ class Config
      * Wrapper function for calling other functions that validate configuration data.
      *
      * @param $type string
-     *   One of 'of 'snippets', 'urls', 'paths', or 'all'.
+     *   One of 'of 'snippets', 'urls', 'paths', 'aliases', 'input_directories', or 'all'.
      */
     public function validate($type = 'all')
     {
@@ -75,6 +75,10 @@ class Config
                 $this->checkInputDirectories();
                 exit;
                 break;
+            default:
+                $message = "Sorry, $type is not an allowed value for --checkconfig. " .
+                    "Allowed values are 'snippets', 'urls', 'paths', 'aliases', 'input_directories', or 'all'.\n";
+                exit($message);
         }
     }
 
