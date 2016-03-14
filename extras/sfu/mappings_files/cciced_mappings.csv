@@ -1,0 +1,13 @@
+Title,<titleInfo><title>%value%</title></titleInfo>
+Description,<abstract>%value%</abstract>
+Date,"<originInfo><dateIssued encoding=""w3cdtf"" keyDate=""yes"">%value%</dateIssued></originInfo>"
+Creator,"<name><namePart>%value%</namePart><role><roleTerm type=""text"">creator</roleTerm></role></name>"
+Type,"<genre authority=""marcgt""></genre>"
+Subject,<subject><topic>%value%</topic></subject>
+Series-group,"<relatedItem type=""series""><titleInfo><title>%value%</title></titleInfo></relatedItem>"
+Number of pages,<physicalDescription><extent>%value% pages</extent></physicalDescription>
+Rights,"<accessCondition type=""use and reproduction""></accessCondition>"
+Identifier,"<identifier type=""local"">%value%</identifier>"
+null0,<typeOfResource>text</typeOfResource>
+null1,<extension><CONTENTdmData></CONTENTdmData></extension>
+null2,"<identifier type=""uuid""/>"
