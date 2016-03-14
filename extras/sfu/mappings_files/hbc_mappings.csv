@@ -1,0 +1,10 @@
+Title,<titleInfo><title>%value%</title></titleInfo>
+Creator,"<name><namePart>%value%</namePart><role><roleTerm type=""code"" authority=""marcrelator"">pht</roleTerm><roleTerm type=""text"" authority=""marcrelator"">Photographer</roleTerm></role></name> "
+Date,"<originInfo><dateIssued encoding=""w3cdtf"" keyDate=""yes"">%value%</dateIssued></originInfo>"
+Location,<abstract>%value%</abstract>
+Type,"<genre authority='lcsh'>photographs</genre>"
+Rights,"<accessCondition type=""use and reproduction"">%value%</accessCondition>"
+Identifier,"<identifier type=""local"">%value%</identifier>"
+null0,<typeOfResource>still image</typeOfResource>
+null1,"<identifier type='uuid'/>"
+null2,<extension><CONTENTdmData></CONTENTdmData></extension>
