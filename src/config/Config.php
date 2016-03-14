@@ -199,17 +199,24 @@ class Config
      */
      public function checkInputDirectories()
      {
+        if (!isset($this->settings['FILE_GETTER']['input_directories'])) {
+            print "No input directories are defined in the FILE_GETTER section.\n";
+            return;
+        }
+        if (strlen($this->settings['FILE_GETTER']['input_directories'][0]) == 0) {
+            print "No input directories are defined in the FILE_GETTER section.\n";
+            return;
+        }
+
         $input_directories = $this->settings['FILE_GETTER']['input_directories'];
         
         foreach ($input_directories as $input_directory) {
-            
             if (!file_exists(realpath($input_directory))) {
                 exit("Error: Can't find input directory $input_directory\n");
             }
         }
         
         print "Input directory paths are OK.\n";
-        
         
      }
 
