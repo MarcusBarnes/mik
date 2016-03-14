@@ -1,0 +1,15 @@
+Title,<titleInfo><nonSort>The</nonSort><title>British Columbia Federationist</title></titleInfo>
+Language,"<language><languageTerm type=""text"">English</languageTerm><languageTerm type =""code"" authority=""iso639-2b"">eng</languageTerm></language>"
+Subject,"<subject authority=""lcsh""><topic>Labor movement--British Columbia--Newspapers</topic></subject>"
+Publisher,"<originInfo><place><placeTerm type=""code"" authority=""marccountry"">bcc</placeTerm><placeTerm type=""text"">Vancouver, B.C.</placeTerm></place><publisher>Vancouver Trades and Labor Council></publisher></originInfo>"
+Date,"<originInfo><dateIssued encoding=""w3cdtf"" keyDate=""yes"">%value%</dateIssued></originInfo>"
+Type,"<genre authority=""lcgft"">newspapers</genre>"
+Rights,"<accessCondition type=""use and reproduction"">%value%</accessCondition>"
+Identifier,"<identifier type=""local"">%value%</identifier>"
+null0,<typeOfResource>text</typeOfResource>
+null2,"<subject authority=""lcsh""><topic>Labor unions--British Columbia--Newspapers</topic></subject>"
+null3,"<subject authority=""lcsh""><topic>Labor movement--Newspapers</topic></subject>"
+null4,"<subject authority=""lcsh""><topic>Labor unions--Newspapers</topic></subject>"
+null5,"<subject authority=""lcsh""><geographic>British Columbia--Newspapers</geographic></subject>"
+null6,"<identifier type='uuid'/>"
+null7,<extension><CONTENTdmData></CONTENTdmData></extension>
