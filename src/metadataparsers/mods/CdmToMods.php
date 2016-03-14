@@ -140,6 +140,7 @@ class CdmToMods extends Mods
             } else {
                 // Log mismatch between mapping file and source fields (e.g., CDM).
                 $logMessage = "Mappings file contains a row $CONTENTdmField that ";
+                $logMessage .= "is not in source CONTENTdm metadata for this object.";
                 $this->log->addWarning($logMessage, array('Source fieldname' => $CONTENTdmField));
                 continue;
             }
