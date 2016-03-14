@@ -1,0 +1,11 @@
+Title,<titleInfo><title>%value%</title></titleInfo>
+Creator,"<name><namePart>%value%</namePart><role><roleTerm type=""text"" authority=""marcrelator"">photographer</roleTerm><roleTerm type=""code"" authority=""marcrelator"">pht</roleTerm></role></name>"
+Subject,<subject><topic>%value%</topic></subject>
+Description,<abstract>%value%</abstract>
+Date_sort,"<originInfo><dateIssued encoding=""w3cdtf"" keyDate=""yes"">%value%</dateIssued></originInfo>"
+Identifier,"<identifier>%value%</identifier>"
+Rights,"<accessCondition type=""use and reproduction"">%value%</accessCondition>"
+Type,"<genre authority=""lcsh"">photographs</genre>"
+null0,<typeOfResource>image</typeOfResource>
+null1,"<identifier type='uuid'/>"
+null2,<extension><CONTENTdmData></CONTENTdmData></extension>
