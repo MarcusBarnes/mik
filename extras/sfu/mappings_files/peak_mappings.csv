@@ -1,0 +1,14 @@
+Title,<titleInfo><nonSort>The</nonSort><title>peak</title></titleInfo>
+Language,"<language><languageTerm type=""text"">English</languageTerm><languageTerm type =""code"" authority=""iso639-2b"">eng</languageTerm></language>"
+Subject,"<subject authority=""lcsh""><topic>Universities and colleges--British Columbia--Burnaby--Newspapers</topic></subject>"
+Publisher,"<originInfo><place><placeTerm type=""code"" authority=""marccountry"">bcc</placeTerm><placeTerm type=""text"">Burnaby, B.C.</placeTerm></place><publisher>Peak Publications Society</publisher></originInfo>"
+Date,"<originInfo><dateIssued encoding=""w3cdtf"" keyDate=""yes"">%value%</dateIssued></originInfo>"
+Type,"<genre authority=""lcgft"">newspapers</genre>"
+Rights,"<accessCondition type=""use and reproduction"">%value%</accessCondition>"
+Identifier,"<identifier type=""local"">%value%</identifier>"
+null0,<typeOfResource>text</typeOfResource>
+null1,"<subject authority=""lcsh""><name type=""corporate"" authority=""naf"">Simon Fraser University</name></subject>"
+null2,"<subject authority=""lcsh""><geographic>British Columbia--Newspapers</geographic></subject>"
+null3,"<subject authority=""lcsh""><geographic>Burnaby (B.C.)--Newspapers</geographic></subject>"
+null4,"<identifier type=""uuid""/>"
+null5,<extension><CONTENTdmData></CONTENTdmData></extension>
