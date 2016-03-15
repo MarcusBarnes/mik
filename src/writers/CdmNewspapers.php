@@ -235,10 +235,6 @@ class CdmNewspapers extends Writer
           $regex = '%[0-9]*$%';
           $result = preg_match($regex, $filename, $matches);
           
-          echo "<pre>";
-          echo print_r($matches);
-          echo "<pre>";
-          
           if($matches[0] == ''){
             // $result evaluates to false
             // There is a problem with the filename
