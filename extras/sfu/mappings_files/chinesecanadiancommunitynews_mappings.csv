@@ -5,7 +5,7 @@
 "主題詞","<subject lang='chi' script='Hant'>%value%</subject>",
 "Language","<language><languageTerm type='text'>Chinese</languageTerm><languageTerm type='code' authority='iso639-2b'>chi</languageTerm></language>",
 "Publisher","<originInfo><place><placeTerm type='code' authority='marccountry'>onc</placeTerm><placeTerm type='text'>Ottawa, Ontario</placeTerm></place><publisher>Chinese-Canadian Community Association of Ottawa</publisher></originInfo>",
-"Rights","<accessCondition type='use and reproduction'>%value%</accessCondition>",
+"Rights","<accessCondition type='use and reproduction'>Copyright the Multicultural History Society of Ontario.</accessCondition>",
 "Type","<genre authority='lcgft'>newspapers</genre>",
 "null0","<typeOfResource>text</typeOfResource>",
 "null1","<titleInfo type='alternative' lang='chi' script='Hant'><title>加華僑報</title></titleInfo>",
@@ -16,3 +16,4 @@
 "null6","<subject authority='lcsh'><geographic>Ontario--Newspapers</geographic></subject>"
 "null7","<subject authority='lcsh'><geographic>Ottawa (Ont.)--Newspapers</geographic></subject>",
 "null8","<extension><CONTENTdmData></CONTENTdmData></extension>",
+null9,"<identifier type='uuid'/>"
