@@ -233,7 +233,14 @@ class CdmNewspapers extends Writer
           //1988-07-13-01           
           $filename = $path_parts['filename'];
           $regex = '%[0-9]*$%';
-          preg_match($regex, $filename, $matches);
+          $result = preg_match($regex, $filename, $matches);
+          
+          if($matches[0] == ''){
+            // $result evaluates to false
+            // There is a problem with the filename
+            throw new \Exception("CdmNewspaper Writer: The filename $filename did not match the regex required for creating the issue page directory name.");
+          }
+          
           // remove possible left zero padded number.
           $pageNumber = ltrim($matches[0]);
           return $pageNumber;
