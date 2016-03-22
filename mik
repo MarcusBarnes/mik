@@ -279,15 +279,16 @@ $time = $time_end - $time_start;
 $timeMessage =  "Completed in " . $time/60 . " minutes." . PHP_EOL;
 echo $timeMessage;
 $logInfo->addInfo($timeMessage);
-$notifier = NotifierFactory::create();
-if ($notifier) {
-    $notifier_body = "Output packages are in " . $settings['WRITER']['output_directory'];
-    $notification =
-        (new Notification())
-        ->setTitle('MIK has completed.')
-        ->setBody($notifier_body)
-        ->setIcon(__DIR__.'/tools.png');
-    $notifier->send($notification);
+
+if ($settings['WRITER']['notification']) {
+    $notifier = NotifierFactory::create();
+    if ($notifier) {
+        $notifier_body = "Output packages are in " . $settings['WRITER']['output_directory'];
+        $notification =
+            (new Notification())
+            ->setTitle('MIK has completed.')
+            ->setBody($notifier_body)
+            ->setIcon(__DIR__.'/tools.png');
+        $notifier->send($notification);
+    }
 }
-
-
