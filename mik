@@ -41,6 +41,9 @@ use mik\exceptions\MikErrorException;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
+use Joli\JoliNotif\Notification;
+use Joli\JoliNotif\NotifierFactory;
+
 echo "Commencing MIK." . PHP_EOL;
 // Get command line options.
 // Assumes --longopts.
@@ -276,4 +279,15 @@ $time = $time_end - $time_start;
 $timeMessage =  "Completed in " . $time/60 . " minutes." . PHP_EOL;
 echo $timeMessage;
 $logInfo->addInfo($timeMessage);
+$notifier = NotifierFactory::create();
+if ($notifier) {
+    $notifier_body = "Output packages are in " . $settings['WRITER']['output_directory'];
+    $notification =
+        (new Notification())
+        ->setTitle('MIK has completed.')
+        ->setBody($notifier_body)
+        ->setIcon(__DIR__.'/tools.png');
+    $notifier->send($notification);
+}
+
 

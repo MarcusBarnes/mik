@@ -109,3 +109,6 @@ MIK is designed to be extensible. If you have an idea for a useful manipulator o
 
 README_DEV.md contains some inforation on coding standards, etc.
 
+## Acknowledgement
+
+Tools icon by [Jeremy J Bristol](https://thenounproject.com/search/?q=building%20tool&i=11514) from the Noun Project, used under a [CC BY 3.0 US](https://creativecommons.org/licenses/by/3.0/us/) license.
