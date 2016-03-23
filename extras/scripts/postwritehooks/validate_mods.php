@@ -26,28 +26,32 @@ $mods_filename = 'MODS.xml';
 // to create the issue-level output directories.
 $item_info_field_for_issues = 'date';
 
-$path_to_success_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . 'postwritehook_validate_mods_success.log';
-$path_to_error_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . 'postwritehook_validate_mods_error.log';
+$path_to_success_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
+    'postwritehook_validate_mods_success.log';
+$path_to_error_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
+    'postwritehook_validate_mods_error.log';
 
 // Set up logging.
-$log = new Logger('postwritehooks/validate_mods.php');
+$info_log = new Logger('postwritehooks/validate_mods.php');
 $info_handler = new StreamHandler($path_to_success_log, Logger::INFO);
+$info_log->pushHandler($info_handler);
+
+$error_log = new Logger('postwritehooks/validate_mods.php');
 $error_handler = new StreamHandler($path_to_error_log, Logger::WARNING);
-$log->pushHandler($info_handler);
-$log->pushHandler($error_handler);
+$error_log->pushHandler($error_handler);
 
 // Different MIK writers will put the MODS files in different places. We need
 // to determine that type of writer is being used and hand off the task of finding
 // and validating the MODS files to the appropriate callback.
 switch ($config['WRITER']['class']) {
   case 'CdmNewspapers':
-    cdm_newspapers_writer($record_key, $children_record_keys, $path_to_schema, $mods_filename, $item_info_field_for_issues, $config, $log);
+    cdm_newspapers_writer($record_key, $children_record_keys, $path_to_schema, $mods_filename, $item_info_field_for_issues, $config, $info_log, $error_log);
     break;
   case 'CsvSingleFile':
-    csv_single_file_writer($record_key, $path_to_schema, $config, $log);
+    csv_single_file_writer($record_key, $path_to_schema, $config, $info_log, $error_log);
     break;
   default:
-    cdm_single_file_writer($record_key, $path_to_schema, $config, $log);
+    cdm_single_file_writer($record_key, $path_to_schema, $config, $info_log, $error_log);
     break;
 }
 
@@ -63,13 +67,16 @@ switch ($config['WRITER']['class']) {
  * @param array $config
  *   The MIK configuration settings.
  *
- * @param object $log
- *   The Monolog logger object.
+ * @param object $info_log
+ *   A Monolog logger object.
+ *
+ * @param object $error_log
+ *   A Monolog logger object.
  */
-function cdm_single_file_writer($record_key, $path_to_schema, $config, $log) {
+function cdm_single_file_writer($record_key, $path_to_schema, $config, $info_log, $error_log) {
   $path_to_mods = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
     $record_key . '.xml';
-  validate_mods($path_to_schema, $path_to_mods, $log);
+  validate_mods($path_to_schema, $path_to_mods, $info_log, $error_log);
 }
 
 /**
@@ -96,15 +103,18 @@ function cdm_single_file_writer($record_key, $path_to_schema, $config, $log) {
  *   The MIK configuration settings.
  *
  * @param object $log
- *   The Monolog logger object.
+ *   A Monolog logger object.
+ *
+ * @param object $error_log
+ *   A Monolog logger object.
  */
-function cdm_newspapers_writer($record_key, $children_record_keys, $path_to_schema, $mods_filename, $item_info_field_for_issues, $config, $log) {
+function cdm_newspapers_writer($record_key, $children_record_keys, $path_to_schema, $mods_filename, $item_info_field_for_issues, $config, $info_log, $error_log) {
   $issue_dir = get_issue_dir($record_key, $item_info_field_for_issues, $config);
   $dir = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . $issue_dir;
   $directory_iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
   foreach ($directory_iterator as $filepath => $info) {
     if (preg_match('/' . $mods_filename . "$/", $filepath)) { 
-      validate_mods($path_to_schema, $filepath, $log);
+      validate_mods($path_to_schema, $filepath, $info_log, $error_log);
     }
   }
 }
@@ -122,9 +132,12 @@ function cdm_newspapers_writer($record_key, $children_record_keys, $path_to_sche
  *   The MIK configuration settings.
  *
  * @param object $log
- *   The Monolog logger object.
+ *   A Monolog logger object.
+ *
+ * @param object $error_log
+ *   A Monolog logger object.
  */
-function csv_single_file_writer($record_key, $path_to_schema, $config, $log) {
+function csv_single_file_writer($record_key, $path_to_schema, $config, $info_log, $error_log) {
   if (isset($config['WRITER']['preserve_content_filenames']) && $config['WRITER']['preserve_content_filenames']) {
     // Get the value of [FILE_GETTER] file_name_field from the cached metadata
     // and use it, minus the extension, as the MODS filename.
@@ -136,12 +149,12 @@ function csv_single_file_writer($record_key, $path_to_schema, $config, $log) {
     $filename = pathinfo($metadata->{$file_name_field}, PATHINFO_FILENAME);
     $path_to_mods = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
       $filename . '.xml';
-    validate_mods($path_to_schema, $path_to_mods, $log);
+    validate_mods($path_to_schema, $path_to_mods, $info_log, $error_log);
   }
   else {
     $path_to_mods = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
       $record_key . '.xml';
-    validate_mods($path_to_schema, $path_to_mods, $log);
+    validate_mods($path_to_schema, $path_to_mods, $info_log, $error_log);
   }
 }
 
@@ -156,16 +169,19 @@ function csv_single_file_writer($record_key, $path_to_schema, $config, $log) {
  *   The path to the MODS file to be validated.
  *
  * @param object $log
- *   The Monolog logger object.
+ *   A Monolog logger object.
+ *
+ * @param object $error_log
+ *   A Monolog logger object.
  */
-function validate_mods($path_to_schema, $path_to_mods, $log) {
+function validate_mods($path_to_schema, $path_to_mods, $info_log, $error_log) {
   $mods = new DOMDocument();
   $mods->load($path_to_mods);
   if ($mods->schemaValidate($path_to_schema)) {
-    $log->addInfo("MODS file validates", array('MODS file' => $path_to_mods));
+    $info_log->addInfo("MODS file validates", array('MODS file' => $path_to_mods));
   }
   else {
-    $log->addWarning("MODS file does not validate", array('MODS file' => $path_to_mods));
+    $error_log->addWarning("MODS file does not validate", array('MODS file' => $path_to_mods));
   }
 }
 

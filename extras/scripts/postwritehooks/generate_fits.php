@@ -32,24 +32,28 @@ $children_record_keys = explode(',', $argv[2]);
 $config_path = trim($argv[3]);
 $config = parse_ini_file($config_path, true);
 
-$path_to_success_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . 'postwritehook_generate_fits_success.log';
-$path_to_error_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . 'postwritehook_generate_fits_error.log';
+$path_to_success_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
+    'postwritehook_generate_fits_success.log';
+$path_to_error_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
+    'postwritehook_generate_fits_error.log';
 
 // Set up logging.
-$log = new Logger('postwritehooks/generate_fits.php');
+$info_log = new Logger('postwritehooks/generate_fits.php');
 $info_handler = new StreamHandler($path_to_success_log, Logger::INFO);
+$info_log->pushHandler($info_handler);
+
+$error_log = new Logger('postwritehooks/generate_fits.php');
 $error_handler = new StreamHandler($path_to_error_log, Logger::WARNING);
-$log->pushHandler($info_handler);
-$log->pushHandler($error_handler);
+$error_log->pushHandler($error_handler);
 
 if (!file_exists($path_to_fits)) {
-  $log->addWarning("FITS executable cannot be found", array('Path' => $path_to_fits));
+  $error_log->addWarning("FITS executable cannot be found", array('Path' => $path_to_fits));
 }
 
 if (count($children_record_keys)) {
   foreach ($children_record_keys as $child_record_key) {
     if (!$issue_dir = get_issue_dir_name($record_key, $item_info_field_for_issues, $config)) {
-      $log->addWarning("FITS output not generated because issue directory not retrievable from CONTENTdm",
+      $error_log->addWarning("FITS output not generated because issue directory not retrievable from CONTENTdm",
         array('Issue dir' => $record_key));
       exit;
     }
@@ -63,17 +67,17 @@ if (count($children_record_keys)) {
 					$cmd = "$path_to_fits -i $path_to_obj -xc -o $path_to_fits_output";
 					exec($cmd, $output, $return_var);
 					if ($return_var) {
-						$log->addWarning("FITS output not generated due to error with FITS",
+						$error_log->addWarning("FITS output not generated due to error with FITS",
 							array('FITS return value' => $return_var, 'OBJ file' => $path_to_obj));
 					}
 					else {
-						$log->addInfo("FITS output generated",
+						$info_log->addInfo("FITS output generated",
 							array('OBJ file' => $path_to_obj, 'FITS output' => $path_to_fits_output));
 					}
 				}
 			}
       else {
-        $log->addWarning("FITS output not generated because OBJ file not found",
+        $error_log->addWarning("FITS output not generated because OBJ file not found",
           array('OBJ file' => $path_to_obj));
       }
     }

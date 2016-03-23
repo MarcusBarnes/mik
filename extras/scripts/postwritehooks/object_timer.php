@@ -22,7 +22,8 @@ $children_record_keys = explode(',', $children_record_keys_string);
 $config_path = trim($argv[3]);
 $config = parse_ini_file($config_path, true);
 
-$object_timer_log_path = dirname($config['LOGGING']['path_to_log']) . DIRECTORY_SEPARATOR . 'object_timer.log';
+$object_timer_log_path = dirname($config['LOGGING']['path_to_log']) . DIRECTORY_SEPARATOR .
+    'postwritehook_object_timer.log';
 $object_timer_last_object_end_time_path = $config['FETCHER']['temp_directory'] . DIRECTORY_SEPARATOR . 'object_timer.dat';
 
 $now = time();
