@@ -32,9 +32,15 @@ $children_record_keys = explode(',', $argv[2]);
 $config_path = trim($argv[3]);
 $config = parse_ini_file($config_path, true);
 
+$path_to_success_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . 'postwritehook_generate_fits_success.log';
+$path_to_error_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . 'postwritehook_generate_fits_error.log';
+
 // Set up logging.
 $log = new Logger('postwritehooks/generate_fits.php');
-$log->pushHandler(new StreamHandler($config['LOGGING']['path_to_log'], Logger::INFO));
+$info_handler = new StreamHandler($path_to_success_log, Logger::INFO);
+$error_handler = new StreamHandler($path_to_error_log, Logger::WARNING);
+$log->pushHandler($info_handler);
+$log->pushHandler($error_handler);
 
 if (!file_exists($path_to_fits)) {
   $log->addWarning("FITS executable cannot be found", array('Path' => $path_to_fits));

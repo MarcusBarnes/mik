@@ -26,8 +26,15 @@ $mods_filename = 'MODS.xml';
 // to create the issue-level output directories.
 $item_info_field_for_issues = 'date';
 
+$path_to_success_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . 'postwritehook_validate_mods_success.log';
+$path_to_error_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . 'postwritehook_validate_mods_error.log';
+
+// Set up logging.
 $log = new Logger('postwritehooks/validate_mods.php');
-$log->pushHandler(new StreamHandler($config['LOGGING']['path_to_log'], Logger::INFO));
+$info_handler = new StreamHandler($path_to_success_log, Logger::INFO);
+$error_handler = new StreamHandler($path_to_error_log, Logger::WARNING);
+$log->pushHandler($info_handler);
+$log->pushHandler($error_handler);
 
 // Different MIK writers will put the MODS files in different places. We need
 // to determine that type of writer is being used and hand off the task of finding
