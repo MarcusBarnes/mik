@@ -1,6 +1,5 @@
 Creating Country,<originInfo><place>%value%</place></originInfo> 
 Title,<titleInfo><title>%value%</title></titleInfo>
-Year,"<originInfo><dateIssued encoding=""w3cdtf"" keyDate=""yes"">%value%</dateIssued></originInfo>"
 Date,"<originInfo><dateIssued encoding=""w3cdtf"" keyDate=""yes"">%value%</dateIssued></originInfo>"
 Type,"<genre authority=""tgm"">postage stamps</genre>"
 Continent,<originInfo><place>%value%</place></originInfo> 
@@ -8,5 +7,5 @@ Value,"<note type=""acquisition"">%value%</note>"
 Identifier,"<identifier type=""local"">%value%</identifier>"
 Rights,"<accessCondition type=""use and reproduction"">%value%</accessCondition>"
 null0,<typeOfResource>still image</typeOfResource>
-null1,"<identifier type='uuid'/>"
+null1,"<identifier type=""uuid""/>"
 null2,<extension><CONTENTdmData></CONTENTdmData></extension>
