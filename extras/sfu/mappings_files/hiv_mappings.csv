@@ -1,11 +1,11 @@
-Creating Country,<originInfo><place>%value%</place></originInfo> 
-Title,<titleInfo><title>%value%</title></titleInfo>
+Creating Country,"<originInfo><place><placeTerm type='text'>%value%</placeTerm></place></originInfo>"
+Title,"<titleInfo><title>%value%</title></titleInfo>"
 Date,"<originInfo><dateIssued encoding=""w3cdtf"" keyDate=""yes"">%value%</dateIssued></originInfo>"
 Type,"<genre authority=""tgm"">postage stamps</genre>"
-Continent,<originInfo><place>%value%</place></originInfo> 
+Continent,"<originInfo><place><placeTerm type='text'>%value%</placeTerm></place></originInfo>"
 Value,"<note type=""acquisition"">%value%</note>"
 Identifier,"<identifier type=""local"">%value%</identifier>"
 Rights,"<accessCondition type=""use and reproduction"">%value%</accessCondition>"
-null0,<typeOfResource>still image</typeOfResource>
+null0,"<typeOfResource>still image</typeOfResource>"
 null1,"<identifier type=""uuid""/>"
-null2,<extension><CONTENTdmData></CONTENTdmData></extension>
+null2,"<extension><CONTENTdmData></CONTENTdmData></extension>"
