@@ -1,0 +1,11 @@
+Title,<titleInfo><title>%value%</title></titleInfo>
+Photographer,<name><namePart>%value%</namePart><role><roleTerm type="text">photographer</roleTerm></role></name>
+Date,<originInfo><dateIssued keyDate='yes'>%value%</dateIssued></originInfo>
+
+"Date","<originInfo><dateIssued encoding='w3cdtf' keyDate='yes'>%value%</dateIssued></originInfo>",
+null1,"<originInfo><place><placeTerm type='code' authority='marccountry'>lau</placeTerm><placeTerm type='text'>Baton Rouge, LA</placeTerm></place><publisher>Louisiana Digital Library</publisher></originInfo>",
+
+
+Subjects,<subject><topic>%value%</topic></subject>
+Notes,<abstract>%value%</abstract>
+null5,<extension><CONTENTdmData></CONTENTdmData></extension>
