@@ -1,11 +1,17 @@
 Title,<titleInfo><title>%value%</title></titleInfo>
-Photographer,<name><namePart>%value%</namePart><role><roleTerm type="text">photographer</roleTerm></role></name>
+Contact Information,<accessCondition type="use and reproduction">%value%</accessCondition>
+Creator,<name><namePart>%value%</namePart><role><roleTerm type="text">creator</roleTerm><roleTerm type="code">cre</roleTerm></role></name>
+Subject,<subject><topic>%value%</topic></subject>
+Credit,<note type="preferred citation">%value%</note>
+Description,<abstract>%value%</abstract>
 Date,<originInfo><dateIssued keyDate='yes'>%value%</dateIssued></originInfo>
-
-"Date","<originInfo><dateIssued encoding='w3cdtf' keyDate='yes'>%value%</dateIssued></originInfo>",
-null1,"<originInfo><place><placeTerm type='code' authority='marccountry'>lau</placeTerm><placeTerm type='text'>Baton Rouge, LA</placeTerm></place><publisher>Louisiana Digital Library</publisher></originInfo>",
-
-
-Subjects,<subject><topic>%value%</topic></subject>
-Notes,<abstract>%value%</abstract>
-null5,<extension><CONTENTdmData></CONTENTdmData></extension>
+Type,<typeOfResource>still image</typeOfResource>
+Medium,<physicalDescription><form>%value%</form></physicalDescription>
+Extent,<physicalDescription><extent>%value%</extent></physicalDescription>
+Source,<note type="ownership">%value% (http://www.hnoc.org/ )</note>
+Language,<language><languageTerm type="code">%value%</languageTerm></language>
+Relation,<relatedItem type="host"><location><url>%value%</url></location></relatedItem>
+Rights,<accessCondition type="restriction on access">%value%</accessCondition>
+Accession No,<note type="accession number">%value%</note>
+Object File Name,<identifier>%value%</identifier>
+null1,<extension><CONTENTdmData></CONTENTdmData></extension>
