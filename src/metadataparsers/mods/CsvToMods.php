@@ -88,6 +88,9 @@ class CsvToMods extends Mods
         $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
         
         foreach ($collectionMappingArray as $field => $fieldMappings) {
+            if (preg_match('/^#/', $fieldMappings[0])) {
+              continue;
+            }
             $csvFieldName = $fieldMappings[0];
             if (property_exists($objectInfo, $csvFieldName)) {
                 $fieldValue = $objectInfo->$csvFieldName;
