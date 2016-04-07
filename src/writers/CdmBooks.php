@@ -213,12 +213,14 @@ class CdmBooks extends Writer
             // Write outut page level MODS.XML
             $MODS_expected = in_array('MODS', $this->datastreams);
             if ($MODS_expected xor $no_datastreams_setting_flag) {
-
+                /*
                 if(isset($page_object_info['title'])) {
                     $page_title = $page_object_info['title'];
                 } else {
                     $page_title = 'Page ' . $directoryNumber;
                 }
+                */
+                $page_title = 'Page ' . $directoryNumber;
                 $this->writePageLevelMetadaFile($page_pointer, $page_title, $page_dir);
             }
         }
