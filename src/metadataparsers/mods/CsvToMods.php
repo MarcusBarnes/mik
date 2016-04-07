@@ -111,7 +111,7 @@ class CsvToMods extends Mods
             $fieldValue = htmlspecialchars($fieldValue, ENT_NOQUOTES|ENT_XML1);
             $fieldValue = trim($fieldValue);
 
-            $xmlSnippet = $fieldMappings[1];
+            $xmlSnippet = trim($fieldMappings[1]);
             if (!empty($xmlSnippet)) {
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);

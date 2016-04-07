@@ -77,6 +77,11 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
         $mods = $parser->metadata('postcard_2');
         $this->assertRegExp('#<dateIssued\sencoding="w3cdtf">1924\-12\-24</dateIssued>#', $mods,
             "NormalizeDate metadata manipulator for (\d\d\d\d)\s+(\d\d)\s+(\d\d) did not work");
+
+        // Test for matches against dates like 1924/12/24.
+        $mods = $parser->metadata('postcard_4');
+        $this->assertRegExp('#<dateIssued\sencoding="w3cdtf">1924\-12\-24</dateIssued>#', $mods,
+            "NormalizeDate metadata manipulator for (\d\d\d\d)/(\d\d)/(\d\d) did not work");
     }
 
     public function testAddCsvDataMetadataManipulator()
