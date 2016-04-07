@@ -32,7 +32,14 @@ class NormalizeDate extends MetadataManipulator
         if (count($paramsArray) == 2) {
             $this->sourceDateField = $paramsArray[0];
             $this->destDateElement = $paramsArray[1];
-        } else {
+            $this->log->addInfo("NormalizeDate", array('No pattern preference supplied' => ''));
+        } elseif (count($paramsArray) == 3) {
+            $this->sourceDateField = $paramsArray[0];
+            $this->destDateElement = $paramsArray[1];
+            $this->preference = $paramsArray[2];
+            $this->log->addInfo("NormalizeDate", array('Pattern preference supplied' => $this->preference));
+        }
+        else {
             $this->log->addInfo("NormalizeDate", array('Wrong parameter count' => count($paramsArray)));
         }
     }
@@ -74,7 +81,17 @@ class NormalizeDate extends MetadataManipulator
 
             // Check for dates in \d\d-\d\d-\d\d\d\d.
             if (preg_match('/^(\d\d)\-(\d\d)\-(\d\d\d\d)$/', $this->sourceDateFieldValue, $matches)) {
-                $date_element->nodeValue = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
+                // This pattern is often interpreted in two ways (US and UK dates) so we allow
+                // it to take an optional 'preference' flag. Value of 'm' indicates that the
+                // first part of the incoming date value is month.
+                if (isset($this->preference) && $this->preference == 'm') {
+                  // Interpreted as mm-dd-yyyy. Reassemble the value as yyyy-mm-dd.
+                  $date_element->nodeValue = $matches[3] . '-' . $matches[1] . '-' . $matches[2];
+                }
+                else {
+                  // Interpreted as dd-mm-yyy (this is the default). Reassemble the value as yyyy-mm-dd.
+                  $date_element->nodeValue = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
+                }
                 // Reassemble the parent and child elements.
                 $origin_info_element->appendChild($date_element);
                 // Convert the back to the snippet and return it.
@@ -83,6 +100,7 @@ class NormalizeDate extends MetadataManipulator
             }
             // Check for dates in \d\d\d\d \d\d \d\d.
             elseif (preg_match('/^(\d\d\d\d)\s+(\d\d)\s+(\d\d)$/', $this->sourceDateFieldValue, $matches)) {
+                // Reassemble the value as yyyy-mm-dd.
                 $date_element->nodeValue = $matches[1] . '-' . $matches[2] . '-' . $matches[3];
                 $origin_info_element->appendChild($date_element);
                 $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
@@ -90,8 +108,26 @@ class NormalizeDate extends MetadataManipulator
             }
             // Check for dates in \d\d\d\d/\d\d/\d\d.
             elseif (preg_match('#^(\d\d\d\d)/(\d\d)/(\d\d)$#', $this->sourceDateFieldValue, $matches)) {
+                // Reassemble the value as yyyy-mm-dd.
                 $date_element->nodeValue = $matches[1] . '-' . $matches[2] . '-' . $matches[3];
                 $origin_info_element->appendChild($date_element);
+                $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
+                return $dom->saveXML($origin_info_element);
+            }
+            // Check for dates in \d\d/\d\d/\d\d\d\d.
+            elseif (preg_match('#^(\d\d)/(\d\d)/(\d\d\d\d)$#', $this->sourceDateFieldValue, $matches)) {
+                // Another pattern that can be interpreted in two ways (US and UK dates).
+                if (isset($this->preference) && $this->preference == 'm') {
+                  // Interpreted as mm/dd/yyyy. Reassemble the value as yyyy-mm-dd.
+                  $date_element->nodeValue = $matches[3] . '-' . $matches[1] . '-' . $matches[2];
+                }
+                else {
+                  // Interpreted as dd/mm/yyyy (this is the default). Reassemble the value as yyyy-mm-dd.
+                  $date_element->nodeValue = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
+                }
+                // Reassemble the parent and child elements.
+                $origin_info_element->appendChild($date_element);
+                // Convert the back to the snippet and return it.
                 $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
                 return $dom->saveXML($origin_info_element);
             }
