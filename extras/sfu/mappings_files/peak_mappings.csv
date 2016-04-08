@@ -7,7 +7,7 @@ Type,"<genre authority=""lcgft"">newspapers</genre>"
 Rights,"<accessCondition type=""use and reproduction"">%value%</accessCondition>"
 Identifier,"<identifier type=""local"">%value%</identifier>"
 null0,<typeOfResource>text</typeOfResource>
-null1,"<subject authority=""lcsh""><name type=""corporate"" authority=""naf"">Simon Fraser University</name></subject>"
+null1,"<subject authority=""lcsh""><name type=""corporate"" authority=""naf""><namePart>Simon Fraser University</namePart></name></subject>"
 null2,"<subject authority=""lcsh""><geographic>British Columbia--Newspapers</geographic></subject>"
 null3,"<subject authority=""lcsh""><geographic>Burnaby (B.C.)--Newspapers</geographic></subject>"
 null4,"<identifier type=""uuid""/>"
