@@ -1,0 +1,39 @@
+Common name (on plate),<titleInfo usage="primary" displayLabel="Common name (on plate)"><title>%value%</title></titleInfo>
+Current common name,<subject authority="local" displayLabel="Current common name"><topic>%value%</topic></subject>
+Notes,<note type="content">%value%</note>
+Scientific name (on plate),<titleInfo displayLabel="Scientific name (on plate)"><subTitle>%value%</subTitle></titleInfo>
+Current scientific name,<subject authority="local" displayLabel="Current scientific name"><topic>%value%</topic></subject>
+Common name of plant,<titleInfo displayLabel="Common name of plant"><subTitle>%value%</subTitle></titleInfo>
+Scientific name of plant,<titleInfo displayLabel="Scientific name of plant"><subTitle type="alternative">%value%</subTitle></titleInfo>
+Current scientific plant name,<subject authority="local" displayLabel="Current scientific plant name"><topic>%value%</topic></subject>
+Plate number,<titleInfo><partNumber>Plate number %value%</partNumber></titleInfo>
+Part number,<titleInfo><partNumber>Part number %value%</partNumber></titleInfo>
+Artist,<name displayLabel="Artist"><namePart>%value%</namePart><role><roleTerm type="code" authority="marcrelator">art</roleTerm><roleTerm type="text" authority="marcrelator">Artist</roleTerm></role></name>
+Date drawn,<originInfo><dateCreated>%value%</dateCreated></originInfo>
+Publication Date,<originInfo><dateIssued keyDate='yes'>%value%</dateIssued></originInfo>
+Printer (publisher),<originInfo><publisher>%value%</publisher></originInfo>
+Engraver/lithographer,<name displayLabel="Engraver/lithographer"><namePart>%value%</namePart><role><roleTerm type="code" authority="marcrelator">eng</roleTerm><roleTerm type="text" authority="marcrelator">Engraver</roleTerm></role></name>
+Donated by,<name displayLabel="Donated by"><namePart>%value%</namePart><role><roleTerm type="code" authority="marcrelator">dnr</roleTerm><roleTerm type="text" authority="marcrelator">Donor</roleTerm></role></name>
+Subjects,<subject authority="lcsh"><topic>%value%</topic></subject>
+Location of bird drawn,<subject authority="lcsh" displayLabel="Location of bird drawn"><geographic>%value%</geographic></subject>
+Physical description,<abstract>%value%</abstract>
+General Type,<typeOfResource>still image</typeOfResource>
+Type,<physicalDescription><form>%value%</form></physicalDescription>
+Original Format,<physicalDescription><note type="medium">%value%</note></physicalDescription>
+Language,<language><languageTerm type="code">%value%</languageTerm></language>
+Digital Collection,<relatedItem type="host"><titleInfo displayLabel="Digital Collection"><title>%value%</title></titleInfo></relatedItem>
+Repository,<note type="ownership" displayLabel="Repository">%value%</note>
+Repository Collection,<relatedItem type="host"><titleInfo type="alternative" displayLabel="Repository Collection"><title>%value%</title></titleInfo></relatedItem>
+null1,<relatedItem type="host"><location><url displayLabel="Relation">http://ldl.lib.lsu.edu/content/john-james-audubon-louisiana</url></location></relatedItem>
+null1,<location><physicalLocation>LUU</physicalLocation></location>
+null2,<location><physicalLocation>LSU Libraries</physicalLocation></location>
+null3,<location><url>http://lib.lsu.edu</url></location>
+null4,<location><holdingSimple><copyInformation><subLocation>Hill Memorial Library, Special Collections</subLocation></copyInformation></holdingSimple></location>
+Restrictions,<accessCondition type="restriction on access" dislayLabel="Rights">%value%</accessCondition>
+Cite As,<note type="preferred citation" displayLabel="Cite As">%value%</note>
+Contact and Ordering Information,<accessCondition type="use and reproduction" dislayLabel="Contact Information">%value%</accessCondition>
+Item number,<identifier type="local" displayLabel="Item Number">%value%</identifier>
+Accession number,<identifier type="local" displayLabel="Accession number">%value%</identifier>
+Cataloger,<recordInfo><recordInfoNote displayLabel="Cataloger">%value%</recordInfoNote></recordInfo>
+Cataloged date,<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>
+Digital reproduction information,<extension><digitalReproductionInfo>%value%</digitalReproductionInfo></extension>
