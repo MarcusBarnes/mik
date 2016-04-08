@@ -1,0 +1,24 @@
+Title,<titleInfo displayLabel="Title"><title>%value%</title></titleInfo>
+Creator,<name displayLabel="Interviewer"><namePart>%value%</namePart><role><roleTerm type="code" authority="marcrelator">ivr</roleTerm><roleTerm type="text" authority="marcrelator">Interviewer</roleTerm></role></name>
+Date,<originInfo><dateIssued keyDate='yes'>%value%</dateIssued></originInfo>
+Publisher,<originInfo><publisher>%value%</publisher></originInfo>
+Subject,<subject authority="lcsh"><topic>%value%</topic></subject>
+Coverage-Temporal,<subject displayLabel="Temporal Subject"><temporal>%value%</temporal></subject>
+Type,<typeOfResource>sound recording-nonmusical</typeOfResource>
+Format,<physicalDescription><internetMediaType>%value%</internetMediaType></physicalDescription>
+Language,<language><languageTerm type="code">%value%</languageTerm></language>
+Source,<note type="ownership" displayLabel="Repository">%value%</note>
+null1,<relatedItem type="host"><location><url displayLabel="Relation">http://ldl.lib.lsu.edu/content/joseph-h-fichter-sj-tapes</url></location></relatedItem>
+Relation,<relatedItem type="host"><titleInfo displayLabel="Repository Collection"><title>%value%</title></titleInfo></relatedItem>
+Rights,<accessCondition type="restriction on access" dislayLabel="Rights">%value%</accessCondition>
+Permissions,<accessCondition type="restriction on access" dislayLabel="Permissions">%value%</accessCondition>
+Contact Information,<accessCondition type="use and reproduction" dislayLabel="Contact Information">%value%</accessCondition>
+Cataloger,<recordInfo><recordInfoNote displayLabel="Cataloger">%value%</recordInfoNote></recordInfo>
+Date created,<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>
+Date modified,<recordInfo><recordChangeDate><%value%</recordChangeDate></recordInfo>
+Resolution,<extension><audioResolution>%value%</audioResolution></extension>
+Bit-rate,<extension><audioBitRate>%value%</audioBitRate></extension>
+File Size (Archival),<extension><fileSize>%value%</fileSize></extension>
+Hardware/Software (Archival),<extension><hardwareSoftware>%value%</hardwareSoftware></extension>
+Digitized By,<extension><digitizedBy>%value%</digitizedBy></extension>
+Digitized Date,<extension><digitizedDate>%value%</digitizedDate></extension>
