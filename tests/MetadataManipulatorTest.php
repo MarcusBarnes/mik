@@ -7,7 +7,7 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
 
    protected function setUp()
     {
-        $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_tests_temp_dir";
+        $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_tests_temp_dir." . time();
         @mkdir($this->path_to_temp_dir);
         $this->path_to_log = $this->path_to_temp_dir . DIRECTORY_SEPARATOR . "mik_metadataparser_test.log";
         $this->path_to_manipulator_log = $this->path_to_temp_dir . DIRECTORY_SEPARATOR . "mik_metadatamanipulator_test.log";
@@ -68,7 +68,7 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
 
         $parser = new CsvToMods($settings);
 
-        // Test for matches against dates like 24-12-1954.
+        // Test for matches against dates like 24-12-1954 (day first).
         $mods = $parser->metadata('postcard_1');
         $this->assertRegExp('#<dateIssued\sencoding="w3cdtf">1954\-12\-24</dateIssued>#', $mods,
             "NormalizeDate metadata manipulator for (\d\d)\-(\d\d)\-(\d\d\d\d) did not work");
@@ -82,6 +82,11 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
         $mods = $parser->metadata('postcard_4');
         $this->assertRegExp('#<dateIssued\sencoding="w3cdtf">1924\-12\-24</dateIssued>#', $mods,
             "NormalizeDate metadata manipulator for (\d\d\d\d)/(\d\d)/(\d\d) did not work");
+
+        // Test for matches against dates like 25/11/1925 (day first). 
+        $mods = $parser->metadata('postcard_11');
+        $this->assertRegExp('#<dateIssued\sencoding="w3cdtf">1925\-11\-25</dateIssued>#', $mods,
+            "NormalizeDate metadata manipulator for (\d\d\)/(\d\d)/(\d\d\d\d) did not work");
     }
 
     public function testAddCsvDataMetadataManipulator()

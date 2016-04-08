@@ -131,6 +131,9 @@ class CdmToMods extends Mods
         $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
         
         foreach ($collectionMappingArray as $key => $valueArray) {
+            if (preg_match('/^#/', $valueArray[0])) {
+              continue;
+            }
             $CONTENTdmField = $valueArray[0];
             if (isset($CONTENTdmFieldValuesArray[$CONTENTdmField])) {
                 $fieldValue = $CONTENTdmFieldValuesArray[$CONTENTdmField];
