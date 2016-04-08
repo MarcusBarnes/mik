@@ -29,3 +29,4 @@ File Size (Archival),<extension><fileSize>%value%</fileSize></extension>
 Hardware/Software (Archival),<extension><hardwareSoftware>%value%</hardwareSoftware></extension>
 Digitized By,<extension><digitizedBy>%value%</digitizedBy></extension>
 Digitized Date,<extension><digitizedDate>%value%</digitizedDate></extension>
+null2,<extension><CONTENTdmData></CONTENTdmData></extension>

@@ -37,3 +37,4 @@ Accession number,<identifier type="local" displayLabel="Accession number">%value
 Cataloger,<recordInfo><recordInfoNote displayLabel="Cataloger">%value%</recordInfoNote></recordInfo>
 Cataloged date,<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>
 Digital reproduction information,<extension><digitalReproductionInfo>%value%</digitalReproductionInfo></extension>
+null5,<extension><CONTENTdmData></CONTENTdmData></extension>
