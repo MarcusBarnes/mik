@@ -1,17 +1,34 @@
 Title,<titleInfo><title>%value%</title></titleInfo>
-Contact Information,<accessCondition type="use and reproduction">Contact the Historic New Orleans Collection for more information about use and reproduction. %value%</accessCondition>
-Creator,<name><namePart>%value%</namePart><role><roleTerm type="text">photographer</roleTerm><roleTerm type="code">pht</roleTerm></role></name>
-Subject,<subject><topic>%value%</topic></subject>
-Credit,<note type="preferred citation">%value%</note>
-Description,<abstract>%value%</abstract>
+Creator,<name displayLabel="Photographer"><namePart>%value%</namePart><role><roleTerm type="text" authority="marcrelator">Photographer</roleTerm><roleTerm type="code" authority="marcrelator">pht</roleTerm></role></name>
+Contributors,<name displayLabel="Contributor"><namePart>%value%</namePart><role><roleTerm type="text" authority="marcrelator">Contributor</roleTerm><roleTerm type="code" authority="marcrelator">ctb</roleTerm></role></name>
 Date,<originInfo><dateIssued keyDate='yes'>%value%</dateIssued></originInfo>
+Publisher,<originInfo><publisher>%value%</publisher></originInfo>
+Subject,<subject authority="lcsh"><topic>%value%</topic></subject>
+Coverage-Spatial,<subject authority="lcsh" displayLabel="Geographic Subject"><geographic>%value%</geographic></subject>
+Description,<abstract displayLabel="Description">%value%</abstract>
+Notes,<note>%value%</note>
 Type,<typeOfResource>still image</typeOfResource>
-Medium,<physicalDescription><form>%value%</form></physicalDescription>
+Format,<physicalDescription><internetMediaType>%value%</internetMediaType></physicalDescription>
+Medium,<physicalDescription><note type="medium">%value%</note></physicalDescription>
 Extent,<physicalDescription><extent>%value%</extent></physicalDescription>
-Source,<note type="ownership">%value%</note>
 Language,<language><languageTerm type="code">%value%</languageTerm></language>
-Relation,<relatedItem type="host"><location><url>%value%</url></location></relatedItem>
-Rights,<accessCondition type="restriction on access">%value%</accessCondition>
-Accession No,<note type="accession number">%value%</note>
-Object File Name,<identifier>%value%</identifier>
+Source,<note type="ownership" displayLabel="Repository">%value%</note>
+Source URL,<location><url>%value%</url></location>
+Relation,<relatedItem type="host"><location><url displayLabel="Relation">http://ldl.lib.lsu.edu/content/clarence-john-laughlin-photograph-collection</url></location></relatedItem>
+Credit,<accessCondition type="restriction on access" displayLabel="Credit">%value%</accessCondition>
+Rights,<accessCondition type="restriction on access" displayLabel="Rights">%value%</accessCondition>
+Contact Information,<accessCondition type="use and reproduction" displayLabel="Contact Information">Contact the Historic New Orleans Collection for more information about use and reproduction. %value%</accessCondition>
+Accession No,<note type="accession number" displayLabel="Accession No">%value%</note>
+Object File Name,<identifier displayLabel="Object File Name">%value%</identifier>
+Cataloger,<recordInfo><recordInfoNote displayLabel="Cataloger">%value%</recordInfoNote></recordInfo>
+Cataloged Date,<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>
+Image Resolution (Archival),<extension><imageResolution>%value%</imageResolution></extension>
+Image Bit-Depth (Archival),<extension><imageBitDepth>%value%</imageBitDepth></extension>
+Color Mode (Archival),<extension><colorMode>%value%</colorMode></extension>
+Extent (Archival),<extension><extentArchival>%value%</extentArchival></extension>
+Image Manipulation (Archival),<extension><imageManipulation>%value%</imageManipulation></extension>
+File Size (Archival),<extension><fileSize>%value%</fileSize></extension>
+Hardware/Software (Archival),<extension><hardwareSoftware>%value%</hardwareSoftware></extension>
+Digitized By,<extension><digitizedBy>%value%</digitizedBy></extension>
+Digitized Date,<extension><digitizedDate>%value%</digitizedDate></extension>
 null1,<extension><CONTENTdmData></CONTENTdmData></extension>
