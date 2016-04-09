@@ -109,6 +109,7 @@ class NormalizeDate extends MetadataManipulator
                 $origin_info_element->appendChild($date_element);
                 // Convert the back to the snippet and return it.
                 $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
+                $this->logInvalidDate($year, $month, $day);
                 return $dom->saveXML($origin_info_element);
             }
             /**
@@ -136,6 +137,7 @@ class NormalizeDate extends MetadataManipulator
                 $origin_info_element->appendChild($date_element);
                 // Convert the back to the snippet and return it.
                 $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
+                $this->logInvalidDate($year, $month, $day);
                 return $dom->saveXML($origin_info_element);
             }
             /**
@@ -148,6 +150,7 @@ class NormalizeDate extends MetadataManipulator
                 $date_element->nodeValue = $year . '-' . $month . '-' . $day;
                 $origin_info_element->appendChild($date_element);
                 $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
+                $this->logInvalidDate($year, $month, $day);
                 return $dom->saveXML($origin_info_element);
             }
             /**
@@ -160,6 +163,7 @@ class NormalizeDate extends MetadataManipulator
                 $date_element->nodeValue = $year . '-' . $month . '-' . $day;
                 $origin_info_element->appendChild($date_element);
                 $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
+                $this->logInvalidDate($year, $month, $day);
                 return $dom->saveXML($origin_info_element);
             }
             /**
@@ -244,4 +248,29 @@ class NormalizeDate extends MetadataManipulator
              )
          );
      }
+
+    /**
+     * Validates a date and logs invalid ones.
+     *
+     * @param int
+     *     The normalized year.
+     * @param int
+     *     The normalized month.
+     * @param int
+     *     The normalized day.
+     */
+     public function logInvalidDate($year, $month, $day)
+     {
+         if (checkdate($month, $day, $year)) {
+           return;
+         }
+
+         $this->log->addWarning("NormalizeDate",
+             array(
+                 'Record key' => $this->record_key,
+                 'Normalized date value is not a valid date' => $year . '-' . $month . '-' . $day,
+             )
+         );
+     }
+
 }
