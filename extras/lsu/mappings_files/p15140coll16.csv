@@ -4,7 +4,7 @@ Volume,<part><detail type="volume"><number>%value%</number><caption>vol.</captio
 Issue,<part><detail type="issue"><number>%value%</number><caption>no.</caption></detail></part>
 Date,<part><date>%value%</date></part>
 Publisher,<originInfo><publisher>%value%</publisher></originInfo>
-null1<originInfo><issuance>serial</issuance></originInfo>
+null1,<originInfo><issuance>serial</issuance></originInfo>
 Subject,<subject><topic>%value%</topic></subject>
 Coverage-Spatial,<subject authority="lcsh" displayLabel="Geographic Subject"><geographic>%value%</geographic></subject>
 Coverage-Temporal,<subject displayLabel="Temporal Subject"><temporal>%value%</temporal></subject>

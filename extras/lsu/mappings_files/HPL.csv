@@ -18,3 +18,4 @@ Cataloger,<recordInfo><recordInfoNote displayLabel="Cataloger">%value%</recordIn
 Catalog Date,<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>
 Object_File_Name,<identifier type="local" displayLabel="Object File Name">%value%</identifier>
 Date modified,<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>
+null1,<extension><CONTENTdmData></CONTENTdmData></extension>
