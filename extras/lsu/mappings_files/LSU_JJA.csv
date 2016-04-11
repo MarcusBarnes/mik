@@ -28,7 +28,7 @@ null1,<relatedItem type="host"><location><url displayLabel="Relation">http://ldl
 null1,<location><physicalLocation>LUU</physicalLocation></location>
 null2,<location><physicalLocation>LSU Libraries</physicalLocation></location>
 null3,<location><url>http://lib.lsu.edu</url></location>
-null4,<location><holdingSimple><copyInformation><subLocation>Hill Memorial Library, Special Collections</subLocation></copyInformation></holdingSimple></location>
+null4,<location><holdingSimple><copyInformation><subLocation>Hill Memorial Library: Special Collections</subLocation></copyInformation></holdingSimple></location>
 Restrictions,<accessCondition type="restriction on access" dislayLabel="Rights">%value%</accessCondition>
 Cite As,<note type="preferred citation" displayLabel="Cite As">%value%</note>
 Contact and Ordering Information,<accessCondition type="use and reproduction" dislayLabel="Contact Information">%value%</accessCondition>

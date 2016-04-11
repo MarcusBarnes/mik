@@ -11,7 +11,7 @@ Repository Collection Guide,<relatedItem type="host"><location><url dislayLabel=
 null1,<location><physicalLocation>LUU</physicalLocation></location>
 null2,<location><physicalLocation>LSU Libraries</physicalLocation></location>
 null3,<location><url>http://lib.lsu.edu</url></location>
-null4,<location><holdingSimple><copyInformation><subLocation>Hill Memorial Library, Special Collections</subLocation></copyInformation></holdingSimple></location>
+null4,<location><holdingSimple><copyInformation><subLocation>Hill Memorial Library: Special Collections</subLocation></copyInformation></holdingSimple></location>
 Shelving Location,<location><holdingSimple><copyInformation><shelfLocator>%value%</shelfLocator></copyInformation></holdingSimple></location>
 Cite As,<note type="preferred citation">%value%</note>
 Restrictions,<accessCondition type="restriction on access" dislayLabel="Rights">%value%</accessCondition>
