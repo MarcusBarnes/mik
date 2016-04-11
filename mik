@@ -20,7 +20,7 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 // in the set_error_handler function halting the program.
 // Provide a default timezone if date.timezone is null in the the PHP INI.
 if (null == ini_get('date.timezone')) {
-    date_default_timezone_set('America/Vancouver');
+    date_default_timezone_set('America/Chicago');
 }
 
 // On Windows, opcache.enable_cli causes 'Fatal Error Unable to reattach

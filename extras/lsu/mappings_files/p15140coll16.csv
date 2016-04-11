@@ -15,8 +15,8 @@ Format,<physicalDescription><internetMediaType>%value%</internetMediaType></phys
 Language,<language><languageTerm type="code">%value%</languageTerm></language>
 Relation,<relatedItem type="host"><location><url displayLabel="Relation">http://ldl.lib.lsu.edu/content/tiger-rag-%E2%80%93-student-newspapers-lsu-school-medicine-new-orleans</url></location></relatedItem>
 Source,<note type="ownership" displayLabel="Repository">%value%</note>
-Rights,<accessCondition type="restriction on access" dislayLabel="Rights">%value%</accessCondition>
-Cataloger,<recordInfo><recordInfoNote displayLabel="Cataloger">%value%</recordInfoNote></recordInfo>
+Rights,<accessCondition type="restriction on access">%value%</accessCondition>
+Cataloger,<extension><cataloger>%value%</cataloger></extension>
 Date created,<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>
 Date modified,<recordInfo><recordChangeDate>%value%</recordChangeDate></recordInfo>
 Viewer Information,<extension><viewerInformation>%value%</viewerInformation></extension>

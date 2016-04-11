@@ -4,7 +4,7 @@ Notes,<note type="content">%value%</note>
 Scientific name (on plate),<titleInfo displayLabel="Scientific name (on plate)"><subTitle>%value%</subTitle></titleInfo>
 Current scientific name,<subject authority="local" displayLabel="Current scientific name"><topic>%value%</topic></subject>
 Common name of plant,<titleInfo displayLabel="Common name of plant"><subTitle>%value%</subTitle></titleInfo>
-Scientific name of plant,<titleInfo displayLabel="Scientific name of plant"><subTitle type="alternative">%value%</subTitle></titleInfo>
+Scientific name of plant,<titleInfo displayLabel="Scientific name of plant"><subTitle>%value%</subTitle></titleInfo>
 Current scientific plant name,<subject authority="local" displayLabel="Current scientific plant name"><topic>%value%</topic></subject>
 Plate number,<titleInfo><partNumber>Plate number %value%</partNumber></titleInfo>
 Part number,<titleInfo><partNumber>Part number %value%</partNumber></titleInfo>
@@ -24,17 +24,17 @@ Language,<language><languageTerm type="code">%value%</languageTerm></language>
 Digital Collection,<relatedItem type="host"><titleInfo displayLabel="Digital Collection"><title>%value%</title></titleInfo></relatedItem>
 Repository,<note type="ownership" displayLabel="Repository">%value%</note>
 Repository Collection,<relatedItem type="host"><titleInfo type="alternative" displayLabel="Repository Collection"><title>%value%</title></titleInfo></relatedItem>
-null1,<relatedItem type="host"><location><url displayLabel="Relation">http://ldl.lib.lsu.edu/content/john-james-audubon-louisiana</url></location></relatedItem>
+null6,<relatedItem type="host"><location><url displayLabel="Relation">http://ldl.lib.lsu.edu/content/john-james-audubon-louisiana</url></location></relatedItem>
 null1,<location><physicalLocation>LUU</physicalLocation></location>
 null2,<location><physicalLocation>LSU Libraries</physicalLocation></location>
 null3,<location><url>http://lib.lsu.edu</url></location>
 null4,<location><holdingSimple><copyInformation><subLocation>Hill Memorial Library: Special Collections</subLocation></copyInformation></holdingSimple></location>
-Restrictions,<accessCondition type="restriction on access" dislayLabel="Rights">%value%</accessCondition>
+Restrictions,<accessCondition type="restriction on access">%value%</accessCondition>
 Cite As,<note type="preferred citation" displayLabel="Cite As">%value%</note>
-Contact and Ordering Information,<accessCondition type="use and reproduction" dislayLabel="Contact Information">%value%</accessCondition>
+Contact and Ordering Information,<accessCondition type="use and reproduction">%value%</accessCondition>
 Item number,<identifier type="local" displayLabel="Item Number">%value%</identifier>
 Accession number,<identifier type="local" displayLabel="Accession number">%value%</identifier>
-Cataloger,<recordInfo><recordInfoNote displayLabel="Cataloger">%value%</recordInfoNote></recordInfo>
+Cataloger,<extension><cataloger>%value%</cataloger></extension>
 Cataloged date,<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>
 Digital reproduction information,<extension><digitalReproductionInfo>%value%</digitalReproductionInfo></extension>
 null5,<extension><CONTENTdmData></CONTENTdmData></extension>
