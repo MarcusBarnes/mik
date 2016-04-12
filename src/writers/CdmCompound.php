@@ -106,8 +106,7 @@ class CdmCompound extends Writer
                 // so we can grab the extension.
                 $item_info = $this->fetcher->getItemInfo($child_pointer);
                 $source_file_extension = pathinfo($item_info['find'], PATHINFO_EXTENSION);
-                // @todo: replace 'DSID' with the correct filename
-                $output_file_path = $childObjectPath . DIRECTORY_SEPARATOR . 'DSID' . '.' . $source_file_extension;
+                $output_file_path = $childObjectPath . DIRECTORY_SEPARATOR . 'OBJ' . '.' . $source_file_extension;
                 rename($temp_file_path, $output_file_path);
             }
             catch (Exception $e) {
