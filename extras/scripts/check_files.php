@@ -48,6 +48,9 @@ switch ($options['cmodel']) {
     case 'islandora:newspaperIssueCModel':
         islandora_newspaper_issue_cmodel($options);
         break; 
+    case 'islandora:bookCModel':
+        islandora_book_cmodel($options);
+        break; 
     default:
         exit("Sorry, the content model " . $options['cmodel'] . " is not registered with this script.\n");
 }
@@ -246,15 +249,186 @@ function islandora_newspaper_issue_cmodel($options) {
         print "All of expected newspaper pages are present.\n";
     }
 
-    if ($bad_ocr_encoding) {
-        print "** Some OCR.txt files in " . $options['dir'] . " appear not to be valid UTF-8.\n";
+    if (in_array('OCR.txt', $file_patterns)) {   
+        if ($bad_ocr_encoding) {
+            print "** Some OCR.txt files in " . $options['dir'] . " appear not to be valid UTF-8.\n";
+        }
+        else {
+            print "All OCR.txt files in " . $options['dir'] . " appear to be valid UTF-8.\n";
+        }
+    }
+
+
+    print "More detail may be available in " . $options['log'] . ".\n";
+}
+
+/**
+ * Checks the existence of MODS.xml for each issue in $options['dir'], and
+ * for the existence of the files listed in $options['files'] for each page.
+ * Does not check for the existence of extra files.
+ *
+ * Example: php check_files.php --cmodel=islandora:bookCModel --dir=/path/to/mikoutput
+ *    --files=JP2.jp2,JPEG.jpg,MODS.xml,OBJ.tiff,OCR.txt,TN.jpg,TECHMD.xml --log=/tmp/mylog.txt
+ */
+function islandora_book_cmodel($options) {
+    $file_patterns = explode(',', $options['files']);
+    $options['book_level_metadata'] = (!array_key_exists('book_level_metadata', $options)) ?
+        'MODS.xml' : $options['book_level_metadata'];
+    // $all_issue_level_dirs = array();
+    $files_missing = false;
+    $pages_missing = false;
+    $extra_files_in_books_dir = false;
+    $extra_files_in_book_dir = false;
+    $extra_files_in_pages_dir = false;
+    $bad_ocr_encoding = false;
+    if ($books_handle = opendir($options['dir'])) {
+        while (false !== ($books_dir = readdir($books_handle))) {
+            // Check to make sure that there are no files in the issues directory
+            // other than MODS.xml and TN.jpg.
+            if (is_file($options['dir'] . DIRECTORY_SEPARATOR . $books_dir)) {
+                error_log($options['dir'] . DIRECTORY_SEPARATOR . $books_dir . " should not exist.\n", 3, $options['log']);
+                $extra_files_in_books_dir = true;
+            }
+
+            if ($books_dir != "." && $books_dir != "..") {
+                $book_dir = trim($options['dir'] . DIRECTORY_SEPARATOR . $books_dir);
+                // Test for existence of MODS.xml.
+                if (is_dir($book_dir)) {
+                    $metadata_path = $book_dir . DIRECTORY_SEPARATOR . $options['book_level_metadata'];
+                    if (!file_exists($metadata_path)) {
+                        error_log("$metadata_path does not exist.\n", 3, $options['log']);
+                        $files_missing = true;
+                    }
+                    // Issue-level check for TN.jpg hard-coded for now.
+                    $tn_path = $book_dir . DIRECTORY_SEPARATOR . 'TN.jpg';
+                    if (!file_exists($tn_path)) {
+                        error_log("$tn_path does not exist.\n", 3, $options['log']);
+                        $files_missing = true;
+                    }
+                }
+
+                // Check for files other than MODS.xml and TN.jpg in $issue_dir.
+                if (is_dir($book_dir)) {
+                    $book_dir_contents = scandir($book_dir);
+                    foreach ($book_dir_contents as $book_dir_file) {
+                        // To whoever needs to debug or maintain this... please forgive me. I am not a monster.
+                        $book_level_metadata_file = $book_dir . DIRECTORY_SEPARATOR . $options['book_level_metadata'];
+                        if (is_file($book_dir . DIRECTORY_SEPARATOR . $book_dir_file) &&
+                                ($book_dir . DIRECTORY_SEPARATOR . $book_dir_file != $book_level_metadata_file)) {
+                            $book_level_tn_file = $book_dir . DIRECTORY_SEPARATOR . 'TN.jpg';
+                            if (is_file($book_dir . DIRECTORY_SEPARATOR . $book_dir_file) &&
+                                ($book_dir . DIRECTORY_SEPARATOR . $book_dir_file != $book_level_tn_file)) {
+                                error_log($book_dir . DIRECTORY_SEPARATOR . $book_dir_file .
+                                    " should not exist.\n", 3, $options['log']);
+                                $extra_files_in_book_dir = true;
+                            }
+                        }
+                    }
+                }
+
+                // Get all the page-level directories in $book_dir.
+                $page_dirs_pattern = trim($book_dir) . DIRECTORY_SEPARATOR . "*";
+                $page_dirs = glob($page_dirs_pattern, GLOB_ONLYDIR);
+
+                // Count the number of page_dirs against expected number from issue-level MODS.XML 
+                $mods_path = $book_dir . DIRECTORY_SEPARATOR . $options['book_level_metadata'];
+                $expectedNumPageDirs = expectedNumPageDirFromModsXML($mods_path);
+                $numPageDirs = count($page_dirs);
+                if ($expectedNumPageDirs != $numPageDirs) {
+                    $error_msg = "For issue $book_dir, ";
+                    $error_msg .= "the number of directories for book pages ($numPageDirs) ";
+                    $error_msg .= " does not match the expected number ($expectedNumPageDirs)\n";
+                    error_log($error_msg, 3, $options['log']);
+                    $pages_missing = true;
+                }
+
+                // Now check for the existence of each of the specified files.
+                foreach ($page_dirs as $page_dir) {
+                    foreach ($file_patterns as $file_pattern) {
+                        $path_to_file = $page_dir . DIRECTORY_SEPARATOR . $file_pattern;
+                        if (!file_exists($path_to_file) && !is_dir($path_to_file) && $path_to_file != $options['log']) {
+                            error_log("$path_to_file does not exist.\n", 3, $options['log']);
+                            $files_missing = true;
+                        }
+                    }
+
+                    // Check for extraneous files in the page directory.
+                    $page_dir_contents = scandir($page_dir);
+                    // Remove . and ..
+                    $page_dir_contents = array_slice($page_dir_contents, 2);
+                    foreach ($page_dir_contents as $page_dir_file) {
+                        if (!in_array($page_dir_file, $file_patterns)) {
+                            error_log($page_dir . DIRECTORY_SEPARATOR . $page_dir_file . 
+                                " should not exist.\n", 3, $options['log']);
+                            $extra_files_in_pages_dir = true;
+                        }
+                    }
+
+                    // Check each OCR.txt file to ensure it's encoded in UTF-8.
+                    $path_to_ocr_file = $page_dir . DIRECTORY_SEPARATOR . 'OCR.txt';
+                    if (file_exists($path_to_ocr_file)) {
+                        $ocr_content = file_get_contents($path_to_ocr_file);
+                        if (!mb_check_encoding($ocr_content, 'UTF-8')) {
+                            error_log("$path_to_ocr_file is not valid UTF-8\n", 3, $options['log']);
+                            $bad_ocr_encoding  = true;
+                        }
+                    }
+                }
+            }
+        }
+        closedir($books_handle);
+        clearstatcache();
+    }
+
+    if ($extra_files_in_books_dir) {
+        print "** Files exist in ". $options['dir'] . " that should not be present.\n";
     }
     else {
-        print "All OCR.txt files in " . $options['dir'] . " appear to be valid UTF-8.\n";
+        print "There are no unexpected files in " . $options['dir'] . ".\n";
+    }
+
+    if ($extra_files_in_book_dir) {
+        print "** Files exist in one or more book-level directories that should not be present.\n";
+    }
+    else {
+        print "There are no unexpected files in any book-level directories.\n";
+    }
+
+    if ($extra_files_in_pages_dir) {
+        print "** Files exist in one or more book page directories that should not be present.\n";
+    }
+    else {
+        print "There are no unexpected files in any book page directories.\n";
+    }
+
+    if ($files_missing) {
+        print "** Some books in " . $options['dir'] . " are missing one of " .
+            $options['files'] . ".\n";
+    }
+    else {
+        print "All books in " . $options['dir'] . " have the files " .
+            $options['files'] . ".\n";
+    }
+
+    if ($pages_missing) {
+        print "** There is a mismatch between the number of books in " . $options['dir'] 
+            . " and the number of book pages expected based on the CPD.XML contained in the issue level MODS XML.\n"; 
+    } else {
+        print "All of expected book pages are present.\n";
+    }
+
+    if (in_array('OCR.txt', $file_patterns)) { 
+        if ($bad_ocr_encoding) {
+            print "** Some OCR.txt files in " . $options['dir'] . " appear not to be valid UTF-8.\n";
+        }
+        else {
+            print "All OCR.txt files in " . $options['dir'] . " appear to be valid UTF-8.\n";
+        }
     }
 
     print "More detail may be available in " . $options['log'] . ".\n";
 }
+
 
 /**
  * Determines the expected number of pages in an issue by checking the CDP data stored
