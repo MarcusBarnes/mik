@@ -5,7 +5,7 @@
 "Date","<originInfo><dateIssued encoding='w3cdtf' keyDate='yes'>%value%</dateIssued></originInfo>"
 "Type","<genre authority='lcgft'>newspapers</genre>"
 "Identifier","<identifier type='local'>%value%</identifier>"
-"Rights","<accessCondition type='use and reproduction'>%value%</accessCondition>"
+"Rights","<accessCondition type='use and reproduction'>Copyright the Multicultural History Society of Ontario.</accessCondition>"
 "null0","<typeOfResource>text</typeOfResource>"
 "null1","<note>Place of publication varies</note>"
 "null2","<subject authority='lcsh'><topic>Jews--Newspapers</topic></subject>"

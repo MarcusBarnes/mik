@@ -1,21 +1,23 @@
 Title,<titleInfo><title>%value%</title></titleInfo>
-Creator,"<name type=""personal""><namePart>%value%</namePart><role><roleTerm type=""text"" authority=""marcrelator"">interviewer</roleTerm><roleTerm type=""code"" authority=""marcrelator"">ivr</roleTerm></role></name>"
+Creator,"<name type=""personal""><namePart>%value%</namePart><role><roleTerm type=""text"" authority=""marcrelator"">interviewer</roleTerm><roleTerm type=""code"" authority=""marcrelator"">ivr</roleTerm></role></name> "
+Subject,"<subject authority=""lcsh""><topic>East Indian Canadians--British Columbia--History--20th century</topic></subject>"
 Language,"<language><languageTerm type =""code"" authority=""iso639-2b"">%value%</languageTerm></language>"
 Summary,<abstract>%value%</abstract>
 Summary - French,"<abstract lang=""fre"">%value%</abstract>"
 Summary - Punjabi,"<abstract lang=""pan"">%value%</abstract>"
-Date,"<originInfo><dateIssued encoding=""w3cdtf"" keyDate=""yes"">%value%</dateIssued></originInfo>"
+Date,"<originInfo><dateCreated encoding=""w3cdtf"" keyDate=""yes"">%value%</dateCreated></originInfo>"
 Type,"<genre authority=""lcgft"">Interviews (Sound recordings)</genre>"
-Identifier,"<identifier type=""local"">%value%</identifier>"
-Rights,"<accessCondition type=""use and reproduction"">%value%</accessCondition>"
+Identifier,"</identifier><identifier type=""local"">%value%</identifier>"
+# Rights,"<accessCondition type=""use and reproduction"">%value%</accessCondition>"
 Duration,<physicalDescription><extent>%value%</extent></physicalDescription>
-Transcript,"<note lang=""eng"">%value%</note>"
-null0,<typeOfResource>sound recording</typeOfResource>
-null1,"<subject authority=""lcsh""><topic>East Indian Canadians--British Columbia--History--20th century</topic></subject>"
-null2,"<subject authority=""lcsh""><topic>Punjab (India)--Emigration and immigration--History--20th century</topic></subject> "
-null3,"<subject authority=""lcsh""><topic>Panjabis (South Asian people)--British Columbia--History--20th century</topic></subject>"
-null4,"<subject authority=""lcsh""><topic>East Indian Canadians--British Columbia--Cultural Assimilation</topic></subject>"
-null5,"<subject authority=""lcsh""><topic>East Indian Canadians--Ethnic Identity</topic></subject>"
-null6,"<subject authority=""lcsh""><topic>Sikh Canadians--British Columbia--Vancouver--Interviews</topic></subject>"
-null7,"<subject authority=""lcsh""><topic>Women immigrants--British Columbia--Vancouver--Interviews</topic></subject>"
-null8,"<genre authority=""lcgft"">Sound recordings</genre>"
+Transcript,<note>%value%</note>
+null0,"<genre authority=""lcgft"">Oral histories</genre>"
+null1,"<subject authority=""lcsh""><topic>Punjab (India)--Emigration and immigration--History--20th century</topic></subject>"
+null2,"<subject authority=""lcsh""><topic>Panjabis (South Asian people)--British Columbia--History--20th century</topic></subject>"
+null3,"<subject authority=""lcsh""><topic>East Indian Canadians--British Columbia--Cultural Assimilation</topic></subject>"
+null4,"<subject authority=""lcsh""><topic>East Indian Canadians--Ethnic Identity</topic></subject>"
+null5,"<subject authority=""lcsh""><topic>Sikh Canadians--British Columbia--Vancouver--Interviews</topic></subject>"
+null6,"<subject authority=""lcsh""><topic>Women immigrants--British Columbia--Vancouver--Interviews</topic></subject>"
+null7,<typeOfResource>sound recording-nonmusical</typeOfResource>
+null8,<extension><CONTENTdmData></CONTENTdmData></extension>
+null9,"<identifier type=""uuid""/>"
