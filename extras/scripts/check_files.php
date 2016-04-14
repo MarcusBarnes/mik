@@ -68,31 +68,58 @@ function islandora_single_file_cmodels($options) {
     // of files for each of the entries in $options['files'].
     $all_file_pattern_counts = array();
     $all_file_pattern_globs = array();
+		$all_files_we_expect = array();
     foreach ($file_patterns as $file_pattern) {
         $glob_pattern = $options['dir'] . DIRECTORY_SEPARATOR . trim($file_pattern);
         $file_list = glob($glob_pattern);
+				$all_files_we_expect = array_merge($all_files_we_expect, $file_list);
         sort($file_list, SORT_NATURAL);
         $all_file_pattern_globs[$file_pattern] = $file_list;
         $all_file_pattern_counts[$file_pattern] = count($file_list);
     }
+		
+		// We need to figure out if there are any files in the directory that don't
+		// belong (I'm looking at you thumbs.db). Get a list of all files in the
+		// directory so we can compare it to just the files we expect to be there.
+		$all_files_pattern = $options['dir'] . DIRECTORY_SEPARATOR . '*.*';
+		$all_files = glob($all_files_pattern);
+		$unexpected_files = array_diff($all_files, $all_files_we_expect);
+		
+    // Since we can have multiple non-XML extensions in one directory as long
+		// as they both belong to the same content model (e.g., *.tif and *.jp2
+		// in one islandora:sp_large_image_cmodel batch) let's get the count of
+		// all *.xml files and see if the remainder add up to its count.
+    $count_files_xml = $all_file_pattern_counts['*.xml'];
+    print "There are $count_files_xml .xml files\n";
+		// Remove the .xml list so we don't count it twice.
+		unset($all_file_pattern_counts['*.xml']);
+		$count_files_other_patterns = 0;
+		foreach ($all_file_pattern_counts as $pattern => $count) {
+			$count_files_other_patterns = $count_files_other_patterns + $count;
+		}
+		
+		if ($count_files_xml == $count_files_other_patterns) {
+		    $groups_match = 'Yes';
+		}
+		else {
+			  $groups_match = 'No. Lists of all the file patterns has been written to ' . $options['log'];
+				 $file_lists = var_export($all_file_pattern_globs, true);
+         error_log($file_lists . "\n", 3, $options['log']);
+		}
 
-    // To see if each file has the same count, reduce the number of counts
-    // and if we have one value, we're good. If we don't, we have a mismatch.
-    $all_file_pattern_totals = array();
-    foreach ($all_file_pattern_counts as $pattern => $count) {
-        $all_file_pattern_totals[] = $count;
-    }
-    $all_file_pattern_totals = array_unique($all_file_pattern_totals);
-    if (count($all_file_pattern_totals) != 1) {
-      $groups_match = 'No. Lists of all the file patterns has been written to ' . $options['log'];
-      $file_lists = var_export($all_file_pattern_globs, true);
-      error_log($file_lists . "\n", 3, $options['log']);
-    }
-    else {
-       $groups_match = 'Yes';
-    }
     print "Number of " . $options['files'] . " files matches: $groups_match\n";
+		if ($num_unexecpted_files = count($unexpected_files)) {
+		    print "Number of unexpected files detected: $num_unexecpted_files. See the log for more detail.\n";
+				error_log("Unexpected files:\n", 3, $options['log']);
+				$unexpected_file_list = array_values($unexpected_files);
+				$unexpected_file_list = var_export($unexpected_file_list, true);
+        error_log($unexpected_file_list . "\n", 3, $options['log']);
+		}
+		else {
+			  print "No unexpected files detected.\n";
+		}
 }
+
 
 /**
  * Checks the existence of MODS.xml for each issue in $options['dir'], and
