@@ -72,8 +72,7 @@ class CdmToMods extends Mods
             $this->repeatableWrapperElements = array();
         }
         $mappingCSVpath = $this->mappingCSVpath;
-        $this->collectionMappingArray =
-            $this->getMappingsArray($mappingCSVpath);
+        $this->collectionMappingArray = $this->getMappingsArray($mappingCSVpath);
         if (isset($this->settings['MANIPULATORS']['metadatamanipulators'])) {
             $this->metadatamanipulators = $this->settings['MANIPULATORS']['metadatamanipulators'];
         } else {
@@ -136,7 +135,7 @@ class CdmToMods extends Mods
                 $fieldValue = $CONTENTdmFieldValuesArray[$CONTENTdmField];
             } elseif (preg_match("/(null)\d+/i", $key)) {
                 // Special source field name for mappings to static snippets.
-                $fiedlValue = '';
+                $fieldValue = '';
             } else {
                 // Log mismatch between mapping file and source fields (e.g., CDM).
                 $logMessage = "Mappings file contains a row $CONTENTdmField that ";
@@ -192,7 +191,7 @@ class CdmToMods extends Mods
         if ($includeMigratedFromUri == true) {
             $CONTENTdmItemUrl = '<identifier type="uri" invalid="yes" ';
             $CONTENTdmItemUrl .= 'displayLabel="Migrated From">';
-            $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection/';
+            $CONTENTdmItemUrl .= 'http://cdm16313.contentdm.oclc.org/cdm/singleitem/collection/';
             $CONTENTdmItemUrl .= $collectionAlias. '/id/'. $itemId .'</identifier>';
             $modsOpeningTag .= $CONTENTdmItemUrl;
         }
