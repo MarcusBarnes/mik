@@ -2,7 +2,7 @@
 <mods xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xlink="http://www.w3.org/1999/xlink">
     <titleInfo usage="primary" displayLabel="Common name (on plate)">
-        <title>The Yellow-throated Vireo, or Greenlet</title>
+        <title>Yellow-throated Vireo, or Greenlet</title>
     </titleInfo>
     <subject authority="local" displayLabel="Current common name">
         <topic/>
@@ -48,7 +48,7 @@
             <roleTerm type="code" authority="marcrelator">dnr</roleTerm>
             <roleTerm type="text" authority="marcrelator">Donor</roleTerm>
         </role>
-        <namePart>Mike Wagugh</namePart>
+        <namePart/>
     </name>
     <subject authority="lcsh">
         <topic>Birds--North America</topic>
