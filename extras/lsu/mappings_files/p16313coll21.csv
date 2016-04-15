@@ -17,14 +17,13 @@ Source,"<note type='ownership' displayLabel='Repository'>The Historic New Orlean
 null1,"<location><physicalLocation>LHC</physicalLocation></location>"
 null2,"<location><physicalLocation>The Historic New Orleans Collection</physicalLocation></location>"
 null3,"<location><url>http://www.hnoc.org</url></location>"
-null4,"<location><holdingSimple><copyInformation><subLocation>Williams Research Center</sublocation></copyInformation></holdingSimple></location>"
+null4,"<location><holdingSimple><copyInformation><subLocation>Williams Research Center</subLocation></copyInformation></holdingSimple></location>"
 Source URL,"<location><url>%value%</url></location>"
 Relation,"<relatedItem type='host'><location><url displayLabel='Relation'>http://ldl.lib.lsu.edu/content/clarence-john-laughlin-photograph-collection</url></location></relatedItem>"
 Rights,"<accessCondition type='restriction on access'>%value%</accessCondition>"
 Credit,"<accessCondition type='use and reproduction'>Credit: %value%</accessCondition>"
-Contact Information,"<accessCondition type='use and reproduction'>Contact the Historic New Orleans Collection for more information about use and reproduction. %value%</accessCondition>
+Contact Information,"<accessCondition type='use and reproduction'>Contact the Historic New Orleans Collection for more information about use and reproduction. %value%</accessCondition>"
 Accession No,"<note type='accession number' displayLabel='Accession No'>%value%</note>"
->>>>>>> 01ec86259cb78f5fbeaf82dba2f5c3a561b216cf
 Cataloged Date,"<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>"
 Cataloger,"<extension><cataloger>%value%</cataloger></extension>"
 Image Resolution (Archival),"<extension><imageResolution>%value%</imageResolution></extension>"

@@ -131,6 +131,8 @@ class CdmToMods extends Mods
         
         foreach ($collectionMappingArray as $key => $valueArray) {
             $CONTENTdmField = $valueArray[0];
+            // because an easy error is typos in mappings_files -- this will indicate which line has typo.
+            var_dump($CONTENTdmField);
             if (isset($CONTENTdmFieldValuesArray[$CONTENTdmField])) {
                 $fieldValue = $CONTENTdmFieldValuesArray[$CONTENTdmField];
             } elseif (preg_match("/(null)\d+/i", $key)) {

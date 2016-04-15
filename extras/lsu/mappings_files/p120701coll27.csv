@@ -32,5 +32,5 @@ Image Manipulation (Archival),"<extension><imageManipulation>%value%</imageManip
 File Size (Archival),"<extension><fileSize>%value%</fileSize></extension>"
 Hardware/Software (Archival),"<extension><hardwareSoftware>%value%</hardwareSoftware></extension>"
 Digitized By,"<extension><digitizedBy>%value%</digitizedBy></extension>"
-Date modified,"<recordInfo><recordChangeDate><%value%</recordChangeDate></recordInfo>"
+Date modified,"<recordInfo><recordChangeDate>%value%</recordChangeDate></recordInfo>"
 null5,"<extension><CONTENTdmData></CONTENTdmData></extension>"
