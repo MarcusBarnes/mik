@@ -48,7 +48,7 @@
             <roleTerm type="code" authority="marcrelator">dnr</roleTerm>
             <roleTerm type="text" authority="marcrelator">Donor</roleTerm>
         </role>
-        <namePart/>
+        <namePart>Mike Wagugh</namePart>
     </name>
     <subject authority="lcsh">
         <topic>Birds--North America</topic>
