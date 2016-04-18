@@ -98,7 +98,7 @@ class LocalCdmFiles extends Fetcher
     /**
      * Query CONTENTdm with the values in the query map and return an array of records.
      */
-    public function queryContentdm($limit)
+    public function readContentdm($limit)
     {
         $totalRecs = $this->getNumRecs();
         // Account for CONTENTdm's limit of only returning 1024 records per
@@ -127,14 +127,11 @@ class LocalCdmFiles extends Fetcher
         $output = new \StdClass();
         $output->records = array();
         for ($processed_chunks = 1; $processed_chunks <= $num_chunks; $processed_chunks++) {
-            $query = $this->settings['ws_url'] . 'dmQuery/'. $this->settings['alias'] .
-                '/'. $qm['searchstrings'] . '/'. $qm['fields'] . '/'. $qm['sortby'] .
-                '/'. $this->chunk_size . '/'. $this->start_at . '/'. $qm['supress'] .
-                '/'. $qm['docptr'] . '/'.  $qm['suggest'] . '/'. $qm['facets'] .
-                '/' . $qm['format'];
+            $start_at_as_str = strval($this->start_at);
+            $filepath = 'Cached_CDM_files/' . $this->settings['alias'] . '/Elems_in_Collection_' . $start_at_as_str .'.json';
 
             // Query CONTENTdm and return records; if failure, log problem.
-            if ($json = file_get_contents($query, false, null)) {
+            if ($json = file_get_contents($filepath, false, null)) {
                 $chunk_output = json_decode($json);
                 $chunk_output = $this->addKeyPropertyForRecords($chunk_output);
             } else {
@@ -145,6 +142,7 @@ class LocalCdmFiles extends Fetcher
             $output->records = array_merge($output->records, $chunk_output->records);
             $this->start_at = $this->chunk_size * $processed_chunks + 1;
         }
+        var_dump($output);
         return $output;
     }
     
@@ -169,29 +167,29 @@ class LocalCdmFiles extends Fetcher
         }
 
         $propertiesOfRecordsObj->records = $arrayOfRecordObjects;
-
+        var_dump($propertiesOfRecordsObj);
         return $propertiesOfRecordsObj;
     }
 
     /**
-     * Query CDM for total records for a colletion.
+     * Pulls total number of records in a colletion from local folder.
      */
     public function getNumRecs()
     {
-        $qm = $this->browseQueryMap;
-        $query = $this->settings['ws_url'] . 'dmQueryTotalRecs/'
-          . $this->settings['alias'] . '|0/xml';
-        // Query CONTENTdm and return records; if failure, log problem.
-        if ($xml = file_get_contents($query, false, null)) {
-            $doc = new \DomDocument('1.0');
-            $doc->loadXML($xml);
-            return $doc->getElementsByTagName('total')->item(0)->nodeValue;
+        $filepath = 'Cached_CDM_files/' . $this->settings['alias'] . '/Collection_TotalRecs.xml';
+        if (!file_exists($filepath)) {
+            exit("Sorry, can't find " . $filepath . "\n");
         } else {
-            $message = date('c') . "\t". 'Query failed:' . "\t" . $query . "\n";
-            // @todo: Log failure.
-            return false;
+           if($xml = file_get_contents($filepath, false, null)) {
+                $doc = new \DomDocument('1.0');
+                $doc->loadXML($xml);
+                return $doc->getElementsByTagName('total')->item(0)->nodeValue;
+            } else {
+                $message = date('c') . "\t". 'Fileread failed:' . "\t" . $filepath . "\n";
+                echo $message;
+                return false;
+            }
         }
-
     }
     
     /**
@@ -205,19 +203,17 @@ class LocalCdmFiles extends Fetcher
     public function getItemInfo($pointer)
     {
         $raw_metadata_cache = $this->settings['temp_directory'] . DIRECTORY_SEPARATOR . $pointer . '.metadata';
-        $wsUrl = $this->settings['ws_url'];
-        $alias = $this->settings['alias'];
-        $queryUrl = $wsUrl . 'dmGetItemInfo/' . $alias . '/' .
-          $pointer . '/json';
+        $filepath = 'Cached_CDM_files/' . $this->settings['alias'] . '/' . $pointer . '.metadata';
         if (!file_exists($raw_metadata_cache)) {
-            $response = file_get_contents($queryUrl);
-            $itemInfo = json_decode($response, true);
+            $doc = file_get_contents($queryUrl);
+            $itemInfo = json_decode($doc, true);
             file_put_contents($raw_metadata_cache, serialize($itemInfo));
         }
         else {
             $itemInfo = unserialize(file_get_contents($raw_metadata_cache));
         }
         if (is_array($itemInfo)) {
+            var_dump($item_info);
             return $itemInfo;
         } else {
             return false;
@@ -234,13 +230,14 @@ class LocalCdmFiles extends Fetcher
     */
     public function getRecords($limit)
     {
-        $results = $this->queryContentdm($limit);
+        $results = $this->readContentdm($limit);
         if ($this->fetchermanipulators) {
             $filtered_records = $this->applyFetchermanipulators($results->records);
         }
         else {
             $filtered_records = $results->records;
         }
+        var_dump($filtered_records);
         return $filtered_records;
     }
 
@@ -256,6 +253,7 @@ class LocalCdmFiles extends Fetcher
                 $manipulator_settings_array);
             $records = $fetchermanipulator->manipulate($records);
         }
+        var_dump($records);
         return $records;
     }
 
