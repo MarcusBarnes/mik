@@ -1,4 +1,5 @@
 /vendor/
-/composer.*
+composer.*
 /nbproject/*
 output/*
+Cached_CDM_files/*
