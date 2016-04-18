@@ -1,7 +1,7 @@
 Title,"<titleInfo><title>%value%</title></titleInfo>"
 Photographer,"<name displayLabel='Photographer'><namePart>%value%</namePart><role><roleTerm type='code' authority='marcrelator'>pht</roleTerm><roleTerm type='text' authority='marcrelator'>Photographer</roleTerm></role></name>"
 Date,"<originInfo><dateIssued keyDate='yes'>%value%</dateIssued></originInfo>"
-Type,"<typeOfResource>%value%</typeOfResource>"
+Type,"<typeOfResource>still image</typeOfResource>"
 Physical Description,"<physicalDescription><note type='medium'>%value%</note></physicalDescription>"
 Subjects,"<subject authority='lcsh'><topic>%value%</topic></subject>"
 Repository,"<note type='ownership'>%value%</note>"
