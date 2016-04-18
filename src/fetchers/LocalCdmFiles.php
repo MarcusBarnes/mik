@@ -142,7 +142,6 @@ class LocalCdmFiles extends Fetcher
             $output->records = array_merge($output->records, $chunk_output->records);
             $this->start_at = $this->chunk_size * $processed_chunks + 1;
         }
-        var_dump($output);
         return $output;
     }
     
@@ -237,7 +236,6 @@ class LocalCdmFiles extends Fetcher
         else {
             $filtered_records = $results->records;
         }
-        var_dump($filtered_records);
         return $filtered_records;
     }
 
