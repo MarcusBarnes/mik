@@ -231,7 +231,7 @@ class CdmToMods extends Mods
         if ($includeMigratedFromUri == true) {
             $CONTENTdmItemUrl = '<identifier type="uri" invalid="yes" ';
             $CONTENTdmItemUrl .= 'displayLabel="Migrated From">';
-            $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection/';
+            $CONTENTdmItemUrl .= 'http://cdm16313.contentdm.oclc.org/cdm/ref/collection/';
             $CONTENTdmItemUrl .= $collectionAlias . '/id/'. $page_pointer .'</identifier>';
             $modsOpeningTag .= $CONTENTdmItemUrl;
         }
