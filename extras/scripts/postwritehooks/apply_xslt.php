@@ -18,12 +18,12 @@ $children_record_keys = explode(',', $argv[2]);
 $config_path = trim($argv[3]);
 $config = parse_ini_file($config_path, true);
 
-$xslt_outdir = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . 'transformed';
-mkdir($xslt_outdir);
+$mods_backup = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . 'original-mods';
+mkdir($mods_backup);
 
-$path_to_success_log = $xslt_outdir . DIRECTORY_SEPARATOR .
+$path_to_success_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
     'postwritehook_apply_xslt_success.log';
-$path_to_error_log = $xslt_outdir . DIRECTORY_SEPARATOR .
+$path_to_error_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
     'postwritehook_apply_xslt_error.log';
 
 // Set up logging.
@@ -36,10 +36,11 @@ $error_handler = new StreamHandler($path_to_error_log, Logger::WARNING);
 $error_log->pushHandler($error_handler);
 
 $path_to_mods = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . $record_key . '.xml';
+copy($path_to_mods, $mods_backup . DIRECTORY_SEPARATOR . $record_key . ".xml");
 $info_log->addInfo("working on file $path_to_mods");
 
 $xslts = $config['XSLT']['stylesheets'];
-$xslt_outpath = $xslt_outdir . DIRECTORY_SEPARATOR . $record_key . '.xml';
+$xslt_outpath = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . $record_key . '.xml';
 
 transform($path_to_mods, $xslt_outpath, $xslts, $info_log, $error_log);
 
