@@ -6,3 +6,4 @@
 "postcard_11","Old dd/mm/yyyy sign","25/11/1925","","Signs","Testing day-first (dd/mm/yyyy) date parsing","postcard_11.tif"
 "postcard_12","Old mm/dd/yyyy sign","11/25/1925","","Signs","Testing month-first (mm/dd/yyyy) date parsing.","postcard_12.tif"
 "postcard_13","A mm-dd-yyyy sign","10-29-1941","","Signs","Testing month-first (mm-dd-yyyy) date parsing.","postcard_13.tif"
+"postcard_14","A yyyy-mm-dd date with some crud around the date","1941-10-29;","","Signs","Testing date cleaning.","postcard_14.tif"

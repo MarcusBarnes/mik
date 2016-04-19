@@ -167,6 +167,18 @@ class NormalizeDate extends MetadataManipulator
                 return $dom->saveXML($origin_info_element);
             }
             /**
+             * Check for dates in the format we want yyyy-mm-dd but which have puncutation
+             * around the date, and removes the puncutation.
+             */
+            elseif (preg_match('#^[.,;:]?(\d\d\d\d\-\d\d\-\d\d)[.,;:]?$#', $this->sourceDateFieldValue, $matches)) {
+                $date_element->nodeValue = $matches[1];
+                $origin_info_element->appendChild($date_element);
+                $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
+                list($year, $month, $day) = explode('-', $matches[1]);
+                $this->logInvalidDate($year, $month, $day);
+                return $dom->saveXML($origin_info_element);
+            }
+            /**
              * Check for date value that is empty or not string. Just log it.
              */
             elseif (!is_string($this->sourceDateFieldValue) || !strlen($this->sourceDateFieldValue)) {
