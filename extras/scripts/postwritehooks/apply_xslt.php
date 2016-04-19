@@ -18,14 +18,12 @@ $children_record_keys = explode(',', $argv[2]);
 $config_path = trim($argv[3]);
 $config = parse_ini_file($config_path, true);
 
-//$mods_filename = 'MODS.xml';
-// The CONTENTdm 'nick' for the field that contains the data used
-// to create the issue-level output directories.
-//$item_info_field_for_issues = 'date';
+$xslt_outdir = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . 'transformed';
+mkdir($xslt_outdir);
 
-$path_to_success_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
+$path_to_success_log = $xslt_outdir . DIRECTORY_SEPARATOR .
     'postwritehook_apply_xslt_success.log';
-$path_to_error_log = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR .
+$path_to_error_log = $xslt_outdir . DIRECTORY_SEPARATOR .
     'postwritehook_apply_xslt_error.log';
 
 // Set up logging.
@@ -41,17 +39,18 @@ $path_to_mods = $config['WRITER']['output_directory'] . DIRECTORY_SEPARATOR . $r
 $info_log->addInfo("working on file $path_to_mods");
 
 $xslts = $config['XSLT']['stylesheets'];
+$xslt_outpath = $xslt_outdir . DIRECTORY_SEPARATOR . $record_key . '.xml';
 
-transform($path_to_mods, $xslts, $info_log, $error_log);
+transform($path_to_mods, $xslt_outpath, $xslts, $info_log, $error_log);
 
 
-function transform($path_to_mods, $xslts, $info_log, $error_log){
-    $out = $path_to_mods.".transformed";
+function transform($path_to_mods, $xslt_outpath, $xslts, $info_log, $error_log){
+
     $info_log->addInfo("Beginning xslt transformations for ".$path_to_mods);
     foreach($xslts as $xslt){
         $info_log->addInfo("Applying stylesheet ". $xslt);
-        $info_log->addInfo("Saxon command line: java -jar saxon9he.jar -s:$path_to_mods -xsl:$xslt  -o:$out");
-        exec("java -jar saxon9he.jar -s:$path_to_mods -xsl:$xslt  -o:$out", $ret);
+        $info_log->addInfo("Saxon command line: java -jar saxon9he.jar -s:$path_to_mods -xsl:$xslt  -o:$xslt_outpath");
+        exec("java -jar saxon9he.jar -s:$path_to_mods -xsl:$xslt  -o:$xslt_outpath", $ret);
         $info_log->addInfo(sprintf("Output from saxon: %s", implode("\n", $ret)));
     }
 }
