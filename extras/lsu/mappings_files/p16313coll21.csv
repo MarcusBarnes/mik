@@ -23,7 +23,7 @@ Relation,"<relatedItem type='host'><location><url displayLabel='Relation'>http:/
 Rights,"<accessCondition type='restriction on access'>%value%</accessCondition>"
 Credit,"<accessCondition type='use and reproduction'>Credit: %value%</accessCondition>"
 Contact Information,"<accessCondition type='use and reproduction'>Contact the Historic New Orleans Collection for more information about use and reproduction. %value%</accessCondition>"
-Accession No,"identifier type='accession number' displayLabel='Accession No'>%value%</identifier>"
+Accession No,"identifier type='local' displayLabel='Accession Number'>%value%</identifier>"
 Cataloged Date,"<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>"
 Cataloger,"<extension><cataloger>%value%</cataloger></extension>"
 Image Resolution (Archival),"<extension><imageResolution>%value%</imageResolution></extension>"
