@@ -131,6 +131,8 @@ class CdmToMods extends Mods
         
         foreach ($collectionMappingArray as $key => $valueArray) {
             $CONTENTdmField = $valueArray[0];
+            // because an easy error is typos in mappings_files -- this will indicate which line has typo.
+            var_dump($CONTENTdmField);
             if (isset($CONTENTdmFieldValuesArray[$CONTENTdmField])) {
                 $fieldValue = $CONTENTdmFieldValuesArray[$CONTENTdmField];
             } elseif (preg_match("/(null)\d+/i", $key)) {
@@ -229,7 +231,7 @@ class CdmToMods extends Mods
         if ($includeMigratedFromUri == true) {
             $CONTENTdmItemUrl = '<identifier type="uri" invalid="yes" ';
             $CONTENTdmItemUrl .= 'displayLabel="Migrated From">';
-            $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection/';
+            $CONTENTdmItemUrl .= 'http://cdm16313.contentdm.oclc.org/cdm/ref/collection/';
             $CONTENTdmItemUrl .= $collectionAlias . '/id/'. $page_pointer .'</identifier>';
             $modsOpeningTag .= $CONTENTdmItemUrl;
         }

@@ -2,6 +2,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     exclude-result-prefixes="xs"
+    xmlns:mods="http://www.loc.gov/mods/v3"
+    xpath-default-namespace="http://www.loc.gov/mods/v3"
     version="2.0">
     
     <!-- 1. removes empty subject with displayLabel of Current common name 
@@ -9,6 +11,7 @@
     
     <xsl:template match="@* | node()">
         <xsl:copy>
+            <xsl:namespace name="mods" select="'http://www.loc.gov/mods/v3'"/>
             <xsl:apply-templates select="@* | node()"/>
         </xsl:copy>
     </xsl:template>
@@ -18,18 +21,22 @@
             <xsl:when test="topic = ''">
             </xsl:when>
             <xsl:otherwise>
-                <name displayLabel="Current common name">
+                <xsl:element name="name" namespace="http://www.loc.gov/mods/v3">
+                    <xsl:attribute name="displayLabel">
+                        <xsl:text>Current common name</xsl:text>
+                    </xsl:attribute>
                     <xsl:apply-templates />
-                </name>
+                </xsl:element>
+
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
     
     <xsl:template match="subject[topic]">
         <xsl:for-each select="topic">
-            <xsl:element name="subject">
+            <xsl:element name="subject" namespace="http://www.loc.gov/mods/v3">
                 <xsl:for-each select="tokenize(.,'--')">
-                    <xsl:element name="topic">
+                    <xsl:element name="topic" namespace="http://www.loc.gov/mods/v3">
                         <xsl:attribute name="authority">lcsh</xsl:attribute>
                         <xsl:value-of select="replace(., '^\s+|\s+$', '')"/>
                     </xsl:element>
