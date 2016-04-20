@@ -76,6 +76,9 @@ Add additional stylesheets to the ini following this example:
 * `git checkout 9c47c9f80`
 * `composer install` # assumes that composer is installed and in your PATH
 * `sha1sum output/LSU_JJA_OUTPUT/original-mods/32.xml && sha1sum output/LSU_JJA_OUTPUT/32.xml`
+    * you may find that your sha1sum is different from that listed here; our mik pull from cdm includes 'date retrieved' information in the <extension> element (the original cdm metadata).
+	
+	
 * Compare in oxygen
     * Open the files in oxygen 
     * from the menu, choose `Tools` > `Compare files`, selecting the two files you've just opened
