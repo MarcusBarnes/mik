@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns="http://www.loc.gov/mods/v3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    exclude-result-prefixes="Namespaces"
-    version="2.0">
+    xmlns:mods="http://www.loc.gov/mods/v3"
+    xpath-default-namespace="http://www.loc.gov/mods/v3"
+    exclude-result-prefixes="xs"
+    version="2.0"
+    xmlns="http://www.loc.gov/mods/v3" >
     
     <!-- 1. removes empty subject with displayLabel of Current common name 
     2. changes subject topic topic to subject topic subject topic (split on double dashes) -->
