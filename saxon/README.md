@@ -62,12 +62,15 @@ Add additional stylesheets to the ini following this example:
 * ensure that Java is installed and available from your PATH
     * you can test this on the command line:
 	
-	jason@lappy:~/Documents/test$ java -version
+~~~
+
+    jason@lappy:~/Documents/test$ java -version
     java version "1.7.0_95"
     OpenJDK Runtime Environment (IcedTea 2.6.4) (7u95-2.6.4-0ubuntu0.14.04.2)
     OpenJDK 64-Bit Server VM (build 24.95-b01, mixed mode)
 
-	
+~~~
+
 * `git clone https://github.com/lsulibraries/mik`
 * `cd mik`
 * `git checkout 9c47c9f80`
