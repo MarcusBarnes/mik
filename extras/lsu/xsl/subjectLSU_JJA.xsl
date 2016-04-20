@@ -5,7 +5,7 @@
     xpath-default-namespace="http://www.loc.gov/mods/v3"
     exclude-result-prefixes="xs"
     version="2.0"
-    xmlns="http://www.loc.go/mods/v3" >
+    xmlns="http://www.loc.gov/mods/v3" >
     
     <!-- 1. removes empty subject with displayLabel of Current common name 
     2. changes subject topic topic to subject topic subject topic (split on double dashes) -->
