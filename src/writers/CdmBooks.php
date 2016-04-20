@@ -327,6 +327,31 @@ class CdmBooks extends Writer
     public function createIssueDirectory($record_key)
     {
         $issueObjectPath = $this->outputDirectory . DIRECTORY_SEPARATOR . $record_key;
+        
+        // if the book level directory already exists, we are dealing with a possible
+        // duplicate (or more) upload into CDM.  Create additional directories with
+        // #record_key.\d# naming convention and log possible duplicate Cdm
+        // object so that the best choice(s) for the issue are selected during QA prior
+        // to batch ingest into Islandora or other systems.
+        $multipleBookNumber = 0;
+        while(file_exists($issueObjectPath) == true) {
+            // log that the issue directory already exists and may indicate that the
+            // book may already exit in the output directory or that more than one Cdm
+            // pointer refers to the same newspaper issue (multiple Cdm upload for same
+            // book).                    
+            $this->log->addInfo("CdmBook writer", 
+                array(
+                    'Book already exits in output directory:' => $issueObjectPath,
+                    'pointer:' => $record_key
+                )
+            );
+                
+            $multipleBookNumber += 1;
+           
+           $issueObjectPath = $this->outputDirectory . DIRECTORY_SEPARATOR . $record_key;
+           $issueObjectPath .= "." . $multipleBookNumber;
+        }
+        
         if (!file_exists($issueObjectPath)) {
             mkdir($issueObjectPath);
             // return issue_object_path for use when writing files.
