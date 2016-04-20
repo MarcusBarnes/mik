@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <mods xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xlink="http://www.w3.org/1999/xlink">
+
     <titleInfo usage="primary" displayLabel="Common name (on plate)">
         <title>Yellow-throated Vireo, or Greenlet</title>
     </titleInfo>
@@ -114,8 +115,7 @@
             <title>E.A. McIlhenny Natural History Collection</title>
         </titleInfo>
         <location>
-            <url displayLabel="Relation"
-                >http://ldl.lib.lsu.edu/content/john-james-audubon-louisiana</url>
+            <url displayLabel="Relation">http://ldl.lib.lsu.edu/content/john-james-audubon-louisiana</url>
         </location>
     </relatedItem>
     <extension>
