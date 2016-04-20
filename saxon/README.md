@@ -77,6 +77,7 @@ Add additional stylesheets to the ini following this example:
 * `composer install` # assumes that composer is installed and in your PATH
 * `sha1sum output/LSU_JJA_OUTPUT/original-mods/32.xml && sha1sum output/LSU_JJA_OUTPUT/32.xml`
     * you may find that your sha1sum is different from that listed here; our mik pull from cdm includes 'date retrieved' information in the <extension> element (the original cdm metadata).
+	![sha1 diff](images/sha1-diff.png)
 	
 	
 * Compare in oxygen
@@ -89,3 +90,6 @@ Add additional stylesheets to the ini following this example:
     * causing saxon to issue warnings about namespace
     * preventing xslt from matching anything
  
+![adding another stylesheet](images/addAbstract.xsl.ini.png)
+
+![warning message in oxygen](images/abstract.xsl-namespace-issue.png)
