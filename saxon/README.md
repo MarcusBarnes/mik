@@ -57,10 +57,29 @@ Add additional stylesheets to the ini following this example:
 
 ![INI](images/ini.png)
 
+### To reproduce:
 
+* ensure that Java is installed and available from your PATH
+    * you can test this on the command line:
+	
+	jason@lappy:~/Documents/test$ java -version
+    java version "1.7.0_95"
+    OpenJDK Runtime Environment (IcedTea 2.6.4) (7u95-2.6.4-0ubuntu0.14.04.2)
+    OpenJDK 64-Bit Server VM (build 24.95-b01, mixed mode)
+
+	
+* `git clone https://github.com/lsulibraries/mik`
+* `cd mik`
+* `git checkout 9c47c9f80`
+* `composer install` # assumes that composer is installed and in your PATH
+* `sha1sum output/LSU_JJA_OUTPUT/original-mods/32.xml && sha1sum output/LSU_JJA_OUTPUT/32.xml`
+* Compare in oxygen
+    * Open the files in oxygen 
+    * from the menu, choose `Tools` > `Compare files`, selecting the two files you've just opened
 
 ### Unanswered Questions - further investigations...
 
 * While adding the xslt step to mik, it seemed as though namespace incongruities between xml and xslt were:
     * causing saxon to issue warnings about namespace
     * preventing xslt from matching anything
+ 
