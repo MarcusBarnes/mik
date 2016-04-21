@@ -7,7 +7,7 @@
       version="2.0"
       xmlns="http://www.loc.gov/mods/v3">
     
-    <!-- If the donor namePart is blank, then delete the name node -->
+    <!-- If the namePart is blank, or is "Unknown" then delete the name node -->
     
     <xsl:template match="@* | node()">
         <xsl:copy>
@@ -15,14 +15,18 @@
         </xsl:copy>
     </xsl:template>
     
-    <xsl:template match="name[@displayLabel='Donated by']">
+    <xsl:template match="name">
         <xsl:choose>
             <xsl:when test="namePart = ''">
             </xsl:when>
+            <xsl:when test="namePart = 'Unknown'">                
+            </xsl:when>
+            <xsl:when test="namePart = 'unknown'">                
+            </xsl:when>
             <xsl:otherwise>
-                <name displayLabel="Donated by">
-                    <xsl:apply-templates />
-                </name>
+                <xsl:copy>
+                    <xsl:apply-templates/>
+                </xsl:copy>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

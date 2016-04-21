@@ -7,7 +7,7 @@
       version="2.0"
       xmlns="http://www.loc.gov/mods/v3">
     
-    <!-- If the donor namePart is blank, then delete the name node -->
+    <!-- replace Engraver with Lithographer when physicalDescription/form = Lithographs -->
     
     <xsl:template match="@* | node()">
         <xsl:copy>
@@ -15,12 +15,21 @@
         </xsl:copy>
     </xsl:template>
     
-    <xsl:template match="name[@displayLabel='Donated by']">
+    <xsl:template match="name[@displayLabel='Engraver/lithographer']">
         <xsl:choose>
-            <xsl:when test="namePart = ''">
+            <xsl:when test="//physicalDescription/form = 'Lithographs'">
+                <name displayLabel="Engraver/lithographer">
+                    <role>
+                        <roleTerm type="code" authority="marcrelator">ltg</roleTerm>
+                        <roleTerm type="text" authority="marcrelator">Lithographer</roleTerm>
+                    </role>
+                    <namePart>
+                        <xsl:value-of select="namePart"/>
+                    </namePart>
+                </name>
             </xsl:when>
             <xsl:otherwise>
-                <name displayLabel="Donated by">
+                <name>
                     <xsl:apply-templates />
                 </name>
             </xsl:otherwise>

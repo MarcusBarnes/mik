@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mods xmlns:mods="http://www.loc.gov/mods/v3"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+    <titleInfo usage="primary" displayLabel="Common name (on plate)">
+        <title>The Yellow-throated Vireo, or Greenlet</title>
+    </titleInfo>
+    <titleInfo displayLabel="Scientific name (on plate)">
+        <subTitle/>
+    </titleInfo>
+    <titleInfo displayLabel="Common name of plant">
+        <subTitle>Swamp Snowball</subTitle>
+    </titleInfo>
+    <titleInfo displayLabel="Scientific name of plant">
+        <subTitle>Hydrangea quercifolia</subTitle>
+    </titleInfo>
+    <titleInfo>
+        <partNumber>Plate number 238 (119 E.Fol.)</partNumber>
+    </titleInfo>
+    <titleInfo>
+        <partNumber>Part number 48</partNumber>
+    </titleInfo>
+    <name displayLabel="Artist">
+        <role>
+            <roleTerm type="code" authority="marcrelator">art</roleTerm>
+            <roleTerm type="text" authority="marcrelator">Artist</roleTerm>
+        </role>
+        <namePart>Audubon, John James (1785-1851)</namePart>
+    </name>
+    <name displayLabel="Engraver/lithographer">
+        <role>
+            <roleTerm type="code" authority="marcrelator">eng</roleTerm>
+            <roleTerm type="text" authority="marcrelator">Engraver</roleTerm>
+        </role>
+        <namePart>J.T. Bowen</namePart>
+    </name>
+    <name displayLabel="Donated by">
+        <role>
+            <roleTerm type="code" authority="marcrelator">dnr</roleTerm>
+            <roleTerm type="text" authority="marcrelator">Donor</roleTerm>
+        </role>
+        <namePart/>
+    </name>
+    <originInfo>
+        <dateCreated/>
+        <dateIssued keyDate="yes"/>
+        <publisher>J.B. Chevalier</publisher>
+    </originInfo>
+    <subject authority="local" displayLabel="Current common name">
+        <topic/>
+    </subject>
+    <subject authority="local" displayLabel="Current scientific name">
+        <topic>Vireo flavifrons</topic>
+    </subject>
+    <subject authority="local" displayLabel="Current scientific plant name">
+        <topic/>
+    </subject>
+    <subject authority="lcsh">
+        <topic>Birds--North America</topic>
+        <topic>Birds--Pictorial works</topic>
+    </subject>
+    <subject authority="lcsh" displayLabel="Location of bird drawn">
+        <geographic>Louisiana, Oakley Plantation</geographic>
+    </subject>
+    <abstract>7in x 11in; Depicts a male in a branch of hydrangea reaching for a wasp.</abstract>
+    <note type="content"/>
+    <typeOfResource>Image</typeOfResource>
+    <physicalDescription>
+        <form>Lithographs</form>
+        <note type="medium">Water-colored lithograph</note>
+    </physicalDescription>
+    <language>
+        <languageTerm type="code">en</languageTerm>
+    </language>
+    <note type="ownership" displayLabel="Repository">Louisiana State University Libraries, Special
+        Collections ( http://www.lib.lsu.edu/special )</note>
+    <relatedItem type="host">
+        <titleInfo displayLabel="Digital Collection">
+            <title>John James Audubon in Louisiana</title>
+        </titleInfo>
+        <titleInfo type="alternative" displayLabel="Repository Collection">
+            <title>E.A. McIlhenny Natural History Collection</title>
+        </titleInfo>
+        <location>
+            <url displayLabel="Relation">http://ldl.lib.lsu.edu/content/john-james-audubon-louisiana</url>
+        </location>
+    </relatedItem>
+    <location>
+        <physicalLocation>LUU</physicalLocation>
+    </location>
+    <location>
+        <physicalLocation>LSU Libraries</physicalLocation>
+    </location>
+    <location>
+        <url>http://lib.lsu.edu</url>
+    </location>
+    <location>
+        <holdingSimple>
+            <copyInformation>
+                <subLocation>Hill Memorial Library: Special Collections</subLocation>
+            </copyInformation>
+        </holdingSimple>
+    </location>
+    <accessCondition type="restriction on access">Physical rights are retained by the LSU Libraries.
+        Copyright of the original material is retained in accordance with U.S. copyright laws.
+        Permission to reproduce this image must be requested through the Special Collections
+        Division, Louisiana State University Libraries.</accessCondition>
+    <accessCondition type="use and reproduction">E-mail lsudiglib@lsu.edu with questions or
+        comments. See instructions for ordering reprints of this item here:
+        http://www.lib.lsu.edu/special/services/duplication.html Mention the "Item number" or "Item
+        URL" in your request. </accessCondition>
+    <note type="preferred citation" displayLabel="Cite As">John James Audubon in Louisiana,
+        LOUISiana Digital Library, Baton Rouge, La.</note>
+    <identifier type="local" displayLabel="Item Number">aud00017</identifier>
+    <identifier type="local" displayLabel="Accession number"/>
+    <identifier type="uri" invalid="yes" displayLabel="Migrated From">http://cdm16313.contentdm.oclc.org/cdm/singleitem/collection/LSU_JJA/id/17</identifier>
+    <recordInfo>
+        <recordCreationDate>070504</recordCreationDate>
+    </recordInfo>
+    <extension>
+        <cataloger>Aimee Everrett</cataloger>
+        <digitalReproductionInfo>Scanned with a DigiBook 10000 RGB Color
+            Scanner</digitalReproductionInfo>
+        <CONTENTdmData>
+            <alias>LSU_JJA</alias>
+            <pointer>17</pointer>
+            <dmGetItemInfo timestamp="2016-04-14 12:09:46"
+                mimetype="application/json"
+                source="https://server16313.contentdm.oclc.org/dmwebservices/index.php?q=dmGetItemInfo/LSU_JJA/17/json">{"title":"Yellow-throated Vireo, or Greenlet","notes":{},"currea":{},"subjec":{},"descri":"Vireo flavifrons","common":"Swamp Snowball","scient":"Hydrangea quercifolia","curren":{},"creato":"Audubon, John James (1785-1851)","date":{},"public":{},"plate":"238 (119 E.Fol.)","part":"48","publis":"J.B. Chevalier","engrav":"J.T. Bowen","contri":{},"type":"7in x 11in; Depicts a male in a branch of hydrangea reaching for a wasp.","format":"Water-colored lithograph","subjea":"Birds--North America; Birds--Pictorial works","author":{},"langua":"en","locati":"Louisiana, Oakley Plantation","biblio":{},"digita":"John James Audubon in Louisiana","reposi":"Louisiana State University Libraries, Special Collections ( http:\/\/www.lib.lsu.edu\/special )","reposa":"E.A. McIlhenny Natural History Collection","more":"http:\/\/www.lib.lsu.edu\/special\/exhibits\/audubon","digitb":"Scanned with a DigiBook 10000 RGB Color Scanner","restri":"Physical rights are retained by the LSU Libraries.  Copyright of the original material is retained in accordance with U.S. copyright laws.  Permission to reproduce this image must be requested through the Special Collections Division, Louisiana State University Libraries.","cite":"John James Audubon in Louisiana, LOUISiana Digital Library, Baton Rouge, La.","to":"E-mail lsudiglib@lsu.edu with questions or comments. See instructions for ordering reprints of this item here: http:\/\/www.lib.lsu.edu\/special\/services\/duplication.html Mention the \"Item number\" or \"Item URL\" in your request. ","itea":"aud00017","access":{},"item":"See \"reference url\" on the navigation bars","collec":"Homepage: http:\/\/www.lib.lsu.edu\/special\/exhibits\/audubon;   List of images: http:\/\/www.louisianadigitallibrary.org\/cdm4\/browse.php?CISOROOT=\/LSU_JJA","catalo":"Aimee Everrett","catala":"070504","typea":"Lithographs","genera":"Image","fullrs":{},"find":"18.jp2","dmaccess":{},"dmimage":{},"dmcreated":"2007-05-04","dmmodified":"2008-06-17","dmoclcno":{},"dmrecord":"17","restrictionCode":"1","cdmfilesize":"4945944","cdmfilesizeformatted":"4.72 MB","cdmprintpdf":"0","cdmhasocr":"0","cdmisnewspaper":"0"}</dmGetItemInfo>
+        </CONTENTdmData>
+    </extension>
+</mods>
