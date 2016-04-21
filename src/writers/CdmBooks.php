@@ -234,9 +234,10 @@ class CdmBooks extends Writer
                     // assumes that the source destination is on a l
                     copy($pathToFile, $obj_output_file_path);
                 }
-            } else {
+            } else if (!$this->skip_obj) {
                 // The OBJ datastream is required: 
                 // see: https://github.com/Islandora/islandora_paged_content/blob/7.x/xml/islandora_pageCModel_ds_composite_model.xml
+                // Only skip if the skip_obj flag is set to true in the WRITER seection of the configuration file.
                 // If using tiff datastream from external source, datastreams[] = OBJ
                 // in the WRITER section of the configuration file or do not include datastreams[] option to create all datastreams
                 // MODS, OBJ, OCR, JPEG, JP2
