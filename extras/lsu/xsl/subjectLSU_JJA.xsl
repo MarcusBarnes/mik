@@ -12,7 +12,6 @@
     
     <xsl:template match="@* | node()">
         <xsl:copy>
-            <xsl:namespace name="mods" select="'http://www.loc.gov/mods/v3'"/>
             <xsl:apply-templates select="@* | node()"/>
         </xsl:copy>
     </xsl:template>
@@ -22,7 +21,7 @@
             <xsl:when test="topic = ''">
             </xsl:when>
             <xsl:otherwise>
-                <xsl:element name="name" namespace="http://www.loc.gov/mods/v3">
+                <xsl:element name="name">
                     <xsl:attribute name="displayLabel">
                         <xsl:text>Current common name</xsl:text>
                     </xsl:attribute>
@@ -35,9 +34,9 @@
     
     <xsl:template match="subject[topic]">
         <xsl:for-each select="topic">
-            <xsl:element name="subject" namespace="http://www.loc.gov/mods/v3">
+            <xsl:element name="subject">
                 <xsl:for-each select="tokenize(.,'--')">
-                    <xsl:element name="topic" namespace="http://www.loc.gov/mods/v3">
+                    <xsl:element name="topic">
                         <xsl:attribute name="authority">lcsh</xsl:attribute>
                         <xsl:value-of select="replace(., '^\s+|\s+$', '')"/>
                     </xsl:element>
