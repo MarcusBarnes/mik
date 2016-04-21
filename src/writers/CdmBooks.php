@@ -116,6 +116,7 @@ class CdmBooks extends Writer
         } else {
             // No OBJ source files
             $OBJFilesArray = array();
+            
         }
 
         $sub_dir_num = 0;
@@ -135,7 +136,7 @@ class CdmBooks extends Writer
                 $directoryNumber = $this->directoryNameFromFileName($pathToFile);
             
             } else {
-            
+                
                 // Infer the numbered directory name from  $page_object_info
                 $directoryNumber = $this->directoryNameFromPageObjectInfo($pagePtrPageTitleMap, $page_object_info);
             }
@@ -223,10 +224,8 @@ class CdmBooks extends Writer
             
             $OBJ_expected = in_array('OBJ', $this->datastreams);
             if ($OBJ_expected xor $no_datastreams_setting_flag) {
-                // Create OBJ file for page.
-                //$filekey = $page_number - 1;
-                //$pathToFile = $OBJFilesArray[$filekey];
-
+                
+                // OBJ from source files - either TIFF, jpeg, or jp2                
                 $pathToPageOK = $this->cdmNewspapersFileGetter
                    ->checkBookPageFilePath($pathToFile, $sub_dir_num);
 
@@ -235,9 +234,25 @@ class CdmBooks extends Writer
                     // assumes that the source destination is on a l
                     copy($pathToFile, $obj_output_file_path);
                 }
+            } else {
+                // The OBJ datastream is required: 
+                // see: https://github.com/Islandora/islandora_paged_content/blob/7.x/xml/islandora_pageCModel_ds_composite_model.xml
+                // If using tiff datastream from external source, datastreams[] = OBJ
+                // in the WRITER section of the configuration file or do not include datastreams[] option to create all datastreams
+                // MODS, OBJ, OCR, JPEG, JP2
+                if ($JP2_expected){
+                    $obj_jp2_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.jp2';
+                    copy($jp2_output_file_path, $obj_jp2_output_file_path);
+                } else if ($JPEG_expected) {
+                    $obj_jpeg_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.jpg';
+                    copy($jpg_output_file_path, $obj_jpeg_output_file_path);
+                
+                } else {
+                    // Create an exception since OJB are required in Islandora Book packages.
+                    throw new \Exception("OBJ datastream is required - no OBJ datastream created.  Please check your configuration.");
+                }
+            
             }
-
-            // For each page, we need two files that can't be downloaded from CONTENTdm: PDF.pdf and MODS.xml.
             
             // Write outut page level MODS.XML
             $MODS_expected = in_array('MODS', $this->datastreams);
