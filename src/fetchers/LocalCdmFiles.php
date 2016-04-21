@@ -20,7 +20,7 @@ class LocalCdmFiles extends Fetcher
     /**
      *
      */
-    protected $chunk_size = 1024;
+    protected $chunk_size = 100;
 
     /**
      *
@@ -166,7 +166,7 @@ class LocalCdmFiles extends Fetcher
         }
 
         $propertiesOfRecordsObj->records = $arrayOfRecordObjects;
-        var_dump($propertiesOfRecordsObj);
+
         return $propertiesOfRecordsObj;
     }
 
@@ -202,12 +202,8 @@ class LocalCdmFiles extends Fetcher
     public function getItemInfo($pointer)
     {
         $filepath = 'Cached_Cdm_files/' . $this->settings['alias'] . '/' . $pointer . '.xml';
-        $xmlDoc = simplexml_load_file($filepath);
-        $itemInfo = array();
-        foreach ($xmlDoc as $ourkey => $ourvalue) {
-            echo "$ourkey  $ourvalue";
-            $itemInfo[$ourkey] = strval($ourvalue);
-        }
+        $doc = file_get_contents($filepath);
+        $itemInfo = json_decode($doc, true);
         if (is_array($itemInfo)) {
             return $itemInfo;
         } else {
