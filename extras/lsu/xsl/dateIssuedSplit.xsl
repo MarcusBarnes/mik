@@ -22,7 +22,8 @@
     <xsl:variable name="dates" select="node()/originInfo/dateIssued/text()"/>
     <xsl:variable name="yearRangeRegEx" select="'([0-9]{4})-([0-9]{4})'"/> <!-- YYYY-YYYY -->
     <xsl:variable name="caRegEx" select="'[cC]a.\s([0-9]{4})'"/> <!-- Ca. YYYY -->
-
+    <xsl:variable name="betweenRegEx" select="'Between\s([0-9]{4})\sand\s([0-9]{4})'"/>
+    
     <xsl:template match="originInfo/dateIssued">
         <xsl:choose>
             <xsl:when test="matches(., $yearRangeRegEx) and not(matches(., 'Ca.'))">
@@ -53,6 +54,18 @@
                             <xsl:value-of select="replace(regex-group(1), '\s+', ' ')"/>
                         </dateIssued>
                         <dateIssued point="end" keydate="yes" qualifier="approximate">
+                            <xsl:value-of select="replace(regex-group(2), '\s+', ' ')"/>
+                        </dateIssued>
+                    </xsl:matching-substring>
+                </xsl:analyze-string>
+            </xsl:when>
+            <xsl:when test="matches(., $betweenRegEx)">
+                <xsl:analyze-string select="$dates" regex="{$betweenRegEx}">
+                    <xsl:matching-substring>
+                        <dateIssued point="start" keydate="yes">
+                            <xsl:value-of select="replace(regex-group(1), '\s+', ' ')"/>
+                        </dateIssued>
+                        <dateIssued point="end" keydate="yes">
                             <xsl:value-of select="replace(regex-group(2), '\s+', ' ')"/>
                         </dateIssued>
                     </xsl:matching-substring>
