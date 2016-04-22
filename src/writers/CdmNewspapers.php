@@ -298,7 +298,8 @@ class CdmNewspapers extends Writer
             );
                 
             $multipleIssueNumber += 1;
-            $issueObjectPath = $issueObjectPath . "." . $multipleIssueNumber;
+            $issueObjectPath = $this->outputDirectory . DIRECTORY_SEPARATOR . $this->issueDate;
+            $issueObjectPath .= "." . $multipleIssueNumber;
         }
         
         if (!file_exists($issueObjectPath)) {
