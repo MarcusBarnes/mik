@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\writers;
+use Monolog\Logger;
 
 class CdmBooks extends Writer
 {
@@ -72,6 +73,13 @@ class CdmBooks extends Writer
         
         $metadtaClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
         $this->metadataParser = new $metadtaClass($settings);
+        
+        // Set up logger.
+        $this->pathToLog = $this->settings['LOGGING']['path_to_log'];
+        $this->log = new \Monolog\Logger('Writer');
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
+            Logger::INFO);
+        $this->log->pushHandler($this->logStreamHandler);
 
     }
 
@@ -82,15 +90,34 @@ class CdmBooks extends Writer
     {
         // Create root output folder
         $this->createOutputDirectory();
+        
         $issueObjectPath = $this->createIssueDirectory($record_key);
         $this->writeMetadataFile($metadata, $issueObjectPath);
         
+        $cpdData = $this->cdmNewspapersFileGetter->getCpdFile($record_key);        
+        $pagePtrPageTitleMap = $this->cpdPagePtrPageTitleMap($cpdData);
+        
+        // If there were no datastreams explicitly set in the configuration,
+        // set flag so that all datastreams in the writer class are run.
+        // $this->datareams is an empty array by default.
+        $no_datastreams_setting_flag = false;
+        if (count($this->datastreams) == 0) {
+            $no_datastreams_setting_flag = true;
+        }
+        
         // filegetter for OBJ.tiff files for monograph pages
-        $OBJFilesArray = $this->cdmNewspapersFileGetter
+        $OBJ_expected = in_array('OBJ', $this->datastreams);
+        if ($OBJ_expected xor $no_datastreams_setting_flag) {
+             $OBJFilesArray = $this->cdmNewspapersFileGetter 
                  ->getIssueLocalFilesForOBJ($record_key);
-        // Array of paths to tiffs for OBJ for newspaper issue pages may not be sorted
-        // on some systems.  Sort.
-        sort($OBJFilesArray);
+            // Array of paths to tiffs for OBJ for newspaper issue pages may not be sorted
+            // on some systems.  Sort.
+            sort($OBJFilesArray);
+        } else {
+            // No OBJ source files
+            $OBJFilesArray = array();
+            
+        }
 
         $sub_dir_num = 0;
         foreach ($pages as $page_pointer) {
@@ -99,11 +126,20 @@ class CdmBooks extends Writer
             // Create subdirectory for each page of newspaper issue
             $page_object_info = $this->fetcher->getItemInfo($page_pointer);
 
-            $filekey = $sub_dir_num - 1;
-            $pathToFile = $OBJFilesArray[$filekey];
+            //var_dump($page_object_info);
             
-            // Infer the numbered directory name from the OBJ file name.
-            $directoryNumber = $this->directoryNameFromFileName($pathToFile);
+            if ($OBJ_expected xor $no_datastreams_setting_flag) {
+                $filekey = $sub_dir_num - 1;
+                $pathToFile = $OBJFilesArray[$filekey];
+            
+                // Infer the numbered directory name from the OBJ file name.
+                $directoryNumber = $this->directoryNameFromFileName($pathToFile);
+            
+            } else {
+                
+                // Infer the numbered directory name from  $page_object_info
+                $directoryNumber = $this->directoryNameFromPageObjectInfo($pagePtrPageTitleMap, $page_object_info);
+            }
             
             // left trim leading left zero padded numbers
             $directoryNumber = ltrim($directoryNumber, "0");
@@ -128,13 +164,7 @@ class CdmBooks extends Writer
             print "Exporting files for book " . $record_key
               . ', page ' . $directoryNumber . "\n";
             
-            // If there were no datastreams explicitly set in the configuration,
-            // set flag so that all datastreams in the writer class are run.
-            // $this->datareams is an empty array by default.
-            $no_datastreams_setting_flag = false;
-            if (count($this->datastreams) == 0) {
-               $no_datastreams_setting_flag = true;
-            }
+
             
             // Write out $page_object_info['full'], which we'll use as the OCR datastream.
             $ocr_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OCR.txt';
@@ -194,10 +224,8 @@ class CdmBooks extends Writer
             
             $OBJ_expected = in_array('OBJ', $this->datastreams);
             if ($OBJ_expected xor $no_datastreams_setting_flag) {
-                // Create OBJ file for page.
-                //$filekey = $page_number - 1;
-                //$pathToFile = $OBJFilesArray[$filekey];
-
+                
+                // OBJ from source files - either TIFF, jpeg, or jp2                
                 $pathToPageOK = $this->cdmNewspapersFileGetter
                    ->checkBookPageFilePath($pathToFile, $sub_dir_num);
 
@@ -206,9 +234,26 @@ class CdmBooks extends Writer
                     // assumes that the source destination is on a l
                     copy($pathToFile, $obj_output_file_path);
                 }
+            } else if (!$this->skip_obj) {
+                // The OBJ datastream is required: 
+                // see: https://github.com/Islandora/islandora_paged_content/blob/7.x/xml/islandora_pageCModel_ds_composite_model.xml
+                // Only skip if the skip_obj flag is set to true in the WRITER seection of the configuration file.
+                // If using tiff datastream from external source, datastreams[] = OBJ
+                // in the WRITER section of the configuration file or do not include datastreams[] option to create all datastreams
+                // MODS, OBJ, OCR, JPEG, JP2
+                if ($JP2_expected){
+                    $obj_jp2_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.jp2';
+                    copy($jp2_output_file_path, $obj_jp2_output_file_path);
+                } else if ($JPEG_expected) {
+                    $obj_jpeg_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.jpg';
+                    copy($jpg_output_file_path, $obj_jpeg_output_file_path);
+                
+                } else {
+                    // Create an exception since OJB are required in Islandora Book packages.
+                    throw new \Exception("OBJ datastream is required - no OBJ datastream created.  Please check your configuration.");
+                }
+            
             }
-
-            // For each page, we need two files that can't be downloaded from CONTENTdm: PDF.pdf and MODS.xml.
             
             // Write outut page level MODS.XML
             $MODS_expected = in_array('MODS', $this->datastreams);
@@ -228,7 +273,7 @@ class CdmBooks extends Writer
     }
     
     /**
-     * Infer the numbered name for the newspaper issue page subdirectory from the OJB file name.
+     * Infer the numbered name for the book page subdirectory from the OJB file name.
      */
     public function directoryNameFromFileName($pathToOBJfile) {
     
@@ -240,6 +285,51 @@ class CdmBooks extends Writer
           // remove possible left zero padded number.
           $pageNumber = ltrim($matches[0]);
           return $pageNumber;
+    }
+    
+    /**
+     * Infer the number name for the book page subdirectory from the page_object_info metadata
+     */ 
+    public function directoryNameFromPageObjectInfo($pagePtrPageTitleMap, $page_object_info) {
+    
+        $pageptr = $page_object_info['dmrecord'];
+        $pagetitle = $pagePtrPageTitleMap[$pageptr];
+        // Page 312
+        $regex = '%[0-9]*$%';    
+        preg_match($regex, $pagetitle, $matches);
+        $pageNumber = ltrim($matches[0]);
+        return $pageNumber;
+    }
+    
+    /**
+     *  Takes book level meta
+     */
+    public function cpdPagePtrPageTitleMap($cpdData) {
+       $doc = new \DomDocument('1.0');
+       $doc->loadXML($cpdData);
+       $pages = $doc->getElementsByTagName('page');
+       
+       $returnMap = array();
+       foreach($pages as $page_info) {
+            $childNodes = $page_info->childNodes;
+            unset($pageptr);
+            unset($pagetitle);
+            foreach ($childNodes as $child) {
+                if ($child->nodeName == 'pageptr'){
+                    $pageptr = $child->nodeValue;
+                }
+                if ($child->nodeName == 'pagetitle') {
+                    $pagetitle = $child->nodeValue;
+                }
+            }
+            if(isset($pageptr) && isset($pagetitle)){
+                $returnMap[$pageptr] = $pagetitle;
+            }
+
+       
+        } 
+
+        return $returnMap;       
     }
 
     /**
@@ -253,6 +343,31 @@ class CdmBooks extends Writer
     public function createIssueDirectory($record_key)
     {
         $issueObjectPath = $this->outputDirectory . DIRECTORY_SEPARATOR . $record_key;
+        
+        // if the book level directory already exists, we are dealing with a possible
+        // duplicate (or more) upload into CDM.  Create additional directories with
+        // #record_key.\d# naming convention and log possible duplicate Cdm
+        // object so that the best choice(s) for the issue are selected during QA prior
+        // to batch ingest into Islandora or other systems.
+        $multipleBookNumber = 0;
+        while(file_exists($issueObjectPath) == true) {
+            // log that the issue directory already exists and may indicate that the
+            // book may already exit in the output directory or that more than one Cdm
+            // pointer refers to the same newspaper issue (multiple Cdm upload for same
+            // book).                    
+            $this->log->addInfo("CdmBook writer", 
+                array(
+                    'Book already exits in output directory:' => $issueObjectPath,
+                    'pointer:' => $record_key
+                )
+            );
+                
+            $multipleBookNumber += 1;
+           
+           $issueObjectPath = $this->outputDirectory . DIRECTORY_SEPARATOR . $record_key;
+           $issueObjectPath .= "." . $multipleBookNumber;
+        }
+        
         if (!file_exists($issueObjectPath)) {
             mkdir($issueObjectPath);
             // return issue_object_path for use when writing files.
