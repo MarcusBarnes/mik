@@ -14,7 +14,7 @@ Relation,"<relatedItem type='host'><location><url displayLabel='Relation'>http:/
 null1,"<location><physicalLocation>LRT</physicalLocation></location>"
 null2,"<location><physicalLocation>Louisiana Tech University</physicalLocation></location>"
 null3,"<location><url>http://www.latech.edu/library/</url></location>"
-null4,"<location><holdingSimple><copyInformation><subLocation>Prescott Memorial Library: Special Collections</sublocation></copyInformation></holdingSimple></location>"
+null4,"<location><holdingSimple><copyInformation><subLocation>Prescott Memorial Library: Special Collections</subLocation></copyInformation></holdingSimple></location>"
 Rights,"<accessCondition type='restriction on access'>%value%</accessCondition>"
 Contact Information,"<accessCondition type='use and reproduction' displayLabel='Contact Information'>Contact Special Collections, Manuscripts and Archives at Louisiana Tech University for more information about use and reproduction. specialcollections@latech.edu</accessCondition>"
 Cataloged Date,"<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>"
