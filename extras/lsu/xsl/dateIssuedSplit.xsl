@@ -44,7 +44,7 @@
             <xsl:when test="matches(., $caRegEx) and not(matches(., '-'))">
                 <xsl:analyze-string select="$dates" regex="{$caRegEx}">
                     <xsl:matching-substring>
-                        <dateIssued point="start" keydate="yes" qualifier="approximate">
+                        <dateIssued keydate="yes" qualifier="approximate">
                             <xsl:value-of select="replace(regex-group(1), '\s+', ' ')"/>
                         </dateIssued>
                     </xsl:matching-substring>
