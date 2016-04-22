@@ -12,6 +12,7 @@
     Ca. YYYY gets an attribute qualifier="approximate"
     Ca. YYYY-YYYY gets approximate qualifier and start and end
     Before YYYY and YYYY gets split with point start and point end
+    YYYY; YYYY; YYYY captures and splits first and last years - discards the middles
     all others stay the same-->
     
     <xsl:template match="@* | node()">
@@ -23,8 +24,8 @@
     <xsl:variable name="dates" select="node()/originInfo/dateIssued/text()"/>
     <xsl:variable name="yearRangeRegEx" select="'([0-9]{4})-([0-9]{4})'"/> <!-- YYYY-YYYY -->
     <xsl:variable name="caRegEx" select="'[cC]a.\s([0-9]{4})'"/> <!-- Ca. YYYY -->
-    <xsl:variable name="betweenRegEx" select="'Between\s([0-9]{4})\sand\s([0-9]{4})'"/>
-    <xsl:variable name="semicolonRegEx" select="'(^[0-9]{4});.*([0-9]{4}$)'"/>
+    <xsl:variable name="betweenRegEx" select="'Between\s([0-9]{4})\sand\s([0-9]{4})'"/> <!-- Between YYYY and YYYY -->
+    <xsl:variable name="semicolonRegEx" select="'(^[0-9]{4});.*([0-9]{4}$)'"/> <!-- YYYY; YYYY (not captured); YYYY -->
     
     <xsl:template match="originInfo/dateIssued">
         <xsl:choose>
