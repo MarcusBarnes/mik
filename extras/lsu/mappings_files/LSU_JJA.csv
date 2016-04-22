@@ -36,6 +36,6 @@ Item number,"<identifier type='local' displayLabel='Item Number'>%value%</identi
 Accession number,"<identifier type='local' displayLabel='Accession Number'>%value%</identifier>"
 Cataloger,"<extension><cataloger>%value%</cataloger></extension>"
 Digital reproduction information,"<extension><digitalReproductionInfo>%value%</digitalReproductionInfo></extension>"
-Cataloged date,"<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>"
+Date created,"<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>"
 Date modified,"<recordInfo><recordChangeDate>%value%</recordChangeDate></recordInfo>"
 null5,"<extension><CONTENTdmData></CONTENTdmData></extension>"
