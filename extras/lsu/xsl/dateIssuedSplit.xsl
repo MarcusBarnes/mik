@@ -10,7 +10,8 @@
     <!-- takes various permutations of date formatting in dateIssued and converts them
     YYYY-YYYY breaks into point=start and point=end
     Ca. YYYY gets an attribute qualifier="approximate"
-    Ca. YYYY-YYYY gets approximate qualifier and start and end 
+    Ca. YYYY-YYYY gets approximate qualifier and start and end
+    Before YYYY and YYYY gets split with point start and point end
     all others stay the same-->
     
     <xsl:template match="@* | node()">
@@ -23,6 +24,7 @@
     <xsl:variable name="yearRangeRegEx" select="'([0-9]{4})-([0-9]{4})'"/> <!-- YYYY-YYYY -->
     <xsl:variable name="caRegEx" select="'[cC]a.\s([0-9]{4})'"/> <!-- Ca. YYYY -->
     <xsl:variable name="betweenRegEx" select="'Between\s([0-9]{4})\sand\s([0-9]{4})'"/>
+    <xsl:variable name="semicolonRegEx" select="'(^[0-9]{4});.*([0-9]{4}$)'"/>
     
     <xsl:template match="originInfo/dateIssued">
         <xsl:choose>
@@ -61,6 +63,18 @@
             </xsl:when>
             <xsl:when test="matches(., $betweenRegEx)">
                 <xsl:analyze-string select="$dates" regex="{$betweenRegEx}">
+                    <xsl:matching-substring>
+                        <dateIssued point="start" keydate="yes">
+                            <xsl:value-of select="replace(regex-group(1), '\s+', ' ')"/>
+                        </dateIssued>
+                        <dateIssued point="end" keydate="yes">
+                            <xsl:value-of select="replace(regex-group(2), '\s+', ' ')"/>
+                        </dateIssued>
+                    </xsl:matching-substring>
+                </xsl:analyze-string>
+            </xsl:when>
+            <xsl:when test="matches(., $semicolonRegEx)">
+                <xsl:analyze-string select="$dates" regex="{$semicolonRegEx}">
                     <xsl:matching-substring>
                         <dateIssued point="start" keydate="yes">
                             <xsl:value-of select="replace(regex-group(1), '\s+', ' ')"/>
