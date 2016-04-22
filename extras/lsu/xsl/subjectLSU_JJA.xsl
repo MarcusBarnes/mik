@@ -12,7 +12,6 @@
     
     <xsl:template match="@* | node()">
         <xsl:copy>
-            <xsl:namespace name="mods" select="'http://www.loc.gov/mods/v3'"/>
             <xsl:apply-templates select="@* | node()"/>
         </xsl:copy>
     </xsl:template>
