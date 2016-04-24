@@ -475,7 +475,7 @@ function islandora_compound_cmodel($options) {
     foreach ($all_files as $object_directory) {
         if (!is_dir($object_directory)) {
             $extra_files_in_dir = true;
-            error_log($options['dir'] . DIRECTORY_SEPARATOR . $object_dir . " should not exist.\n", 3, $options['log']);
+            error_log($options['dir'] . DIRECTORY_SEPARATOR . $object_directory . " should not exist.\n", 3, $options['log']);
         }
     }
 
@@ -489,6 +489,9 @@ function islandora_compound_cmodel($options) {
     $missing_child_obj = false;
     $extra_child_files = false;
     foreach ($all_files as $object_directory) {
+        if (!is_dir($object_directory)) {
+            continue;
+        }
         $child_dirs = array();
         $child_object_results = array();
         $mods_path = $object_directory . DIRECTORY_SEPARATOR . 'MODS.xml';
@@ -507,7 +510,7 @@ function islandora_compound_cmodel($options) {
         if (count($child_dirs) != $expected_number_of_children) {
             $missing_object_children = true;
             error_log($object_directory . " does not have the expected number of children " .
-                "(or its MODS file is missing).\n", 3, $options['log']);
+                "($expected_number_of_children), or its MODS file is missing.\n", 3, $options['log']);
         }
 
         // Check for unwanted files in each object directory.
@@ -516,9 +519,10 @@ function islandora_compound_cmodel($options) {
         $total_object_files = count($all_object_files);
         // 1 for MODS.xml and 1 for structure.cpd.
         $total_expected_obj_files = $expected_number_of_children + 2;
-        if ($total_expected_obj_files != count($total_object_files)) {
+        if ($total_expected_obj_files != $total_object_files) {
             $extra_object_files = true;
-            error_log($object_directory . " contains an unexpected number of files.\n", 3, $options['log']);
+            error_log($object_directory . " contains an unexpected number of files " .
+                "(either extra files or missing child subdirectories).\n", 3, $options['log']);
 	    $unexpected_object_file_list = var_export($all_object_files, true);
             error_log($unexpected_object_file_list . ".\n", 3, $options['log']);
         }
@@ -548,7 +552,6 @@ function islandora_compound_cmodel($options) {
 	        $unexpected_file_list = var_export($all_child_files, true);
                 error_log($unexpected_file_list . ".\n", 3, $options['log']);
             }
-
         }
     }
 
@@ -581,7 +584,6 @@ function islandora_compound_cmodel($options) {
     else {
         print "All objects in " . $options['dir'] . " appear to have the correct number of children.\n";
     }
-
 
     if ($missing_object_cpd) {
         print "** Some objects in ". $options['dir'] . " have missing structure.cpd files.\n";
