@@ -51,6 +51,9 @@ switch ($options['cmodel']) {
     case 'islandora:bookCModel':
         islandora_book_cmodel($options);
         break;
+    case 'islandora:compoundCModel':
+        islandora_compound_cmodel($options);
+        break;
     default:
         exit("Sorry, the content model " . $options['cmodel'] . " is not registered with this script.\n");
 }
@@ -68,56 +71,56 @@ function islandora_single_file_cmodels($options) {
     // of files for each of the entries in $options['files'].
     $all_file_pattern_counts = array();
     $all_file_pattern_globs = array();
-	$all_files_we_expect = array();
+    $all_files_we_expect = array();
     foreach ($file_patterns as $file_pattern) {
         $glob_pattern = $options['dir'] . DIRECTORY_SEPARATOR . trim($file_pattern);
         $file_list = glob($glob_pattern);
-				$all_files_we_expect = array_merge($all_files_we_expect, $file_list);
+        $all_files_we_expect = array_merge($all_files_we_expect, $file_list);
         sort($file_list, SORT_NATURAL);
         $all_file_pattern_globs[$file_pattern] = $file_list;
         $all_file_pattern_counts[$file_pattern] = count($file_list);
     }
 
-	// We need to figure out if there are any files in the directory that don't
-	// belong (I'm looking at you thumbs.db). Get a list of all files in the
-	// directory so we can compare it to just the files we expect to be there.
-	$all_files_pattern = $options['dir'] . DIRECTORY_SEPARATOR . '*.*';
-	$all_files = glob($all_files_pattern);
-	$unexpected_files = array_diff($all_files, $all_files_we_expect);
+    // We need to figure out if there are any files in the directory that don't
+    // belong (I'm looking at you thumbs.db). Get a list of all files in the
+    // directory so we can compare it to just the files we expect to be there.
+    $all_files_pattern = $options['dir'] . DIRECTORY_SEPARATOR . '*.*';
+    $all_files = glob($all_files_pattern);
+    $unexpected_files = array_diff($all_files, $all_files_we_expect);
 
     // Since we can have multiple non-XML extensions in one directory as long
-	// as they both belong to the same content model (e.g., *.tif and *.jp2
-	// in one islandora:sp_large_image_cmodel batch) let's get the count of
-	// all *.xml files and see if the remainder add up to its count.
+    // as they both belong to the same content model (e.g., *.tif and *.jp2
+    // in one islandora:sp_large_image_cmodel batch) let's get the count of
+    // all *.xml files and see if the remainder add up to its count.
     $count_files_xml = $all_file_pattern_counts['*.xml'];
     print "There are $count_files_xml .xml files\n";
 	// Remove the .xml list so we don't count it twice.
 	unset($all_file_pattern_counts['*.xml']);
 	$count_files_other_patterns = 0;
 	foreach ($all_file_pattern_counts as $pattern => $count) {
-		$count_files_other_patterns = $count_files_other_patterns + $count;
+	    $count_files_other_patterns = $count_files_other_patterns + $count;
 	}
 
 	if ($count_files_xml == $count_files_other_patterns) {
 	    $groups_match = 'Yes';
 	}
 	else {
-		$groups_match = 'No. Lists of all the file patterns has been written to ' . $options['log'];
+	    $groups_match = 'No. Lists of all the file patterns has been written to ' . $options['log'];
 	    $file_lists = var_export($all_file_pattern_globs, true);
-        error_log($file_lists . "\n", 3, $options['log']);
+            error_log($file_lists . "\n", 3, $options['log']);
 	}
 
     print "Number of " . $options['files'] . " files matches: $groups_match\n";
-	if ($num_unexecpted_files = count($unexpected_files)) {
-	    print "Number of unexpected files detected: $num_unexecpted_files. See the log for more detail.\n";
-		error_log("Unexpected files:\n", 3, $options['log']);
-		$unexpected_file_list = array_values($unexpected_files);
-		$unexpected_file_list = var_export($unexpected_file_list, true);
+    if ($num_unexecpted_files = count($unexpected_files)) {
+        print "Number of unexpected files detected: $num_unexecpted_files. See the log for more detail.\n";
+	error_log("Unexpected files:\n", 3, $options['log']);
+	$unexpected_file_list = array_values($unexpected_files);
+	$unexpected_file_list = var_export($unexpected_file_list, true);
         error_log($unexpected_file_list . "\n", 3, $options['log']);
-	}
-	else {
-		print "No unexpected files detected.\n";
-	}
+    }
+    else {
+        print "No unexpected files detected.\n";
+    }
 }
 
 
@@ -173,7 +176,7 @@ function islandora_newspaper_issue_cmodel($options) {
                         // To whoever needs to debug or maintain this... please forgive me. I am not a monster.
                         $issue_level_metadata_file = $issue_dir . DIRECTORY_SEPARATOR . $options['issue_level_metadata'];
                         if (is_file($issue_dir . DIRECTORY_SEPARATOR . $issue_dir_file) &&
-                                ($issue_dir . DIRECTORY_SEPARATOR . $issue_dir_file != $issue_level_metadata_file)) {
+                               ($issue_dir . DIRECTORY_SEPARATOR . $issue_dir_file != $issue_level_metadata_file)) {
                             $issue_level_tn_file = $issue_dir . DIRECTORY_SEPARATOR . 'TN.jpg';
                             if (is_file($issue_dir . DIRECTORY_SEPARATOR . $issue_dir_file) &&
                                 ($issue_dir . DIRECTORY_SEPARATOR . $issue_dir_file != $issue_level_tn_file)) {
@@ -454,6 +457,161 @@ function islandora_book_cmodel($options) {
     }
 
     print "More detail may be available in " . $options['log'] . ".\n";
+}
+
+/**
+ * Checks for the existense of subfolders in $options['dir'] (that correspond to compound
+ * objects) that contain one subfolder per child object. Each compound folder must contain
+ * a file named 'structure.cpd' and a file named 'MODS.xml'. Each child folder must contain
+ * a named 'MODS.xml' and a file with the name 'OBJ', with any extension.
+ *
+ * Example: php check_files.php --cmodel=islandora:compoundCModel --dir=/path/to/mikoutput --log=/tmp/mylog.txt
+ */
+function islandora_compound_cmodel($options) {
+    // Make sure the target directory only contains (compound object) subdirectories.
+    $extra_files_in_dir = false;
+    $all_files_pattern = $options['dir'] . DIRECTORY_SEPARATOR . '*';
+    $all_files = glob($all_files_pattern);
+    foreach ($all_files as $object_directory) {
+        if (!is_dir($object_directory)) {
+            $extra_files_in_dir = true;
+            error_log($options['dir'] . DIRECTORY_SEPARATOR . $object_directory . " should not exist.\n", 3, $options['log']);
+        }
+    }
+
+    // For each compound object subdirectory, test for the presence of MODS.xml,
+    // structure.cpd, and the expected number of child subdirectories.
+    $missing_object_mods = false;
+    $missing_object_cpd = false;
+    $missing_object_children = false;
+    $extra_object_files = false;
+    $missing_child_mods = false;
+    $missing_child_obj = false;
+    $extra_child_files = false;
+    foreach ($all_files as $object_directory) {
+        if (!is_dir($object_directory)) {
+            continue;
+        }
+        $child_dirs = array();
+        $child_object_results = array();
+        $mods_path = $object_directory . DIRECTORY_SEPARATOR . 'MODS.xml';
+        $cpd_path = $object_directory . DIRECTORY_SEPARATOR . 'structure.cpd';
+        if (!file_exists($mods_path)) {
+            $missing_object_mods = true;
+            error_log($mods_path . " appears to be missing.\n", 3, $options['log']);
+        }
+        if (!file_exists($cpd_path)) {
+            $missing_object_cpd = true;
+            error_log($cpd_path . " appears to be missing.\n", 3, $options['log']);
+        }
+        $child_dirs_pattern = $object_directory . DIRECTORY_SEPARATOR . '*';
+        $child_dirs = glob($child_dirs_pattern , GLOB_ONLYDIR);
+        $expected_number_of_children = expectedNumPageDirFromModsXML($mods_path);
+        if (count($child_dirs) != $expected_number_of_children) {
+            $missing_object_children = true;
+            error_log($object_directory . " does not have the expected number of children " .
+                "($expected_number_of_children), or its MODS file is missing.\n", 3, $options['log']);
+        }
+
+        // Check for unwanted files in each object directory.
+        $all_object_files_pattern = $object_directory . DIRECTORY_SEPARATOR . '*';
+        $all_object_files = glob($all_object_files_pattern);
+        $total_object_files = count($all_object_files);
+        // 1 for MODS.xml and 1 for structure.cpd.
+        $total_expected_obj_files = $expected_number_of_children + 2;
+        if ($total_expected_obj_files != $total_object_files) {
+            $extra_object_files = true;
+            error_log($object_directory . " contains an unexpected number of files " .
+                "(either extra files or missing child subdirectories).\n", 3, $options['log']);
+	    $unexpected_object_file_list = var_export($all_object_files, true);
+            error_log($unexpected_object_file_list . ".\n", 3, $options['log']);
+        }
+
+        // For each child object subdirectory, test for the presence of MODS.xml and a
+        // file with the base filename 'OBJ.'.
+        foreach ($child_dirs as $child_dir) {
+            $all_child_files_pattern = $child_dir . DIRECTORY_SEPARATOR . '*';
+            $all_child_file_paths = glob($all_child_files_pattern);
+            $all_child_files = array();
+            foreach ($all_child_file_paths as $child_file_path) {
+                $all_child_files[] = $child_file_path; 
+            }
+            $obj_pattern = $child_dir . DIRECTORY_SEPARATOR . 'OBJ.*';
+            $all_obj_file_paths = glob($obj_pattern);
+            if (count($all_obj_file_paths) < 1) {
+                $missing_child_obj = true;
+                error_log($child_idr . DIRECTORY_SEPARATOR . "OBJ file is missing.\n", 3, $options['log']);
+            }
+            if (!file_exists($child_dir . DIRECTORY_SEPARATOR . 'MODS.xml')) {
+                $missing_child_mods = true;
+                error_log($child_idr . DIRECTORY_SEPARATOR . "MODS.xml is missing.\n", 3, $options['log']);
+            }
+            if (count($all_child_files) > 2) {
+                $extra_child_files = true;
+                error_log($child_dir . DIRECTORY_SEPARATOR . " contains extra files.\n", 3, $options['log']);
+	        $unexpected_file_list = var_export($all_child_files, true);
+                error_log($unexpected_file_list . ".\n", 3, $options['log']);
+            }
+        }
+    }
+
+    if ($extra_files_in_dir) {
+        print "** Files exist in ". $options['dir'] . " that should not be present.\n";
+    }
+    else {
+        print "There are no unexpected files in " . $options['dir'] . ".\n";
+    }
+
+    if ($missing_object_mods) {
+        print "** Some objects in ". $options['dir'] . " have missing MODS.xml files.\n";
+    }
+    else {
+        print "All objects in " . $options['dir'] . " have a MODS.xml file.\n";
+    }
+
+    if ($missing_object_children) {
+        print "** Some objects in ". $options['dir'] . " have missing children " .
+           "(or their MODS files are missing and we can't tell how many children they should have).\n";
+    }
+    else {
+        print "All objects in " . $options['dir'] . " appear to have the correct number of children.\n";
+    }
+
+    if ($extra_object_files) {
+        print "** Some objects in ". $options['dir'] . " contain an unexpected number of files " .
+           "(or their MODS files are missing and we can't tell how many children directories they should have).\n";
+    }
+    else {
+        print "All objects in " . $options['dir'] . " appear to have the correct number of children.\n";
+    }
+
+    if ($missing_object_cpd) {
+        print "** Some objects in ". $options['dir'] . " have missing structure.cpd files.\n";
+    }
+    else {
+        print "All objects in " . $options['dir'] . " have a structure.cpd file.\n";
+    }
+
+    if ($missing_child_obj) {
+        print "** Some child objects in ". $options['dir'] . " have missing OBJ files.\n";
+    }
+    else {
+        print "All child objects in " . $options['dir'] . " have OBJ files.\n";
+    }
+
+    if ($missing_child_mods) {
+        print "** Some child objects in ". $options['dir'] . " have a missing MODS.xml file.\n";
+    }
+    else {
+        print "All child objects in " . $options['dir'] . " have a MODS.xml file.\n";
+    }
+
+    if ($extra_child_files) {
+        print "** Some child objects in ". $options['dir'] . " contain unexpected files.\n";
+    }
+    else {
+        print "All child objects in " . $options['dir'] . " have no expected files.\n";
+    }
 }
 
 
