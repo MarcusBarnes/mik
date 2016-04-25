@@ -128,14 +128,14 @@ class LocalCdmFiles extends Fetcher
         $output->records = array();
         for ($processed_chunks = 1; $processed_chunks <= $num_chunks; $processed_chunks++) {
             $start_at_as_str = strval($this->start_at);
-            $filepath = 'Cached_CDM_files/' . $this->settings['alias'] . '/Elems_in_Collection_' . $start_at_as_str .'.json';
+            $filepath = 'Cached_Cdm_files/' . $this->settings['alias'] . '/Elems_in_Collection_' . $start_at_as_str .'.json';
 
             // Query CONTENTdm and return records; if failure, log problem.
             if ($json = file_get_contents($filepath, false, null)) {
                 $chunk_output = json_decode($json);
                 $chunk_output = $this->addKeyPropertyForRecords($chunk_output);
             } else {
-                $message = date('c') . "\t". 'Query failed:' . "\t" . $query . "\n";
+                $message = date('c') . "\t". 'Query failed:' . "\t" . $filepath . "\n";
                 // @todo: Log failure.
                 return false;
             }
@@ -166,7 +166,7 @@ class LocalCdmFiles extends Fetcher
         }
 
         $propertiesOfRecordsObj->records = $arrayOfRecordObjects;
-        var_dump($propertiesOfRecordsObj);
+
         return $propertiesOfRecordsObj;
     }
 
@@ -175,7 +175,7 @@ class LocalCdmFiles extends Fetcher
      */
     public function getNumRecs()
     {
-        $filepath = 'Cached_CDM_files/' . $this->settings['alias'] . '/Collection_TotalRecs.xml';
+        $filepath = 'Cached_Cdm_files/' . $this->settings['alias'] . '/Collection_TotalRecs.xml';
         if (!file_exists($filepath)) {
             exit("Sorry, can't find " . $filepath . "\n");
         } else {
@@ -201,18 +201,10 @@ class LocalCdmFiles extends Fetcher
      */
     public function getItemInfo($pointer)
     {
-        $raw_metadata_cache = $this->settings['temp_directory'] . DIRECTORY_SEPARATOR . $pointer . '.metadata';
-        $filepath = 'Cached_CDM_files/' . $this->settings['alias'] . '/' . $pointer . '.metadata';
-        if (!file_exists($raw_metadata_cache)) {
-            $doc = file_get_contents($queryUrl);
-            $itemInfo = json_decode($doc, true);
-            file_put_contents($raw_metadata_cache, serialize($itemInfo));
-        }
-        else {
-            $itemInfo = unserialize(file_get_contents($raw_metadata_cache));
-        }
+        $filepath = 'Cached_Cdm_files/' . $this->settings['alias'] . '/' . $pointer . '.xml';
+        $doc = file_get_contents($filepath);
+        $itemInfo = json_decode($doc, true);
         if (is_array($itemInfo)) {
-            var_dump($item_info);
             return $itemInfo;
         } else {
             return false;
