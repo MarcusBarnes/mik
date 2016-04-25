@@ -7,8 +7,7 @@
     version="2.0"
     xmlns="http://www.loc.gov/mods/v3" >
 
-    <!-- changes subject topic topic to subject topic subject topic (split on double dashes)
-     now with additional function to capitalize first letter-->
+    <!-- removes semicolonts from subject/Temporal (as in Loyola University New Orleans Athletics Collection-->
     
     <xsl:template match="@* | node()">
         <xsl:copy>
