@@ -1,5 +1,5 @@
 Title,"<titleInfo><title>%value%</title></titleInfo>"
-Creator,"<name displayLabel='Creator'><namePart>%value%</namePart><role><roleTerm type='code' authority='marcrelator'>cre/roleTerm><roleTerm type='text' authority='marcrelator'>Creator</roleTerm></role></name>"
+Creator,"<name displayLabel='Creator'><namePart>%value%</namePart><role><roleTerm type='code' authority='marcrelator'>cre</roleTerm><roleTerm type='text' authority='marcrelator'>Creator</roleTerm></role></name>"
 Date,"<originInfo><dateIssued keyDate='yes'>%value%</dateIssued></originInfo>"
 Digitized Date,"<originInfo><dateCaptured>%value%</dateCaptured></originInfo>"
 Subject,"<subject authority='lcsh'><topic>%value%</topic></subject>"
