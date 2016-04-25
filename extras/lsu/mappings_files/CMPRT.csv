@@ -18,7 +18,7 @@ null4,"<location><holdingSimple><copyInformation><subLocation>Prescott Memorial 
 Rights,"<accessCondition type='restriction on access'>%value%</accessCondition>"
 Contact Information,"<accessCondition type='use and reproduction' displayLabel='Contact Information'>Contact Special Collections, Manuscripts and Archives at Louisiana Tech University for more information about use and reproduction. specialcollections@latech.edu</accessCondition>"
 Cataloged Date,"<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>"
-Date modified,"<recordInfo><recordChangeDate><%value%</recordChangeDate></recordInfo>"
+Date modified,"<recordInfo><recordChangeDate>%value%</recordChangeDate></recordInfo>"
 Cataloger,"<extension><cataloger>%value%</cataloger></extension>"
 Image Resolution (Archival),"<extension><imageResolution>%value%</imageResolution></extension>"
 Image Bit-Depth (Archival),"<extension><imageBitDepth>%value%</imageBitDepth></extension>"
