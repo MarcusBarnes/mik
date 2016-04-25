@@ -32,10 +32,10 @@
             <xsl:when test="matches(., $yearRangeRegEx) and not(matches(., 'Ca.'))">
                 <xsl:analyze-string select="$dates" regex="{$yearRangeRegEx}">
                     <xsl:matching-substring>
-                        <dateIssued point="start" keydate="yes">
+                        <dateIssued point="start" keyDate="yes">
                             <xsl:value-of select="replace(regex-group(1), '\s+', ' ')"/>
                         </dateIssued>
-                        <dateIssued point="end" keydate="yes">
+                        <dateIssued point="end">
                             <xsl:value-of select="replace(regex-group(2), '\s+', ' ')"/>
                         </dateIssued>
                     </xsl:matching-substring>
@@ -44,7 +44,7 @@
             <xsl:when test="matches(., $caRegEx) and not(matches(., '-'))">
                 <xsl:analyze-string select="$dates" regex="{$caRegEx}">
                     <xsl:matching-substring>
-                        <dateIssued keydate="yes" qualifier="approximate">
+                        <dateIssued keyDate="yes" qualifier="approximate">
                             <xsl:value-of select="replace(regex-group(1), '\s+', ' ')"/>
                         </dateIssued>
                     </xsl:matching-substring>
@@ -53,10 +53,10 @@
             <xsl:when test="matches(., '-') and matches(., 'Ca.')">
                 <xsl:analyze-string select="$dates" regex="{$yearRangeRegEx}">
                     <xsl:matching-substring>
-                        <dateIssued point="start" keydate="yes" qualifier="approximate">
+                        <dateIssued point="start" keyDate="yes" qualifier="approximate">
                             <xsl:value-of select="replace(regex-group(1), '\s+', ' ')"/>
                         </dateIssued>
-                        <dateIssued point="end" keydate="yes" qualifier="approximate">
+                        <dateIssued point="end" qualifier="approximate">
                             <xsl:value-of select="replace(regex-group(2), '\s+', ' ')"/>
                         </dateIssued>
                     </xsl:matching-substring>
@@ -65,10 +65,10 @@
             <xsl:when test="matches(., $betweenRegEx)">
                 <xsl:analyze-string select="$dates" regex="{$betweenRegEx}">
                     <xsl:matching-substring>
-                        <dateIssued point="start" keydate="yes">
+                        <dateIssued point="start" keyDate="yes">
                             <xsl:value-of select="replace(regex-group(1), '\s+', ' ')"/>
                         </dateIssued>
-                        <dateIssued point="end" keydate="yes">
+                        <dateIssued point="end">
                             <xsl:value-of select="replace(regex-group(2), '\s+', ' ')"/>
                         </dateIssued>
                     </xsl:matching-substring>
@@ -77,17 +77,17 @@
             <xsl:when test="matches(., $semicolonRegEx)">
                 <xsl:analyze-string select="$dates" regex="{$semicolonRegEx}">
                     <xsl:matching-substring>
-                        <dateIssued point="start" keydate="yes">
+                        <dateIssued point="start" keyDate="yes">
                             <xsl:value-of select="replace(regex-group(1), '\s+', ' ')"/>
                         </dateIssued>
-                        <dateIssued point="end" keydate="yes">
+                        <dateIssued point="end">
                             <xsl:value-of select="replace(regex-group(2), '\s+', ' ')"/>
                         </dateIssued>
                     </xsl:matching-substring>
                 </xsl:analyze-string>
             </xsl:when>
             <xsl:otherwise>
-                <dateIssued keydate="yes">
+                <dateIssued keyDate="yes">
                     <xsl:value-of select="."/>
                 </dateIssued>
             </xsl:otherwise>
