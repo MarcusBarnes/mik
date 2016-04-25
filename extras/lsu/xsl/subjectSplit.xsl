@@ -8,7 +8,7 @@
     xmlns="http://www.loc.gov/mods/v3" >
 
     <!-- changes subject topic topic to subject topic subject topic (split on double dashes)
-     now with additional function to capitalize first letter and remove period if it ends the string-->
+     capitalizes first letter and remove period if it ends the string; splits subject/geographic-->
     
     <xsl:template match="@* | node()">
         <xsl:copy>
@@ -26,6 +26,19 @@
                             <xsl:value-of select="replace(replace(concat(upper-case(substring(.,1,1)),substring(.,2)), '^\s+|\s+$', ''),'\.$','')"/>
                         </xsl:element>
                     </xsl:for-each>
+            </xsl:element>
+        </xsl:for-each>
+    </xsl:template>
+    
+    <xsl:template match="subject[geographic]">
+        <xsl:for-each select="geographic">
+            <xsl:element name="subject">
+                <xsl:attribute name="authority">local</xsl:attribute>
+                <xsl:for-each select="tokenize(.,'--')">
+                    <xsl:element name="geographic">
+                        <xsl:value-of select="replace(replace(concat(upper-case(substring(.,1,1)),substring(.,2)), '^\s+|\s+$', ''),'\.$','')"/>
+                    </xsl:element>
+                </xsl:for-each>
             </xsl:element>
         </xsl:for-each>
     </xsl:template>
