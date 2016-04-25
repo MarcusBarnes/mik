@@ -13,7 +13,7 @@ if (trim($argv[1]) == 'help') {
     print "A script to verify that the files in MIK output are present.\n\n";
     print "Example usage: php check_files.php --cmodel=islandora:sp_basic_image --dir=/tmp/mik_output --files=*.jpg,*.xml\n\n";
     print "Options:\n";
-    print "    --cmodel : An Islandora content model PID. Required.\n";
+    print "    --cmodel : An Islandora content model PID. Required. The abbreviated values 'single', 'newspapers', 'books', and 'compound' are allowed.\n";
     print "    --dir : The directory containing the files you want to check, without the trailing slash. Required.\n";
     print "    --files : A comma-separated list of files that need to be present. Required. For content
         models where the filenames are variable, use a * to indicate the filename (e.g., '*.jpg, *.xml').\n";
@@ -38,6 +38,7 @@ if (!file_exists($options['dir'])) {
 }
 
 switch ($options['cmodel']) {
+    case 'single':
     case 'islandora:sp_basic_image':
     case 'islandora:sp_large_image_cmodel':
     case 'islandora:sp_pdf':
@@ -45,12 +46,15 @@ switch ($options['cmodel']) {
     case 'islandora:sp_videoCModel':
         islandora_single_file_cmodels($options);
         break;
+    case 'newspapers':
     case 'islandora:newspaperIssueCModel':
         islandora_newspaper_issue_cmodel($options);
         break;
+    case 'books':
     case 'islandora:bookCModel':
         islandora_book_cmodel($options);
         break;
+    case 'compound':
     case 'islandora:compoundCModel':
         islandora_compound_cmodel($options);
         break;
@@ -540,11 +544,11 @@ function islandora_compound_cmodel($options) {
             $all_obj_file_paths = glob($obj_pattern);
             if (count($all_obj_file_paths) < 1) {
                 $missing_child_obj = true;
-                error_log($child_idr . DIRECTORY_SEPARATOR . "OBJ file is missing.\n", 3, $options['log']);
+                error_log($child_dir . DIRECTORY_SEPARATOR . "OBJ file is missing.\n", 3, $options['log']);
             }
             if (!file_exists($child_dir . DIRECTORY_SEPARATOR . 'MODS.xml')) {
                 $missing_child_mods = true;
-                error_log($child_idr . DIRECTORY_SEPARATOR . "MODS.xml is missing.\n", 3, $options['log']);
+                error_log($child_dir . DIRECTORY_SEPARATOR . "MODS.xml is missing.\n", 3, $options['log']);
             }
             if (count($all_child_files) > 2) {
                 $extra_child_files = true;
