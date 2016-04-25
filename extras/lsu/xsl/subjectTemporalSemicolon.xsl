@@ -19,7 +19,7 @@
     <xsl:template match="subject/temporal">
         <xsl:variable name="temporalText" select="."/>
         <temporal>
-            <xsl:value-of select="replace($temporalText,'; ','')"/>
+            <xsl:value-of select="replace($temporalText,'; |;','')"/>
         </temporal>
     </xsl:template>
 
