@@ -340,5 +340,14 @@ class CdmNewspapers extends FileGetter
         }
         
     }
+    
+    public function getCpdFile($pointer)
+    {
+        $ws_url = $this->settings['ws_url'];
+        $alias = $this->alias;
+        $query_url = $ws_url . 'dmGetCompoundObjectInfo/' . $alias . '/' .  $pointer . '/xml';
+        $cpd_content = file_get_contents($query_url);
+        return $cpd_content;
+    }
 
 }
