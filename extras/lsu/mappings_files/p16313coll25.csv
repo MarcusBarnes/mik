@@ -16,5 +16,5 @@ null2,"<location><physicalLocation>University of Louisiana at Lafayette: Univers
 null3,"<location><url>http://library.louisiana.edu/</url></location>"		
 Rights,"<accessCondition type='restriction on access'>%value%</accessCondition>"
 Date created,"<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>"
-Date modified,"<recordInfo><recordChangeDate><%value%</recordChangeDate></recordInfo>"
+Date modified,"<recordInfo><recordChangeDate>%value%</recordChangeDate></recordInfo>"
 null5,"<extension><CONTENTdmData></CONTENTdmData></extension>"

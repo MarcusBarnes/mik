@@ -18,7 +18,7 @@ null2,"<location><physicalLocation>University of Louisiana at Monroe Library</ph
 null3,"<location><url>http://ulm.edu/library</url></location>"
 Rights,"<accessCondition type='restriction on access'>%value%</accessCondition>"
 Cataloged Date,"<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>"
-Date modified,"<recordInfo><recordChangeDate><%value%</recordChangeDate></recordInfo>"
+Date modified,"<recordInfo><recordChangeDate>%value%</recordChangeDate></recordInfo>"
 Cataloger,"<extension><cataloger>%value%</cataloger></extension>"
 Extent (Archival),"<extension><extentArchival>%value%</extentArchival></extension>"
 File Size (Archival),"<extension><fileSize>%value%</fileSize></extension>"
