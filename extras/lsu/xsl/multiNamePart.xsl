@@ -15,20 +15,17 @@
         </xsl:copy>
     </xsl:template>
     
-    <xsl:template match="name">
-        <xsl:choose>
-            <xsl:when test="namePart = ''">
-            </xsl:when>
-            <xsl:when test="namePart = 'Unknown'">                
-            </xsl:when>
-            <xsl:when test="namePart = 'unknown'">                
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:copy>
-                    <xsl:copy-of select="@*" />
-                    <xsl:apply-templates select="*"/>
-                </xsl:copy>
-            </xsl:otherwise>
-        </xsl:choose>
+    <xsl:template match="name[@displayLabel='Contributor']">
+        <xsl:for-each select="namePart">
+            <name displayLabel="Contributor">
+                <role>
+                    <roleTerm type="text" authority="marcrelator">Contributor</roleTerm>
+                    <roleTerm type="code" authority="marcrelator">ctb</roleTerm>
+                </role>
+                <namePart>
+                    <xsl:value-of select="."/>
+                </namePart>
+            </name>
+        </xsl:for-each>
     </xsl:template>
 </xsl:stylesheet>
