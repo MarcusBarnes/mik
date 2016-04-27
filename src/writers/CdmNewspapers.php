@@ -92,13 +92,31 @@ class CdmNewspapers extends Writer
         $this->createOutputDirectory();
         $issueObjectPath = $this->createIssueDirectory($metadata, $record_key);
         $this->writeMetadataFile($metadata, $issueObjectPath);
-        
+              
+              
+        $cpdData = $this->cdmNewspapersFileGetter->getCpdFile($record_key);        
+        $pagePtrPageTitleMap = $this->cpdPagePtrPageTitleMap($cpdData);
+                
+        // If there were no datastreams explicitly set in the configuration,
+        // set flag so that all datastreams in the writer class are run.
+        // $this->datareams is an empty array by default.
+        $no_datastreams_setting_flag = false;
+        if (count($this->datastreams) == 0) {
+            $no_datastreams_setting_flag = true;
+        }
+              
         // filegetter for OBJ.tiff files for newspaper issue pages
-        $OBJFilesArray = $this->cdmNewspapersFileGetter
-                 ->getIssueLocalFilesForOBJ($this->issueDate);
-        // Array of paths to tiffs for OBJ for newspaper issue pages may not be sorted
-        // on some systems.  Sort.
-        sort($OBJFilesArray);
+        $OBJ_expected = in_array('OBJ', $this->datastreams);
+        if ($OBJ_expected xor $no_datastreams_setting_flag) {
+            $OBJFilesArray = $this->cdmNewspapersFileGetter
+                    ->getIssueLocalFilesForOBJ($this->issueDate);
+            // Array of paths to tiffs for OBJ for newspaper issue pages may not be sorted
+            // on some systems.  Sort.
+            sort($OBJFilesArray);
+        } else {
+            // No OBJ source files
+            $OBJFilesArray = array();        
+        }
 
         $sub_dir_num = 0;
         foreach ($pages as $page_pointer) {
@@ -106,11 +124,16 @@ class CdmNewspapers extends Writer
 
             // Create subdirectory for each page of newspaper issue
             $page_object_info = $this->fetcher->getItemInfo($page_pointer);
-            $filekey = $sub_dir_num - 1;
-            $pathToFile = $OBJFilesArray[$filekey];
-            // Infer the numbered directory name from the OBJ file name.
-            $directoryNumber = $this->directoryNameFromFileName($pathToFile);
             
+            if ($OBJ_expected xor $no_datastreams_setting_flag) {            
+                $filekey = $sub_dir_num - 1;
+                $pathToFile = $OBJFilesArray[$filekey];
+                // Infer the numbered directory name from the OBJ file name.
+                $directoryNumber = $this->directoryNameFromFileName($pathToFile);
+            } else {
+                // Infer the numbered directory name from  $page_object_info
+                $directoryNumber = $this->directoryNameFromPageObjectInfo($pagePtrPageTitleMap, $page_object_info);
+            }
             // left trim leading left zero padded numbers
             $directoryNumber = ltrim($directoryNumber, "0");
             
@@ -127,14 +150,6 @@ class CdmNewspapers extends Writer
 
             print "Exporting files for issue " . $this->issueDate
               . ', page ' . $directoryNumber . "\n";
-            
-            // If there were no datastreams explicitly set in the configuration,
-            // set flag so that all datastreams in the writer class are run.
-            // $this->datareams is an empty array by default.
-            $no_datastreams_setting_flag = false;
-            if (count($this->datastreams) == 0) {
-               $no_datastreams_setting_flag = true;
-            }
 
             // Write out $page_object_info['full'], which we'll use as the OCR datastream.
             $ocr_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OCR.txt';
@@ -195,10 +210,8 @@ class CdmNewspapers extends Writer
             
             $OBJ_expected = in_array('OBJ', $this->datastreams);
             if ($OBJ_expected xor $no_datastreams_setting_flag) {
-                // Create OBJ file for page.
-                //$filekey = $page_number - 1;
-                //$pathToFile = $OBJFilesArray[$filekey];
-
+    
+                // OBJ from source files - either TIFF, jpeg, or jp2
                 $pathToPageOK = $this->cdmNewspapersFileGetter
                    ->checkNewspaperPageFilePath($pathToFile, $directoryNumber);
 
@@ -210,9 +223,26 @@ class CdmNewspapers extends Writer
                     // if the path to the page is NOT OK, throw an exception 
                     throw new \Exception("The path $pathToFile for the OBJ file for page $directoryNumber did not pass the check.");
                 }
+            } else if (!$this->skip_obj) {
+                // The OBJ datastream is required: 
+                // see: https://github.com/Islandora/islandora_paged_content/blob/7.x/xml/islandora_pageCModel_ds_composite_model.xml
+                // Only skip if the skip_obj flag is set to true in the WRITER seection of the configuration file.
+                // If using tiff datastream from external source, datastreams[] = OBJ
+                // in the WRITER section of the configuration file or do not include datastreams[] option to create all datastreams
+                // MODS, OBJ, OCR, JPEG, JP2
+                if ($JP2_expected){
+                    $obj_jp2_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.jp2';
+                    copy($jp2_output_file_path, $obj_jp2_output_file_path);
+                } else if ($JPEG_expected) {
+                    $obj_jpeg_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'OBJ.jpg';
+                    copy($jpg_output_file_path, $obj_jpeg_output_file_path);
+                
+                } else {
+                    // Create an exception since OJB are required in Islandora Book packages.
+                    throw new \Exception("OBJ datastream is required - no OBJ datastream created.  Please check your configuration.");
+                }       
+            
             }
-
-            // For each page, we need two files that can't be downloaded from CONTENTdm: PDF.pdf and MODS.xml.
             
             // Write outut page level MODS.XML
             $MODS_expected = in_array('MODS', $this->datastreams);
@@ -308,6 +338,51 @@ class CdmNewspapers extends Writer
             return $issueObjectPath;
         }
         
+    }
+    
+    /**
+     * Infer the number name for the newspaper page subdirectory from the page_object_info metadata
+     */ 
+    public function directoryNameFromPageObjectInfo($pagePtrPageTitleMap, $page_object_info) {
+    
+        $pageptr = $page_object_info['dmrecord'];
+        $pagetitle = $pagePtrPageTitleMap[$pageptr];
+        // Page 312
+        $regex = '%[0-9]*$%';    
+        preg_match($regex, $pagetitle, $matches);
+        $pageNumber = ltrim($matches[0]);
+        return $pageNumber;
+    } 
+    
+    /**
+     *  Takes Cdm newspaper .cpd Data
+     */
+    public function cpdPagePtrPageTitleMap($cpdData) {
+       $doc = new \DomDocument('1.0');
+       $doc->loadXML($cpdData);
+       $pages = $doc->getElementsByTagName('page');
+       
+       $returnMap = array();
+       foreach($pages as $page_info) {
+            $childNodes = $page_info->childNodes;
+            unset($pageptr);
+            unset($pagetitle);
+            foreach ($childNodes as $child) {
+                if ($child->nodeName == 'pageptr'){
+                    $pageptr = $child->nodeValue;
+                }
+                if ($child->nodeName == 'pagetitle') {
+                    $pagetitle = $child->nodeValue;
+                }
+            }
+            if(isset($pageptr) && isset($pagetitle)){
+                $returnMap[$pageptr] = $pagetitle;
+            }
+
+       
+        } 
+
+        return $returnMap;       
     }
 
     public function writeMetadataFile($metadata, $path)
