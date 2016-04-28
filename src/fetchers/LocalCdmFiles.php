@@ -4,7 +4,6 @@ namespace mik\fetchers;
 
 class LocalCdmFiles extends Fetcher
 {
-
     /**
      * @var array $settings - configuration settings from confugration class.
      */
@@ -51,8 +50,6 @@ class LocalCdmFiles extends Fetcher
     protected $browseQueryMap = array(
         // 'alias' => 'foo',
         'searchstrings' => '0',
-        // We ask for as little possible info at this point since we'll
-        // be doing another query on each item later.
         'fields' => 'dmcreated',
         'sortby' => 'dmcreated!dmrecord',
         // 'maxrecs' => 1000,
@@ -81,7 +78,6 @@ class LocalCdmFiles extends Fetcher
         else {
             $this->fetchermanipulators = null;
         }
-
         if (!$this->createTempDirectory()) {
             $this->log->addError("LocalCdmFiles fetcher",
                 array('Cannot create temp_directory' => $this->tempDirectory));
@@ -96,7 +92,7 @@ class LocalCdmFiles extends Fetcher
     );
 
     /**
-     * Query CONTENTdm with the values in the query map and return an array of records.
+     * Megafunction for splitting elems_in_collections list into elements, then pulling the xml for each, then merging all.
      */
     public function readContentdm($limit)
     {
@@ -130,12 +126,11 @@ class LocalCdmFiles extends Fetcher
             $start_at_as_str = strval($this->start_at);
             $filepath = 'Cached_Cdm_files/' . $this->settings['alias'] . '/Elems_in_Collection_' . $start_at_as_str .'.json';
 
-            // Query CONTENTdm and return records; if failure, log problem.
             if ($json = file_get_contents($filepath, false, null)) {
                 $chunk_output = json_decode($json);
                 $chunk_output = $this->addKeyPropertyForRecords($chunk_output);
             } else {
-                $message = date('c') . "\t". 'Query failed:' . "\t" . $filepath . "\n";
+                $message = date('c') . "\t". 'fileread failed:' . "\t" . $filepath . "\n";
                 // @todo: Log failure.
                 return false;
             }
@@ -153,20 +148,15 @@ class LocalCdmFiles extends Fetcher
      */
     private function addKeyPropertyForRecords($propertiesOfRecordsObj)
     {
-
         $arrayOfRecordObjects = array();
-
         foreach ($propertiesOfRecordsObj->records as $recordProperties) {
-
             if (isset($recordProperties->pointer)) {
                 $record_key = $this->key;
                 $recordProperties->key = $recordProperties->$record_key;
             }
             $arrayOfRecordObjects[] = $recordProperties;
         }
-
         $propertiesOfRecordsObj->records = $arrayOfRecordObjects;
-
         return $propertiesOfRecordsObj;
     }
 
@@ -176,18 +166,14 @@ class LocalCdmFiles extends Fetcher
     public function getNumRecs()
     {
         $filepath = 'Cached_Cdm_files/' . $this->settings['alias'] . '/Collection_TotalRecs.xml';
-        if (!file_exists($filepath)) {
-            exit("Sorry, can't find " . $filepath . "\n");
+        if($xml = file_get_contents($filepath, false, null)) {
+            $doc = new \DomDocument('1.0');
+            $doc->loadXML($xml);
+            return $doc->getElementsByTagName('total')->item(0)->nodeValue;
         } else {
-           if($xml = file_get_contents($filepath, false, null)) {
-                $doc = new \DomDocument('1.0');
-                $doc->loadXML($xml);
-                return $doc->getElementsByTagName('total')->item(0)->nodeValue;
-            } else {
-                $message = date('c') . "\t". 'Fileread failed:' . "\t" . $filepath . "\n";
-                echo $message;
-                return false;
-            }
+            $message = date('c') . "\t". 'Fileread failed:' . "\t" . $filepath . "\n";
+            echo $message;
+            return false;
         }
     }
     
@@ -243,7 +229,6 @@ class LocalCdmFiles extends Fetcher
                 $manipulator_settings_array);
             $records = $fetchermanipulator->manipulate($records);
         }
-        var_dump($records);
         return $records;
     }
 
