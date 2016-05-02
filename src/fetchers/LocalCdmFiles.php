@@ -126,7 +126,7 @@ class LocalCdmFiles extends Fetcher
             $start_at_as_str = strval($this->start_at);
             $filepath = 'Cached_Cdm_files/' . $this->settings['alias'] . '/Elems_in_Collection_' . $start_at_as_str .'.json';
 
-            if ($json == file_get_contents($filepath, false, null)) {
+            if ($json = file_get_contents($filepath, false, null)) {
                 $chunk_output = json_decode($json);
                 $chunk_output = $this->addKeyPropertyForRecords($chunk_output);
             } else {
