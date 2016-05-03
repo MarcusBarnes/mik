@@ -1,5 +1,6 @@
 /vendor/
 composer.*
+.vagrant/*
 /nbproject/*
 output/*
 Cached_Cdm_files/*
