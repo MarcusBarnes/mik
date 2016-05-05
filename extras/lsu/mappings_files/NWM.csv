@@ -20,7 +20,7 @@ null4,"<location><holdingSimple><copyInformation><subLocation>Noel Memorial Libr
 Rights,"<accessCondition type='restriction on access'>%value%</accessCondition>"
 Contact Information,"<accessCondition type='use and reproduction'>Contact Information: %value%</accessCondition>"
 Cataloged Date,"<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>"
-Date modified,"<recordInfo><recordChangeDate><%value%</recordChangeDate></recordInfo>"
+Date modified,"<recordInfo><recordChangeDate>%value%</recordChangeDate></recordInfo>"
 Object File Name,"<identifier type='local' displayLabel='Object File Name'>%value%</identifier>"
 Cataloger,"<extension><cataloger>%value%</cataloger></extension>"
 Image Resolution (Archival),"<extension><imageResolution>%value%</imageResolution></extension>"

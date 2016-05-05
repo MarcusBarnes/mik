@@ -20,7 +20,7 @@ Contact Information,"<accessCondition type='use and reproduction'>Contact the Hi
 Object File Name,"<identifier type='local' displayLabel='Object File Name'>%value%</identifier>"
 Accession No,"<identifier type='local' displayLabel='Accession Number'>%value%</identifier>"
 Date created,"<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>"
-Date modified,"<recordInfo><recordChangeDate><%value%</recordChangeDate></recordInfo>"
+Date modified,"<recordInfo><recordChangeDate>%value%</recordChangeDate></recordInfo>"
 Cataloger,"<extension><cataloger>%value%</cataloger></extension>"
 Image Resolution (Archival),"<extension><imageResolution>%value%</imageResolution></extension>"
 Image Bit-Depth (Archival),"<extension><imageBitDepth>%value%</imageBitDepth></extension>"

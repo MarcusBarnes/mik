@@ -23,7 +23,7 @@ Folder Label,"<location><holdingSimple><copyInformation><shelfLocator>Folder Lab
 Rights,"<accessCondition type='restriction on access'>%value%</accessCondition>"
 Contact Information,"<accessCondition type='use and reproduction'>Contact Information: %value%</accessCondition>"
 Cataloged date,"<recordInfo><recordCreationDate>%value%</recordCreationDate></recordInfo>"
-Date modified,"<recordInfo><recordChangeDate><%value%</recordChangeDate></recordInfo>"
+Date modified,"<recordInfo><recordChangeDate>%value%</recordChangeDate></recordInfo>"
 Cataloged by,"<extension><cataloger>%value%</cataloger></extension>"
 Image Resolution (Archival),"<extension><imageResolution>%value%</imageResolution></extension>"
 Digitized by,"<extension><digitizedBy>%value%</digitizedBy></extension>"
