@@ -28,4 +28,4 @@ Color Mode (Archival),"<extension><imageBitDepth>%value%</imageBitDepth></extens
 Image Manipulation (Archival),"<extension><imageManipulation>%value%</imageManipulation></extension>"
 File Size (Archival),"<extension><fileSize>%value%</fileSize></extension>"
 Hardware/Software (Archival),"<extension><hardwareSoftware>%value%</hardwareSoftware></extension>"
-null5,"<extension><CONTENTdmData></CONTENTdmData></extension>"
+null6,"<extension><CONTENTdmData></CONTENTdmData></extension>"
