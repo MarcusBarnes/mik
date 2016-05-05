@@ -130,6 +130,9 @@ class CdmToMods extends Mods
         $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
         
         foreach ($collectionMappingArray as $key => $valueArray) {
+            if (preg_match('/^#/', $valueArray[0])) {
+              continue;
+            }
             $CONTENTdmField = $valueArray[0];
             // because an easy error is typos in mappings_files -- this will indicate which line has typo.
             var_dump($CONTENTdmField);
@@ -158,7 +161,7 @@ class CdmToMods extends Mods
             // metadata creation may break.
             $fieldValue = htmlspecialchars($fieldValue, ENT_NOQUOTES|ENT_XML1);
             if (isset($valueArray[1])) {
-                $xmlSnippet = $valueArray[1];
+                $xmlSnippet = trim($valueArray[1]);
             } else {
                 // If $valueArray[1] is not set, then there coule be
                 // issues with the mappings file or there may be

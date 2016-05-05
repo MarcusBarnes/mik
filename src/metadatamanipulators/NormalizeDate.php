@@ -5,8 +5,9 @@ namespace mik\metadatamanipulators;
 use \Monolog\Logger;
 
 /**
- * NormalizeDate - Normalize a date from the source metadata for use
- * within MODS' originInfo/dateIssued, dateCreated, dateCaptured,
+ * NormalizeDate - Normalize a date from the raw source metadata
+ * (i.e., the metadata stored in $settings['FETCHER']['temp_directory'])
+ * for use within MODS' originInfo/dateIssued, dateCreated, dateCaptured,
  * dateValid, dateModified, copyrightDate, and dateOther child elements.
  *
  * Applies to all MODS toolchains.
@@ -32,7 +33,12 @@ class NormalizeDate extends MetadataManipulator
         if (count($paramsArray) == 2) {
             $this->sourceDateField = $paramsArray[0];
             $this->destDateElement = $paramsArray[1];
-        } else {
+        } elseif (count($paramsArray) == 3) {
+            $this->sourceDateField = $paramsArray[0];
+            $this->destDateElement = $paramsArray[1];
+            $this->preference = $paramsArray[2];
+        }
+        else {
             $this->log->addInfo("NormalizeDate", array('Wrong parameter count' => count($paramsArray)));
         }
     }
@@ -63,32 +69,118 @@ class NormalizeDate extends MetadataManipulator
             // metadata parser.
             $origin_info_element = $date_element->parentNode;
 
+            // This is the metadata stored in $settings['FETCHER']['temp_directory'],
+            // not in the incoming sMODS element.
             $this->sourceDateFieldValue = $this->getSourceDateFieldValue();
 
-            // See if the value of the date field in the raw metadata matches our
-            // pattern, and if it does, replace the value of the target MODS element
-            // with a w3cdtf version of the date value.
+            /**
+             * In the series of if/elseif blocks below, see if the value of the date field
+             * in the incoming metadata matches our pattern, and if it does, replace the
+             * value of the target MODS element with a w3cdtf version of the date value.
+             *
+             * @todo: When 'ca.'' is present, add 'qualifier' attribute with values 'approximate',
+             * 'inferred', 'questionable'. Set a default (maybe configurable) date in this case?
+             */
 
-            // @todo: When 'ca.'' is present, add 'qualifier' attribute with values 'approximate',
-            // 'inferred', 'questionable'. Set a default (maybe configurable) date in this case?
-
-            // Check for dates in \d\d-\d\d-\d\d\d\d.
-            if (preg_match('/^(\d\d)\-(\d\d)\-(\d\d\d\d)$/', $this->sourceDateFieldValue, $matches)) {
-                $date_element->nodeValue = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
+            /**
+             * Check for dates like 1-8-1930. Leading zeros on day and month optional,
+             * as are the position of month and day.
+             */
+            if (preg_match('/^(\d\d?)\-(\d\d?)\-(\d\d\d\d)$/', $this->sourceDateFieldValue, $matches)) {
+                // This pattern is often interpreted in two ways (US and UK dates) so we allow
+                // it to take an optional 'preference' flag. Value of 'm' indicates that the
+                // first part of the incoming date value is month.
+                if (isset($this->preference) && $this->preference == 'm') {
+                    // Interpret as mm-dd-yyyy. Reassemble the value as yyyy-mm-dd.
+                    list($month, $day, $year) = explode('-', $matches[0]);
+                }
+                else {
+                    // Interpret as dd-mm-yyyy (this is the default). Reassemble the value as yyyy-mm-dd.
+                    list($day, $month, $year) = explode('-', $matches[0]);
+                }
                 // Reassemble the parent and child elements.
+                if (strlen($day)=== 1) {
+                    $day = '0' . $day;
+                }
+                if (strlen($month) === 1) {
+                    $month = '0' . $month;
+                }
+                $date_element->nodeValue = $year . '-' . $month . '-' . $day;
                 $origin_info_element->appendChild($date_element);
                 // Convert the back to the snippet and return it.
                 $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
+                $this->logInvalidDate($year, $month, $day);
                 return $dom->saveXML($origin_info_element);
             }
-            // Check for dates in \d\d\d\d \d\d \d\d.
+            /**
+             * Check for dates like 1/8/1930. Leading zeros on day and month optional, as are
+             * the position of month and day.
+             */
+            elseif (preg_match('#^(\d\d?)/(\d\d?)/(\d\d\d\d)$#', $this->sourceDateFieldValue, $matches)) {
+                // Another pattern that can be interpreted in two ways (US and UK dates).
+                if (isset($this->preference) && $this->preference == 'm') {
+                    // Interpret as mm/dd/yyyy. Reassemble the value as yyyy-mm-dd.
+                    list($month, $day, $year) = explode('/', $matches[0]);
+                }
+                else {
+                    // Interpret as dd/mm/yyyy (this is the default). Reassemble the value as yyyy-mm-dd.
+                    list($day, $month, $year) = explode('/', $matches[0]);
+                }
+                // Reassemble the parent and child elements.
+                if (strlen($day) === 1) {
+                    $day = '0' . $day;
+                }
+                if (strlen($month) === 1) {
+                    $month = '0' . $month;
+                }
+                $date_element->nodeValue = $year . '-' . $month . '-' . $day;
+                $origin_info_element->appendChild($date_element);
+                // Convert the back to the snippet and return it.
+                $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
+                $this->logInvalidDate($year, $month, $day);
+                return $dom->saveXML($origin_info_element);
+            }
+            /**
+             * Check for dates like 1930 10 15. Assumes leading zeros on month and day and that
+             * the incoming date is in format yyyy mm dd.
+             */
             elseif (preg_match('/^(\d\d\d\d)\s+(\d\d)\s+(\d\d)$/', $this->sourceDateFieldValue, $matches)) {
-                $date_element->nodeValue = $matches[1] . '-' . $matches[2] . '-' . $matches[3];
+                list($year, $month, $day) = preg_split('/\s+/', $matches[0]);
+                // Reassemble the value as yyyy-mm-dd.
+                $date_element->nodeValue = $year . '-' . $month . '-' . $day;
                 $origin_info_element->appendChild($date_element);
                 $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
+                $this->logInvalidDate($year, $month, $day);
                 return $dom->saveXML($origin_info_element);
             }
-            // Check for date value that is empty or not string. Just log it.
+            /**
+             * Check for dates like 1930/10/15. Assumes leading zeros on month and day and that
+             * the incoming date is in format yyyy/mm/dd.
+             */
+            elseif (preg_match('#^(\d\d\d\d)/(\d\d)/(\d\d)$#', $this->sourceDateFieldValue, $matches)) {
+                list($year, $month, $day) = explode('/', $matches[0]);
+                // Reassemble the value as yyyy-mm-dd.
+                $date_element->nodeValue = $year . '-' . $month . '-' . $day;
+                $origin_info_element->appendChild($date_element);
+                $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
+                $this->logInvalidDate($year, $month, $day);
+                return $dom->saveXML($origin_info_element);
+            }
+            /**
+             * Check for dates in the format we want yyyy-mm-dd but which have puncutation
+             * around the date, and removes the puncutation.
+             */
+            elseif (preg_match('#^[.,;:]?(\d\d\d\d\-\d\d\-\d\d)[.,;:]?$#', $this->sourceDateFieldValue, $matches)) {
+                $date_element->nodeValue = $matches[1];
+                $origin_info_element->appendChild($date_element);
+                $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
+                list($year, $month, $day) = explode('-', $matches[1]);
+                $this->logInvalidDate($year, $month, $day);
+                return $dom->saveXML($origin_info_element);
+            }
+            /**
+             * Check for date value that is empty or not string. Just log it.
+             */
             elseif (!is_string($this->sourceDateFieldValue) || !strlen($this->sourceDateFieldValue)) {
                 $this->log->addWarning("NormalizeDate",
                     array(
@@ -168,4 +260,29 @@ class NormalizeDate extends MetadataManipulator
              )
          );
      }
+
+    /**
+     * Validates a date and logs invalid ones.
+     *
+     * @param int
+     *     The normalized year.
+     * @param int
+     *     The normalized month.
+     * @param int
+     *     The normalized day.
+     */
+     public function logInvalidDate($year, $month, $day)
+     {
+         if (checkdate($month, $day, $year)) {
+           return;
+         }
+
+         $this->log->addWarning("NormalizeDate",
+             array(
+                 'Record key' => $this->record_key,
+                 'Normalized date value is not a valid date' => $year . '-' . $month . '-' . $day,
+             )
+         );
+     }
+
 }

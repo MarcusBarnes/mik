@@ -61,6 +61,13 @@ abstract class Writer
         if (isset($this->settings['WRITER']['datastreams'])) {
             $this->datastreams = $this->settings['WRITER']['datastreams'];
         }
+        
+        if (isset($this->settings['WRITER']['skip_obj'])) {
+            $this->skip_obj = $this->settings['WRITER']['skip_obj'];
+        }  else {
+            // default flag to false - do not skip OBJ file creation.
+            $this->skip_obj = false;
+        }
 
         if (isset($this->settings['WRITER']['OBJ_file_extension'])){
             $this->OBJ_file_extension = $this->settings['WRITER']['OBJ_file_extension'];
