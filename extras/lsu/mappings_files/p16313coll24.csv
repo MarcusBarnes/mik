@@ -1,5 +1,5 @@
 Title,"<titleInfo><title>%value%</title></titleInfo>"
-Scientific Name,""<titleInfo displayLabel='Scientific Name'><subTitle>%value%</subTitle></titleInfo>"
+Scientific Name,"<titleInfo displayLabel='Scientific Name'><subTitle>%value%</subTitle></titleInfo>"
 Creator,"<name displayLabel='Artist'><namePart>%value%</namePart><role><roleTerm type='code' authority='marcrelator'>art</roleTerm><roleTerm type='text' authority='marcrelator'>Artist</roleTerm></role></name>"
 null7,"<originInfo><place><placeTerm type='text'>London</placeTerm></place></originInfo>"
 Publisher,"<originInfo><publisher>Printed by Taylor and Francis, pub. by the author.</publisher></originInfo>"
