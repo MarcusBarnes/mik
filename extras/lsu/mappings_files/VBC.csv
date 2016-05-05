@@ -14,7 +14,7 @@ Relation,"<relatedItem type='host'><location><url displayLabel='Relation'>http:/
 null1,"<location><physicalLocation>LSB</physicalLocation></location>"
 null2,"<location><physicalLocation>Southern University and A and M College</physicalLocation></location>"
 null3,"<location><url>http://www.lib.subr.edu/</url></location>"
-null4,"<location><holdingSimple><copyInformation><subLocation>Archives Department - John B. Cade Library</sublocation></copyInformation></holdingSimple></location>"
+null4,"<location><holdingSimple><copyInformation><subLocation>Archives Department: John B. Cade Library</sublocation></copyInformation></holdingSimple></location>"
 Rights,"<accessCondition type='restriction on access'>%value%</accessCondition>"
 Ordering Information,"<accessCondition type='use and reproduction'>%value%</accessCondition>"
 Object File Name,"<identifier type='local' displayLabel='Object File Name'>%value%</identifier>"
