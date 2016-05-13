@@ -20,11 +20,11 @@ If you have a question, please open a Github issue.
 
 ## Islandora content that has been prepared using MIK
 
-* Some of Emily Carr University of Art and Design's collections in [Arca](http://arcabc.ca/) were migrated from CONTENTdm using MIK
+* Some of Emily Carr University of Art and Design's collections in [Arca](http://arcabc.ca/)
   * [Academic Calendars](http://arcabc.ca/islandora/object/ecuad:cals)
   * [Wosk Masterworks Print Collection](arcabc.ca/islandora/object/ecuad:wosk)
-
-More to come as Simon Fraser University completes its migration.
+* All of the newspapers in Simon Fraser University Library's [Digitized Newspapers](http://newspapers.lib.sfu.ca/) and [Chinese Times](http://chinesetimes.lib.sfu.ca/) sites
+* All of the collections in Simon Fraser University Library's [Digitized Collections](http://digital.lib.sfu.ca/)
 
 ## Installation
 
@@ -85,25 +85,27 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
   * multi-file PDFs
   * single-file objects (images, audio, etc.)
   * books
+  * generic (non-book and non-newspaper) compound objects
 * CSV
   * metadata and content files from a local filesystem for single-file objects
 
 ## Roadmap
 
-* Version 0.9 (- April 2016)
-  * Toolchain for CONTENTdm generic (non-book and non-newspaper) compound objects
-  * Complete end-user and developer documentation
+* Version 0.9 (- May 2016)
+  * Complete end-user documentation 
 * Version 1.0 (May - August 2016)
   * Toolchains for CSV newspapers, books, and generic compound objects
+  * developer documentation
   * Code cleanup
   * More automated tests
 
 ## Development
 
-We are focused on completing our migration in April, but once the dust settles, we welcome community development partners. Some features that would be really great to see include:
+We are focused on completing our migration in May, but once the dust settles, we welcome community development partners. Some features that would be really great to see include:
 
-* a toolchain to migrate from DSpace to Islandora
+* toolchains to migrate from DSpace, Bepress, and other repository platforms to Islandora
 * a toolchaing to generate Hydra import packages (yes, it's called Move to Islandora Kit but it's flexible enough to create other types of ingest packages)
+* better tools for creating mappings files
 
 MIK is designed to be extensible. If you have an idea for a useful manipulator or post-write hook script, please let us know.
 
