@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\writers;
+use Monolog\Logger;
 
 class CsvNewspapers extends Writer
 {
@@ -31,7 +32,13 @@ class CsvNewspapers extends Writer
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
         $this->output_directory = $settings['WRITER']['output_directory'];
-        $this->preserve_content_filenames = $settings['WRITER']['preserve_content_filenames'];
+
+        // Set up logger.
+        $this->pathToLog = $this->settings['LOGGING']['path_to_log'];
+        $this->log = new \Monolog\Logger('Writer');
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
+            Logger::INFO);
+        $this->log->pushHandler($this->logStreamHandler);
     }
 
     /**
@@ -43,16 +50,6 @@ class CsvNewspapers extends Writer
      */
     public function writePackages($metadata, $pages, $record_id)
     {
-        /*
-        my_batch/
-            issue1/
-                MODS.xml
-                1/
-                    OBJ.tiff
-                2/
-                    OBJ.tiff
-        */
-
         // If there were no datastreams explicitly set in the configuration,
         // set flag so that all datastreams in the writer class are run.
         // $this->datastreams is an empty array by default.
@@ -61,35 +58,20 @@ class CsvNewspapers extends Writer
             $no_datastreams_setting_flag = true;
         }
 
-        // Create an issue-level subdirectory in the output directory.
-        $issue_level_output_dir = $this->output_directory . DIRECTORY_SEPARATOR . $record_id;
-        if (!file_exists($issue_level_output_dir)) {
-            mkdir($issue_level_output_dir);
+        // Create an issue-level subdirectory in the output directory, but only if there is
+        // a corresponding inputdirectory.
+        $issue_level_input_dir = $this->fileGetter->getIssueSourcePath($record_id);
+        if (file_exists($issue_level_input_dir)) {
+            $issue_level_output_dir = $this->output_directory . DIRECTORY_SEPARATOR . $record_id;
+            if (!file_exists($issue_level_output_dir)) {
+                mkdir($issue_level_output_dir);
+            }
         }
-        // var_dump($record_id);
-        // var_dump($pages);
-
-/*
-        // Whether to use record filename from csv as identifier vs. record_id
-        $preserve_content_filenames = $this->preserve_content_filenames;
-
-        // Create root output folder
-        $this->createOutputDirectory();
-        $output_path = $this->outputDirectory . DIRECTORY_SEPARATOR;
-
-        // Retrieve the file associated with the document and write it to the output
-        // folder using the filename or record_id identifier
-        $source_file_path = $this->fileGetter->getFilePath($record_id);
-        $source_file_name = pathinfo($source_file_path, PATHINFO_FILENAME);
-        $source_file_extension = pathinfo($source_file_path, PATHINFO_EXTENSION);
-        $identifier = ($preserve_content_filenames) ? $source_file_name : $record_id;
-
-        $content_file_path = $output_path . $identifier . '.' . $source_file_extension;
-        $metadata_file_path = $output_path . $identifier . '.xml';
-
-        // Do not overwrite if source and content file paths match
-        $enforce_metadata_only = $source_file_path == $content_file_path;
-*/
+        else {
+            $this->log->addWarning("CSV Newspapers warning",
+                array('Issue-level input directory does not exist' => $issue_level_input_dir));
+            return;
+        }
 
         $MODS_expected = in_array('MODS', $this->datastreams);
         $DC_expected = in_array('DC', $this->datastreams);
@@ -112,44 +94,16 @@ class CsvNewspapers extends Writer
         }
 
         foreach ($pages as $page_path) {
-            // Get the page number from the filename.
+            // Get the page number from the filename. It is the last se
             $pathinfo = pathinfo($page_path);
             $filename_segments = explode('-', $pathinfo['filename']);
-            $page_number = ltrim($filename_segments[3], '0');
+            $page_number = ltrim(end($filename_segments), '0');
             $page_level_output_dir = $issue_level_output_dir . DIRECTORY_SEPARATOR . $page_number;
             mkdir($page_level_output_dir);
             $extension = $pathinfo['extension'];
             $page_output_file_path = $page_level_output_dir . DIRECTORY_SEPARATOR . 'OBJ.' . $extension;
             copy($page_path, $page_output_file_path);
         }
-
-/*
-        // Note that since the datastream ID of the file being copied varies,
-        // we can't specify one here like we do for MODS or OBJ. This means
-        // that we only write the file if no datastream IDs are specified in the
-        // datastreams[] configuration option.
-        if ($no_datastreams_setting_flag) {
-            // The default is to overwrite the content file (but not if generating metadata only)
-            if ($this->overwrite_content_files && ! $enforce_metadata_only) {
-                copy($source_file_path, $content_file_path);
-            }
-            else {
-                // But if the config says not to, or source and content paths match,
-                // we log the existence of the file.
-                if (file_exists($content_file_path)) {
-                    $warning = ($enforce_metadata_only) ?
-                        "Source and content paths match, generating metadata only" :
-                        "Content file already exists, not overwriting it" ;
-                    $this->log->addWarning($warning,
-                        array('file' => $content_file_path));
-                }
-                else {
-                    copy($source_file_path, $content_file_path);
-                }
-            }
-        }
-*/
-
     }
 
     public function writeMetadataFile($metadata, $path, $overwrite = true)

@@ -2,16 +2,6 @@
 
 namespace mik\filegetters;
 
-/**
- * Note: Input directory contains data for a single newspaper. The CSV file contains
- * metadata for issues. The issue data should be organized in this way:
- * The_times
- *   1910
- *     1910-01
- *       1910-01-01
- *         page_01.tif
- *         page_02.tif
- */
 class CsvNewspapers extends FileGetter
 {
     /**
@@ -20,9 +10,8 @@ class CsvNewspapers extends FileGetter
     public $settings;
 
     /**
-     * @var array allowed_file_extensions_for_OBJ - array of file extensions when searching for Master files (for OBJ datastreams).
-     * This helps handle the situaiton where the same file types are given different file extensions due to OS or applicatoin differences.
-     * For example, tiff and tif for normal tiff files.
+     * @var array allowed_file_extensions_for_OBJ - array of file extensions when searching
+     * for master files (for OBJ datastreams).
      */
     public $allowed_file_extensions_for_OBJ = array('tiff', 'tif', 'jp2');
 
@@ -43,7 +32,7 @@ class CsvNewspapers extends FileGetter
     }
 
     /**
-     * Issue pages are the children.
+     * Return a list of absolute filepaths to the pages of an issue.
      *
      * @param $record_key
      *
@@ -54,7 +43,8 @@ class CsvNewspapers extends FileGetter
      */
     public function getChildren($record_key)
     {
-        // Get the path to the issue
+        /*
+        // Get the path to the issue.
         $item_info = $this->fetcher->getItemInfo($record_key);
         $issue_directory = $item_info->{$this->file_name_field};
         $escaped_issue_directory = preg_replace('/\-/', '\-', $issue_directory);
@@ -64,6 +54,18 @@ class CsvNewspapers extends FileGetter
         foreach ($this->OBJFilePaths as $paths) {
             foreach ($paths as $path) {
                 if (preg_match($directory_regex, $path)) {
+                    $page_paths[] = $path;
+                }
+            }
+        }
+        return $page_paths;
+        */
+        $page_paths = array();
+        $issue_input_path = $this->getIssueSourcePath($record_key);
+        foreach ($this->OBJFilePaths as $paths) {
+            foreach ($paths as $path) {
+                // If there's a match, we expect it to start at position 0.
+                if (strpos($path, $issue_input_path) === 0) {
                     $page_paths[] = $path;
                 }
             }
@@ -128,6 +130,30 @@ class CsvNewspapers extends FileGetter
             }
         }
         return $dictOfItems;
+    }
+
+    /**
+     * Return a list of absolute filepaths to the pages of an issue.
+     *
+     * @param $record_key
+     *
+     * @return string
+     *    The absolute paths to the issue's page files.
+     */
+    public function getIssueSourcePath($record_key)
+    {
+        // Get the path to the issue.
+        $item_info = $this->fetcher->getItemInfo($record_key);
+        $issue_directory = $item_info->{$this->file_name_field};
+        $escaped_issue_directory = preg_replace('/\-/', '\-', $issue_directory);
+        $directory_regex = '#' . DIRECTORY_SEPARATOR . $escaped_issue_directory . DIRECTORY_SEPARATOR . '#';
+        foreach ($this->OBJFilePaths as $paths) {
+            foreach ($paths as $path) {
+                if (preg_match($directory_regex, $path)) {
+                    return pathinfo($path, PATHINFO_DIRNAME);
+                }
+            }
+        }
     }
 
 }
