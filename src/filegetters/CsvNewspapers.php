@@ -16,7 +16,8 @@ class CsvNewspapers extends FileGetter
     public $allowed_file_extensions_for_OBJ = array('tiff', 'tif', 'jp2');
 
     /**
-     * Create a new CSV Fetcher Instance
+     * Create a new CSV Fetcher instance.
+     *
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
@@ -34,7 +35,7 @@ class CsvNewspapers extends FileGetter
     /**
      * Return a list of absolute filepaths to the pages of an issue.
      *
-     * @param $record_key
+     * @param string $record_key
      *
      * @return array
      *    An array of absolute paths to the issue's page files. This list of
@@ -43,23 +44,6 @@ class CsvNewspapers extends FileGetter
      */
     public function getChildren($record_key)
     {
-        /*
-        // Get the path to the issue.
-        $item_info = $this->fetcher->getItemInfo($record_key);
-        $issue_directory = $item_info->{$this->file_name_field};
-        $escaped_issue_directory = preg_replace('/\-/', '\-', $issue_directory);
-        // Get an array of all the issue page paths.
-        $page_paths = array();
-        $directory_regex = '#' . DIRECTORY_SEPARATOR . $escaped_issue_directory . DIRECTORY_SEPARATOR . '#';
-        foreach ($this->OBJFilePaths as $paths) {
-            foreach ($paths as $path) {
-                if (preg_match($directory_regex, $path)) {
-                    $page_paths[] = $path;
-                }
-            }
-        }
-        return $page_paths;
-        */
         $page_paths = array();
         $issue_input_path = $this->getIssueSourcePath($record_key);
         foreach ($this->OBJFilePaths as $paths) {
@@ -73,6 +57,17 @@ class CsvNewspapers extends FileGetter
         return $page_paths;
     }
 
+    /**
+     * Recurses down a directory to find all potential input files.
+     *
+     * @param string $inputDirectory
+     *    The input directory as defined in the configuration.
+     * @param array $allowedFileTypes
+     *    The list of file types (e.g. extensions) to look for.
+     *
+     * @return array
+     *    A list of absolute paths to all the found files.
+     */
     private function getMasterFiles($inputDirectory, $allowedFileTypes)
     {
         // Use a static cache to avoid building the source path list
@@ -98,13 +93,21 @@ class CsvNewspapers extends FileGetter
         return $potentialObjFiles;
     }
 
+    /**
+     * Filters out paths to files that do not have a yyyy-mm-dd date in their parent directories.
+     *
+     * @param array $arrayOfFilesToPreserve
+     *    The list of file types (e.g. extensions) to look for.
+     *
+     * @return array
+     *    An associative array with keys containing dates in yyyy-mm-dd
+     *    format and values containing paths to files with the key date.
+     */
     private function determineObjItems($arrayOfFilesToPreserve)
     {
-        // For newspaper issues
-
-        # This regex will look for a pattern like /yyyy-mm-dd/ in the path that
-        # represents the issue date for the newspaper.
-        # Assumes publication frequency of at most one issue daily.
+        // This regex will look for a pattern like /yyyy-mm-dd/ in the path that
+        // represents the issue date for the newspaper. Assumes publication frequency
+        // of at most one issue daily.
         $regex_pattern = '%[/\\\\][0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][/\\\\]%';
 
         $dateForIdentifierArray = array();

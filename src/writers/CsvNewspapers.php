@@ -22,7 +22,7 @@ class CsvNewspapers extends Writer
     private $fileGetter;
 
     /**
-     * Create a new newspaper writer Instance
+     * Create a new newspaper writer instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
@@ -32,6 +32,14 @@ class CsvNewspapers extends Writer
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
         $this->output_directory = $settings['WRITER']['output_directory'];
+        $this->metadata_filename = $settings['WRITER']['metadata_filename'];
+        // Default is to generate page-level MODS.xml files.
+        if (isset($settings['WRITER']['generate_page_modsxml'])) {
+            $this->generate_page_modsxml = $settings['WRITER']['generate_page_modsxml'];
+        }
+        else {
+            $this->generate_page_modsxml = true;
+        }
 
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_log'];
@@ -74,25 +82,13 @@ class CsvNewspapers extends Writer
         }
 
         $MODS_expected = in_array('MODS', $this->datastreams);
-        $DC_expected = in_array('DC', $this->datastreams);
-        if ($MODS_expected xor $DC_expected xor $no_datastreams_setting_flag) {
-            $metadata_file_path = $issue_level_output_dir . DIRECTORY_SEPARATOR . 'MODS.xml';
-            // The default is to overwrite the metadata file.
-            if ($this->overwrite_metadata_files) {
-                $this->writeMetadataFile($metadata, $metadata_file_path, true);
-            }
-            else {
-                // But if the config says not to, we log the existence of the file.
-                if (file_exists($metadata_file_path)) {
-                    $this->log->addWarning("Metadata file already exists, not overwriting it",
-                        array('file' => $metadata_file_path));
-                }
-                else {
-                    $this->writeMetadataFile($metadata, $metadata_file_path, true);
-                }
-            }
+        if ($MODS_expected xor $no_datastreams_setting_flag) {
+            $metadata_file_path = $issue_level_output_dir . DIRECTORY_SEPARATOR . $this->metadata_filename;
+            $this->writeMetadataFile($metadata, $metadata_file_path);
         }
 
+        // @todo: Add error handling on mkdir and copy.
+        // @todo: Write page level MODS.xml file, after testing ingest as is.
         foreach ($pages as $page_path) {
             // Get the page number from the filename. It is the last se
             $pathinfo = pathinfo($page_path);
@@ -100,21 +96,32 @@ class CsvNewspapers extends Writer
             $page_number = ltrim(end($filename_segments), '0');
             $page_level_output_dir = $issue_level_output_dir . DIRECTORY_SEPARATOR . $page_number;
             mkdir($page_level_output_dir);
-            $extension = $pathinfo['extension'];
-            $page_output_file_path = $page_level_output_dir . DIRECTORY_SEPARATOR . 'OBJ.' . $extension;
-            copy($page_path, $page_output_file_path);
+
+            $OBJ_expected = in_array('OBJ', $this->datastreams);
+            if ($OBJ_expected xor $no_datastreams_setting_flag) {
+                $extension = $pathinfo['extension'];
+                $page_output_file_path = $page_level_output_dir . DIRECTORY_SEPARATOR . 'OBJ.' . $extension;
+                copy($page_path, $page_output_file_path);
+            }
+
+            if ($MODS_expected xor $no_datastreams_setting_flag) {
+                if ($this->generate_page_modsxml) {
+                    $this->writePageMetadataFile($metadata, $page_number, $page_level_output_dir);
+                }
+            }
         }
     }
 
-    public function writeMetadataFile($metadata, $path, $overwrite = true)
+    /**
+     * Writes out the issue-level MODS.xml file.
+     *
+     * @param $metadata
+     *    The MODS XML document produced by the metadta parser.
+     * @param $path
+     *    The path to write the XML file to.
+     */
+    public function writeMetadataFile($metadata, $path)
     {
-        // file_put_contents() overwrites by default.
-        if (!$overwrite) {
-            $this->log->addWarning("Metadata file exists, and overwrite is set to false",
-                array('file' => $path));
-            return;
-        }
-
         // Add XML decleration
         $doc = new \DomDocument('1.0');
         $doc->loadXML($metadata);
@@ -124,7 +131,53 @@ class CsvNewspapers extends Writer
         if ($path !='') {
             $fileCreationStatus = file_put_contents($path, $metadata);
             if ($fileCreationStatus === false) {
-                $this->log->addWarning("There was a problem writing the metadata to a file",
+                $this->log->addWarning("There was a problem writing the issue-level metadata to a file",
+                    array('file' => $path));
+            }
+        }
+    }
+
+    /**
+     * Generates a very simple MODS.xml file for a newspaper page.
+     *
+     * @param $parent_metadata
+     *    The MODS document associated with the page's parent issue.
+     * @param $page_number
+     *    The page's page number, taken from its file's filename.
+     * @param $path
+     *    The path to write the XML file to.
+     */
+    public function writePageMetadataFile($parent_metadata, $page_number, $path)
+    {
+        // Get the first title element from the issue's MODS.
+        $dom = new \DOMDocument;
+        $dom->loadXML($parent_metadata);
+        $xpath = new \DOMXPath($dom);
+        $titles = $xpath->query("//mods:titleInfo/mods:title");
+        $page_title = $titles->item(0)->nodeValue . ', page ' . $page_number;
+        $dates = $xpath->query("//mods:originInfo/mods:dateIssued");
+        $page_date = $dates->item(0)->nodeValue;
+
+        $page_mods = <<<EOQ
+<mods xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <titleInfo>
+    <title>{$page_title}</title>
+  </titleInfo>
+  <originInfo>
+    <dateIssued encoding="w3cdtf">{$page_date}</dateIssued>
+  </originInfo>
+</mods>
+EOQ;
+        $path = $path . DIRECTORY_SEPARATOR . $this->metadata_filename;
+        $doc = new \DomDocument('1.0');
+        $doc->loadXML($page_mods);
+        $doc->formatOutput = true;
+        $metadata = $doc->saveXML();
+
+        if ($path !='') {
+            $fileCreationStatus = file_put_contents($path, $metadata);
+            if ($fileCreationStatus === false) {
+                $this->log->addWarning("There was a problem writing the page-level metadata to a file",
                     array('file' => $path));
             }
         }
