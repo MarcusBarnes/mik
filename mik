@@ -38,8 +38,6 @@ use League\CLImate\CLImate;
 use Cocur\BackgroundProcess\BackgroundProcess;
 
 use mik\exceptions\MikErrorException;
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
 
 echo "Commencing MIK." . PHP_EOL;
 // Get command line options.
@@ -65,6 +63,22 @@ if (isset($options['limit'])) {
 // Instantiate a configuration.
 $mikConfig = new Config($configPath);
 $settings = $mikConfig->settings;
+
+// Monolog requires that the date.timezone PHP setting be set else
+// it will create an E_WARNING, which will be turned into an excption 
+// in the set_error_handler function halting the program.
+// Provide a default timezone if date.timezone is null in the the PHP INI.
+if (ini_get('date.timezone') == null || isset($settings['SYSTEM']['date_default_timezone'])) {
+    if(isset($settings['SYSTEM']['date_default_timezone'])){
+        $date_timezone = $settings['SYSTEM']['date_default_timezone'];
+        date_default_timezone_set($date_timezone);
+    } else {
+        // use a default time-zone.
+        date_default_timezone_set('America/Vancouver');
+    }
+};
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 // Converts all errors into Exceptions.
 // Set here so that you can pass the configuration settings to the MIK Error Exception class.
