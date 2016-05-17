@@ -15,14 +15,6 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     $onWindows = false;
 }
 
-// Monolog requires that the date.timezone PHP setting be set else
-// it will create an E_WARNING, which will be turned into an excption 
-// in the set_error_handler function halting the program.
-// Provide a default timezone if date.timezone is null in the the PHP INI.
-if (null == ini_get('date.timezone')) {
-    date_default_timezone_set('America/Vancouver');
-};
-
 // On Windows, opcache.enable_cli causes 'Fatal Error Unable to reattach
 // to base address' errors when running background processes, and causes
 // these processes to fail. Disable it at runtime.
@@ -30,18 +22,6 @@ if ($onWindows) {
     ini_set('opcache.enable_cli', '0');
 }
 
-// Use composer to load vendor and project classes.
-require 'vendor/autoload.php';
-
-use mik\config\Config;
-use League\CLImate\CLImate;
-use Cocur\BackgroundProcess\BackgroundProcess;
-
-use mik\exceptions\MikErrorException;
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-
-echo "Commencing MIK." . PHP_EOL;
 // Get command line options.
 // Assumes --longopts.
 // Required --config=path/to/config/ini_file
@@ -61,6 +41,36 @@ if (isset($options['limit'])) {
 } else {
     $limit = null;
 }
+
+// Monolog requires that the date.timezone PHP setting be set else
+// it will create an E_WARNING, which will be turned into an excption 
+// in the set_error_handler function halting the program.
+// Provide a default timezone if date.timezone is null in the the PHP INI.
+// Load [SYSTEM] stettings for user-defined default timeszone using config path
+$system_settings = parse_ini_file($configPath, true)['SYSTEM'];
+if (ini_get('date.timezone') == null || isset($system_settings['date_default_timezone'])) {
+    if(isset($system_settings['date_default_timezone'])){
+        $date_timezone = $system_settings['date_default_timezone'];
+        date_default_timezone_set($date_timezone);
+    } else {
+        // use a default time-zone.
+        date_default_timezone_set('America/Vancouver');
+    }
+};
+
+
+// Use composer to load vendor and project classes.
+require 'vendor/autoload.php';
+
+use mik\config\Config;
+use League\CLImate\CLImate;
+use Cocur\BackgroundProcess\BackgroundProcess;
+
+use mik\exceptions\MikErrorException;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
+echo "Commencing MIK." . PHP_EOL;
 
 // Instantiate a configuration.
 $mikConfig = new Config($configPath);
