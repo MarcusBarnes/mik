@@ -72,8 +72,7 @@ class CdmToMods extends Mods
             $this->repeatableWrapperElements = array();
         }
         $mappingCSVpath = $this->mappingCSVpath;
-        $this->collectionMappingArray =
-            $this->getMappingsArray($mappingCSVpath);
+        $this->collectionMappingArray = $this->getMappingsArray($mappingCSVpath);
         if (isset($this->settings['MANIPULATORS']['metadatamanipulators'])) {
             $this->metadatamanipulators = $this->settings['MANIPULATORS']['metadatamanipulators'];
         } else {
@@ -135,6 +134,8 @@ class CdmToMods extends Mods
               continue;
             }
             $CONTENTdmField = $valueArray[0];
+            // because an easy error is typos in mappings_files -- this will indicate which line has typo.
+            var_dump($CONTENTdmField);
             if (isset($CONTENTdmFieldValuesArray[$CONTENTdmField])) {
                 $fieldValue = $CONTENTdmFieldValuesArray[$CONTENTdmField];
             } elseif (preg_match("/(null)\d+/i", $key)) {
@@ -195,7 +196,7 @@ class CdmToMods extends Mods
         if ($includeMigratedFromUri == true) {
             $CONTENTdmItemUrl = '<identifier type="uri" invalid="yes" ';
             $CONTENTdmItemUrl .= 'displayLabel="Migrated From">';
-            $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection/';
+            $CONTENTdmItemUrl .= 'http://cdm16313.contentdm.oclc.org/cdm/singleitem/collection/';
             $CONTENTdmItemUrl .= $collectionAlias. '/id/'. $itemId .'</identifier>';
             $modsOpeningTag .= $CONTENTdmItemUrl;
         }
@@ -233,7 +234,7 @@ class CdmToMods extends Mods
         if ($includeMigratedFromUri == true) {
             $CONTENTdmItemUrl = '<identifier type="uri" invalid="yes" ';
             $CONTENTdmItemUrl .= 'displayLabel="Migrated From">';
-            $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection/';
+            $CONTENTdmItemUrl .= 'http://cdm16313.contentdm.oclc.org/cdm/ref/collection/';
             $CONTENTdmItemUrl .= $collectionAlias . '/id/'. $page_pointer .'</identifier>';
             $modsOpeningTag .= $CONTENTdmItemUrl;
         }

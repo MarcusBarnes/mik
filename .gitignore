@@ -1,2 +1,6 @@
 /vendor/
-/composer.phar
+composer.*
+.vagrant/*
+/nbproject/*
+output/*
+Cached_Cdm_files/*
