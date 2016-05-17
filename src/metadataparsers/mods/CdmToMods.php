@@ -106,7 +106,7 @@ class CdmToMods extends Mods
         foreach ($objectInfo as $key => $value) {
             // $key is the 'nick'
             $fieldAttributes = $this->getFieldAttribute($key);
-            $name = $fieldAttributes['name'];
+            $name = trim($fieldAttributes['name']);
             $CONTENTdmFieldValuesArray[$name] = $value;
         }
         return $CONTENTdmFieldValuesArray;
