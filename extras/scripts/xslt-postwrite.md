@@ -1,4 +1,4 @@
-This post-write hook requires the Saxon HE processor. Follow the installation instructions, and place the file saxon9he.jar in your mik top-level folder. http://www.saxonica.com/html/documentation/about/gettingstarted/gettingstartedjava.html
+This post-write hook requires the Saxon HE processor. Follow the installation instructions, and place the file saxon9he.jar in your top-level MIK folder. http://www.saxonica.com/html/documentation/about/gettingstarted/gettingstartedjava.html
 
 * Using the config file extras/lsu/configuration_files/HPL.ini as an example specify that you want to use the xslt hook and also the xslts that you wish it to use.
 

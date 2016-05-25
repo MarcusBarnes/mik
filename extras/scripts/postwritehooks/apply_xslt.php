@@ -1,17 +1,15 @@
 <?php
 
 /**
- * Post-write hook script for MIK that validates MODS XML files.
- * Works for single-file CONTENTdm and CSV import packages as well as
- * newspaper issue packages, and can be extended to handle the MODS.xml
- * files created by other MIK toolchains.
+  * Post-Write script for MIK that applies XSLTs defined in .ini file
+  * to the mods output of MIK. Before transformation of original mods
+  * are saved in a subdirecory of 'output_directory' named 'original_mods' 
  */
 
 require 'vendor/autoload.php';
 
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-use GuzzleHttp\Client;
 
 $record_key = trim($argv[1]);
 $children_record_keys = explode(',', $argv[2]);
