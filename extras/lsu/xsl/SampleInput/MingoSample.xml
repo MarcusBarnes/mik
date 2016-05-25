@@ -1,0 +1,94 @@
+<mods xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <titleInfo>
+        <title>
+            Group portrait of six unidentified African American women and men
+        </title>
+    </titleInfo>
+    <name displayLabel="Photographer">
+        <role>
+            <roleTerm type="code" authority="marcrelator">pht</roleTerm>
+            <roleTerm type="text" authority="marcrelator">Photographer</roleTerm>
+        </role>
+        <namePart>Arlington Studio (Hot Springs, Ark.)</namePart>
+    </name>
+    <originInfo>
+        <dateIssued keyDate="yes">1905-1915</dateIssued>
+    </originInfo>
+    <typeOfResource>image</typeOfResource>
+    <physicalDescription>
+        <note type="medium">1 photo print</note>
+    </physicalDescription>
+    <subject authority="lcsh">
+        <topic>African Americans--Photographs.</topic>
+    </subject>
+    <note type="ownership">
+        Louisiana State University Libraries, Special Collections (http://www.lib.lsu.edu/special).
+    </note>
+    <location>
+        <holdingSimple>
+            <copyInformation>
+                <shelfLocator>65:01:00</shelfLocator>
+            </copyInformation>
+        </holdingSimple>
+    </location>
+    <note type="preferred citation">
+        Mingo Family African American Photographs, Mss. 5113, Louisiana and Lower Mississippi Valley Collections, LSU Libraries, Baton Rouge, La.
+    </note>
+    <accessCondition type="restriction on access">
+        Physical rights are retained by the LSU Libraries. Copyright of the original material is retained in accordance with U.S. copyright laws. Permission to reproduce this image must be requested through the Special Collections Division, Louisiana State University Libraries.
+    </accessCondition>
+    <accessCondition type="use and reproduction">
+        Contact Information: E-mail lsudiglib@lsu.edu with questions or comments. See instructions for ordering reprints of this image here: http://www.lib.lsu.edu/special/services/duplication.html Mention the 'Item number' or 'Item URL' in your request.
+    </accessCondition>
+    <identifier type="local" displayLabel="Item Number">511324</identifier>
+    <location>
+        <physicalLocation>LUU</physicalLocation>
+    </location>
+    <location>
+        <physicalLocation>LSU Libraries</physicalLocation>
+    </location>
+    <location>
+        <url>http://lib.lsu.edu</url>
+    </location>
+    <location>
+        <holdingSimple>
+            <copyInformation>
+                <subLocation>Hill Memorial Library: Special Collections</subLocation>
+            </copyInformation>
+        </holdingSimple>
+    </location>
+    <extension>
+        <CONTENTdmData>
+            <alias>p16313coll54</alias>
+            <pointer>56</pointer>
+            <dmGetItemInfo timestamp="2016-04-15 10:29:55" mimetype="application/json" source="https://server16313.contentdm.oclc.org/dmwebservices/index.php?q=dmGetItemInfo/p16313coll54/56/json">
+                <![CDATA[
+{"title":"Group portrait of six unidentified African American women and men","creato":"Arlington Studio (Hot Springs, Ark.)","date":"1905-1915","descri":"1 Real photo postcard","notes":{},"type":"image","subjec":"African Americans--Photographs.","contri":"Mingo Family African American Photographs, 1
+]]>
+<![CDATA[
+887-1955","identi":"65:01:00","publis":"Louisiana State University Libraries, Special Collections (http:\/\/www.lib.lsu.edu\/special).","reposi":"Finding Aid: http:\/\/www.lib.lsu.edu\/sites\/default\/files\/sc\/findaid\/5113.pdf","source":"Mingo Family African American Photographs, Mss. 5113, Louisiana and Lower Mississippi Valley Collections, LSU Libraries, Baton Rouge, La.","relati":"Physical rights are retained by the LSU Libraries. Copyright of the original material is retained in accordance with U.S. copyright laws. Permission to reproduce this image must be requested through the Special Collections Division, Louisiana State University Libraries.","langua":"E-mail lsudiglib@lsu.edu with questions or comments. See instructions for ordering reprints of this image here: http:\/\/www.lib.lsu.edu\/special\/services\/duplication.html Mention the 'Item number' or 'Item URL' in your request.","a":"511324","covera":"See \"reference url\" on the navigation bar.","coverb":{},"object":{},"fullrs":{},"find":"57.jp2","dmaccess":{},"dmimage":{},"dmcreated":"2014-01-13","dmmodified":"2014-05-13","dmoclcno":{},"dmrecord":"56","restrictionCode":"1","cdmfilesize":"1767868","cdmfilesizeformatted":"1.69 MB","cdmprintpdf":"0","cdmhasocr":"0","cdmisnewspaper":"0"}
+]]>
+            </dmGetItemInfo>
+        </CONTENTdmData>
+    </extension>
+    <identifier type="uri" invalid="yes" displayLabel="Migrated From">
+        http://cdm16313.contentdm.oclc.org/cdm/singleitem/collection/p16313coll54/id/56
+    </identifier>
+    <relatedItem type="host">
+        <titleInfo displayLabel="Digital Collection">
+            <title>
+                Mingo Family African American Photographs, 1887-1955
+            </title>
+        </titleInfo>
+        <location>
+            <url displayLabel="Relation">
+                http://ldl.lib.lsu.edu/content/mingo-family-african-american-photographs-1887-1955
+            </url>
+        </location>
+        <location>
+            <url displayLabel="Repository Collection Guide">
+                http://www.lib.lsu.edu/sites/default/files/sc/findaid/5113.pdf
+            </url>
+        </location>
+    </relatedItem>
+</mods>
