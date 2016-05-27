@@ -88,6 +88,7 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
   * generic (non-book and non-newspaper) compound objects
 * CSV
   * metadata and content files from a local filesystem for single-file objects
+  * metadata and content files from a local filesystem for newspaper issues
 
 ## Roadmap
 
