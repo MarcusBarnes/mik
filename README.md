@@ -70,7 +70,7 @@ Creating 10 Islandora ingest packages. Please be patient.
 
 and when finished will tell you where your ingest packages have been saved and where your log file is.
 
-### 4. Load your content into Islandora.
+### 4. Load your content into Islandora
 
 And you're done. In practice, you probably want to do some quality assurance on the Islandora ingest packages before you import them (and MIK provides some helper scripts to do that). If you're not happy with what MIK produced, you can always modify your configuration settings or your metadata mappings file and run MIK again.
 
@@ -95,17 +95,17 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
 * Version 0.9 (- May 2016)
   * Complete end-user documentation 
 * Version 1.0 (May - August 2016)
-  * Toolchains for CSV newspapers, books, and generic compound objects
+  * toolchains for books and generic compound objects
   * developer documentation
-  * Code cleanup
-  * More automated tests
+  * code cleanup
+  * more automated tests
 
 ## Development
 
 We are focused on completing our migration in May, but once the dust settles, we welcome community development partners. Some features that would be really great to see include:
 
 * toolchains to migrate from DSpace, Bepress, and other repository platforms to Islandora
-* a toolchaing to generate Hydra import packages (yes, it's called Move to Islandora Kit but it's flexible enough to create other types of ingest packages)
+* a toolchain to generate Hydra import packages (yes, it's called Move to Islandora Kit but it's flexible enough to create other types of ingest packages)
 * better tools for creating mappings files
 
 MIK is designed to be extensible. If you have an idea for a useful manipulator or post-write hook script, please let us know.
