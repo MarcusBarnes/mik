@@ -161,7 +161,7 @@ class CdmNewspapers extends Writer
                 } else if (isset($page_object_info['fullte'])) {
                     file_put_contents($ocr_output_file_path, $page_object_info['fullte']);
                 } else {
-                    throw new \Exception("Problem creating OCR.txt.  Possibly unknown Cdm nick.cd ");
+                    throw new \Exception("Problem creating OCR.txt.  Possibly unknown Cdm nickname.");
                 }
             }
 
