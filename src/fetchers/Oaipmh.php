@@ -92,42 +92,10 @@ class Oaipmh extends Fetcher
             $records = $endpoint->listRecords($this->metadataPrefix, $this->from, $this->until, $this->setSpec);
             foreach($records as $rec) {
                 $identifier = urlencode($rec->header->identifier);
-                file_put_contents($this->tempDirectory . DIRECTORY_SEPARATOR . $identifier . '.oai.xml', $rec->asXML());
+                file_put_contents($this->tempDirectory . DIRECTORY_SEPARATOR . $identifier . '.metadata', $rec->asXML());
             }
 
 /*
-            $inputCsv = Reader::createFromPath($this->input_file);
-                $inputCsv->setDelimiter($this->field_delimiter);
-                if (isset($this->field_enclosure)) {
-                    $inputCsv->setEnclosure($this->field_enclosure);
-                }
-                if (isset($this->escape_character)) {
-                    $inputCsv->setEscape($this->escape_character);
-                }
-                if (is_null($limit)) {
-                    // Get all records.
-                    $limit = -1;
-                }
-            $records = $inputCsv
-                ->addFilter(function ($row, $index) {
-                    // Skip header row.
-                    return $index > 0;
-            })
-            ->setLimit($limit)
-            ->fetchAssoc();
-*/
-
-/*
-            foreach ($records as $index => &$record) {
-                if (!is_null($record[$this->record_key]) || strlen($record[$this->record_key])) {
-                    $record = (object) $record;
-                    $record->key = $record->{$this->record_key};
-                }
-                else {
-                    unset($records[$index]);
-                }
-            }
-
             if ($this->fetchermanipulators) {
                 $filtered_records = $this->applyFetchermanipulators($records);
             }
@@ -155,7 +123,8 @@ class Oaipmh extends Fetcher
     }
 
     /**
-     * @note: This function is copied from the CSV fetcher.
+     * @note: This function is copied from the CSV fetcher and will need to
+     *        be updated for the OAI fetcher.
      *
      * Implements fetchers\Fetcher::getItemInfo
      * Returns a hashed array or object containing a record's information.
@@ -198,52 +167,6 @@ class Oaipmh extends Fetcher
             $records = $fetchermanipulator->manipulate($records);
         }
         return $records;
-    }
-
-    /**
-     * @note: This function is copied from the CSV fetcher.
-     *
-     * Removes the CSV escape character from field values.
-     *
-     * See https://github.com/MarcusBarnes/mik/issues/129.
-     *
-     * @param $record object
-     *    The CSV record object.
-     * @return object
-     */
-    private function removeEscape($record)
-    {
-        // League\Csv\Reader defaults, which are not set
-        // explicitly in _construct.
-        if (isset($this->field_enclosure)) {
-            $enclosure = $this->field_enclosure;
-        }
-        else {
-            $enclosure = '"';
-        }
-        if (isset($this->escape_character)) {
-            $escape = $this->escape_character;
-        }
-        else {
-            $escape = '\\';
-        }
-
-        // Backslashes need to be scaped in regex patterns,
-        // as do ^ and $, etc.
-        $metachars = array('\\', '^', '$', '*', '.');
-        if (in_array($escape, $metachars)) {
-            $escape = '\\' . $escape;
-        }
-        if (in_array($enclosure, $metachars)) {
-            $enclosure = '\\' . $enclosure;
-        }
-
-        foreach ($record as $field_name => $field_value) {
-            $pattern = '/' . $escape . $enclosure . '/';
-            $field_value = preg_replace($pattern, $enclosure, $field_value);
-            $record->{$field_name} = $field_value;
-        }
-        return $record;
     }
 
 }
