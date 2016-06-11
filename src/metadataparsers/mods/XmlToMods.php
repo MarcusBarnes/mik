@@ -8,13 +8,12 @@ class XmlToMods extends Mods
 
     /**
      * Create a new Metadata Parser Instance
-     * @param path to CSV file containing the Cdm to Mods mapping info.
      */
     public function __construct($settings)
     {
         parent::__construct($settings);
-        $this->fetcher = new \mik\fetchers\Csv($settings);
-        $this->record_key = $this->fetcher->record_key;
+        $this->fetcher = new \mik\fetchers\Oaipmh($settings);
+        // $this->record_key = $this->fetcher->record_key;
         $this->xsltPath = $this->settings['METADATA_PARSER']['xslt_path'];
 
         if (isset($this->settings['MANIPULATORS']['metadatamanipulators'])) {
@@ -27,15 +26,20 @@ class XmlToMods extends Mods
     /**
      * @todo: Pick up the OAI record and pass it through the main XSLT.
      */
-    public function createModsXML()
+    public function createModsXML($collectionMappingArray = array(), $objectInfo = array())
     {
-        $record_key_column = $this->record_key;
-        $record_key = $objectInfo->$record_key_column;
+        // @todo: Replace these two lines with XML parser to get identifier?
+        // $record_key_column = $this->record_key;
+        // $record_key = $objectInfo->$record_key_column;
+
+        // @todo: Pass $objectInfo through XSLT here?
         
-        if (isset($this->metadatamanipulators)) {
+        // if (isset($this->metadatamanipulators)) {
+        if (!is_null($this->metadatamanipulators)) {
             $mods_xml = $this->applyMetadatamanipulators($mods_xml, $record_key);
         }
 
+        $mods_xml = $objectInfo;
         return $mods_xml;
     }
 
@@ -68,7 +72,8 @@ class XmlToMods extends Mods
     public function metadata($record_key)
     {
         $objectInfo = $this->fetcher->getItemInfo($record_key);
-        $metadata = $this->createModsXML();
+        $metadata = $this->createModsXML(array(), $objectInfo);
+        // var_dump($metadata);
         return $metadata;
     }
 }

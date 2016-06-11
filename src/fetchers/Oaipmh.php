@@ -80,7 +80,7 @@ class Oaipmh extends Fetcher
     * @param $limit int
     *   The number of records to get.
     *
-    * @return object The records.
+    * @return array The records.
     */
     public function getRecords($limit = null)
     {
@@ -93,6 +93,10 @@ class Oaipmh extends Fetcher
             foreach($records as $rec) {
                 $identifier = urlencode($rec->header->identifier);
                 file_put_contents($this->tempDirectory . DIRECTORY_SEPARATOR . $identifier . '.metadata', $rec->asXML());
+                // @todo: MIK expects each record to be an object with a ->key property.
+                $record = new \stdClass();
+                $record->key = $identifier;
+                $filtered_records[] = $record;
             }
 
 /*
@@ -104,7 +108,7 @@ class Oaipmh extends Fetcher
             }
 */
         }
-        $filtered_records = $records;
+        // $filtered_records = $records;
         return $filtered_records;
     }
 
@@ -118,7 +122,7 @@ class Oaipmh extends Fetcher
      */
     public function getNumRecs()
     {
-        $iterator = new FilesystemIterator($this->tempDir, FilesystemIterator::SKIP_DOTS);
+        $iterator = new \FilesystemIterator($this->tempDirectory, \FilesystemIterator::SKIP_DOTS);
         return iterator_count($iterator);
     }
 
@@ -137,19 +141,7 @@ class Oaipmh extends Fetcher
     public function getItemInfo($recordKey)
     {
         $raw_metadata_cache = $this->settings['temp_directory'] . DIRECTORY_SEPARATOR . $recordKey . '.metadata';
-        if (!file_exists($raw_metadata_cache)) {
-            $records = $this->getRecords();
-            foreach ($records as $record) {
-                if (strlen($record->key) && $record->key == $recordKey) {
-                    $record = $this->removeEscape($record);
-                    file_put_contents($raw_metadata_cache, serialize($record));
-                    return $record;
-                }
-            }
-        }
-        else {
-            return unserialize(file_get_contents($raw_metadata_cache));
-        }
+        return file_get_contents($raw_metadata_cache);
     }
 
     /**
