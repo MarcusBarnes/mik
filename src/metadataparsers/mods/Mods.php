@@ -37,7 +37,7 @@ abstract class Mods extends MetadataParser
      *  @param array $colletionMappyingArray collection mappings
      *  @param array $objectInfo array of info about the object that the MODS XML will be created for
      */
-    abstract public function createModsXML($collectionMappingArray = array(), $objectInfo = array());
+    abstract public function createModsXML($collectionMappingArray, $objectInfo);
 
     public function outputModsXML($modsxml, $outputPath = '')
     {

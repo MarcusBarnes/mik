@@ -26,7 +26,7 @@ class XmlToMods extends Mods
     /**
      * @todo: Pick up the OAI record and pass it through the main XSLT.
      */
-    public function createModsXML($collectionMappingArray = array(), $objectInfo = array())
+    public function createModsXML($collectionMappingArray, $objectInfo)
     {
         // @todo: Replace these two lines with XML parser to get identifier?
         // $record_key_column = $this->record_key;
@@ -73,7 +73,6 @@ class XmlToMods extends Mods
     {
         $objectInfo = $this->fetcher->getItemInfo($record_key);
         $metadata = $this->createModsXML(array(), $objectInfo);
-        // var_dump($metadata);
         return $metadata;
     }
 }
