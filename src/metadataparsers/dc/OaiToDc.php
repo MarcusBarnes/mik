@@ -1,9 +1,9 @@
 <?php
-// src/metadataparsers/mods/XmlToMods.php
+// src/metadataparsers/dc/OaiToDc.php
 
-namespace mik\metadataparsers\mods;
+namespace mik\metadataparsers\dc;
 
-class XmlToMods extends Mods
+class OaiToDc extends Dc
 {
 
     /**
@@ -13,7 +13,6 @@ class XmlToMods extends Mods
     {
         parent::__construct($settings);
         $this->fetcher = new \mik\fetchers\Oaipmh($settings);
-        // $this->record_key = $this->fetcher->record_key;
         $this->xsltPath = $this->settings['METADATA_PARSER']['xslt_path'];
 
         if (isset($this->settings['MANIPULATORS']['metadatamanipulators'])) {
@@ -24,28 +23,29 @@ class XmlToMods extends Mods
     }
 
     /**
-     * @todo: Pick up the OAI record and pass it through the main XSLT.
+     * Pass the OAI record and through the configured XSLT.
      */
-    public function createModsXML($collectionMappingArray, $objectInfo)
+    public function createDcXML($MappingArray, $objectInfo)
     {
-        // @todo: Replace these two lines with XML parser to get identifier?
-        // $record_key_column = $this->record_key;
-        // $record_key = $objectInfo->$record_key_column;
-
-        // @todo: Pass $objectInfo through XSLT here?
+        // Pass $objectInfo through XSLT here?
+        $xsl_doc = new \DOMDocument();
+        $xsl_doc->load($this->xsltPath);
+        $xml_doc = new \DOMDocument();
+        $xml_doc->loadXML($objectInfo);
+        $xslt_proc = new \XSLTProcessor();
+        $xslt_proc->importStylesheet($xsl_doc);
+        $dc_xml = $xslt_proc->transformToXML($xml_doc);
         
-        // if (isset($this->metadatamanipulators)) {
         if (!is_null($this->metadatamanipulators)) {
-            $mods_xml = $this->applyMetadatamanipulators($mods_xml, $record_key);
+            $dc_xml = $this->applyMetadatamanipulators($dc_xml, $record_key);
         }
 
-        $mods_xml = $objectInfo;
-        return $mods_xml;
+        return $dc_xml;
     }
 
     /**
      * @todo: Loop through the registered manipulators, just like wth Cdm and CSV,
-     *        but these manuipulators should apply to the entire MODS document,
+     *        but these manuipulators should apply to the entire XML document,
      *        not snippets.
      *
      * Applies metadatamanipulators listed in the config to provided XML snippet.
@@ -72,7 +72,7 @@ class XmlToMods extends Mods
     public function metadata($record_key)
     {
         $objectInfo = $this->fetcher->getItemInfo($record_key);
-        $metadata = $this->createModsXML(array(), $objectInfo);
+        $metadata = $this->createDcXML(array(), $objectInfo);
         return $metadata;
     }
 }
