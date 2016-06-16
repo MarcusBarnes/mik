@@ -15,6 +15,7 @@
         "squizlabs/php_codesniffer":"~2.3",
         "league/csv":"~7.1",
         "league/climate":"~3.1",
+        "caseyamcl/phpoaipmh": "~2.0",
         "guzzlehttp/guzzle": "~6.0",
         "ramsey/uuid": "~3.0",
         "cocur/background-process": "^0.5.0"
