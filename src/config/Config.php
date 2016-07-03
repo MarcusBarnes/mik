@@ -51,6 +51,7 @@ class Config
                 $this->checkMappingSnippets();
                 $this->checkPaths();
                 $this->checkUrls();
+                $this->checkOaiEndpoint();
                 $this->checkAliases();
                 $this->checkInputDirectories();
                 exit;
@@ -61,6 +62,7 @@ class Config
                 break;
             case 'urls':
                 $this->checkUrls();
+                $this->checkOaiEndpoint();
                 exit;
                 break;
             case 'paths':
@@ -87,6 +89,11 @@ class Config
      */
     public function checkMappingSnippets()
     {
+        $fetchers = array('Cdm', 'Csv');
+        if (!in_array($this->settings['FETCHER']['class'], $fetchers)) {
+            return; 
+        }
+
         ini_set('display_errors', false);
         $path = $this->settings['METADATA_PARSER']['mapping_csv_path'];
         // First test that the mappings file exists.
@@ -109,7 +116,7 @@ class Config
     }
 
     /**
-     * Tests URLs (whose setting names end in _url) in configuration files.
+     * Tests CONTENTdm URLs (whose setting names end in _url) in configuration files.
      */
     public function checkUrls()
     {
@@ -142,6 +149,28 @@ class Config
                     }
                 }
             }
+        }
+        print "URLs are OK\n";
+    }
+
+    /**
+     * Tests the OAI-PMH base URL ('endpoint').
+     */
+    public function checkOaiEndpoint()
+    {
+        // This check applies only to OAI-PMH toolchains.
+        if ($this->settings['FETCHER']['class'] != 'Oaipmh') {
+            return;
+        }
+
+        $client = new Client();
+        $base_url = $this->settings['FETCHER']['oai_endpoint'];
+        try {
+            $response = $client->get($base_url);
+            $code = $response->getStatusCode();
+        }
+        catch (RequestException $e) {
+            exit("Error: The OAI endpoint URL $base_url appears to be invalid.\n");
         }
         print "URLs are OK\n";
     }
