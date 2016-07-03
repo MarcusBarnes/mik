@@ -89,6 +89,8 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
 * CSV
   * metadata and content files from a local filesystem for single-file objects
   * metadata and content files from a local filesystem for newspaper issues
+* OAI-PMH
+  * metadata and one PDF per article from an Open Journal Systems
 
 ## Roadmap
 
