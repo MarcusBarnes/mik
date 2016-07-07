@@ -232,6 +232,11 @@ class Config
      */
      public function checkInputDirectories()
      {
+        $fetchers = array('Cdm', 'Csv');
+        if (!in_array($this->settings['FETCHER']['class'], $fetchers)) {
+            return; 
+        }
+
         if (!isset($this->settings['FILE_GETTER']['input_directories'])) {
             print "No input directories are defined in the FILE_GETTER section.\n";
             return;
