@@ -50,9 +50,10 @@ class Config
             case 'all':
                 $this->checkMappingSnippets();
                 $this->checkPaths();
-                $this->checkUrls();
+                $this->checkOaiEndpoint();
                 $this->checkAliases();
                 $this->checkInputDirectories();
+                $this->checkUrls();
                 exit;
                 break;
             case 'snippets':
@@ -61,6 +62,7 @@ class Config
                 break;
             case 'urls':
                 $this->checkUrls();
+                $this->checkOaiEndpoint();
                 exit;
                 break;
             case 'paths':
@@ -87,6 +89,11 @@ class Config
      */
     public function checkMappingSnippets()
     {
+        $fetchers = array('Cdm', 'Csv');
+        if (!in_array($this->settings['FETCHER']['class'], $fetchers)) {
+            return; 
+        }
+
         ini_set('display_errors', false);
         $path = $this->settings['METADATA_PARSER']['mapping_csv_path'];
         // First test that the mappings file exists.
@@ -109,7 +116,7 @@ class Config
     }
 
     /**
-     * Tests URLs (whose setting names end in _url) in configuration files.
+     * Tests CONTENTdm URLs (whose setting names end in _url) in configuration files.
      */
     public function checkUrls()
     {
@@ -120,6 +127,7 @@ class Config
 
         $client = new Client();
         $sections = array_values($this->settings);
+        $code = '404';
         foreach ($sections as $section) {
             foreach ($section as $key => $value) {
                 if (preg_match('/_url$/', $key) && strlen($value)) {
@@ -147,6 +155,28 @@ class Config
     }
 
     /**
+     * Tests the OAI-PMH base URL ('endpoint').
+     */
+    public function checkOaiEndpoint()
+    {
+        // This check applies only to OAI-PMH toolchains.
+        if ($this->settings['FETCHER']['class'] != 'Oaipmh') {
+            return;
+        }
+
+        $client = new Client();
+        $base_url = $this->settings['FETCHER']['oai_endpoint'];
+        try {
+            $response = $client->get($base_url);
+            $code = $response->getStatusCode();
+        }
+        catch (RequestException $e) {
+            exit("Error: The OAI endpoint URL $base_url appears to be invalid.\n");
+        }
+        print "URLs are OK\n";
+    }
+
+    /**
      * Tests filesystem paths (whose setting names end in _path or _directory) in configuration files.
      */
     public function checkPaths()
@@ -156,7 +186,7 @@ class Config
             foreach ($section as $key => $value) {
                 if (preg_match('/(_path|_directory)$/', $key) && strlen($value)) {
                     if (!file_exists($value)) {
-                        exit("The path $value (defined in configuration setting $key) does not exist but will be created for you.\n");
+                        print "The path $value (defined in configuration setting $key) does not exist but will be created for you.\n";
                     }
                 }
             }
@@ -197,31 +227,51 @@ class Config
     }
     
     /** 
-     * Checks for the existance of input_directories[] 
+     * Checks for the existance of input_directories.
      *
      * See https://github.com/MarcusBarnes/mik/issues/169
      */
      public function checkInputDirectories()
      {
-        if (!isset($this->settings['FILE_GETTER']['input_directories'])) {
-            print "No input directories are defined in the FILE_GETTER section.\n";
-            return;
-        }
-        if (strlen($this->settings['FILE_GETTER']['input_directories'][0]) == 0) {
-            print "No input directories are defined in the FILE_GETTER section.\n";
-            return;
-        }
-
-        $input_directories = $this->settings['FILE_GETTER']['input_directories'];
+        // For Cdm toolchains, where multiple input directories are allowed.
+        $filegetters = array('CdmNewspapers', 'CdmSingleFile', 'CdmPhpDocuments');
+        if (in_array($this->settings['FILE_GETTER']['class'], $filegetters)) {
+            if (!isset($this->settings['FILE_GETTER']['input_directories'])) {
+                print "No input directories are defined in the FILE_GETTER section.\n";
+                return;
+            }
+            if (strlen($this->settings['FILE_GETTER']['input_directories'][0]) == 0) {
+                print "No input directories are defined in the FILE_GETTER section.\n";
+                return;
+            }
+            $input_directories = $this->settings['FILE_GETTER']['input_directories'];
+            foreach ($input_directories as $input_directory) {
+                if (!file_exists(realpath($input_directory))) {
+                    exit("Error: Can't find input directory $input_directory\n");
+                }
+            }
         
-        foreach ($input_directories as $input_directory) {
+            print "Input directory paths are OK.\n";
+        }
+        
+        // For Csv toolchains, where a single input directory is allowed.
+        $filegetters = array('CsvSingleFile', 'CsvNewspapers');
+        if (in_array($this->settings['FILE_GETTER']['class'], $filegetters)) {
+            if (!isset($this->settings['FILE_GETTER']['input_directory'])) {
+                print "No input directories are defined in the FILE_GETTER section.\n";
+                return;
+            }
+            if (strlen($this->settings['FILE_GETTER']['input_directory']) == 0) {
+                print "No input directories are defined in the FILE_GETTER section.\n";
+                return;
+            }
+            $input_directory = $this->settings['FILE_GETTER']['input_directory'];
             if (!file_exists(realpath($input_directory))) {
                 exit("Error: Can't find input directory $input_directory\n");
             }
+        
+            print "Input directory paths are OK.\n";
         }
-        
-        print "Input directory paths are OK.\n";
-        
      }
 
 }
