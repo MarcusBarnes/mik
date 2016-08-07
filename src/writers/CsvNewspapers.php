@@ -6,7 +6,7 @@ use Monolog\Logger;
 class CsvNewspapers extends Writer
 {
     /**
-     * @var array $settings - configuration settings from confugration class.
+     * @var array $settings - settings from the confugration class.
      */
     public $settings;
 
@@ -16,19 +16,17 @@ class CsvNewspapers extends Writer
     private $fetcher;
 
     /**
-     * @var object cdmPhpDocumentsFileGetter - filegetter class for
-     * getting files related to CDM PHP documents.
+     * @var object - filegetter class for CSV newspaper issues.
      */
     private $fileGetter;
 
     /**
-     * Create a new newspaper writer instance
+     * Create a new newspaper writer instance.
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
     {
         parent::__construct($settings);
-        $this->fetcher = new \mik\fetchers\Cdm($settings);
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
         $this->output_directory = $settings['WRITER']['output_directory'];
@@ -67,7 +65,7 @@ class CsvNewspapers extends Writer
         }
 
         // Create an issue-level subdirectory in the output directory, but only if there is
-        // a corresponding inputdirectory.
+        // a corresponding input directory.
         $issue_level_input_dir = $this->fileGetter->getIssueSourcePath($record_id);
         if (file_exists($issue_level_input_dir)) {
             $issue_level_output_dir = $this->output_directory . DIRECTORY_SEPARATOR . $record_id;

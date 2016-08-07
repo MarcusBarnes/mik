@@ -58,7 +58,7 @@ class CsvNewspapers extends FileGetter
     }
 
     /**
-     * Recurses down a directory to find all potential input files.
+     * Recurses down a directory to find all potential page-level input files.
      *
      * @param string $inputDirectory
      *    The input directory as defined in the configuration.
