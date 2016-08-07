@@ -16,10 +16,14 @@ class CsvCompound extends Writer
     private $fetcher;
 
     /**
-     * @var object cdmPhpDocumentsFileGetter - filegetter class for
-     * getting files related to CDM PHP documents.
+     * @var object CsvCompound filegetter class.
      */
     private $fileGetter;
+
+    /**
+     * @var object CsvToMods metadata parser class.
+     */
+    private $metadataParser;
 
     /**
      * Create a new newspaper writer instance
@@ -31,8 +35,19 @@ class CsvCompound extends Writer
         $this->fetcher = new \mik\fetchers\Cdm($settings);
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
+        $metadataParserClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
+        $this->metadataParser = new $metadataParserClass($settings);
         $this->output_directory = $settings['WRITER']['output_directory'];
         $this->metadata_filename = $settings['WRITER']['metadata_filename'];
+        $this->child_title = $settings['WRITER']['child_title'];
+        // Default is to derive child sequence number by splitting filename on '_'.
+        if (isset($settings['WRITER']['child_sequence_separator'])) {
+            $this->child_sequence_separator = $settings['WRITER']['child_sequence_separator'];
+        }
+        else {
+            $this->child_sequence_separator = '_';
+        }
+
         // Default is to generate page-level MODS.xml files.
         if (isset($settings['WRITER']['generate_child_modsxml'])) {
             $this->generate_child_modsxml = $settings['WRITER']['generate_child_modsxml'];
@@ -90,8 +105,8 @@ class CsvCompound extends Writer
                 continue;
             }
             // Get the sequence number from the filename. It is the last segment of the
-            // child filename, split on '_'.
-            $filename_segments = explode('_', $pathinfo['filename']);
+            // child filename, split on value of $this->child_sequence_separator.
+            $filename_segments = explode($this->child_sequence_separator, $pathinfo['filename']);
             $sequence_number = ltrim(end($filename_segments), '0');
             $child_output_dir = $cpd_output_dir . DIRECTORY_SEPARATOR . $sequence_number;
             mkdir($child_output_dir);
@@ -99,7 +114,8 @@ class CsvCompound extends Writer
             $OBJ_expected = in_array('OBJ', $this->datastreams);
             if ($OBJ_expected xor $no_datastreams_setting_flag) {
                 $extension = $pathinfo['extension'];
-                $child_output_file_path = $child_output_dir . DIRECTORY_SEPARATOR . 'OBJ.' . $extension;
+                $child_output_file_path = $child_output_dir . DIRECTORY_SEPARATOR .
+                    'OBJ.' . $extension;
                 copy($child_path, $child_output_file_path);
             }
 
@@ -148,12 +164,19 @@ class CsvCompound extends Writer
      */
     public function writeChildMetadataFile($parent_metadata, $sequence_number, $path)
     {
-        // Get the first title element from the issue's MODS.
-        $dom = new \DOMDocument;
-        $dom->loadXML($parent_metadata);
-        $xpath = new \DOMXPath($dom);
-        $titles = $xpath->query("//mods:titleInfo/mods:title");
-        $child_title = $titles->item(0)->nodeValue . ', part ' . $sequence_number;
+        $child_title = $this->child_title;
+        if (preg_match('/%parent_title%/', $this->child_title)) {
+            // Get the first title element from the issue's MODS.
+            $dom = new \DOMDocument;
+            $dom->loadXML($parent_metadata);
+            $xpath = new \DOMXPath($dom);
+            $titles = $xpath->query("//mods:titleInfo/mods:title");
+            $parent_title = $titles->item(0)->nodeValue;
+            $child_title = preg_replace('/%parent_title%/', $parent_title, $child_title);
+        }
+        if (preg_match('/%sequence_number%/', $this->child_title)) {
+            $child_title = preg_replace('/%sequence_number%/', $sequence_number, $child_title);
+        }
 
         $child_mods = <<<EOQ
 <mods xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink">
