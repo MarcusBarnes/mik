@@ -26,19 +26,26 @@ class CsvCompound extends Writer
     private $metadataParser;
 
     /**
+     * @var boolean Whether or not this item has its own child-level metadata.
+     */
+    private $childHasMetadata;
+
+    /**
      * Create a new newspaper writer instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
     {
         parent::__construct($settings);
-        $this->fetcher = new \mik\fetchers\Cdm($settings);
+        $this->fetcher = new \mik\fetchers\Csv($settings);
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
         $metadataParserClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
         $this->metadataParser = new $metadataParserClass($settings);
         $this->output_directory = $settings['WRITER']['output_directory'];
         $this->metadata_filename = $settings['WRITER']['metadata_filename'];
+        $this->compound_directory_field = $settings['WRITER']['compound_directory_field'];
+        $this->child_key = $settings['FETCHER']['child_key'];
         $this->child_title = $settings['WRITER']['child_title'];
         // Default is to derive child sequence number by splitting filename on '_'.
         if (isset($settings['WRITER']['child_sequence_separator'])) {
@@ -82,19 +89,27 @@ class CsvCompound extends Writer
         }
 
         // Create a compound-level subdirectory in the output directory to correspond
-        // to a compound-evel input subdirectory
+        // to a compound-evel input subdirectory. We check to make sure that the row
+        // contains no child sequence value so we don't create object-level directories
+        // for rows that contain child metadata.
+        $cpd_item_info = $this->fetcher->getItemInfo($record_id);
+        $MODS_expected = in_array('MODS', $this->datastreams);
         $cpd_input_dir = $this->fileGetter->getCpdSourcePath($record_id);
-        if (file_exists($cpd_input_dir)) {
-            $cpd_output_dir = $this->output_directory . DIRECTORY_SEPARATOR . $record_id;
+        if (file_exists($cpd_input_dir) && strlen($cpd_item_info->{$this->child_key}) === 0) {
+            $cpd_output_dir = $this->output_directory . DIRECTORY_SEPARATOR .
+                $cpd_item_info->{$this->compound_directory_field};
             if (!file_exists($cpd_output_dir)) {
                 mkdir($cpd_output_dir);
             }
-        }
 
-        $MODS_expected = in_array('MODS', $this->datastreams);
-        if ($MODS_expected xor $no_datastreams_setting_flag) {
-            $metadata_file_path = $cpd_output_dir . DIRECTORY_SEPARATOR . $this->metadata_filename;
-            $this->writeMetadataFile($metadata, $metadata_file_path);
+            if ($MODS_expected xor $no_datastreams_setting_flag) {
+                if (file_exists($cpd_output_dir)) {
+                    $metadata_file_path = $cpd_output_dir . DIRECTORY_SEPARATOR . $this->metadata_filename;
+                    if (file_exists($metadata_file_path)) {
+                        $this->writeMetadataFile($metadata, $metadata_file_path);
+                    }
+                }
+            }
         }
 
         $children_paths = $this->fileGetter->getChildren($record_id);
@@ -104,24 +119,46 @@ class CsvCompound extends Writer
             if (preg_match('/thumbs\.db/i', $pathinfo['basename'])) {
                 continue;
             }
-            // Get the sequence number from the filename. It is the last segment of the
-            // child filename, split on value of $this->child_sequence_separator.
-            $filename_segments = explode($this->child_sequence_separator, $pathinfo['filename']);
-            $sequence_number = ltrim(end($filename_segments), '0');
-            $child_output_dir = $cpd_output_dir . DIRECTORY_SEPARATOR . $sequence_number;
-            mkdir($child_output_dir);
 
-            $OBJ_expected = in_array('OBJ', $this->datastreams);
-            if ($OBJ_expected xor $no_datastreams_setting_flag) {
-                $extension = $pathinfo['extension'];
-                $child_output_file_path = $child_output_dir . DIRECTORY_SEPARATOR .
-                    'OBJ.' . $extension;
-                copy($child_path, $child_output_file_path);
+            $child_item_info = $this->fetcher->getItemInfo($record_id);
+            if ($child_item_info->{$this->child_key}) {
+                $this->childHasMetadata = true;
+            }
+            else {
+                $this->childHasMetadata = false;
+            }
+
+            // Get the sequence number from the last segment of the child filename,
+            // split on value of $this->child_sequence_separator.
+            $filename_segments = explode($this->child_sequence_separator, $pathinfo['filename']);
+            $sequence_number = end($filename_segments);
+
+            $cpd_output_dir = $this->output_directory . DIRECTORY_SEPARATOR .
+                $child_item_info->{$this->compound_directory_field};
+
+            $child_output_dir = $cpd_output_dir . DIRECTORY_SEPARATOR . $sequence_number;
+            if (!$this->childHasMetadata) {
+                mkdir($child_output_dir);
+
+                $OBJ_expected = in_array('OBJ', $this->datastreams);
+                if ($OBJ_expected xor $no_datastreams_setting_flag) {
+                    $extension = $pathinfo['extension'];
+                    $child_output_file_path = $child_output_dir . DIRECTORY_SEPARATOR .
+                        'OBJ.' . $extension;
+                    copy($child_path, $child_output_file_path);
+                }
             }
 
             if ($MODS_expected xor $no_datastreams_setting_flag) {
                 if ($this->generate_child_modsxml) {
-                    $this->writeChildMetadataFile($metadata, $sequence_number, $child_output_dir);
+                    if ($this->childHasMetadata && ($child_item_info->{$this->child_key} == $sequence_number)) {
+                        $metadata = $this->metadataParser->metadata($record_id);
+                        $this->writeChildMetadataFile($metadata, $sequence_number, $child_output_dir, $child_item_info);
+                    }
+                    else {
+                        $metadata = $this->metadataParser->metadata($record_id);
+                        $this->writeChildMetadataFile($cpd_metadata, $sequence_number, $child_output_dir);
+                    }
                 }
             }
         }
@@ -143,7 +180,7 @@ class CsvCompound extends Writer
         $doc->formatOutput = true;
         $metadata = $doc->saveXML();
 
-        if ($path !='') {
+        if (file_exists($path)) {
             $fileCreationStatus = file_put_contents($path, $metadata);
             if ($fileCreationStatus === false) {
                 $this->log->addWarning("There was a problem writing the issue-level metadata to a file",
@@ -155,27 +192,43 @@ class CsvCompound extends Writer
     /**
      * Generates a very simple MODS.xml file for a newspaper page.
      *
-     * @param $parent_metadata
-     *    The MODS document associated with the page's parent issue.
+     * @param $metadata
+     *    The MODS document associated with either the child's parent
+     *    or the child itself (as indicated by the $child_level
+     *    parameter.
      * @param $sequence_number
      *    The child's sequence number, taken from its file's filename.
      * @param $path
      *    The path to write the XML file to.
+     * @param $child_level_metadata
+     *     Boolean indicating that the child has it own metadata.
      */
-    public function writeChildMetadataFile($parent_metadata, $sequence_number, $path)
+    public function writeChildMetadataFile($metadata, $sequence_number, $path, $child_item_info = null)
     {
+        if ($child_item_info) {
+            $path = $this->output_directory . DIRECTORY_SEPARATOR .
+                $child_item_info->{$this->compound_directory_field} . DIRECTORY_SEPARATOR .
+                $sequence_number . DIRECTORY_SEPARATOR . $this->metadata_filename;
+            $fileCreationStatus = file_put_contents($path, $metadata);
+            if ($fileCreationStatus === false) {
+                $this->log->addWarning("There was a problem writing the child-level metadata to its file",
+                    array('file' => $path));
+            }
+            return;
+        }
+
         $child_title = $this->child_title;
         if (preg_match('/%parent_title%/', $this->child_title)) {
             // Get the first title element from the issue's MODS.
             $dom = new \DOMDocument;
-            $dom->loadXML($parent_metadata);
+            $dom->loadXML($metadata);
             $xpath = new \DOMXPath($dom);
             $titles = $xpath->query("//mods:titleInfo/mods:title");
             $parent_title = $titles->item(0)->nodeValue;
             $child_title = preg_replace('/%parent_title%/', $parent_title, $child_title);
         }
         if (preg_match('/%sequence_number%/', $this->child_title)) {
-            $child_title = preg_replace('/%sequence_number%/', $sequence_number, $child_title);
+            $child_title = preg_replace('/%sequence_number%/', ltrim($sequence_number, '0'), $child_title);
         }
 
         $child_mods = <<<EOQ
@@ -194,7 +247,7 @@ EOQ;
         if ($path !='') {
             $fileCreationStatus = file_put_contents($path, $metadata);
             if ($fileCreationStatus === false) {
-                $this->log->addWarning("There was a problem writing the child-level metadata to a file",
+                $this->log->addWarning("There was a problem writing the child-level metadata to its file",
                     array('file' => $path));
             }
         }
