@@ -104,9 +104,8 @@ class CsvCompound extends Writer
 
             if ($MODS_expected xor $no_datastreams_setting_flag) {
                 if (file_exists($cpd_output_dir)) {
-                    $metadata_file_path = $cpd_output_dir . DIRECTORY_SEPARATOR . $this->metadata_filename;
-                    if (file_exists($metadata_file_path)) {
-                        $this->writeMetadataFile($metadata, $metadata_file_path);
+                    if (file_exists($cpd_output_dir)) {
+                        $this->writeMetadataFile($metadata, $cpd_output_dir);
                     }
                 }
             }
@@ -121,7 +120,7 @@ class CsvCompound extends Writer
             }
 
             $child_item_info = $this->fetcher->getItemInfo($record_id);
-            if ($child_item_info->{$this->child_key}) {
+            if (strlen($child_item_info->{$this->child_key})) {
                 $this->childHasMetadata = true;
             }
             else {
@@ -139,7 +138,6 @@ class CsvCompound extends Writer
             $child_output_dir = $cpd_output_dir . DIRECTORY_SEPARATOR . $sequence_number;
             if (!$this->childHasMetadata) {
                 mkdir($child_output_dir);
-
                 $OBJ_expected = in_array('OBJ', $this->datastreams);
                 if ($OBJ_expected xor $no_datastreams_setting_flag) {
                     $extension = $pathinfo['extension'];
@@ -148,7 +146,6 @@ class CsvCompound extends Writer
                     copy($child_path, $child_output_file_path);
                 }
             }
-
             if ($MODS_expected xor $no_datastreams_setting_flag) {
                 if ($this->generate_child_modsxml) {
                     if ($this->childHasMetadata && ($child_item_info->{$this->child_key} == $sequence_number)) {
@@ -156,8 +153,7 @@ class CsvCompound extends Writer
                         $this->writeChildMetadataFile($metadata, $sequence_number, $child_output_dir, $child_item_info);
                     }
                     else {
-                        $metadata = $this->metadataParser->metadata($record_id);
-                        $this->writeChildMetadataFile($cpd_metadata, $sequence_number, $child_output_dir);
+                        $this->writeChildMetadataFile('', $sequence_number, $child_output_dir);
                     }
                 }
             }
@@ -165,7 +161,7 @@ class CsvCompound extends Writer
     }
 
     /**
-     * Writes out the child-level MODS.xml file.
+     * Writes out the compound-level MODS.xml file.
      *
      * @param $metadata
      *    The MODS XML document produced by the metadta parser.
@@ -181,29 +177,32 @@ class CsvCompound extends Writer
         $metadata = $doc->saveXML();
 
         if (file_exists($path)) {
-            $fileCreationStatus = file_put_contents($path, $metadata);
+            $metadata_file_path = $path . DIRECTORY_SEPARATOR . $this->metadata_filename;
+            $fileCreationStatus = file_put_contents($metadata_file_path, $metadata);
             if ($fileCreationStatus === false) {
-                $this->log->addWarning("There was a problem writing the issue-level metadata to a file",
+                $this->log->addWarning("There was a problem writing the compound-level metadata to a file",
                     array('file' => $path));
             }
         }
     }
 
     /**
-     * Generates a very simple MODS.xml file for a newspaper page.
+     * Generates a very simple MODS.xml file for compound object's child,
+     * or if the child has its own row in the CSV metadata file, write
+     * out a MODS.xml file using it.
      *
      * @param $metadata
-     *    The MODS document associated with either the child's parent
-     *    or the child itself (as indicated by the $child_level
-     *    parameter.
+     *    An empty string (if children inherit the compound's title) or
+     *    the MODS document associated with the child itself (as indicated by
+     *    whether the the $child_item_info paramter is passed in.
      * @param $sequence_number
      *    The child's sequence number, taken from its file's filename.
      * @param $path
-     *    The path to write the XML file to.
-     * @param $child_level_metadata
-     *     Boolean indicating that the child has it own metadata.
+     *    The path to write the MODS.xml file to.
+     * @param $child_item_info
+     *     The metadata from the CSV file for the child.
      */
-    public function writeChildMetadataFile($metadata, $sequence_number, $path, $child_item_info = null)
+    public function writeChildMetadataFile($metadata, $sequence_number, $path, $child_item_info = false)
     {
         if ($child_item_info) {
             $path = $this->output_directory . DIRECTORY_SEPARATOR .
@@ -219,9 +218,15 @@ class CsvCompound extends Writer
 
         $child_title = $this->child_title;
         if (preg_match('/%parent_title%/', $this->child_title)) {
-            // Get the first title element from the issue's MODS.
+            // This is lazy, but it works. If child has no metadata of its own, we get the
+            // compound object's MODS file (already written out at this point) and parse
+            // out its title. This way children can also inherit any changes to the compound
+            // object metadata made by metadata manipulators.
+            $sequence_directory_pattern = '#' . DIRECTORY_SEPARATOR . $sequence_number . '#';
+            $compound_mods_path = preg_replace($sequence_directory_pattern, '', $path);
+            // Get the first title element from the compound object's MODS.
             $dom = new \DOMDocument;
-            $dom->loadXML($metadata);
+            $dom->load($compound_mods_path . DIRECTORY_SEPARATOR . $this->metadata_filename);
             $xpath = new \DOMXPath($dom);
             $titles = $xpath->query("//mods:titleInfo/mods:title");
             $parent_title = $titles->item(0)->nodeValue;
