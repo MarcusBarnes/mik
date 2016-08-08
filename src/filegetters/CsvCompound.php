@@ -18,7 +18,7 @@ class CsvCompound extends FileGetter
     {
         $this->settings = $settings['FILE_GETTER'];
         $this->input_directory = $this->settings['input_directory'];
-        $this->cpd_directory_field = $this->settings['cpd_directory_field'];
+        $this->compound_directory_field = $this->settings['compound_directory_field'];
         $this->fetcher = new \mik\fetchers\Csv($settings);
     }
 
@@ -53,7 +53,7 @@ class CsvCompound extends FileGetter
         // Get the path to the issue.
         $item_info = $this->fetcher->getItemInfo($record_key);
         $cpd_input_directory = $this->input_directory . DIRECTORY_SEPARATOR .
-            $item_info->{$this->cpd_directory_field};
+            $item_info->{$this->compound_directory_field};
         return $cpd_input_directory;
     }
 

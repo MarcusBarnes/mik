@@ -28,7 +28,7 @@ class CsvCompound extends Writer
     /**
      * @var boolean Whether or not this item has its own child-level metadata.
      */
-    private $childHasMetadata;
+    private $hasChildMetadata;
 
     /**
      * Create a new newspaper writer instance
@@ -44,7 +44,7 @@ class CsvCompound extends Writer
         $this->metadataParser = new $metadataParserClass($settings);
         $this->output_directory = $settings['WRITER']['output_directory'];
         $this->metadata_filename = $settings['WRITER']['metadata_filename'];
-        $this->compound_directory_field = $settings['WRITER']['compound_directory_field'];
+        $this->compound_directory_field = $settings['FILE_GETTER']['compound_directory_field'];
         $this->child_key = $settings['FETCHER']['child_key'];
         $this->child_title = $settings['WRITER']['child_title'];
         // Default is to derive child sequence number by splitting filename on '_'.
@@ -54,7 +54,6 @@ class CsvCompound extends Writer
         else {
             $this->child_sequence_separator = '_';
         }
-
         // Default is to generate page-level MODS.xml files.
         if (isset($settings['WRITER']['generate_child_modsxml'])) {
             $this->generate_child_modsxml = $settings['WRITER']['generate_child_modsxml'];
@@ -72,11 +71,15 @@ class CsvCompound extends Writer
     }
 
     /**
-     * Write folders and files.
+     * Writes out the folders and files that make up the Islandora
+     * import packages.
      *
      * @param $metadata
-     * @param $pages
+     *   The serialized XML metadata produced by the metadata parser.
+     * @param $children
+     *   An array of absolute paths to the object's child files.
      * @param $record_id
+     *   The value of the record key field for this object.
      */
     public function writePackages($metadata, $children, $record_id)
     {
@@ -118,13 +121,16 @@ class CsvCompound extends Writer
             if (preg_match('/thumbs\.db/i', $pathinfo['basename'])) {
                 continue;
             }
+            if (preg_match('/\.DS_Store/i', $child_path)) {
+                continue;
+            }
 
             $child_item_info = $this->fetcher->getItemInfo($record_id);
             if (strlen($child_item_info->{$this->child_key})) {
-                $this->childHasMetadata = true;
+                $this->hasChildMetadata = true;
             }
             else {
-                $this->childHasMetadata = false;
+                $this->hasChildMetadata = false;
             }
 
             // Get the sequence number from the last segment of the child filename,
@@ -136,7 +142,7 @@ class CsvCompound extends Writer
                 $child_item_info->{$this->compound_directory_field};
 
             $child_output_dir = $cpd_output_dir . DIRECTORY_SEPARATOR . $sequence_number;
-            if (!$this->childHasMetadata) {
+            if (!$this->hasChildMetadata) {
                 mkdir($child_output_dir);
                 $OBJ_expected = in_array('OBJ', $this->datastreams);
                 if ($OBJ_expected xor $no_datastreams_setting_flag) {
@@ -148,7 +154,7 @@ class CsvCompound extends Writer
             }
             if ($MODS_expected xor $no_datastreams_setting_flag) {
                 if ($this->generate_child_modsxml) {
-                    if ($this->childHasMetadata && ($child_item_info->{$this->child_key} == $sequence_number)) {
+                    if ($this->hasChildMetadata && ($child_item_info->{$this->child_key} == $sequence_number)) {
                         $metadata = $this->metadataParser->metadata($record_id);
                         $this->writeChildMetadataFile($metadata, $sequence_number, $child_output_dir, $child_item_info);
                     }
@@ -219,9 +225,11 @@ class CsvCompound extends Writer
         $child_title = $this->child_title;
         if (preg_match('/%parent_title%/', $this->child_title)) {
             // This is lazy, but it works. If child has no metadata of its own, we get the
-            // compound object's MODS file (already written out at this point) and parse
-            // out its title. This way children can also inherit any changes to the compound
-            // object metadata made by metadata manipulators.
+            // parent compound object's MODS file (already written out at this point) and
+            // parse out its title. This way children can also inherit any changes to the
+            // compound object metadata made by metadata manipulators. The compound object's
+            // MODS file is in the parent directory of the current child object (i.e., its
+            // path minus the sequence number).
             $sequence_directory_pattern = '#' . DIRECTORY_SEPARATOR . $sequence_number . '#';
             $compound_mods_path = preg_replace($sequence_directory_pattern, '', $path);
             // Get the first title element from the compound object's MODS.
