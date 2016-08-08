@@ -6,7 +6,7 @@ use GuzzleHttp\Client;
 use mik\exceptions\MikErrorException;
 use Monolog\Logger;
 
-class OaipmhOjsPdf extends Writer
+class Oaipmh extends Writer
 {
     /**
      * @var array $settings - configuration settings from confugration class.
@@ -55,23 +55,36 @@ class OaipmhOjsPdf extends Writer
         // Retrieve the file associated with the document and write it to the output
         // folder using the filename or record_id identifier
         $source_file_url = $this->fileGetter->getFilePath($record_id);
-        $source_file_extension = 'pdf';
 
-        $content_file_path = $output_path . $record_id . '.' . $source_file_extension;
         $metadata_file_path = $output_path . $record_id . '.xml';
 
         $this->writeMetadataFile($metadata, $metadata_file_path, true);
 
-        // Retrieve the PDF using Guzzle.
-        $client = new Client();
-        $response = $client->get($source_file_url,
-            ['stream' => true,
-            'timeout' => $this->httpTimeout,
-            'connect_timeout' => $this->httpTimeout]
-        );
-        $body = $response->getBody();
-        while (!$body->eof()) {
-            file_put_contents($content_file_path, $body->read(2048), FILE_APPEND);
+        // Retrieve the PDF, etc. using Guzzle.
+        if ($source_file_url) {
+            $client = new Client();
+            $response = $client->get($source_file_url,
+                ['stream' => true,
+                'timeout' => $this->httpTimeout,
+                'connect_timeout' => $this->httpTimeout]
+            );
+
+            // Lazy MimeType => extension mapping: use the last part of the MimeType.
+            $content_types = $response->getHeader('Content-Type');
+            list($type, $extension) = explode('/', $content_types[0]);
+            $extension = preg_replace('/;.*$/', '', $extension);
+
+            $content_file_path = $output_path . $record_id . '.' . $extension;
+
+            $body = $response->getBody();
+            while (!$body->eof()) {
+                file_put_contents($content_file_path, $body->read(2048), FILE_APPEND);
+            }
+        }
+        else {
+            $this->log->addWarning("No content file found in OAI-PMH record",
+                array('record' => $record_id));
+
         }
     }
 
