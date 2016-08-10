@@ -26,11 +26,6 @@ class CsvCompound extends Writer
     private $metadataParser;
 
     /**
-     * @var boolean Whether or not this item has its own child-level metadata.
-     */
-    private $hasChildMetadata;
-
-    /**
      * Create a new newspaper writer instance
      * @param array $settings configuration settings.
      */
@@ -108,59 +103,59 @@ class CsvCompound extends Writer
             if ($MODS_expected xor $no_datastreams_setting_flag) {
                 if (file_exists($cpd_output_dir)) {
                     if (file_exists($cpd_output_dir)) {
+                        // Generate MODS for child for parent compound object.
                         $this->writeMetadataFile($metadata, $cpd_output_dir);
                     }
                 }
             }
         }
 
+        // Since child objects that have their own metadata appear in
+        // the CSV file along with parent compound objects, we process
+        // them outside of the foreach child loop below.
+        $child_item_info = $this->fetcher->getItemInfo($record_id);
+        if (strlen($child_item_info->{$this->child_key})) {
+            $sequence_number = $child_item_info->{$this->child_key};
+            $cpd_output_dir = $this->output_directory . DIRECTORY_SEPARATOR .
+                $child_item_info->{$this->compound_directory_field};
+            $child_output_dir = $cpd_output_dir . DIRECTORY_SEPARATOR . $sequence_number;
+            $metadata = $this->metadataParser->metadata($record_id);
+            $this->writeChildMetadataFile($metadata, $sequence_number, $child_output_dir, $child_item_info);
+            // Once we've processed the child with its own metadata,
+            // we're done with this row in the CSV file.
+            return;
+        }
+
+        // For parent-level compound objects, get the paths to their child
+        // objects and process each child, including writing out its
+        // MODS file.
         $children_paths = $this->fileGetter->getChildren($record_id);
-        // @todo: Add error handling on mkdir and copy.
         foreach ($children_paths as $child_path) {
             $pathinfo = pathinfo($child_path);
-            if (preg_match('/thumbs\.db/i', $pathinfo['basename'])) {
-                continue;
-            }
-            if (preg_match('/\.DS_Store/i', $child_path)) {
-                continue;
-            }
-
-            $child_item_info = $this->fetcher->getItemInfo($record_id);
-            if (strlen($child_item_info->{$this->child_key})) {
-                $this->hasChildMetadata = true;
-            }
-            else {
-                $this->hasChildMetadata = false;
-            }
-
             // Get the sequence number from the last segment of the child filename,
             // split on value of $this->child_sequence_separator.
             $filename_segments = explode($this->child_sequence_separator, $pathinfo['filename']);
             $sequence_number = end($filename_segments);
 
+            $child_item_info = $this->fetcher->getItemInfo($record_id);
             $cpd_output_dir = $this->output_directory . DIRECTORY_SEPARATOR .
                 $child_item_info->{$this->compound_directory_field};
 
             $child_output_dir = $cpd_output_dir . DIRECTORY_SEPARATOR . $sequence_number;
-            if (!$this->hasChildMetadata) {
+            if (!file_exists($child_output_dir)) {
                 mkdir($child_output_dir);
-                $OBJ_expected = in_array('OBJ', $this->datastreams);
-                if ($OBJ_expected xor $no_datastreams_setting_flag) {
-                    $extension = $pathinfo['extension'];
-                    $child_output_file_path = $child_output_dir . DIRECTORY_SEPARATOR .
-                        'OBJ.' . $extension;
-                    copy($child_path, $child_output_file_path);
-                }
+            }
+            $OBJ_expected = in_array('OBJ', $this->datastreams);
+            if ($OBJ_expected xor $no_datastreams_setting_flag) {
+                $extension = $pathinfo['extension'];
+                $child_output_file_path = $child_output_dir . DIRECTORY_SEPARATOR .
+                    'OBJ.' . $extension;
+                copy($child_path, $child_output_file_path);
             }
             if ($MODS_expected xor $no_datastreams_setting_flag) {
+                // Generate MODS for child that does not have its own row in the CSV file.
                 if ($this->generate_child_modsxml) {
-                    if ($this->hasChildMetadata && ($child_item_info->{$this->child_key} == $sequence_number)) {
-                        $metadata = $this->metadataParser->metadata($record_id);
-                        $this->writeChildMetadataFile($metadata, $sequence_number, $child_output_dir, $child_item_info);
-                    }
-                    else {
-                        $this->writeChildMetadataFile('', $sequence_number, $child_output_dir);
-                    }
+                    $this->writeChildMetadataFile('', $sequence_number, $child_output_dir);
                 }
             }
         }
@@ -210,6 +205,7 @@ class CsvCompound extends Writer
      */
     public function writeChildMetadataFile($metadata, $sequence_number, $path, $child_item_info = false)
     {
+        // For child that has its own row in the CSV file.
         if ($child_item_info) {
             $path = $this->output_directory . DIRECTORY_SEPARATOR .
                 $child_item_info->{$this->compound_directory_field} . DIRECTORY_SEPARATOR .
@@ -222,6 +218,7 @@ class CsvCompound extends Writer
             return;
         }
 
+        // For child that does not have its own row in the CSV file.
         $child_title = $this->child_title;
         if (preg_match('/%parent_title%/', $this->child_title)) {
             // This is lazy, but it works. If child has no metadata of its own, we get the
