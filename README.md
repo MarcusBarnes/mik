@@ -88,9 +88,11 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
   * generic (non-book and non-newspaper) compound objects
 * CSV
   * metadata and content files from a local filesystem for single-file objects
+  * metadata and content files from a local filesystem for compound objects
   * metadata and content files from a local filesystem for newspaper issues
 * OAI-PMH
   * metadata and one PDF per article from an Open Journal Systems
+  * metadata and one file per object from OAI-PMH repositories that identify resource files in a record element
 
 ## Roadmap
 
