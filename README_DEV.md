@@ -19,3 +19,7 @@ Use the PSR-2 coding standard.  You can check your work using PHP Code Sniffer b
 From within the mik directory, run:
 
 `phpunit --bootstrap vendor/autoload.php tests`
+
+If you want to skip running the FITS tests, run:
+
+`phpunit --exclude-group FITS --bootstrap  vendor/autoload.php tests`

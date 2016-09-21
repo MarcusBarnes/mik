@@ -4,9 +4,6 @@
     <testsuites>
         <testsuite name="MIK core tests">
             <directory>.</directory>
-            <!-- Add an entry for directories that contain tests for manipulators
-                 and post-write hook scripts. -->
-            <exclude>FITS</exclude>
         </testsuite>
     </testsuites>
 
