@@ -116,4 +116,32 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
         $mods = $parser->metadata('postcard_20');
         $this->assertRegExp('#<CSVRecord.*"Date":"1907"#', $mods, "AddCsvData metadata manipulator did not work");
     }
+
+    public function testSimpleReplaceMetadataManipulator()
+    {
+        $settings = array(
+            'FETCHER' => array(
+                'class' => 'Csv',
+                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
+                'temp_directory' => $this->path_to_temp_dir,
+                'record_key' => 'ID',
+                'use_cache' => false,
+            ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+                'path_to_manipulator_log' => $this->path_to_manipulator_log,
+            ),
+            'METADATA_PARSER' => array(
+                'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/sample_mappings.csv',
+            ),
+            'MANIPULATORS' => array(
+                'metadatamanipulators' => array('SimpleReplace|#Vancouver,\sB\.C\.</title>#|Victoria, B.C.</title>'),
+            ),
+        );
+
+        $parser = new CsvToMods($settings);
+
+        $mods = $parser->metadata('postcard_20');
+        $this->assertRegExp('#Victoria,\sB\.C\.</title>#', $mods, "SimpleReplace metadata manipulator did not work");
+    }
 }
