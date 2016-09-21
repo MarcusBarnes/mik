@@ -466,7 +466,7 @@ function islandora_book_cmodel($options) {
 /**
  * Checks for the existense of subfolders in $options['dir'] (that correspond to compound
  * objects) that contain one subfolder per child object. Each compound folder must contain
- * a file named 'structure.cpd' and a file named 'MODS.xml'. Each child folder must contain
+ * a file named 'structure.xml' and a file named 'MODS.xml'. Each child folder must contain
  * a named 'MODS.xml' and a file with the name 'OBJ', with any extension.
  *
  * Example: php check_files.php --cmodel=islandora:compoundCModel --dir=/path/to/mikoutput --log=/tmp/mylog.txt
@@ -484,9 +484,9 @@ function islandora_compound_cmodel($options) {
     }
 
     // For each compound object subdirectory, test for the presence of MODS.xml,
-    // structure.cpd, and the expected number of child subdirectories.
+    // structure.xml, and the expected number of child subdirectories.
     $missing_object_mods = false;
-    $missing_object_cpd = false;
+    $missing_object_xml = false;
     $missing_object_children = false;
     $extra_object_files = false;
     $missing_child_mods = false;
@@ -499,14 +499,14 @@ function islandora_compound_cmodel($options) {
         $child_dirs = array();
         $child_object_results = array();
         $mods_path = $object_directory . DIRECTORY_SEPARATOR . 'MODS.xml';
-        $cpd_path = $object_directory . DIRECTORY_SEPARATOR . 'structure.cpd';
+        $xml_path = $object_directory . DIRECTORY_SEPARATOR . 'structure.xml';
         if (!file_exists($mods_path)) {
             $missing_object_mods = true;
             error_log($mods_path . " appears to be missing.\n", 3, $options['log']);
         }
-        if (!file_exists($cpd_path)) {
-            $missing_object_cpd = true;
-            error_log($cpd_path . " appears to be missing.\n", 3, $options['log']);
+        if (!file_exists($xml_path)) {
+            $missing_object_xml = true;
+            error_log($xml_path . " appears to be missing.\n", 3, $options['log']);
         }
         $child_dirs_pattern = $object_directory . DIRECTORY_SEPARATOR . '*';
         $child_dirs = glob($child_dirs_pattern , GLOB_ONLYDIR);
@@ -521,7 +521,7 @@ function islandora_compound_cmodel($options) {
         $all_object_files_pattern = $object_directory . DIRECTORY_SEPARATOR . '*';
         $all_object_files = glob($all_object_files_pattern);
         $total_object_files = count($all_object_files);
-        // 1 for MODS.xml and 1 for structure.cpd.
+        // 1 for MODS.xml and 1 for structure.xml.
         $total_expected_obj_files = $expected_number_of_children + 2;
         if ($total_expected_obj_files != $total_object_files) {
             $extra_object_files = true;
@@ -589,11 +589,11 @@ function islandora_compound_cmodel($options) {
         print "All objects in " . $options['dir'] . " appear to have the correct number of children.\n";
     }
 
-    if ($missing_object_cpd) {
-        print "** Some objects in ". $options['dir'] . " have missing structure.cpd files.\n";
+    if ($missing_object_xml) {
+        print "** Some objects in ". $options['dir'] . " have missing structure.xml files.\n";
     }
     else {
-        print "All objects in " . $options['dir'] . " have a structure.cpd file.\n";
+        print "All objects in " . $options['dir'] . " have a structure.xml file.\n";
     }
 
     if ($missing_child_obj) {
