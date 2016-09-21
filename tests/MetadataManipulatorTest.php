@@ -144,4 +144,38 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
         $mods = $parser->metadata('postcard_20');
         $this->assertRegExp('#Victoria,\sB\.C\.</title>#', $mods, "SimpleReplace metadata manipulator did not work");
     }
+
+    public function testFilterModsTopicMetadataManipulator()
+    {
+        $settings = array(
+            'FETCHER' => array(
+                'class' => 'Csv',
+                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
+                'temp_directory' => $this->path_to_temp_dir,
+                'record_key' => 'ID',
+                'use_cache' => false,
+            ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+                'path_to_manipulator_log' => $this->path_to_manipulator_log,
+            ),
+            'METADATA_PARSER' => array(
+                'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/sample_mappings.csv',
+            ),
+            'MANIPULATORS' => array(
+                'metadatamanipulators' => array('FilterModsTopic|subject'),
+            ),
+        );
+
+        $parser = new CsvToMods($settings);
+
+        $mods = $parser->metadata('postcard_10');
+        $dom = new \DomDocument();
+        $dom->loadxml($mods);
+        $xpath = new \DOMXPath($dom);
+        $xpath->registerNamespace('mods', "http://www.loc.gov/mods/v3");
+        $topic_elements = $xpath->query("//mods:subject/mods:topic");
+
+        $this->assertEquals($topic_elements->length, 3, "FilterModsTopic metadata manipulator did not work");
+    }
 }
