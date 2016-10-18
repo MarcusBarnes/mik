@@ -83,7 +83,7 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('#<dateIssued\sencoding="w3cdtf">1924\-12\-24</dateIssued>#', $mods,
             "NormalizeDate metadata manipulator for (\d\d\d\d)/(\d\d)/(\d\d) did not work");
 
-        // Test for matches against dates like 25/11/1925 (day first). 
+        // Test for matches against dates like 25/11/1925 (day first).
         $mods = $parser->metadata('postcard_11');
         $this->assertRegExp('#<dateIssued\sencoding="w3cdtf">1925\-11\-25</dateIssued>#', $mods,
             "NormalizeDate metadata manipulator for (\d\d\)/(\d\d)/(\d\d\d\d) did not work");
@@ -143,5 +143,56 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
 
         $mods = $parser->metadata('postcard_20');
         $this->assertRegExp('#Victoria,\sB\.C\.</title>#', $mods, "SimpleReplace metadata manipulator did not work");
+    }
+
+    public function testSplitRepeatedValuesMetadataManipulator()
+    {
+        $settings = array(
+            'FETCHER' => array(
+                'class' => 'Csv',
+                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
+                'temp_directory' => $this->path_to_temp_dir,
+                'record_key' => 'ID',
+                'use_cache' => false,
+            ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+                'path_to_manipulator_log' => $this->path_to_manipulator_log,
+            ),
+            'METADATA_PARSER' => array(
+                'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/sample_mappings.csv',
+                'repeatable_wrapper_elements' => array('name'),
+            ),
+            'MANIPULATORS' => array(
+                'metadatamanipulators' => array('SplitRepeatedValues|Subjects|/subject/topic|;'),
+            ),
+        );
+
+
+        $parser = new CsvToMods($settings);
+/*
+        $matches = array(
+            'postcard_1' => 4,
+            'postcard_2' => 3,
+            'postcard_4' => 0,
+            'postcard_2' => 2,
+        );
+
+        foreach ($matches as $id => $count) {
+            $mods = $parser->metadata($id);
+            // Load the MODS XML.
+            $dom = new \DomDocument();
+            $dom->loadxml($mods);
+            var_dump($dom);
+            $xpath = new \DOMXPath($dom);
+            $xpath->registerNamespace('mods', 'http://www.loc.gov/mods/v3');
+            // Can we get this Xpath expression from the config?
+            $topics = $xpath->query('/mods:subject/mods:topic');
+            $this->assertEquals($count, $topics->length, "Number of topics for $id is not the expected $count");
+        }
+*/
+        $mods = $parser->metadata('postcard_7');
+        $this->assertRegExp('#<topic>Streets</topic>#', $mods, "SplitRepeatedValues metadata manipulator did not work");
+        $this->assertRegExp('#<topic>Pedestrians</topic>#', $mods, "SplitRepeatedValues metadata manipulator did not work");
     }
 }
