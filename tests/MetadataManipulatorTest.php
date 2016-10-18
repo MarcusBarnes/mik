@@ -168,29 +168,8 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
             ),
         );
 
-
         $parser = new CsvToMods($settings);
-/*
-        $matches = array(
-            'postcard_1' => 4,
-            'postcard_2' => 3,
-            'postcard_4' => 0,
-            'postcard_2' => 2,
-        );
 
-        foreach ($matches as $id => $count) {
-            $mods = $parser->metadata($id);
-            // Load the MODS XML.
-            $dom = new \DomDocument();
-            $dom->loadxml($mods);
-            var_dump($dom);
-            $xpath = new \DOMXPath($dom);
-            $xpath->registerNamespace('mods', 'http://www.loc.gov/mods/v3');
-            // Can we get this Xpath expression from the config?
-            $topics = $xpath->query('/mods:subject/mods:topic');
-            $this->assertEquals($count, $topics->length, "Number of topics for $id is not the expected $count");
-        }
-*/
         $mods = $parser->metadata('postcard_7');
         $this->assertRegExp('#<topic>Streets</topic>#', $mods, "SplitRepeatedValues metadata manipulator did not work");
         $this->assertRegExp('#<topic>Pedestrians</topic>#', $mods, "SplitRepeatedValues metadata manipulator did not work");
