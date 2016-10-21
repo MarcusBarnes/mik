@@ -37,7 +37,10 @@ $cmd->option('checkconfig')
 
 $cmd->option('limit')
     ->aka('l')
-    ->describedAs('Number of objects to process.');
+    ->describedAs('Number of objects to process.')
+    ->must(function($limit_value) {
+        return is_int($limit_value);
+    });
 
 $configPath = $cmd['config'];
 
