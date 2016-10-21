@@ -1,13 +1,13 @@
 # MIK, the Move to Islandora Kit.
 
-> Important: As of commit 10d0da (Oct. 21, 2016), MIK's command syntax has changed slightly. Previously, MIK's command-line options used an equal sign (`=`) to separate the option name from its value; after commit 10d0da, options use a space instead of an equals sign.
+> Important: As of commit  72b5d88 (Oct. 21, 2016), MIK's command syntax has changed slightly. Previously, MIK's command-line options used an equal sign (`=`) to separate the option name from its value; after commit  72b5d88, options use a space instead of an equals sign.
 
 > * Before: `./mik --config=foo.ini --checkconfig=all`
 > * After: `./mik --config foo.ini --checkconfig all`
 
 ## Overview
 
-The Move to Islandora Kit (MIK) converts source content files and accompanying metadata into ingest packages used by existing Islandora batch ingest modules, [Islandora Batch](https://github.com/Islandora/islandora_batch), [Islandora Newspaper Batch](https://github.com/discoverygarden/islandora_newspaper_batch), and [Islandora Book Batch](https://github.com/Islandora/islandora_book_batch). In other words, it doesn’t import objects into Islandora, it prepares content for importing into Islandora:
+The Move to Islandora Kit (MIK) converts source content files and accompanying metadata into ingest packages used by existing Islandora batch ingest modules, [Islandora Batch](https://github.com/Islandora/islandora_batch), [Islandora Newspaper Batch](https://github.com/discoverygarden/islandora_newspaper_batch), [Islandora Book Batch](https://github.com/Islandora/islandora_book_batch), and [Islandora Compound Batch](https://github.com/MarcusBarnes/islandora_compound_batch). In other words, it doesn’t import objects into Islandora, it prepares content for importing into Islandora:
 
 ![MIK overview](https://dl.dropboxusercontent.com/u/1015702/linked_to/MIK_overview_%20general.png)
 
@@ -47,7 +47,7 @@ In a nutshell, this means create an .ini file for MIK. Details for available too
 
 To check your configuration options, run MIK and include the `--checkconfig` option with a value 'all':
 
-`./mik --config=foo.ini --checkconfig=all`
+```./mik --config foo.ini --checkconfig all```
 
 You can also check specific types of configuration values as described in this [Cookbook entry](https://github.com/MarcusBarnes/mik/wiki/Cookbook:-Check-your-MIK-configuration-values).
 
@@ -55,20 +55,20 @@ You can also check specific types of configuration values as described in this [
 
 Once you have checked your configuration options, you can run MIK to perform the data conversion:
 
-```./mik --config=foo.ini```
+```./mik --config foo.ini```
 
 On Windows, you'll need to run:
 
-```php mik --config=foo.ini```
+```php mik --config foo.ini```
 
 The `--config` option is required, but you can also add a `--limit` option if you only want to create a specific number of import packages. This option is useful for testing. For example:
 
-```./mik --config=foo.ini --limit=10```
+```./mik --config foo.ini --limit 10```
 
 Once MIK starts running, it will display its progress:
 
 ```
-./mik --config=foo.ini
+./mik --config foo.ini
 Creating 10 Islandora ingest packages. Please be patient.
 ===================================================>                          56%
 ```
@@ -101,19 +101,16 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
 
 ## Roadmap
 
-* Version 0.9 (- May 2016)
-  * Complete end-user documentation
-* Version 1.0 (May - August 2016)
-  * toolchains for books and generic compound objects
+* Version 1.0 (December 2016)
+  * toolchains for CSV books
   * developer documentation
   * code cleanup
-  * more automated tests
 
 ## Development
 
 We are focused on completing our migration in May, but once the dust settles, we welcome community development partners. Some features that would be really great to see include:
 
-* toolchains to migrate from DSpace, Bepress, and other repository platforms to Islandora
+* toolchains to migrate from DSpace and other repository platforms to Islandora
 * a toolchain to generate Hydra import packages (yes, it's called Move to Islandora Kit but it's flexible enough to create other types of ingest packages)
 * better tools for creating mappings files
 
