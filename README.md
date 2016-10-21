@@ -1,5 +1,10 @@
 # MIK, the Move to Islandora Kit.
 
+> Important: As of commit 10d0da (Oct. 21, 2016), MIK's command syntax has changed slightly. Previously, MIK's command-line options used an equal sign (`=`) to separate the option name from its value; after commit 10d0da, options use a space instead of an equals sign.
+
+> * Before: `./mik --config=foo.ini --checkconfig=all`
+> * After: `./mik --config foo.ini --checkconfig all`
+
 ## Overview
 
 The Move to Islandora Kit (MIK) converts source content files and accompanying metadata into ingest packages used by existing Islandora batch ingest modules, [Islandora Batch](https://github.com/Islandora/islandora_batch), [Islandora Newspaper Batch](https://github.com/discoverygarden/islandora_newspaper_batch), and [Islandora Book Batch](https://github.com/Islandora/islandora_book_batch). In other words, it doesn’t import objects into Islandora, it prepares content for importing into Islandora:
@@ -32,7 +37,7 @@ Instructions are [available on the wiki](https://github.com/MarcusBarnes/mik/wik
 
 ## Usage
 
-Typical workflow is to 1) configure your toolchain (defined below) by creating an .ini file, 2) check your configuration options and then 3) run MIK to perform the conversion of your source content into Islandora ingest packages. When MIK finishes running, you can import your content into Islandora using [Islandora Batch](https://github.com/Islandora/islandora_batch), [Islandora Newspaper Batch](https://github.com/discoverygarden/islandora_newspaper_batch), or [Islandora Book Batch](https://github.com/Islandora/islandora_book_batch). 
+Typical workflow is to 1) configure your toolchain (defined below) by creating an .ini file, 2) check your configuration options and then 3) run MIK to perform the conversion of your source content into Islandora ingest packages. When MIK finishes running, you can import your content into Islandora using [Islandora Batch](https://github.com/Islandora/islandora_batch), [Islandora Newspaper Batch](https://github.com/discoverygarden/islandora_newspaper_batch), or [Islandora Book Batch](https://github.com/Islandora/islandora_book_batch).
 
 ### 1. Configure your toolchain
 
@@ -42,7 +47,7 @@ In a nutshell, this means create an .ini file for MIK. Details for available too
 
 To check your configuration options, run MIK and include the `--checkconfig` option with a value 'all':
 
-* `./mik --config=foo.ini --checkconfig=all`
+`./mik --config=foo.ini --checkconfig=all`
 
 You can also check specific types of configuration values as described in this [Cookbook entry](https://github.com/MarcusBarnes/mik/wiki/Cookbook:-Check-your-MIK-configuration-values).
 
@@ -76,7 +81,7 @@ And you're done. In practice, you probably want to do some quality assurance on 
 
 ## Current status
 
-Until April 2016, when our migration from CONTENTdm to Islandora will be complete, we will be working on the 0.9 release of MIK. We aim for a 1.0 release of MIK in the summer of 2016. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is already being used in production. 
+Until April 2016, when our migration from CONTENTdm to Islandora will be complete, we will be working on the 0.9 release of MIK. We aim for a 1.0 release of MIK in the summer of 2016. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is already being used in production.
 
 So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, file getters, etc.) for creating Islandora import packages from the following:
 
@@ -97,7 +102,7 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
 ## Roadmap
 
 * Version 0.9 (- May 2016)
-  * Complete end-user documentation 
+  * Complete end-user documentation
 * Version 1.0 (May - August 2016)
   * toolchains for books and generic compound objects
   * developer documentation
