@@ -18,6 +18,7 @@
         "caseyamcl/phpoaipmh": "~2.0",
         "guzzlehttp/guzzle": "~6.0",
         "ramsey/uuid": "~3.0",
-        "cocur/background-process": "^0.5.0"
+        "cocur/background-process": "^0.5.0",
+        "nategood/commando": "*"
     }
 }
