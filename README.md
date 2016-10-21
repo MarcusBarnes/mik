@@ -37,7 +37,7 @@ Instructions are [available on the wiki](https://github.com/MarcusBarnes/mik/wik
 
 ## Usage
 
-Typical workflow is to 1) configure your toolchain (defined below) by creating an .ini file, 2) check your configuration options and then 3) run MIK to perform the conversion of your source content into Islandora ingest packages. When MIK finishes running, you can import your content into Islandora using [Islandora Batch](https://github.com/Islandora/islandora_batch), [Islandora Newspaper Batch](https://github.com/discoverygarden/islandora_newspaper_batch), or [Islandora Book Batch](https://github.com/Islandora/islandora_book_batch).
+Typical workflow is to 1) configure your toolchain (defined below) by creating an .ini file, 2) check your configuration options and then 3) run MIK to perform the conversion of your source content into Islandora ingest packages. When MIK finishes running, you can import your content into Islandora using [Islandora Batch](https://github.com/Islandora/islandora_batch), [Islandora Newspaper Batch](https://github.com/discoverygarden/islandora_newspaper_batch), [Islandora Book Batch](https://github.com/Islandora/islandora_book_batch), or [Islandora Compound Batch](https://github.com/MarcusBarnes/islandora_compound_batch).
 
 ### 1. Configure your toolchain
 
@@ -102,7 +102,7 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
 ## Roadmap
 
 * Version 1.0 (December 2016)
-  * toolchains for CSV books
+  * toolchain for CSV books
   * developer documentation
   * code cleanup
 
