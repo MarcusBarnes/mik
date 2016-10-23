@@ -27,15 +27,15 @@ class OaiToDc extends Dc
      */
     public function createDcXML($MappingArray, $objectInfo)
     {
-        // Pass $objectInfo through XSLT here?
-        $xsl_doc = new \DOMDocument();
-        $xsl_doc->load($this->xsltPath);
         $xml_doc = new \DOMDocument();
         $xml_doc->loadXML($objectInfo);
-        $xslt_proc = new \XSLTProcessor();
-        $xslt_proc->importStylesheet($xsl_doc);
-        $dc_xml = $xslt_proc->transformToXML($xml_doc);
-        
+        $xpath = new \DOMXPath($xml_doc);
+        $xpath->registerNamespace("oai","http://www.openarchives.org/OAI/2.0/");
+        $xpath->registerNamespace("oai_dc","http://www.openarchives.org/OAI/2.0/oai_dc/");
+        $result = $xpath->query('//oai:metadata/*', $xml_doc);
+        $dc_xml_nodelist = $result->item(0);
+        $dc_xml = $xml_doc->saveXML($dc_xml_nodelist);
+
         if (!is_null($this->metadatamanipulators)) {
             $dc_xml = $this->applyMetadatamanipulators($dc_xml, $record_key);
         }
@@ -49,7 +49,7 @@ class OaiToDc extends Dc
      *        not snippets.
      *
      * Applies metadatamanipulators listed in the config to provided XML snippet.
-     * @param string $xmlSnippet 
+     * @param string $xmlSnippet
      *     An XML snippet that can be turned into a valid XML document.
      * @return string
      *     XML snippet as string that whose nodes have been manipulated if applicable.

@@ -12,12 +12,12 @@ class Oaipmh extends Writer
      * @var array $settings - configuration settings from confugration class.
      */
     public $settings;
-    
+
     /**
      * @var object $fetcher - Fetcher registered in .ini file.
      */
     private $fetcher;
-    
+
     /**
      * @var object File getter registered in .ini file.
      */
@@ -104,5 +104,5 @@ class Oaipmh extends Writer
             }
         }
     }
-    
+
 }
