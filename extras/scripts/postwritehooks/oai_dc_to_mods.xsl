@@ -82,8 +82,7 @@
 <!-- dc:format is ambiguous, since it could map to one of physicalDescription/internetMediaType
      or physicalDescription/extent.  -->
 
-<!-- dc:relation is too general to map to the detailed subelements of mods:relatedItem. Therefore,
-     we don't copy it to output document but we do log its presence. -->
+<!-- dc:relation is too general to map to the detailed subelements of mods:relatedItem. -->
 
 <!-- dc:coverage is ambiguous, since it could map to subject/geographic or subject/temporal. -->
 

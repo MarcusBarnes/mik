@@ -56,7 +56,8 @@ class Oaipmh extends Writer
         // folder using the filename or record_id identifier
         $source_file_url = $this->fileGetter->getFilePath($record_id);
 
-        $metadata_file_path = $output_path . $record_id . '.xml';
+        $normalized_record_id = $this->normalizeFilename($record_id);
+        $metadata_file_path = $output_path . $normalized_record_id . '.xml';
 
         $this->writeMetadataFile($metadata, $metadata_file_path, true);
 
@@ -74,7 +75,7 @@ class Oaipmh extends Writer
             list($type, $extension) = explode('/', $content_types[0]);
             $extension = preg_replace('/;.*$/', '', $extension);
 
-            $content_file_path = $output_path . $record_id . '.' . $extension;
+            $content_file_path = $output_path . $normalized_record_id . '.' . $extension;
 
             $body = $response->getBody();
             while (!$body->eof()) {
@@ -103,6 +104,16 @@ class Oaipmh extends Writer
                     array('file' => $path));
             }
         }
+    }
+
+    /**
+     * Convert %3A (:) in filenames into underscores (_).
+     */
+    public function normalizeFilename($string)
+    {
+        $string = urldecode($string);
+        $string = preg_replace('/:/', '_', $string);
+        return $string;
     }
 
 }
