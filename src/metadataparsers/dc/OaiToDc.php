@@ -13,7 +13,6 @@ class OaiToDc extends Dc
     {
         parent::__construct($settings);
         $this->fetcher = new \mik\fetchers\Oaipmh($settings);
-        $this->xsltPath = $this->settings['METADATA_PARSER']['xslt_path'];
 
         if (isset($this->settings['MANIPULATORS']['metadatamanipulators'])) {
             $this->metadatamanipulators = $this->settings['MANIPULATORS']['metadatamanipulators'];
