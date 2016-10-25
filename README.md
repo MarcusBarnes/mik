@@ -2,8 +2,10 @@
 
 > Important: As of commit  72b5d88 (Oct. 21, 2016), MIK's command syntax has changed slightly. Previously, MIK's command-line options used an equal sign (`=`) to separate the option name from its value; after commit  72b5d88, options use a space instead of an equals sign.
 
-> * Before: `./mik --config=foo.ini --checkconfig=all`
-> * After: `./mik --config foo.ini --checkconfig all`
+> * Before: `./mik --config=foo.ini --checkconfig=all --limit=10`
+> * After: `./mik --config foo.ini --checkconfig all --limit 10`
+
+> This change also introduces short forms of the options, e.g., `./mik -c foo.ini -l 10`
 
 ## Overview
 
@@ -108,11 +110,12 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
 
 ## Development
 
-We are focused on completing our migration in May, but once the dust settles, we welcome community development partners. Some features that would be really great to see include:
+We welcome community development partners. Some features that would be really great to see include:
 
-* toolchains to migrate from DSpace and other repository platforms to Islandora
-* a toolchain to generate Hydra import packages (yes, it's called Move to Islandora Kit but it's flexible enough to create other types of ingest packages)
+* a graphical user interface on top of MIK
 * better tools for creating mappings files
+* toolchains to migrate from DSpace and other repository platforms to Islandora (the OAI-PMH toolchain may already cover DSpace - testers welcome)
+* a toolchain to generate Hydra import packages (yes, it's called Move to Islandora Kit but it's flexible enough to create other types of ingest packages and we'd love to collaborate with some Hydra friends)
 
 MIK is designed to be extensible. If you have an idea for a useful manipulator or post-write hook script, please let us know.
 
