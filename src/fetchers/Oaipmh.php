@@ -84,7 +84,6 @@ class Oaipmh extends Fetcher
     */
     public function getRecords($limit = null)
     {
-        // Use a static cache to avoid reading the CSV file multiple times.
         static $filtered_records;
         if (!isset($filtered_records) || $this->use_cache == false) {
             $client = new \Phpoaipmh\Client($this->endpoint);
@@ -93,22 +92,22 @@ class Oaipmh extends Fetcher
             foreach($records as $rec) {
                 $identifier = urlencode($rec->header->identifier);
                 file_put_contents($this->tempDirectory . DIRECTORY_SEPARATOR . $identifier . '.metadata', $rec->asXML());
-                // @todo: MIK expects each record to be an object with a ->key property.
+                // MIK expects each record to be an object with a ->key property.
                 $record = new \stdClass();
                 $record->key = $identifier;
                 $filtered_records[] = $record;
             }
 
-/*
-            if ($this->fetchermanipulators) {
-                $filtered_records = $this->applyFetchermanipulators($records);
+            if (!is_null($limit)) {
+                $filtered_records = array_slice($filtered_records, 0, $limit, true);
             }
-            else {
-                $filtered_records = $records;
+
+            // Unlike other fetchers, we apply manipulators to $filtered_records,
+            // not $records.
+            if (count($this->fetchermanipulators)) {
+                $filtered_records = $this->applyFetchermanipulators($filtered_records);
             }
-*/
         }
-        // $filtered_records = $records;
         return $filtered_records;
     }
 
@@ -145,9 +144,11 @@ class Oaipmh extends Fetcher
     }
 
     /**
-     * @note: This function is copied from the CSV fetcher.
-     * 
      * Applies the fetchermanipulator listed in the config.
+     *
+     * @note: Each member of $records contains only an identifier. Therefore,
+     *     OAI-PMH toolchain fetcher manipulators will need to retrieve the full
+     *     record in order to inspect the contents of the OAI-PMH records.
      */
     private function applyFetchermanipulators($records)
     {
