@@ -41,6 +41,17 @@ class Oaipmh extends Writer
         } else {
             $this->httpTimeout = 60;
         }
+
+        // Default Mac PHP setups may use Apple's Secure Transport
+        // rather than OpenSSL, causing issues with CA verification.
+        // Allow configuration override of CA verification at users own risk.
+        if (isset($this->settings['SYSTEM']['verify_ca']) ){
+            if($this->settings['SYSTEM']['verify_ca'] == false){
+              $this->verifyCA = false;
+            }
+        } else {
+            $this->verifyCA = true;
+        }
     }
 
     /**
@@ -67,7 +78,8 @@ class Oaipmh extends Writer
             $response = $client->get($source_file_url,
                 ['stream' => true,
                 'timeout' => $this->httpTimeout,
-                'connect_timeout' => $this->httpTimeout]
+                'connect_timeout' => $this->httpTimeout,
+                'verify' => $this->verifyCA]
             );
 
             // Lazy MimeType => extension mapping: use the last part of the MimeType.
