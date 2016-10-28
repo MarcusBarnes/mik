@@ -54,6 +54,7 @@ class Config
                 $this->checkAliases();
                 $this->checkInputDirectories();
                 $this->checkUrls();
+                $this->checkCsvFile();
                 exit;
                 break;
             case 'snippets':
@@ -77,10 +78,12 @@ class Config
                 $this->checkInputDirectories();
                 exit;
                 break;
+            case 'csv';
+                $this->checkCsvFile();
+                exit;
+                break;
             default:
-                $message = "Sorry, $type is not an allowed value for --checkconfig. " .
-                    "Allowed values are 'snippets', 'urls', 'paths', 'aliases', 'input_directories', or 'all'.\n";
-                exit($message);
+                exit;
         }
     }
 
@@ -91,7 +94,7 @@ class Config
     {
         $fetchers = array('Cdm', 'Csv');
         if (!in_array($this->settings['FETCHER']['class'], $fetchers)) {
-            return; 
+            return;
         }
 
         ini_set('display_errors', false);
@@ -225,8 +228,8 @@ class Config
             print "CONTENTdm aliases are OK\n";
         }
     }
-    
-    /** 
+
+    /**
      * Checks for the existance of input_directories.
      *
      * See https://github.com/MarcusBarnes/mik/issues/169
@@ -250,10 +253,10 @@ class Config
                     exit("Error: Can't find input directory $input_directory\n");
                 }
             }
-        
+
             print "Input directory paths are OK.\n";
         }
-        
+
         // For Csv toolchains, where a single input directory is allowed.
         $filegetters = array('CsvSingleFile', 'CsvNewspapers');
         if (in_array($this->settings['FILE_GETTER']['class'], $filegetters)) {
@@ -269,9 +272,62 @@ class Config
             if (!file_exists(realpath($input_directory))) {
                 exit("Error: Can't find input directory $input_directory\n");
             }
-        
+
             print "Input directory paths are OK.\n";
         }
      }
+
+    /**
+     * Tests whether the CSV input file is valid.
+     */
+    public function checkCsvFile()
+    {
+        // This check applies only to CSV toolchains.
+        if ($this->settings['FETCHER']['class'] != 'Csv') {
+            return;
+        }
+
+        $csv_has_errors = false;
+
+        try {
+            $reader = Reader::createFromPath($this->settings['FETCHER']['input_file']);
+        } catch (Exception $re) {
+            $csv_has_errors = true;
+            print "Error creating CSV reader: " . $re->getMessage() . PHP_EOL;
+        }
+
+        // Fetch header row and make sure columns are unique.
+        $header = $reader->fetchOne();
+        $num_header_columns = count($header);
+        foreach ($header as $header_value) {
+            if (!strlen($header_value)) {
+                $csv_has_errors = true;
+                print "Error with CSV input file: it appears that one or more header labels are blank." . PHP_EOL;
+            }
+        }
+
+        $header_values = array_unique($header);
+        if (count($header_values) != $num_header_columns) {
+            $csv_has_errors = true;
+            print "Error with CSV input file: it appears that the column headers are not unique." . PHP_EOL;
+        }
+
+        // Fetch each row and make sure that it contains the correct number of columns.
+        $rows = $reader->fetch();
+        $row_num = 0;
+        foreach ($rows as $row) {
+            $row_num++;
+            $columns_in_row = count($row);
+            if ($columns_in_row != $num_header_columns) {
+                $csv_has_errors = true;
+                print "Error with CSV input file: it appears that row $row_num does not have " .
+                    "the same number of colums ($columns_in_row) as the header row ($num_header_columns)." . PHP_EOL;
+            }
+        }
+
+        if (!$csv_has_errors) {
+            print "CSV input file appears to be OK.". PHP_EOL;
+        }
+    }
 
 }
