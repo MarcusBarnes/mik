@@ -37,6 +37,17 @@ class AddContentdmData extends MetadataManipulator
         $this->record_key = $record_key;
         $this->alias = $this->settings['METADATA_PARSER']['alias'];
 
+        // Default Mac PHP setups may use Apple's Secure Transport
+        // rather than OpenSSL, causing issues with CA verification.
+        // Allow configuration override of CA verification at users own risk.
+        if (isset($this->settings['SYSTEM']['verify_ca']) ){
+            if($this->settings['SYSTEM']['verify_ca'] == false){
+              $this->verifyCA = false;
+            }
+        } else {
+            $this->verifyCA = true;
+        }
+
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
         $this->log = new \Monolog\Logger('config');
@@ -196,7 +207,7 @@ class AddContentdmData extends MetadataManipulator
               $cdm_api_function . '/' . $this->alias . '/' . $pointer . '/' . $format;
           $client = new Client();
           try {
-              $response = $client->get($url);
+              $response = $client->get($url, [$this->verifyCA]);
           } catch (Exception $e) {
               $this->log->addInfo("AddContentdmData",
                   array('HTTP request error' => $e->getMessage()));

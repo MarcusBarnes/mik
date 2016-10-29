@@ -66,6 +66,17 @@ class CdmNewspapers extends FileGetter
             $this->settings['http_timeout'] = 60;
         }
 
+        // Default Mac PHP setups may use Apple's Secure Transport
+        // rather than OpenSSL, causing issues with CA verification.
+        // Allow configuration override of CA verification at users own risk.
+        if (isset($settings['SYSTEM']['verify_ca']) ){
+            if($settings['SYSTEM']['verify_ca'] == false){
+              $this->verifyCA = false;
+            }
+        } else {
+            $this->verifyCA = true;
+        }
+
         if (isset($this->settings['allowed_file_extensions_for_OBJ'])) {
             $this->allowed_file_extensions_for_OBJ = $this->settings['allowed_file_extensions_for_OBJ'];
         }
@@ -112,7 +123,8 @@ class CdmNewspapers extends FileGetter
         try {
             $response = $client->get($query_url,
                 ['timeout' => $this->settings['http_timeout'], 
-                'connect_timeout' => $this->settings['http_timeout']]
+                'connect_timeout' => $this->settings['http_timeout'],
+                'verify' => $this->verifyCA]
             );
             $item_structure = $response->getBody();
             $item_structure = json_decode($item_structure, true);
@@ -235,7 +247,8 @@ class CdmNewspapers extends FileGetter
             $client = new Client();
             $response = $client->get($get_image_url_thumbnail,
                 ['timeout' => $this->settings['http_timeout'],
-                'connect_timeout' => $this->settings['http_timeout']]
+                'connect_timeout' => $this->settings['http_timeout'],
+                'verify' => $this->verifyCA]
             );
             $thumbnail_content = $response->getBody();
         }
@@ -266,7 +279,8 @@ class CdmNewspapers extends FileGetter
         try {
             $response = $client->get($get_image_url_jpg,
                 ['timeout' => $this->settings['http_timeout'],
-                'connect_timeout' => $this->settings['http_timeout']]
+                'connect_timeout' => $this->settings['http_timeout'],
+                'verify' => $this->verifyCA]
             );
             $jpg_content = $response->getBody();
             return $jpg_content;
@@ -291,7 +305,8 @@ class CdmNewspapers extends FileGetter
         try {
             $response = $client->get($get_file_url,
                 ['timeout' => $this->settings['http_timeout'],
-                'connect_timeout' => $this->settings['http_timeout']]
+                'connect_timeout' => $this->settings['http_timeout'],
+                'verify' => $this->verifyCA]
             );
             $content = $response->getBody();
             return $content;
