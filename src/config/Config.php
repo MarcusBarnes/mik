@@ -31,6 +31,17 @@ class Config
         $this->logStreamHandler= new \Monolog\Handler\StreamHandler($this->pathToLog, Logger::INFO);
         $this->log->pushHandler($this->logStreamHandler);
 
+        // Default Mac PHP setups may use Apple's Secure Transport
+        // rather than OpenSSL, causing issues with CA verification.
+        // Allow configuration override of CA verification at users own risk.
+        if (isset($this->settings['SYSTEM']['verify_ca']) ){
+            if($this->settings['SYSTEM']['verify_ca'] == false){
+              $this->verifyCA = false;
+            }
+        } else {
+            $this->verifyCA = true;
+        }
+
         if (count($this->settings['CONFIG'])) {
             foreach ($this->settings['CONFIG'] as $config => $value) {
                 $this->log->addInfo("MIK Configuration", array($config => $value));
@@ -139,7 +150,7 @@ class Config
                         $value .= 'getthumbnail';
                     }
                     try {
-                        $response = $client->get($value);
+                        $response = $client->get($value, ['verify' => $this->verifyCA]);
                         $code = $response->getStatusCode();
                     }
                     catch (RequestException $e) {

@@ -41,6 +41,17 @@ class CdmByDmDate extends FetcherManipulator
         $this->alias = $settings['FETCHER']['alias'];
         $this->ws_url = $settings['FETCHER']['ws_url'];
 
+        // Default Mac PHP setups may use Apple's Secure Transport
+        // rather than OpenSSL, causing issues with CA verification.
+        // Allow configuration override of CA verification at users own risk.
+        if (isset($this->settings['SYSTEM']['verify_ca']) ){
+            if($this->settings['SYSTEM']['verify_ca'] == false){
+              $this->verifyCA = false;
+            }
+        } else {
+            $this->verifyCA = true;
+        }
+
         parent::__construct();
     }
 
@@ -117,7 +128,7 @@ class CdmByDmDate extends FetcherManipulator
             $pointer . '/json';
         // Create a new Guzzle client to fetch the CPD (stucture)   file.
         $client = new Client();
-        $response = $client->get($query_url);
+        $response = $client->get($query_url, ['verify' => $this->verifyCA]);
         $body = $response->getBody();
         $dmmodified = json_decode($body, true);
         return $dmmodified[0];

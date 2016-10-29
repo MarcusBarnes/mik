@@ -40,6 +40,17 @@ class CdmCompound extends FileGetter
             $this->settings['http_timeout'] = 60;
         }
 
+        // Default Mac PHP setups may use Apple's Secure Transport
+        // rather than OpenSSL, causing issues with CA verification.
+        // Allow configuration override of CA verification at users own risk.
+        if (isset($settings['SYSTEM']['verify_ca']) ){
+            if($settings['SYSTEM']['verify_ca'] == false){
+              $this->verifyCA = false;
+            }
+        } else {
+            $this->verifyCA = true;
+        }
+
         // Set up logger.
         $this->pathToLog = $settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('CdmPhpDocuments filegetter');
@@ -93,7 +104,8 @@ class CdmCompound extends FileGetter
         try {
             $response = $client->get($query_url,
                 ['timeout' => $this->settings['http_timeout'],
-                'connect_timeout' => $this->settings['http_timeout']]
+                'connect_timeout' => $this->settings['http_timeout'],
+                'verify' => $this->verifyCA]
             );
             $item_structure = $response->getBody();
         }
