@@ -4,7 +4,7 @@
  * Example writer class to demonstrate how to create something other
  * than packages using MODS or DC.
  *
- * For demonstration purposes only - not intended for production.
+ * Intended for demonstration purposes only, not for production.
  */
 
 
@@ -85,9 +85,8 @@ class CsvSingleFileJson extends Writer
         // Do not overwrite if source and content file paths match
         $enforce_metadata_only = $source_file_path == $content_file_path;
 
-        $MODS_expected = in_array('MODS', $this->datastreams);
-        $DC_expected = in_array('DC', $this->datastreams);
-        if ($MODS_expected xor $DC_expected xor $no_datastreams_setting_flag) {
+        $JSON_expected = in_array('JSON', $this->datastreams);
+        if ($JSON_expected xor $no_datastreams_setting_flag) {
             $metadata_file_path = $output_path . $identifier . '.json';
             // The default is to overwrite the metadata file.
             if ($this->overwrite_metadata_files) {
@@ -106,7 +105,7 @@ class CsvSingleFileJson extends Writer
         }
 
         // Note that since the datastream ID of the file being copied varies,
-        // we can't specify one here like we do for MODS or OBJ. This means
+        // we can't specify one here like we do for JSON or OBJ. This means
         // that we only write the file if no datastream IDs are specified in the
         // datastreams[] configuration option.
         if ($no_datastreams_setting_flag) {

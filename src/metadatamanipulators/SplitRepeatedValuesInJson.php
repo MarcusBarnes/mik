@@ -3,9 +3,10 @@
 
 /**
  * Example metadata manipulator class that demonstrates manipulating
- * data that is not XML.
+ * JSON metadata.
  *
- * Doesn't support metadata manipulators, since it's just a demonstration.
+ * Applies to the demonstration CsvToJson toolchain only. Not intended for production.
+ * 
  */
 
 namespace mik\metadatamanipulators;

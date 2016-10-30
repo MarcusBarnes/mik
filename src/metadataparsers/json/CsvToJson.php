@@ -5,7 +5,7 @@
  * Example metadata parser class to demonstrate how to create something other
  * than MODS or DC metadata.
  *
- * Doesn't support metadata manipulators, since it's just a demonstration.
+ * Intended for demonstration purposes only, not for production.
  */
 
 namespace mik\metadataparsers\json;
