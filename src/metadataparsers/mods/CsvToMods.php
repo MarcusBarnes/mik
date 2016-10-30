@@ -119,7 +119,7 @@ class CsvToMods extends Mods
                 $pattern = '/%value%/';
                 $xmlSnippet = preg_replace($pattern, $fieldValue, $xmlSnippet);
                 if (isset($this->metadatamanipulators)) {
-                    $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $record_key);
+                    $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $record_key, $csvFieldName);
                 }
 
                 $modsOpeningTag .= $xmlSnippet;
@@ -429,10 +429,15 @@ class CsvToMods extends Mods
      * Applies metadatamanipulators listed in the config to provided XML snippet.
      * @param string $xmlSnippet 
      *     An XML snippet that can be turned into a valid XML document.
+     * @param string $record_key
+     *     The item's record key value.
+     * @param string $field_name
+     *     The field name of the current field.
+     *
      * @return string
      *     XML snippet as string that whose nodes have been manipulated if applicable.
      */
-    private function applyMetadatamanipulators($xmlSnippet, $record_key)
+    private function applyMetadatamanipulators($xmlSnippet, $record_key, $field_name)
     {
         foreach ($this->metadatamanipulators as $metadatamanipulator) {
             $metadatamanipulatorClassAndParams = explode('|', $metadatamanipulator);
@@ -440,6 +445,7 @@ class CsvToMods extends Mods
             $manipulatorParams = $metadatamanipulatorClassAndParams;
             $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
             $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams,  $record_key);
+            $metadatamanipulator->fieldName = $field_name;
             $xmlSnippet = $metadatamanipulator->manipulate($xmlSnippet);
         }
 
