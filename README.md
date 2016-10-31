@@ -11,7 +11,7 @@
 
 The Move to Islandora Kit (MIK) converts source content files and accompanying metadata into ingest packages used by existing Islandora batch ingest modules, [Islandora Batch](https://github.com/Islandora/islandora_batch), [Islandora Newspaper Batch](https://github.com/discoverygarden/islandora_newspaper_batch), [Islandora Book Batch](https://github.com/Islandora/islandora_book_batch), and [Islandora Compound Batch](https://github.com/MarcusBarnes/islandora_compound_batch). In other words, it doesn’t import objects into Islandora, it prepares content for importing into Islandora:
 
-![MIK overview](https://dl.dropboxusercontent.com/u/1015702/linked_to/MIK_overview_%20general.png)
+![MIK overview](https://dl.dropboxusercontent.com/u/1015702/linked_to/MIK_overview_general.png)
 
 MIK is designed to be extensible. The base classes that convert the source metadata to XML files for importing into Islandora, and that convert the source content files into the required directory structure for importing, can be subclassed easily. MIK also uses plugins (known as "manipulators") and a set of "hook" scripts that allow functionality that can be turned off or on for specific jobs.
 
