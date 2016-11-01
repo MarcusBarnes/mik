@@ -18,11 +18,6 @@ class CsvSingleFileJson extends Writer
     public $settings;
     
     /**
-     * @var object $fetcher - fetcher class for item info methods.
-     */
-    private $fetcher;
-    
-    /**
      * @var object cdmPhpDocumentsFileGetter - filegetter class for 
      * getting files related to CDM PHP documents.
      */
@@ -35,7 +30,6 @@ class CsvSingleFileJson extends Writer
     public function __construct($settings)
     {
         parent::__construct($settings);
-        $this->fetcher = new \mik\fetchers\Cdm($settings);
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
         $this->output_directory = $settings['WRITER']['output_directory'];
