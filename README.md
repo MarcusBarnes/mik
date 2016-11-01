@@ -23,7 +23,7 @@ We are continuing to improve our documentation, which is on the [MIK wiki](https
 
 ## Troubleshooting and support
 
-If you have a question, please open a Github issue.
+If you have a question, please [open an issue](https://github.com/MarcusBarnes/mik/issues)
 
 ## Islandora content that has been prepared using MIK
 
@@ -83,7 +83,7 @@ And you're done. In practice, you probably want to do some quality assurance on 
 
 ## Current status
 
-Until April 2016, when our migration from CONTENTdm to Islandora will be complete, we will be working on the 0.9 release of MIK. We aim for a 1.0 release of MIK in the summer of 2016. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is already being used in production.
+Until April 2016, when our migration from CONTENTdm to Islandora will be complete, we will be working on what we call the 0.9 release of MIK. We aim for a 1.0 release of MIK in January 2017. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is already being used in production.
 
 So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, file getters, etc.) for creating Islandora import packages from the following:
 
@@ -103,21 +103,23 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
 
 ## Roadmap
 
-* Version 1.0 (December 2016)
+* Version 1.0 (January 2017)
   * toolchain for CSV books
   * developer documentation
   * code cleanup
+  * more tests
 
 ## Development
 
 We welcome community development partners. Some features that would be really great to see include:
 
 * a graphical user interface on top of MIK
-* better tools for creating mappings files
+* tools for creating mappings files
 * toolchains to migrate from DSpace and other repository platforms to Islandora (the OAI-PMH toolchain may already cover DSpace - testers welcome)
 * a toolchain to generate Hydra import packages (yes, it's called Move to Islandora Kit but it's flexible enough to create other types of ingest packages and we'd love to collaborate with some Hydra friends)
+  * we have a sample CsvToJson toolchain that demonstrates that it's possible to write out packages that differ from those Islandora uses
 
 MIK is designed to be extensible. If you have an idea for a useful manipulator or post-write hook script, please let us know.
 
-README_DEV.md contains some inforation on coding standards, etc.
+README_DEV.md contains some information on coding standards, etc.
 
