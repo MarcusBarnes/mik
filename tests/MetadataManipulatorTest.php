@@ -2,6 +2,8 @@
 
 namespace mik\metadataparsers\mods;
 
+use DoctrineTest\InstantiatorTestAsset\XMLReaderAsset;
+
 class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -166,11 +168,18 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
             ),
         );
 
-        $expected = '<name authority="local" type="personal"><role><roleTerm authority="marcRelator" type="text">Artist</roleTerm></role><namePart>Ortiz-Palacios, Guillermo</namePart></name>';
+        $name_element = <<<XML
+  <name authority="local" type="personal">
+    <role>
+      <roleTerm authority="marcRelator" type="text">Artist</roleTerm>
+    </role>
+    <namePart>Ortiz-Palacios, Guillermo</namePart>
+  </name>
+XML;
 
         $parser = new CsvToMods($settings);
         $mods = $parser->metadata('1');
 
-        $this->assertRegExp($expected, $mods, "InsertXMLFromTemplate metadata manipulator failed");
+        $this->assertContains($name_element, $mods, "InsertXMLFromTemplate metadata manipulator failed");
     }
 }
