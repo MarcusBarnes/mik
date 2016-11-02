@@ -1,0 +1,1 @@
+<name authority="local" type="personal">{% if CreatorRole %}<role><roleTerm authority="marcRelator" type="text">{{ CreatorRole }}</roleTerm></role>{% endif %}<namePart>{{ CreatorName }}</namePart></name>

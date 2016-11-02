@@ -1,0 +1,3 @@
+Title,<titleInfo><title>%value%</title></titleInfo>
+DateIssued,<originInfo><dateIssued>%value%</dateIssued></originInfo>
+CreatorName,<comment>THIS WILL BE REPLACED BY InsertXmlFromTemplate|CreatorName</comment>
