@@ -2,8 +2,6 @@
 
 namespace mik\metadataparsers\mods;
 
-use DoctrineTest\InstantiatorTestAsset\XMLReaderAsset;
-
 class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
 {
 
