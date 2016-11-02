@@ -181,7 +181,7 @@ class CdmToMods extends Mods
                 $stringToReplace = '%value%';
                 $xmlSnippet = str_replace($stringToReplace, $fieldValue, $xmlSnippet);
                 if (isset($this->metadatamanipulators)) {
-                    $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $pointer);
+                    $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $pointer, $CONTENTdmField);
                 }
                 $modsOpeningTag .= $xmlSnippet;
             } else {
@@ -239,18 +239,16 @@ class CdmToMods extends Mods
         }
 
         if (isset($this->metadatamanipulators)) {
-            $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $page_pointer);
+            $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $page_pointer, '');
             $modsOpeningTag .= $xmlSnippet;
         }
 
         if (in_array('AddUuidToMods', $this->metadatamanipulators)) {
-            
             $xmlSnippet = "<identifier type='uuid'/>";
             // Add the abililty to apply known metadata manipulator when conditionally used?
-            $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $page_pointer);
+            $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $page_pointer, '');
             $modsOpeningTag .= $xmlSnippet;
         }
-        
 
         $modsString = $modsOpeningTag . '</mods>';
 
@@ -537,10 +535,15 @@ class CdmToMods extends Mods
      * Applies metadatamanipulators listed in the config to provided XML snippet.
      * @param string $xmlSnippet
      *     An XML snippet that can be turned into a valid XML document.
+     * @param string $record_key
+     *     The item's record key value.
+     * @param string $field_name
+     *     The field name of the current field.
+     *
      * @return string
      *     XML snippet as string that whose nodes have been manipulated if applicable.
      */
-    private function applyMetadatamanipulators($xmlSnippet, $record_key)
+    private function applyMetadatamanipulators($xmlSnippet, $record_key, $field_name)
     {
         foreach ($this->metadatamanipulators as $metadatamanipulator) {
             $metadatamanipulatorClassAndParams = explode('|', $metadatamanipulator);
@@ -548,6 +551,7 @@ class CdmToMods extends Mods
             $manipulatorParams = $metadatamanipulatorClassAndParams;
             $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
             $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams, $record_key);
+            $metadatamanipulator->fieldName = $field_name;
             $xmlSnippet = $metadatamanipulator->manipulate($xmlSnippet);
         }
 

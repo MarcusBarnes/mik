@@ -144,4 +144,40 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
         $mods = $parser->metadata('postcard_20');
         $this->assertRegExp('#Victoria,\sB\.C\.</title>#', $mods, "SimpleReplace metadata manipulator did not work");
     }
+
+    public function testInsertXMLFromTemplateManipulator() {
+        $settings = array(
+            'FETCHER' => array(
+                'class' => 'Csv',
+                'input_file' => dirname(__FILE__) . '/assets/csv/insertxmlfromtemplate/metadata.csv',
+                'temp_directory' => $this->path_to_temp_dir,
+                'record_key' => 'Identifier',
+                'use_cache' => false,
+            ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+                'path_to_manipulator_log' => $this->path_to_manipulator_log,
+            ),
+            'METADATA_PARSER' => array(
+                'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/insertxmlfromtemplate/mapping.csv',
+            ),
+            'MANIPULATORS' => array(
+                'metadatamanipulators' => array('InsertXmlFromTemplate|CreatorName|' . dirname(__FILE__) . '/assets/csv/insertxmlfromtemplate/creator.twg'),
+            ),
+        );
+
+        $name_element = <<<XML
+  <name authority="local" type="personal">
+    <role>
+      <roleTerm authority="marcRelator" type="text">Artist</roleTerm>
+    </role>
+    <namePart>Ortiz-Palacios, Guillermo</namePart>
+  </name>
+XML;
+
+        $parser = new CsvToMods($settings);
+        $mods = $parser->metadata('1');
+
+        $this->assertContains($name_element, $mods, "InsertXMLFromTemplate metadata manipulator failed");
+    }
 }
