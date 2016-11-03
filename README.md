@@ -1,4 +1,4 @@
-# MIK, the Move to Islandora Kit.
+# MIK, the Move to Islandora Kit. [![Build Status](https://travis-ci.org/MarcusBarnes/mik.png?branch=master)](https://travis-ci.org/MarcusBarnes/mik)
 
 > Important: As of commit  72b5d88 (Oct. 21, 2016), MIK's command syntax has changed slightly. Previously, MIK's command-line options used an equal sign (`=`) to separate the option name from its value; after commit  72b5d88, options use a space instead of an equals sign.
 
