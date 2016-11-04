@@ -29,9 +29,9 @@ $cmd->option('checkconfig')
     ->aka('cc')
     ->describedAs("Applies checks to configuration, does not process objects. " .
         "Must be one of 'snippets', 'urls', 'paths', 'aliases', " .
-        "'input_directories', or 'all'.")
+        "'input_directories', 'csv', or 'all'.")
     ->must(function($cc_option) {
-        $cc_options = array('snippets', 'urls', 'paths', 'aliases', 'input_directories', 'all');
+        $cc_options = array('snippets', 'urls', 'paths', 'aliases', 'input_directories', 'csv', 'all');
         return in_array($cc_option, $cc_options);
     });
 
