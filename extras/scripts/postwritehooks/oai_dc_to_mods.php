@@ -78,3 +78,19 @@ catch (Exception $e) {
 	$error_log->addWarning("Problem with OAI-DC to MODS transform",
         array('MODS file' => $mods_path, 'Error' => $e-getMessage()));
 }
+
+/**
+ * Converts date like 1993-01-01T08:00:00Z into dates
+ * like 1993-01-01.
+ *
+ * @param string $input
+ *   The date string to trim.
+ *
+ * @return string
+ *   The trimmed date.
+ */
+function trim_date($input) {
+  $date = preg_replace('/T.*$/', '', $input);
+  return $date;
+}
+
