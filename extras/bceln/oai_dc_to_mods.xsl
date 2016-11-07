@@ -22,9 +22,11 @@
   </subject>
 </xsl:template>
 
-<xsl:template match="dc:description">
+<!-- gets rid of the extra dc:description field on KORA objects -->
+<xsl:template match="dc:description[1]">
   <abstract><xsl:value-of select="."/></abstract>
 </xsl:template>
+<xsl:template match="dc:description[2]" />
 
 
 <!-- Name splitting processing template. Name splitting for dc:creator and dc:contributor assumes any name with comma is personal, without is corporate. -->
@@ -47,11 +49,12 @@
           </xsl:element>
 
           <xsl:element name="role">
-            <xsl:element name="roleTerm"><xsl:value-of select="$nameRole" /></xsl:element>
+            <xsl:element name="roleTerm"><xsl:attribute name="authority">marcrelator</xsl:attribute><xsl:attribute name="type">text</xsl:attribute>
+              <xsl:value-of select="$nameRole" /></xsl:element>
           </xsl:element>
         <xsl:if test="contains($nameRole,'creator')">
           <xsl:element name="role">
-            <xsl:element name="roleTerm">author</xsl:element>
+            <xsl:element name="roleTerm"><xsl:attribute name="authority">marcrelator</xsl:attribute><xsl:attribute name="type">text</xsl:attribute>author</xsl:element>
           </xsl:element>
 		</xsl:if>
 
@@ -144,7 +147,7 @@
 </xsl:template>
 
 <xsl:template match="dc:language">
-  <language><xsl:value-of select="."/></language>
+  <language><languageTerm type="text"><xsl:value-of select="."/></languageTerm></language>
 </xsl:template>
 
 <xsl:template match="dc:rights">
