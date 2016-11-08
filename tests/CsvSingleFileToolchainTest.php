@@ -4,17 +4,18 @@ namespace mik\fetchers;
 
 namespace mik\filegetters;
 
-namespace mik\metadataparsers\json;
+namespace mik\metadataparsers\mods;
 
 namespace mik\writers;
 
-class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
+class CsvSingleFileToolchainTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
         $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_fetcher_temp_dir";
-        $this->path_to_output_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_json_output_dir";
+        $this->path_to_output_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_single_file_output_dir";
         $this->path_to_log = $this->path_to_temp_dir . DIRECTORY_SEPARATOR . "mik.log";
+        $this->path_to_mods_schema = dirname(__FILE__) . DIRECTORY_SEPARATOR . '../extras/scripts/mods-3-5.xsd';
     }
 
     public function testGetRecords()
@@ -63,11 +64,27 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
             ),
+            'METADATA_PARSER' => array(
+                'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/sample_mappings.csv',
+            ),
         );
-        $parser = new \mik\metadataparsers\json\CsvToJson($settings);
-        $json = $parser->metadata('postcard_1');
-        $json_as_array = json_decode($json, true);
-        $this->assertEquals('1954', $json_as_array['Date'], "Record date is not 1954");
+
+        $parser = new \mik\metadataparsers\mods\CsvToMods($settings);
+        $mods = $parser->metadata('postcard_1');
+
+        $dom = new \DOMDocument;
+        $dom->loadXML($mods);
+
+        $this->assertTrue(
+            $dom->schemaValidate($this->path_to_mods_schema),
+            "MODS document generate by CSV to MODS metadata parser did not validate"
+        );
+        $date_element = <<<XML
+  <originInfo>
+    <dateIssued encoding="w3cdtf">1954</dateIssued>
+  </originInfo>
+XML;
+        $this->assertContains($date_element, $mods, "CSV to MODS metadata parser did not work");
     }
 
     public function testWritePackages()
@@ -83,6 +100,9 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
                  'input_directory' => dirname(__FILE__) . '/assets/csv',
                  'file_name_field' => 'File',
              ),
+            'METADATA_PARSER' => array(
+                'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/sample_mappings.csv',
+            ),
             'WRITER' => array(
                 'output_directory' => $this->path_to_output_dir,
                 'preserve_content_filenames' => true,
@@ -92,19 +112,23 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
             ),
         );
 
-        $parser = new \mik\metadataparsers\json\CsvToJson($settings);
-        $json = $parser->metadata('postcard_1');
+        $parser = new \mik\metadataparsers\mods\CsvToMods($settings);
+        $mods = $parser->metadata('postcard_1');
 
-        $writer = new \mik\writers\CsvSingleFileJson($settings);
-        $writer->writePackages($json, array(), 'postcard_1');
+        $writer = new \mik\writers\CsvSingleFile($settings);
+        $writer->writePackages($mods, array(), 'postcard_1');
 
-        $written_metadata = file_get_contents($this->path_to_output_dir . DIRECTORY_SEPARATOR . 'postcard_1.json');
-        $written_metadata_as_array = json_decode($written_metadata, true);
+        $written_metadata = file_get_contents($this->path_to_output_dir . DIRECTORY_SEPARATOR . 'postcard_1.xml');
+        $date_element = <<<XML
+  <originInfo>
+    <dateIssued encoding="w3cdtf">1954</dateIssued>
+  </originInfo>
+XML;
+        $this->assertContains($date_element, $mods, "CSV to MODS metadata parser did not work");
 
-        $this->assertEquals('1954', $written_metadata_as_array['Date'], "Record date is not 1954");
         $this->assertFileExists(
             $this->path_to_output_dir . DIRECTORY_SEPARATOR . 'postcard_1.jpg',
-            "Postcard_1.jpg file was not written by CsvToJson toolchain."
+            "Postcard_1.jpg file was not written by CsvSingleFile toolchain."
         );
     }
 
