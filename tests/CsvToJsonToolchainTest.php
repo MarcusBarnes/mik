@@ -49,7 +49,7 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
         $this->assertEquals('1947', $record->Date, "Record date is not 1947");
     }
 
-    public function testCreateJson()
+    public function testCreateMetadata()
     {
         $settings = array(
             'FETCHER' => array(
@@ -101,6 +101,21 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
         $this->assertEquals('1954', $written_metadata_as_array['Date'], "Record date is not 1954");
         $this->assertFileExists($this->path_to_output_dir . DIRECTORY_SEPARATOR . 'postcard_1.jpg',
             "Postcard_1.jpg file was not written by CsvToJson toolchain.");
+    }
+
+    protected function tearDown()
+    {
+        $temp_files = glob($this->path_to_temp_dir . '/*');
+        foreach($temp_files as $temp_file) {
+            @unlink($temp_file);
+        }
+        @rmdir($this->path_to_temp_dir);
+
+        $output_files = glob($this->path_to_output_dir . '/*');
+        foreach($output_files as $output_file) {
+            @unlink($output_file);
+        }
+        @rmdir($this->path_to_output_dir);
     }
 
 }

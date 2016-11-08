@@ -40,4 +40,13 @@ class MetadataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('#<geographic>Victoria, BC</geographic>#', $mods, "CSV to MODS metadata parser did not work");
     }
 
+    protected function tearDown()
+    {
+        $temp_files = glob($this->path_to_temp_dir . '/*');
+        foreach($temp_files as $temp_file) {
+            @unlink($temp_file);
+        }
+        @rmdir($this->path_to_temp_dir);
+    }
+
 }

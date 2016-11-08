@@ -62,4 +62,13 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
         $this->assertEquals('1947', $record->Date, "Record date is not 1947");
     }
 
+    protected function tearDown()
+    {
+        $temp_files = glob($this->path_to_temp_dir . '/*');
+        foreach($temp_files as $temp_file) {
+            @unlink($temp_file);
+        }
+        @rmdir($this->path_to_temp_dir);
+    }
+
 }

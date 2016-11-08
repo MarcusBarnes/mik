@@ -180,4 +180,14 @@ XML;
 
         $this->assertContains($name_element, $mods, "InsertXMLFromTemplate metadata manipulator failed");
     }
+
+    protected function tearDown()
+    {
+        $temp_files = glob($this->path_to_temp_dir . '/*');
+        foreach($temp_files as $temp_file) {
+            @unlink($temp_file);
+        }
+        @rmdir($this->path_to_temp_dir);
+    }
+
 }

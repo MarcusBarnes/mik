@@ -168,4 +168,14 @@ class FetcherManipulatorTest extends \PHPUnit_Framework_TestCase
         $records = $csv->getRecords();
         $this->assertCount(10, $records, "CsvSingleFileByFilename manipulator did not work");
     }
+
+    protected function tearDown()
+    {
+        $temp_files = glob($this->path_to_temp_dir . '/*');
+        foreach($temp_files as $temp_file) {
+            @unlink($temp_file);
+        }
+        @rmdir($this->path_to_temp_dir);
+    }
+
 }
