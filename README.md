@@ -15,7 +15,7 @@ The Move to Islandora Kit (MIK) converts source content files and accompanying m
 
 MIK is designed to be extensible. The base classes that convert the source metadata to XML files for importing into Islandora, and that convert the source content files into the required directory structure for importing, can be subclassed easily. MIK also uses plugins (known as "manipulators") and a set of "hook" scripts that allow functionality that can be turned off or on for specific jobs.
 
-MIK is developed by staff at Simon Fraser University Library in support of their migration from CONTENTdm to Islandora, but its longer-term purpose is as a general toolkit for preparing content for importing content into Islandora. So MIK should really stand for "Move [stuff into] Islandora Kit."
+MIK was originally developed by staff at Simon Fraser University Library in support of their migration from CONTENTdm to Islandora, but its longer-term purpose is as a general toolkit for preparing content for importing content into Islandora. So MIK should really stand for "Move [content into] Islandora Kit."
 
 ## Documentation
 
@@ -23,7 +23,7 @@ We are continuing to improve our documentation, which is on the [MIK wiki](https
 
 ## Troubleshooting and support
 
-If you have a question, please [open an issue](https://github.com/MarcusBarnes/mik/issues)
+If you have a question, please [open an issue](https://github.com/MarcusBarnes/mik/issues).
 
 ## Islandora content that has been prepared using MIK
 
@@ -47,7 +47,7 @@ In a nutshell, this means create an .ini file for MIK. Details for available too
 
 ### 2. Check your configuration
 
-To check your configuration options, run MIK and include the `--checkconfig` option with a value 'all':
+To check your configuration options, run MIK and include the `--checkconfig` (or `-cc` option with a value 'all':
 
 ```./mik --config foo.ini --checkconfig all```
 
@@ -83,19 +83,20 @@ And you're done. In practice, you probably want to do some quality assurance on 
 
 ## Current status
 
-Until April 2016, when our migration from CONTENTdm to Islandora will be complete, we will be working on what we call the 0.9 release of MIK. We aim for a 1.0 release of MIK in January 2017. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is already being used in production.
+Until the end of 2016, we will be working on what we call the 0.9 release of MIK. We aim for a 1.0 release of MIK in January 2017. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is already being used in production.
 
 So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, file getters, etc.) for creating Islandora import packages from the following:
 
 * CONTENTdm
-  * newspapers
-  * multi-file PDFs
   * single-file objects (images, audio, etc.)
+  * multi-file PDFs
   * books
-  * generic (non-book and non-newspaper) compound objects
+  * newspapers
+  * non-book and non-newspaper compound objects
 * CSV
-  * metadata and content files from a local filesystem for single-file objects
+  * metadata and content files from a local filesystem for single-file objects (images, audio, etc.)
   * metadata and content files from a local filesystem for compound objects
+  * metadata and content files from a local filesystem for books
   * metadata and content files from a local filesystem for newspaper issues
 * OAI-PMH
   * metadata and one PDF per article from an Open Journal Systems journal
@@ -104,7 +105,6 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
 ## Roadmap
 
 * Version 1.0 (January 2017)
-  * toolchain for CSV books
   * developer documentation
   * code cleanup
   * more tests
