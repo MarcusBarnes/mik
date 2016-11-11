@@ -17,7 +17,7 @@
  *
  *   /home/mark/Documents/hacking/mik/tests/CsvToJsonToolchainTest.php:35
  *
- * These errors likely have something to do wit the visibility of the $csv
+ * These errors likely have something to do with the visibility of the $csv
  * fetcher class but life is too short to confirm that.
  */
 
