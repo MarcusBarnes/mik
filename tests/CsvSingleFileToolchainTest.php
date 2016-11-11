@@ -1,11 +1,8 @@
 <?php
 
 namespace mik\fetchers;
-
 namespace mik\filegetters;
-
 namespace mik\metadataparsers\mods;
-
 namespace mik\writers;
 
 class CsvSingleFileToolchainTest extends \PHPUnit_Framework_TestCase
@@ -46,7 +43,7 @@ class CsvSingleFileToolchainTest extends \PHPUnit_Framework_TestCase
              ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
-            ),
+            ),						 
         );
         $csv = new \mik\fetchers\Csv($settings);
         $record = $csv->getItemInfo('postcard_3');
@@ -63,7 +60,7 @@ class CsvSingleFileToolchainTest extends \PHPUnit_Framework_TestCase
              ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
-            ),
+            ),						 
             'METADATA_PARSER' => array(
                 'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/sample_mappings.csv',
             ),
@@ -75,10 +72,8 @@ class CsvSingleFileToolchainTest extends \PHPUnit_Framework_TestCase
         $dom = new \DOMDocument;
         $dom->loadXML($mods);
 
-        $this->assertTrue(
-            $dom->schemaValidate($this->path_to_mods_schema),
-            "MODS document generate by CSV to MODS metadata parser did not validate"
-        );
+        $this->assertTrue($dom->schemaValidate($this->path_to_mods_schema),
+            "MODS document generate by CSV to MODS metadata parser did not validate");
         $date_element = <<<XML
   <originInfo>
     <dateIssued encoding="w3cdtf">1954</dateIssued>
@@ -109,7 +104,7 @@ XML;
              ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
-            ),
+            ),						 
         );
 
         $parser = new \mik\metadataparsers\mods\CsvToMods($settings);
@@ -126,24 +121,24 @@ XML;
 XML;
         $this->assertContains($date_element, $mods, "CSV to MODS metadata parser did not work");
 
-        $this->assertFileExists(
-            $this->path_to_output_dir . DIRECTORY_SEPARATOR . 'postcard_1.jpg',
-            "Postcard_1.jpg file was not written by CsvSingleFile toolchain."
-        );
+        $this->assertFileExists($this->path_to_output_dir . DIRECTORY_SEPARATOR . 'postcard_1.jpg',
+            "Postcard_1.jpg file was not written by CsvSingleFile toolchain.");
     }
 
     protected function tearDown()
     {
         $temp_files = glob($this->path_to_temp_dir . '/*');
-        foreach ($temp_files as $temp_file) {
+        foreach($temp_files as $temp_file) {
             @unlink($temp_file);
         }
         @rmdir($this->path_to_temp_dir);
 
         $output_files = glob($this->path_to_output_dir . '/*');
-        foreach ($output_files as $output_file) {
+        foreach($output_files as $output_file) {
             @unlink($output_file);
         }
         @rmdir($this->path_to_output_dir);
     }
+
 }
+

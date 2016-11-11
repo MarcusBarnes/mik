@@ -1,0 +1,6 @@
+"Author","<name type=""personal""><namePart>%value%</namePart><role><roleTerm type=""text"" authority=""marcrelator"">author</roleTerm></role></name>"
+"Title","<titleInfo><title>%value%</title></titleInfo>",   
+"Publication Date","<originInfo><dateIssued encoding='w3cdtf' keyDate='yes'>%value%</dateIssued></originInfo>"
+"Identifier","<identifier type='local'>%value%</identifier>"
+"null0","<accessCondition type='use and reproduction'>Public domain</accessCondition>"
+"null2","<typeOfResource>text</typeOfResource>"
