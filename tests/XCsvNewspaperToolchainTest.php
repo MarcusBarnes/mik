@@ -1,29 +1,24 @@
 <?php
 
 /**
- * I've given up on the CsvNewspapers tests for now but am including this test class
- * here anyway.
+ * This file is named XCsvNewspaperToolchainTest.php so that it is run after
+ * CsvSingleFileToolchainTest.php and CsvToJsonToolchain.php. Otherwise,
+ * the following errors occur:
  *
- * I have determined that these tests are somehow polluting the CsvSingleFileToolchainTest
- * and CsvToJsonToolchain tests. Specifically, when tests in this file are run,
- * all MIK fetcher instances in those two test case source files use this fetcher's
- * 'input_file' value (e.g. assets/csv/newspapers/metadata/newspapers_metadata.csv),
- * and not their own input_value, resutling in the following test failures:
-
  *   There were 2 failures:
-
+ *
  *   1) mik\writers\CsvSingleFileToolchainTest::testGetRecords
  *   Failed asserting that actual size 2 matches expected size 20.
-
+ *
  *   /home/mark/Documents/hacking/mik/tests/CsvSingleFileToolchainTest.php:33
-
+ *
  *   2) mik\writers\CsvToJsonToolchain::testGetRecords
  *   Failed asserting that actual size 2 matches expected size 20.
-
+ *
  *   /home/mark/Documents/hacking/mik/tests/CsvToJsonToolchainTest.php:35
  *
- * I cannot figure out how to prevent this from happening. There is some dark magic
- * at play here that I am not privilege to.
+ * These errors likely have something to do wit the visibility of the $csv
+ * fetcher class but life is too short to confirm that.
  */
 
 namespace mik\fetchers;
@@ -36,6 +31,11 @@ namespace mik\writers;
 
 class CsvNewspaperToolchainTest extends \PHPUnit_Framework_TestCase
 {
+    protected $path_to_temp_dir;
+    protected $path_to_output_dir;
+    protected $path_to_log;
+    protected $path_to_mods_schema;
+
     protected function setUp()
     {
         $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_newspaper_temp_dir";
@@ -45,14 +45,7 @@ class CsvNewspaperToolchainTest extends \PHPUnit_Framework_TestCase
         $this->path_to_mods_schema = dirname(__FILE__) . DIRECTORY_SEPARATOR . '../extras/scripts/mods-3-5.xsd';
     }
 
-    public function testNothing()
-    {
-        // To avoid 'No tests found in class "mik\writers\CsvNewspaperToolchainTest".'
-        // messages that results from not running the tests below.
-        $this->assertEquals(null, null);
-    }
-
-    public function XtestGetRecords()
+    public function testGetRecords()
     {
         // Define settings here, not in a configuration file.
         $settings = array(
@@ -60,7 +53,7 @@ class CsvNewspaperToolchainTest extends \PHPUnit_Framework_TestCase
                 'input_file' => dirname(__FILE__) . '/assets/csv/newspapers/metadata/newspapers_metadata.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'Identifier',
-                'use_cache' => FALSE
+                'use_cache' => false
              ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
@@ -71,14 +64,14 @@ class CsvNewspaperToolchainTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $records);
     }
     
-    public function XtestGetItemInfo()
+    public function testGetItemInfo()
     {
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/csv/newspapers/metadata/newspapers_metadata.csv',
                 'record_key' => 'Identifier',
                 'temp_directory' => $this->path_to_temp_dir,
-                'use_cache' => FALSE
+                'use_cache' => false
              ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
@@ -89,14 +82,14 @@ class CsvNewspaperToolchainTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('1907-08-18', $record->Date, "Record date is not 1907-08-18");
     }
 
-    public function XtestCreateMetadata()
+    public function testCreateMetadata()
     {
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/csv/newspapers/metadata/newspapers_metadata.csv',
                 'record_key' => 'Identifier',
                 'temp_directory' => $this->path_to_temp_dir,
-                'use_cache' => FALSE
+                'use_cache' => false
              ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
@@ -124,14 +117,14 @@ XML;
         $this->assertContains($date_element, $mods, "CSV to MODS metadata parser did not work");
     }
 
-    public function _testWritePackages()
+    public function testWritePackages()
     {
         $settings = array(
             'FETCHER' => array(
                 'input_file' => dirname(__FILE__) . '/assets/csv/newspapers/metadata/newspapers_metadata.csv',
                 'record_key' => 'Identifier',
                 'temp_directory' => $this->path_to_temp_dir,
-                'use_cache' => FALSE
+                'use_cache' => false
              ),
             'FILE_GETTER' => array(
                 'class' => 'CsvNewspapers',
@@ -182,13 +175,16 @@ XML;
         }
         @rmdir($this->path_to_temp_dir);
 
-/*
-        // This needs to be completed.
-        $output_files = glob($this->path_to_output_dir . '/*');
-        foreach ($output_files as $output_file) {
-            @unlink($output_file);
+        $issue_dir = $this->path_to_output_dir . '/TT0002';
+        @unlink($issue_dir . '/MODS.xml');
+        $page_dirs = array('1', '2', '3', '4');
+        foreach ($page_dirs as $page_dir) {
+            $page_dir_path = $issue_dir . '/' . $page_dir;
+            @unlink($page_dir_path . '/OBJ.tif');
+            @unlink($page_dir_path . '/MODS.xml');
+            @rmdir($page_dir_path);
         }
+        @rmdir($issue_dir);
         @rmdir($this->path_to_output_dir);
-*/
     }
 }
