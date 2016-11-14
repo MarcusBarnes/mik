@@ -60,4 +60,13 @@ class MetadataManipulatorNormalizeDateWithPreferenceFlagTest extends \PHPUnit_Fr
             "NormalizeDate metadata manipulator for w3cdtf date with surrounding punctuation did not work ($data)");
     }
 
+    protected function tearDown()
+    {
+        $temp_files = glob($this->path_to_temp_dir . '/*');
+        foreach($temp_files as $temp_file) {
+            @unlink($temp_file);
+        }
+        @rmdir($this->path_to_temp_dir);
+    }
+
 }
