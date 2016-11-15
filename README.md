@@ -47,7 +47,7 @@ In a nutshell, this means create an .ini file for MIK. Details for available too
 
 ### 2. Check your configuration
 
-To check your configuration options, run MIK and include the `--checkconfig` (or `-cc` option with a value 'all':
+To check your configuration options, run MIK and include the `--checkconfig` (or `-cc`) option with a value 'all':
 
 ```./mik --config foo.ini --checkconfig all```
 
