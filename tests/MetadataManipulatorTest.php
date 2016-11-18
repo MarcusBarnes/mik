@@ -83,7 +83,7 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('#<dateIssued\sencoding="w3cdtf">1924\-12\-24</dateIssued>#', $mods,
             "NormalizeDate metadata manipulator for (\d\d\d\d)/(\d\d)/(\d\d) did not work");
 
-        // Test for matches against dates like 25/11/1925 (day first).
+        // Test for matches against dates like 25/11/1925 (day first). 
         $mods = $parser->metadata('postcard_11');
         $this->assertRegExp('#<dateIssued\sencoding="w3cdtf">1925\-11\-25</dateIssued>#', $mods,
             "NormalizeDate metadata manipulator for (\d\d\)/(\d\d)/(\d\d\d\d) did not work");
@@ -145,3 +145,49 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('#Victoria,\sB\.C\.</title>#', $mods, "SimpleReplace metadata manipulator did not work");
     }
 
+    public function testInsertXMLFromTemplateManipulator() {
+        $settings = array(
+            'FETCHER' => array(
+                'class' => 'Csv',
+                'input_file' => dirname(__FILE__) . '/assets/csv/insertxmlfromtemplate/metadata.csv',
+                'temp_directory' => $this->path_to_temp_dir,
+                'record_key' => 'Identifier',
+                'use_cache' => false,
+            ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+                'path_to_manipulator_log' => $this->path_to_manipulator_log,
+            ),
+            'METADATA_PARSER' => array(
+                'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/insertxmlfromtemplate/mapping.csv',
+            ),
+            'MANIPULATORS' => array(
+                'metadatamanipulators' => array('InsertXmlFromTemplate|CreatorName|' . dirname(__FILE__) . '/assets/csv/insertxmlfromtemplate/creator.twg'),
+            ),
+        );
+
+        $name_element = <<<XML
+  <name authority="local" type="personal">
+    <role>
+      <roleTerm authority="marcRelator" type="text">Artist</roleTerm>
+    </role>
+    <namePart>Ortiz-Palacios, Guillermo</namePart>
+  </name>
+XML;
+
+        $parser = new CsvToMods($settings);
+        $mods = $parser->metadata('1');
+
+        $this->assertContains($name_element, $mods, "InsertXMLFromTemplate metadata manipulator failed");
+    }
+
+    protected function tearDown()
+    {
+        $temp_files = glob($this->path_to_temp_dir . '/*');
+        foreach($temp_files as $temp_file) {
+            @unlink($temp_file);
+        }
+        @rmdir($this->path_to_temp_dir);
+    }
+
+}
