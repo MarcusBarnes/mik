@@ -145,33 +145,3 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('#Victoria,\sB\.C\.</title>#', $mods, "SimpleReplace metadata manipulator did not work");
     }
 
-    public function testSplitRepeatedValuesMetadataManipulator()
-    {
-        $settings = array(
-            'FETCHER' => array(
-                'class' => 'Csv',
-                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
-                'temp_directory' => $this->path_to_temp_dir,
-                'record_key' => 'ID',
-                'use_cache' => false,
-            ),
-            'LOGGING' => array(
-                'path_to_log' => $this->path_to_log,
-                'path_to_manipulator_log' => $this->path_to_manipulator_log,
-            ),
-            'METADATA_PARSER' => array(
-                'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/sample_mappings.csv',
-                'repeatable_wrapper_elements' => array('name'),
-            ),
-            'MANIPULATORS' => array(
-                'metadatamanipulators' => array('SplitRepeatedValues|Subjects|/subject/topic|;'),
-            ),
-        );
-
-        $parser = new CsvToMods($settings);
-
-        $mods = $parser->metadata('postcard_7');
-        $this->assertRegExp('#<topic>Streets</topic>#', $mods, "SplitRepeatedValues metadata manipulator did not work");
-        $this->assertRegExp('#<topic>Pedestrians</topic>#', $mods, "SplitRepeatedValues metadata manipulator did not work");
-    }
-}
