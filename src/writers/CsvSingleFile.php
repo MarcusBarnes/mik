@@ -60,12 +60,15 @@ class CsvSingleFile extends Writer
         $source_file_path = $this->fileGetter->getFilePath($record_id);
 
 	// But first, check to see if the source file exists, and if it doesn't, log
-	// that fact and skip writing the package.
-        if (!file_exists($source_file_path)) {
-            $this->log->addWarning("Source file does not exist, skipping writing package",
-                array('source_file' => $source_file_path));
-            return;
-	}
+	// that fact and skip writing the package. Allow source file to not exist if
+        // 'MODS' is the only member of $this->datastreams (to allow for testing).
+        if ($this->datastreams != array('MODS')) {
+            if (!file_exists($source_file_path)) {
+                $this->log->addWarning("Source file does not exist, skipping writing package",
+                    array('source_file' => $source_file_path));
+                return;
+	    }
+        }
 
         $source_file_name = pathinfo($source_file_path, PATHINFO_FILENAME);
         $source_file_extension = pathinfo($source_file_path, PATHINFO_EXTENSION);
