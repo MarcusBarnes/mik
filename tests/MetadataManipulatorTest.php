@@ -197,7 +197,7 @@ XML;
             ),
             'METADATA_PARSER' => array(
                 'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/sample_mappings.csv',
-                'repeatable_wrapper_elements' => array('name'),
+                'repeatable_wrapper_elements' => array('subject'),
             ),
             'MANIPULATORS' => array(
                 'metadatamanipulators' => array('SplitRepeatedValues|Subjects|/subject/topic|;'),
@@ -207,8 +207,18 @@ XML;
         $parser = new CsvToMods($settings);
 
         $mods = $parser->metadata('postcard_7');
-        $this->assertRegExp('#<topic>Streets</topic>#', $mods, "SplitRepeatedValues metadata manipulator did not work");
-        $this->assertRegExp('#<topic>Pedestrians</topic>#', $mods, "SplitRepeatedValues metadata manipulator did not work");
+        $subject_element_1 = <<<XML
+  <subject>
+    <geographic>Vancouver, BC</geographic>
+  </subject>
+XML;
+        $this->assertContains($subject_element_1, $mods, "SplitRepeatedValues metadata manipulator did not work");
+        $subject_element_2 = <<<XML
+  <subject authority="lcsh">
+    <topic>Storefronts</topic>
+  </subject>
+XML;
+        $this->assertContains($subject_element_2, $mods, "SplitRepeatedValues metadata manipulator did not work");
     }
 
     protected function tearDown()
