@@ -92,19 +92,30 @@ class CsvCompound extends Writer
         // for rows that contain child metadata.
         $cpd_item_info = $this->fetcher->getItemInfo($record_id);
         $MODS_expected = in_array('MODS', $this->datastreams);
-        $cpd_input_dir = $this->fileGetter->getCpdSourcePath($record_id);
-        if (file_exists($cpd_input_dir) && strlen($cpd_item_info->{$this->child_key}) === 0) {
-            $cpd_output_dir = $this->output_directory . DIRECTORY_SEPARATOR .
-                $cpd_item_info->{$this->compound_directory_field};
+
+        $cpd_output_dir = $this->output_directory . DIRECTORY_SEPARATOR .
+            $cpd_item_info->{$this->compound_directory_field};
+
+        // Allow source file to not exist if 'MODS' is the only member of
+        // $this->datastreams (to allow for testing).
+        if ($this->datastreams == array('MODS')) {
             if (!file_exists($cpd_output_dir)) {
                 mkdir($cpd_output_dir);
             }
+        }
+        else {
+            $cpd_input_dir = $this->fileGetter->getCpdSourcePath($record_id);
+            if (file_exists($cpd_input_dir) && strlen($cpd_item_info->{$this->child_key}) === 0) {
+                if (!file_exists($cpd_output_dir)) {
+                    mkdir($cpd_output_dir);
+                }
 
-            if ($MODS_expected xor $no_datastreams_setting_flag) {
-                if (file_exists($cpd_output_dir)) {
+                if ($MODS_expected xor $no_datastreams_setting_flag) {
                     if (file_exists($cpd_output_dir)) {
-                        // Generate MODS for child for parent compound object.
-                        $this->writeMetadataFile($metadata, $cpd_output_dir);
+                        if (file_exists($cpd_output_dir)) {
+                            // Generate MODS for child for parent compound object.
+                            $this->writeMetadataFile($metadata, $cpd_output_dir);
+                        }
                     }
                 }
             }

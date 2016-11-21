@@ -75,9 +75,13 @@ class CsvBooks extends Writer
             }
         }
         else {
-            $this->log->addWarning("CSV Books warning",
-                array('Book-level input directory does not exist' => $book_level_input_dir));
-            return;
+            // Allow source file to not exist if 'MODS' is the only member of
+            // $this->datastreams (to allow for testing).
+            if ($this->datastreams != array('MODS')) {
+                $this->log->addWarning("CSV Books warning",
+                    array('Book-level input directory does not exist' => $book_level_input_dir));
+                return;
+            }
         }
 
         $MODS_expected = in_array('MODS', $this->datastreams);

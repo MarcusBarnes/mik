@@ -74,9 +74,11 @@ class CsvNewspapers extends Writer
             }
         }
         else {
-            $this->log->addWarning("CSV Newspapers warning",
-                array('Issue-level input directory does not exist' => $issue_level_input_dir));
-            return;
+            if ($this->datastreams != array('MODS')) {
+                $this->log->addWarning("CSV Newspapers warning",
+                    array('Issue-level input directory does not exist' => $issue_level_input_dir));
+                return;
+            }
         }
 
         $MODS_expected = in_array('MODS', $this->datastreams);
@@ -95,11 +97,14 @@ class CsvNewspapers extends Writer
             $page_level_output_dir = $issue_level_output_dir . DIRECTORY_SEPARATOR . $page_number;
             mkdir($page_level_output_dir);
 
-            $OBJ_expected = in_array('OBJ', $this->datastreams);
-            if ($OBJ_expected xor $no_datastreams_setting_flag) {
-                $extension = $pathinfo['extension'];
-                $page_output_file_path = $page_level_output_dir . DIRECTORY_SEPARATOR . 'OBJ.' . $extension;
-                copy($page_path, $page_output_file_path);
+            if ($this->datastreams != array('MODS')) {
+                $OBJ_expected = in_array('OBJ', $this->datastreams);
+                if ($OBJ_expected xor $no_datastreams_setting_flag) {
+                    $extension = $pathinfo['extension'];
+                    $page_output_file_path = $page_level_output_dir . DIRECTORY_SEPARATOR .
+                        'OBJ.' . $extension;
+                    copy($page_path, $page_output_file_path);
+                }
             }
 
             if ($MODS_expected xor $no_datastreams_setting_flag) {
