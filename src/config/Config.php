@@ -42,6 +42,22 @@ class Config
             $this->verifyCA = true;
         }
 
+        // Define some options for the CSV fetcher.
+        if (isset($this->settings['FETCHER']['field_delimiter'])) {
+            $this->csv_field_delimiter = $this->settings['FETCHER']['field_delimiter'];
+        }
+        else {
+            $this->csv_field_delimiter = ',';
+        }
+        // Default enclosure is double quotation marks.
+        if (isset($this->settings['FETCHER']['field_enclosure'])) {
+            $this->csv_field_enclosure = $this->settings['FETCHER']['field_enclosure'];
+        }
+        // Default escape character is \.
+        if (isset($this->settings['FETCHER']['escape_character'])) {
+            $this->csv_escape_character = $this->settings['FETCHER']['escape_character'];
+        }
+
         if (count($this->settings['CONFIG'])) {
             foreach ($this->settings['CONFIG'] as $config => $value) {
                 $this->log->addInfo("MIK Configuration", array($config => $value));
@@ -302,6 +318,13 @@ class Config
 
         try {
             $reader = Reader::createFromPath($this->settings['FETCHER']['input_file']);
+            $reader->setDelimiter($this->csv_field_delimiter);
+            if (isset($this->csv_field_enclosure)) {
+                $reader->setEnclosure($this->csv_field_enclosure);
+            }
+            if (isset($this->csv_escape_character)) {
+                $reader->setEscape($this->csv_escape_character);
+            }
         } catch (Exception $re) {
             $csv_has_errors = true;
             print "Error creating CSV reader: " . $re->getMessage() . PHP_EOL;
