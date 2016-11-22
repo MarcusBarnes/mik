@@ -92,18 +92,29 @@ class CsvCompound extends Writer
         // for rows that contain child metadata.
         $cpd_item_info = $this->fetcher->getItemInfo($record_id);
         $MODS_expected = in_array('MODS', $this->datastreams);
+
         $cpd_input_dir = $this->fileGetter->getCpdSourcePath($record_id);
-        if (file_exists($cpd_input_dir) && strlen($cpd_item_info->{$this->child_key}) === 0) {
-            $cpd_output_dir = $this->output_directory . DIRECTORY_SEPARATOR .
-                $cpd_item_info->{$this->compound_directory_field};
+        $cpd_output_dir = $this->output_directory . DIRECTORY_SEPARATOR .
+            $cpd_item_info->{$this->compound_directory_field};
+
+        // Allow source file to not exist if 'MODS' is the only member of
+        // $this->datastreams (to allow for testing).
+        if ($this->datastreams == array('MODS')) {
             if (!file_exists($cpd_output_dir)) {
                 mkdir($cpd_output_dir);
+                // Generate MODS for parent compound object.
+                $this->writeMetadataFile($metadata, $cpd_output_dir);
             }
+        }
+        else {
+            if (file_exists($cpd_input_dir) && strlen($cpd_item_info->{$this->child_key}) === 0) {
+                if (!file_exists($cpd_output_dir)) {
+                    mkdir($cpd_output_dir);
+                }
 
-            if ($MODS_expected xor $no_datastreams_setting_flag) {
-                if (file_exists($cpd_output_dir)) {
+                if ($MODS_expected xor $no_datastreams_setting_flag) {
                     if (file_exists($cpd_output_dir)) {
-                        // Generate MODS for child for parent compound object.
+                        // Generate MODS for parent compound object.
                         $this->writeMetadataFile($metadata, $cpd_output_dir);
                     }
                 }
@@ -115,6 +126,12 @@ class CsvCompound extends Writer
         // them outside of the foreach child loop below.
         $child_item_info = $this->fetcher->getItemInfo($record_id);
         if (strlen($child_item_info->{$this->child_key})) {
+            // There are no input files so we can't create corresponding
+            // output directories.
+            if ($this->settings['FILE_GETTER']['input_directory'] == '' &&
+                $this->datastreams == array('MODS')) {
+                return;
+            }
             $sequence_number = $child_item_info->{$this->child_key};
             $cpd_output_dir = $this->output_directory . DIRECTORY_SEPARATOR .
                 $child_item_info->{$this->compound_directory_field};
@@ -131,6 +148,12 @@ class CsvCompound extends Writer
         // MODS file.
         $children_paths = $this->fileGetter->getChildren($record_id);
         foreach ($children_paths as $child_path) {
+            // There are no input files so we can't create corresponding
+            // output directories.
+            if ($this->settings['FILE_GETTER']['input_directory'] == '' &&
+                $this->datastreams == array('MODS')) {
+                return;
+            }
             $pathinfo = pathinfo($child_path);
             // Get the sequence number from the last segment of the child filename,
             // split on value of $this->child_sequence_separator.
