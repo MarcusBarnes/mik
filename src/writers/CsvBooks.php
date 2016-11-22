@@ -65,28 +65,32 @@ class CsvBooks extends Writer
             $no_datastreams_setting_flag = true;
         }
 
-        // Create a book-level subdirectory in the output directory, but only if there is
-        // a corresponding input directory.
-        $book_level_input_dir = $this->fileGetter->getBookSourcePath($record_id);
-        if (file_exists($book_level_input_dir)) {
-            $book_level_output_dir = $this->output_directory . DIRECTORY_SEPARATOR . $record_id;
-            if (!file_exists($book_level_output_dir)) {
-                mkdir($book_level_output_dir);
-            }
+        // Create a book-level subdirectory in the output directory.
+        $book_level_output_dir = $this->output_directory . DIRECTORY_SEPARATOR . $record_id;
+        if (!file_exists($book_level_output_dir)) {
+            mkdir($book_level_output_dir);
         }
-        else {
-            // Allow source file to not exist if 'MODS' is the only member of
-            // $this->datastreams (to allow for testing).
-            if ($this->datastreams != array('MODS')) {
-                $this->log->addWarning("CSV Books warning",
-                    array('Book-level input directory does not exist' => $book_level_input_dir));
-                return;
+
+        // Report a missing input dir only when the book level input dir is missing
+        // and all datastreams are expected, or when both MODS and OBJ are explicit.
+        // But don't report a missing input dir when MODS is the only datastream and
+        // the input directory setting is empty.
+        $book_level_input_dir = $this->fileGetter->getBookSourcePath($record_id);
+        if (!file_exists($book_level_input_dir)) {
+            if ($this->settings['FILE_GETTER']['input_directory'] !== '' &&
+                ($this->datastreams != array('MODS') xor $no_datastreams_setting_flag)) {
+                if ($no_datastreams_setting_flag) {
+                    $this->log->addWarning("CSV Books warning",
+                        array('Book-level input directory does not exist' => $book_level_input_dir));
+                    return;
+                }
             }
         }
 
         $MODS_expected = in_array('MODS', $this->datastreams);
         if ($MODS_expected xor $no_datastreams_setting_flag) {
-            $metadata_file_path = $book_level_output_dir . DIRECTORY_SEPARATOR . $this->metadata_filename;
+            $metadata_file_path = $book_level_output_dir . DIRECTORY_SEPARATOR .
+                $this->metadata_filename;
             $this->writeMetadataFile($metadata, $metadata_file_path);
         }
 
@@ -103,7 +107,8 @@ class CsvBooks extends Writer
             $OBJ_expected = in_array('OBJ', $this->datastreams);
             if ($OBJ_expected xor $no_datastreams_setting_flag) {
                 $extension = $pathinfo['extension'];
-                $page_output_file_path = $page_level_output_dir . DIRECTORY_SEPARATOR . 'OBJ.' . $extension;
+                $page_output_file_path = $page_level_output_dir . DIRECTORY_SEPARATOR .
+                    'OBJ.' . $extension;
                 copy($page_path, $page_output_file_path);
             }
 

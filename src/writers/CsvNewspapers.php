@@ -64,6 +64,31 @@ class CsvNewspapers extends Writer
             $no_datastreams_setting_flag = true;
         }
 
+        // Create an issue-level subdirectory in the output directory.
+        $issue_level_output_dir = $this->output_directory . DIRECTORY_SEPARATOR . $record_id;
+        if (!file_exists($issue_level_output_dir)) {
+            mkdir($issue_level_output_dir);
+        }
+
+        // Report a missing input dir only when the issue level input dir is missing
+        // and all datastreams are expected, or when both MODS and OBJ are explicit.
+        // But don't report a missing input dir when MODS is the only datastream and
+        // the input directory setting is empty.
+        $issue_level_input_dir = $this->fileGetter->getIssueSourcePath($record_id);
+        if (!file_exists($issue_level_input_dir)) {
+            if ($this->settings['FILE_GETTER']['input_directory'] !== '' &&
+                ($this->datastreams != array('MODS') xor $no_datastreams_setting_flag)) {
+                if ($no_datastreams_setting_flag) {
+                    $this->log->addWarning("CSV Newspapers warning",
+                        array('Issue-level input directory does not exist' => $issue_level_input_dir));
+                    return;
+                }
+             }
+         }
+
+
+
+/*
         // Create an issue-level subdirectory in the output directory, but only if there is
         // a corresponding input directory.
         $issue_level_input_dir = $this->fileGetter->getIssueSourcePath($record_id);
@@ -80,10 +105,13 @@ class CsvNewspapers extends Writer
                 return;
             }
         }
+*/
+
 
         $MODS_expected = in_array('MODS', $this->datastreams);
         if ($MODS_expected xor $no_datastreams_setting_flag) {
-            $metadata_file_path = $issue_level_output_dir . DIRECTORY_SEPARATOR . $this->metadata_filename;
+            $metadata_file_path = $issue_level_output_dir . DIRECTORY_SEPARATOR .
+                $this->metadata_filename;
             $this->writeMetadataFile($metadata, $metadata_file_path);
         }
 
