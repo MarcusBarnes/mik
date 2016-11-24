@@ -96,15 +96,14 @@ class SplitRepeatedValues extends MetadataManipulator
                       if (isset($matches[1]) && isset($matches[3])) {
                           $output .= $matches[1] . $value . $matches[3];
                           $this->logSplit('info', $this->getSourceFieldValue(), $dest_elements->item(0), $output);
+                      }
+                      else {
+                          $output = $input;
+                          $this->logSplit('warning', $this->getSourceFieldValue(), $dest_elements->item(0), $pattern);
                           return $output;
                       }
                   }
-                  if (count($matches === 0)) {
-                      $output = $input;
-                      $this->logSplit('warning', $this->getSourceFieldValue(), $dest_elements->item(0), $pattern);
-                      return $output;
-                  }
-                  // return $output;
+                  return $output;
                 }
                 else {
                     // If current fragment does not contain any delimiters, return it.
