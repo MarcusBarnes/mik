@@ -62,6 +62,7 @@ class SplitRepeatedValues extends MetadataManipulator
         // fail gracefully, allowing the subsequent 'if' blocks to execute. Probably
         // not the best way to handle this but it works.
         try {
+            libxml_use_internal_errors(true);
             $dom->loadxml($input, LIBXML_NSCLEAN);
         }
         finally {
@@ -71,19 +72,37 @@ class SplitRepeatedValues extends MetadataManipulator
             $dest_elements = $xpath->query($this->destFieldXpath);
 
             if ($dest_elements->length === 1) {
-                // If it is, get the value of the corresponding input field.
-                $source_field_value = $this->getSourceFieldValue();
+                // If it is, get the value of the corresponding input field. We make a copy
+                // of the source field value to explode so we don't need to remove the \ from
+                // the output of preg_quoute().
+                $source_field_value_to_explode = $this->getSourceFieldValue();
+                $source_field_value_to_match = preg_quote($this->getSourceFieldValue(), '#');
                 // If the source field value contains the delimter character, split the value
                 // and add a MODS element for each repeated value.
-                if (preg_match('/' . $this->delimiter . '/', $source_field_value)) {
-                  preg_match('#' . "^(.*)($source_field_value)(.*)$" . '#', $input, $matches);
-                  $repeated_values = explode($this->delimiter, $source_field_value);
+                $pattern = '#' . "^(.*)($source_field_value_to_match)(.*)$" . '#';
+                if (strpos($this->getSourceFieldValue(), $this->delimiter) !== false) {
+                  preg_match($pattern, $input, $matches);
+                  $repeated_values = explode($this->delimiter, $source_field_value_to_explode);
                   $output = '';
                   foreach ($repeated_values as &$value) {
                       $value = trim($value);
-                      $output .= $matches[1] . $value . $matches[3];
+                      // Assumes the source field value has not already had special XML
+                      // characters converted to entities. Also, htmlspecialchars()
+                      // inside the metadata parser's createModsXML() method has at this
+                      // point been applied to this method's $input argument but not to
+                      // the value returned by $this->getSourceFieldValue(), which comes
+                      // from the raw cached metadata.
+                      $value = htmlspecialchars($value, ENT_NOQUOTES|ENT_XML1);
+                      if (isset($matches[1]) && isset($matches[3])) {
+                          $output .= $matches[1] . $value . $matches[3];
+                          $this->logSplit('info', $this->getSourceFieldValue(), $dest_elements->item(0), $output);
+                      }
+                      else {
+                          $output = $input;
+                          $this->logSplit('warning', $this->getSourceFieldValue(), $dest_elements->item(0), $pattern);
+                          return $output;
+                      }
                   }
-                  $this->logSplit($source_field_value, $dest_elements->item(0), $output);
                   return $output;
                 }
                 else {
@@ -137,21 +156,36 @@ class SplitRepeatedValues extends MetadataManipulator
      * Write a successful split operation to the manipulator log.
      *
      * @param string
+     *     Either 'info' or 'warning'.
+     * @param string
      *     The value of the source metadata field.
      * @param object
      *     The target MODS DOM element.
-     * @param object
-     *     The DOM.
+     * @param string
+     *     The XML output, or the failed regex pattern.
      */
-     public function logSplit($source_value, $element, $output)
+     public function logSplit($level, $source_value, $element, $extra)
      {
-         $this->log->addInfo("SplitRepeatedValues",
-             array(
-                 'Record key' => $this->record_key,
-                 'Source field value' => $source_value,
-                 'Output' => $output,
-             )
-         );
+         if ($level == 'info') {
+             $this->log->addInfo("SplitRepeatedValues",
+                 array(
+                     'Record key' => $this->record_key,
+                     'Source field name' => $this->sourceField,
+                     'Source field value' => $source_value,
+                     'Output' => $extra,
+                 )
+             );
+         }
+         if ($level == 'warning') {
+             $this->log->addWarning("SplitRepeatedValues",
+                 array(
+                     'Record key' => $this->record_key,
+                     'Source field name' => $this->sourceField,
+                     'Source field value' => $source_value,
+                     'Failed regex' => $extra,
+                 )
+             );
+         }
      }
 
 }
