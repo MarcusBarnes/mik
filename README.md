@@ -123,3 +123,9 @@ MIK is designed to be extensible. If you have an idea for a useful manipulator o
 
 README_DEV.md contains some information on coding standards, etc.
 
+## Maintainers/Sponsors
+
+* [Simon Fraser University Library](http://www.lib.sfu.ca/)
+* The [Digital Scholarship Unit (DSU)](https://www.utsc.utoronto.ca/digitalscholarship/)
+at the University of Toronto Scarborough Library
+
