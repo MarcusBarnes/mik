@@ -1,0 +1,9 @@
+<originInfo>
+	<dateIssued keyDate="yes">{{ publication_date }}</dateIssued>
+	{% if publisher %}
+	<publisher>{{ publisher }}</publisher>
+	{% endif %}
+	{% if city %}
+	<place>{{ city }}</place>
+	{% endif %}
+</originInfo>
