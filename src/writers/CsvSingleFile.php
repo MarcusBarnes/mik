@@ -27,11 +27,17 @@ class CsvSingleFile extends Writer
     public function __construct($settings)
     {
         parent::__construct($settings);
-        $this->fetcher = new \mik\fetchers\Cdm($settings);
+        $this->fetcher = new \mik\fetchers\Csv($settings);
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
         $this->output_directory = $settings['WRITER']['output_directory'];
         $this->preserve_content_filenames = $settings['WRITER']['preserve_content_filenames'];
+        if (isset($settings['WRITER']['require_source_file'])) {
+            $this->require_source_file = $settings['WRITER']['require_source_file'];
+        }
+        else {
+            $this->require_source_file = false;
+        }
     }
 
     /**
@@ -59,11 +65,24 @@ class CsvSingleFile extends Writer
         // folder using the filename or record_id identifier
         $source_file_path = $this->fileGetter->getFilePath($record_id);
 
-	// But first, check to see if the source file exists, and if it doesn't, log
-	// that fact and skip writing the package. Allow source file to not exist if
-        // 'MODS' is the only member of $this->datastreams (to allow for testing).
+        // If source filename is empty and $this->require_source_file is false,
+        // write the metadata file and return.
+        if (!$this->require_source_file) {
+            $item_info = $this->fetcher->getItemInfo($record_id);
+            if ($item_info->{$this->fileGetter->file_name_field} == '') {
+                $metadata_file_path = $output_path . $record_id . '.xml';
+                $this->writeMetadataFile($metadata, $metadata_file_path);
+                return;
+            }
+        }
+
+	// If source filename is not empty, check to see if the source file exists, and if
+	// it doesn't, log that fact and skip writing the package. Allow source file to not
+        // exist if 'MODS' is the only member of $this->datastreams (to allow for testing).
+        // We also don't want $source_file_path to be a directory, it's got to be
+        // a file.
         if ($this->datastreams != array('MODS')) {
-            if (!file_exists($source_file_path)) {
+            if (!file_exists($source_file_path) || is_dir($source_file_path)) {
                 $this->log->addError("Source file not found, skipping writing package",
                     array('record ID' => $record_id, 'source file' => $source_file_path));
                 $this->problemLog->addError($record_id);
