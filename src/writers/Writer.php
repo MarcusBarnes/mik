@@ -93,6 +93,12 @@ abstract class Writer
         $this->log = new \Monolog\Logger('writer');
         $this->logStreamHandler= new \Monolog\Handler\StreamHandler($this->pathToLog, Logger::INFO);
         $this->log->pushHandler($this->logStreamHandler);
+
+        // Set up problem logger.
+        $this->pathToProblemLog = dirname($settings['LOGGING']['path_to_log']) . DIRECTORY_SEPARATOR . 'problem_records.log';
+        $this->problemLog = new \Monolog\Logger('ProblemRecords');
+        $this->problemLogStreamHandler= new \Monolog\Handler\StreamHandler($this->pathToProblemLog, Logger::ERROR);
+        $this->problemLog->pushHandler($this->problemLogStreamHandler);
     }
 
     /**
