@@ -64,8 +64,9 @@ class CsvSingleFile extends Writer
         // 'MODS' is the only member of $this->datastreams (to allow for testing).
         if ($this->datastreams != array('MODS')) {
             if (!file_exists($source_file_path)) {
-                $this->log->addWarning("Source file does not exist, skipping writing package",
-                    array('source_file' => $source_file_path));
+                $this->log->addError("Source file not found, skipping writing package",
+                    array('record ID' => $record_id, 'source file' => $source_file_path));
+                $this->problemLog->addError($record_id);
                 return;
 	    }
         }
