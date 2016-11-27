@@ -10,7 +10,7 @@ When creating classes (or modifying the namespaces of existing classes), you may
 
 ## Coding Standards
 
-Use the PSR-2 coding standard for all new files. You can check your work using PHP Code Sniffer by issuing the following command:
+Use the PSR-2 coding standard.  You can check your work using PHP Code Sniffer by issuing the following command:
 
 `phpcs --standard=PSR2 yourfile.php`
 
