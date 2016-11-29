@@ -2,7 +2,6 @@
 
 namespace mik\filegetters;
 
-use GuzzleHttp\Client;
 use mik\exceptions\MikErrorException;
 use Monolog\Logger;
 

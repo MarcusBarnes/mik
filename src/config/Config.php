@@ -31,6 +31,33 @@ class Config
         $this->logStreamHandler= new \Monolog\Handler\StreamHandler($this->pathToLog, Logger::INFO);
         $this->log->pushHandler($this->logStreamHandler);
 
+        // Default Mac PHP setups may use Apple's Secure Transport
+        // rather than OpenSSL, causing issues with CA verification.
+        // Allow configuration override of CA verification at users own risk.
+        if (isset($this->settings['SYSTEM']['verify_ca']) ){
+            if($this->settings['SYSTEM']['verify_ca'] == false){
+              $this->verifyCA = false;
+            }
+        } else {
+            $this->verifyCA = true;
+        }
+
+        // Define some options for the CSV fetcher.
+        if (isset($this->settings['FETCHER']['field_delimiter'])) {
+            $this->csv_field_delimiter = $this->settings['FETCHER']['field_delimiter'];
+        }
+        else {
+            $this->csv_field_delimiter = ',';
+        }
+        // Default enclosure is double quotation marks.
+        if (isset($this->settings['FETCHER']['field_enclosure'])) {
+            $this->csv_field_enclosure = $this->settings['FETCHER']['field_enclosure'];
+        }
+        // Default escape character is \.
+        if (isset($this->settings['FETCHER']['escape_character'])) {
+            $this->csv_escape_character = $this->settings['FETCHER']['escape_character'];
+        }
+
         if (count($this->settings['CONFIG'])) {
             foreach ($this->settings['CONFIG'] as $config => $value) {
                 $this->log->addInfo("MIK Configuration", array($config => $value));
@@ -54,6 +81,7 @@ class Config
                 $this->checkAliases();
                 $this->checkInputDirectories();
                 $this->checkUrls();
+                $this->checkCsvFile();
                 exit;
                 break;
             case 'snippets':
@@ -77,10 +105,12 @@ class Config
                 $this->checkInputDirectories();
                 exit;
                 break;
+            case 'csv';
+                $this->checkCsvFile();
+                exit;
+                break;
             default:
-                $message = "Sorry, $type is not an allowed value for --checkconfig. " .
-                    "Allowed values are 'snippets', 'urls', 'paths', 'aliases', 'input_directories', or 'all'.\n";
-                exit($message);
+                exit;
         }
     }
 
@@ -91,7 +121,7 @@ class Config
     {
         $fetchers = array('Cdm', 'Csv');
         if (!in_array($this->settings['FETCHER']['class'], $fetchers)) {
-            return; 
+            return;
         }
 
         ini_set('display_errors', false);
@@ -139,7 +169,7 @@ class Config
                         $value .= 'getthumbnail';
                     }
                     try {
-                        $response = $client->get($value);
+                        $response = $client->get($value, ['verify' => $this->verifyCA]);
                         $code = $response->getStatusCode();
                     }
                     catch (RequestException $e) {
@@ -225,8 +255,8 @@ class Config
             print "CONTENTdm aliases are OK\n";
         }
     }
-    
-    /** 
+
+    /**
      * Checks for the existance of input_directories.
      *
      * See https://github.com/MarcusBarnes/mik/issues/169
@@ -250,10 +280,10 @@ class Config
                     exit("Error: Can't find input directory $input_directory\n");
                 }
             }
-        
+
             print "Input directory paths are OK.\n";
         }
-        
+
         // For Csv toolchains, where a single input directory is allowed.
         $filegetters = array('CsvSingleFile', 'CsvNewspapers');
         if (in_array($this->settings['FILE_GETTER']['class'], $filegetters)) {
@@ -269,9 +299,69 @@ class Config
             if (!file_exists(realpath($input_directory))) {
                 exit("Error: Can't find input directory $input_directory\n");
             }
-        
+
             print "Input directory paths are OK.\n";
         }
      }
+
+    /**
+     * Tests whether the CSV input file is valid.
+     */
+    public function checkCsvFile()
+    {
+        // This check applies only to CSV toolchains.
+        if ($this->settings['FETCHER']['class'] != 'Csv') {
+            return;
+        }
+
+        $csv_has_errors = false;
+
+        try {
+            $reader = Reader::createFromPath($this->settings['FETCHER']['input_file']);
+            $reader->setDelimiter($this->csv_field_delimiter);
+            if (isset($this->csv_field_enclosure)) {
+                $reader->setEnclosure($this->csv_field_enclosure);
+            }
+            if (isset($this->csv_escape_character)) {
+                $reader->setEscape($this->csv_escape_character);
+            }
+        } catch (Exception $re) {
+            $csv_has_errors = true;
+            print "Error creating CSV reader: " . $re->getMessage() . PHP_EOL;
+        }
+
+        // Fetch header row and make sure columns are unique.
+        $header = $reader->fetchOne();
+        $num_header_columns = count($header);
+        foreach ($header as $header_value) {
+            if (!strlen($header_value)) {
+                $csv_has_errors = true;
+                print "Error with CSV input file: it appears that one or more header labels are blank." . PHP_EOL;
+            }
+        }
+
+        $header_values = array_unique($header);
+        if (count($header_values) != $num_header_columns) {
+            $csv_has_errors = true;
+            print "Error with CSV input file: it appears that the column headers are not unique." . PHP_EOL;
+        }
+
+        // Fetch each row and make sure that it contains the correct number of columns.
+        $rows = $reader->fetch();
+        $row_num = 0;
+        foreach ($rows as $row) {
+            $row_num++;
+            $columns_in_row = count($row);
+            if ($columns_in_row != $num_header_columns) {
+                $csv_has_errors = true;
+                print "Error with CSV input file: it appears that row $row_num does not have " .
+                    "the same number of colums ($columns_in_row) as the header row ($num_header_columns)." . PHP_EOL;
+            }
+        }
+
+        if (!$csv_has_errors) {
+            print "CSV input file appears to be OK.". PHP_EOL;
+        }
+    }
 
 }

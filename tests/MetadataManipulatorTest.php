@@ -116,4 +116,118 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
         $mods = $parser->metadata('postcard_20');
         $this->assertRegExp('#<CSVRecord.*"Date":"1907"#', $mods, "AddCsvData metadata manipulator did not work");
     }
+
+    public function testSimpleReplaceMetadataManipulator()
+    {
+        $settings = array(
+            'FETCHER' => array(
+                'class' => 'Csv',
+                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
+                'temp_directory' => $this->path_to_temp_dir,
+                'record_key' => 'ID',
+                'use_cache' => false,
+            ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+                'path_to_manipulator_log' => $this->path_to_manipulator_log,
+            ),
+            'METADATA_PARSER' => array(
+                'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/sample_mappings.csv',
+            ),
+            'MANIPULATORS' => array(
+                'metadatamanipulators' => array('SimpleReplace|#Vancouver,\sB\.C\.</title>#|Victoria, B.C.</title>'),
+            ),
+        );
+
+        $parser = new CsvToMods($settings);
+
+        $mods = $parser->metadata('postcard_20');
+        $this->assertRegExp('#Victoria,\sB\.C\.</title>#', $mods, "SimpleReplace metadata manipulator did not work");
+    }
+
+    public function testInsertXMLFromTemplateManipulator() {
+        $settings = array(
+            'FETCHER' => array(
+                'class' => 'Csv',
+                'input_file' => dirname(__FILE__) . '/assets/csv/insertxmlfromtemplate/metadata.csv',
+                'temp_directory' => $this->path_to_temp_dir,
+                'record_key' => 'Identifier',
+                'use_cache' => false,
+            ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+                'path_to_manipulator_log' => $this->path_to_manipulator_log,
+            ),
+            'METADATA_PARSER' => array(
+                'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/insertxmlfromtemplate/mapping.csv',
+            ),
+            'MANIPULATORS' => array(
+                'metadatamanipulators' => array('InsertXmlFromTemplate|CreatorName|' . dirname(__FILE__) . '/assets/csv/insertxmlfromtemplate/creator.twg'),
+            ),
+        );
+
+        $name_element = <<<XML
+  <name authority="local" type="personal">
+    <role>
+      <roleTerm authority="marcRelator" type="text">Artist</roleTerm>
+    </role>
+    <namePart>Ortiz-Palacios, Guillermo</namePart>
+  </name>
+XML;
+
+        $parser = new CsvToMods($settings);
+        $mods = $parser->metadata('1');
+
+        $this->assertContains($name_element, $mods, "InsertXMLFromTemplate metadata manipulator failed");
+    }
+
+    public function testSplitRepeatedValuesMetadataManipulator()
+    {
+        $settings = array(
+            'FETCHER' => array(
+                'class' => 'Csv',
+                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
+                'temp_directory' => $this->path_to_temp_dir,
+                'record_key' => 'ID',
+                'use_cache' => false,
+            ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+                'path_to_manipulator_log' => $this->path_to_manipulator_log,
+            ),
+            'METADATA_PARSER' => array(
+                'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/sample_mappings.csv',
+                'repeatable_wrapper_elements' => array('subject'),
+            ),
+            'MANIPULATORS' => array(
+                'metadatamanipulators' => array('SplitRepeatedValues|Subjects|/subject/topic|;'),
+            ),
+        );
+
+        $parser = new CsvToMods($settings);
+
+        $mods = $parser->metadata('postcard_7');
+        $subject_element_1 = <<<XML
+  <subject>
+    <geographic>Vancouver, BC</geographic>
+  </subject>
+XML;
+        $this->assertContains($subject_element_1, $mods, "SplitRepeatedValues metadata manipulator did not work");
+        $subject_element_2 = <<<XML
+  <subject authority="lcsh">
+    <topic>Storefronts</topic>
+  </subject>
+XML;
+        $this->assertContains($subject_element_2, $mods, "SplitRepeatedValues metadata manipulator did not work");
+    }
+
+    protected function tearDown()
+    {
+        $temp_files = glob($this->path_to_temp_dir . '/*');
+        foreach($temp_files as $temp_file) {
+            @unlink($temp_file);
+        }
+        @rmdir($this->path_to_temp_dir);
+    }
+
 }

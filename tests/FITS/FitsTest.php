@@ -16,6 +16,9 @@ class FitsTest extends \PHPUnit_Framework_TestCase
         file_put_contents($this->path_to_dummy_file, $dummy_output);
     }
 
+    /**
+     * @group FITS
+     */
     public function testFitsRuns()
     {
         $this->assertFileExists($this->path_to_fits);

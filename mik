@@ -4,7 +4,60 @@
 
 /**
  * Main Move to Islandora Kit script.
- **/
+ */
+
+// Use composer to load vendor and project classes.
+require 'vendor/autoload.php';
+
+use mik\config\Config;
+use League\CLImate\CLImate;
+use Cocur\BackgroundProcess\BackgroundProcess;
+
+use mik\exceptions\MikErrorException;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
+$cmd = new Commando\Command();
+
+$cmd->option('config')
+    ->aka('c')
+    ->require(true)
+    ->describedAs('Path to MIK configuration file.')
+    ->file();
+
+$cmd->option('checkconfig')
+    ->aka('cc')
+    ->describedAs("Applies checks to configuration, does not process objects. " .
+        "Must be one of 'snippets', 'urls', 'paths', 'aliases', " .
+        "'input_directories', 'csv', or 'all'.")
+    ->must(function($cc_option) {
+        $cc_options = array('snippets', 'urls', 'paths', 'aliases', 'input_directories', 'csv', 'all');
+        return in_array($cc_option, $cc_options);
+    });
+
+$cmd->option('limit')
+    ->aka('l')
+    ->describedAs('Number of objects to process. If omitted, all objects will be processed.')
+    ->must(function($limit_value) {
+        return preg_match('/^\d+$/', $limit_value);
+    });
+
+$configPath = $cmd['config'];
+
+$mikConfig = new Config($configPath);
+$settings = $mikConfig->settings;
+echo "Commencing MIK." . PHP_EOL;
+
+if ($cmd['checkconfig']) {
+    $mikConfig->validate($cmd['checkconfig']);
+}
+
+if ($cmd['limit']) {
+    $limit = (int) $cmd['limit'];
+} else {
+    $limit = null;
+}
+
 // Basic wallclock timing
 $time_start = microtime(true);
 
@@ -22,28 +75,8 @@ if ($onWindows) {
     ini_set('opcache.enable_cli', '0');
 }
 
-// Get command line options.
-// Assumes --longopts.
-// Required --config=path/to/config/ini_file
-// Optional --limit=10 (where 10 is the number of input objects to process; 
-// if not set, processes all objects)
-//          --checkconfig=type (where type is one of 'snippets', 'urls', 'paths', 
-//          'aliases', 'input_directories', or 'all'; just apply checks to configuration, do not process objects)
-$options = getopt('', array('config:', 'limit::', 'checkconfig::'));
-
-$configPath = $options['config'];
-if (!file_exists($options['config'])) {
-    exit("Sorry, can't find " . $options['config'] . "\n");
-}
-
-if (isset($options['limit'])) {
-    $limit = (int) $options['limit'];
-} else {
-    $limit = null;
-}
-
 // Monolog requires that the date.timezone PHP setting be set else
-// it will create an E_WARNING, which will be turned into an excption 
+// it will create an E_WARNING, which will be turned into an excption
 // in the set_error_handler function halting the program.
 // Provide a default timezone if date.timezone is null in the the PHP INI.
 // Load [SYSTEM] stettings for user-defined default timeszone using config path
@@ -53,28 +86,10 @@ if (ini_get('date.timezone') == null || isset($system_settings['date_default_tim
         $date_timezone = $system_settings['date_default_timezone'];
         date_default_timezone_set($date_timezone);
     } else {
-        // use a default time-zone.
+        // Use a default time-zone.
         date_default_timezone_set('America/Vancouver');
     }
 };
-
-
-// Use composer to load vendor and project classes.
-require 'vendor/autoload.php';
-
-use mik\config\Config;
-use League\CLImate\CLImate;
-use Cocur\BackgroundProcess\BackgroundProcess;
-
-use mik\exceptions\MikErrorException;
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-
-echo "Commencing MIK." . PHP_EOL;
-
-// Instantiate a configuration.
-$mikConfig = new Config($configPath);
-$settings = $mikConfig->settings;
 
 // Converts all errors into Exceptions.
 // Set here so that you can pass the configuration settings to the MIK Error Exception class.
@@ -83,10 +98,6 @@ set_error_handler(
         throw new mik\exceptions\MikErrorException($severity, $file, $line, $message, $code, $settings);
     }
 );
-
-if (isset($options['checkconfig'])) {
-    $mikConfig->validate($options['checkconfig']);
-}
 
 // Set up logger ErrorException stream for main mik script.
 $pathToLog = $settings['LOGGING']['path_to_log'];
@@ -102,9 +113,9 @@ $logInfo->pushHandler($logInfoStreamHandler);
 $startTimeMessage =  "MIK started running " . date("F j, Y, g:i a") . PHP_EOL;
 $logInfo->addInfo($startTimeMessage);
 
-// Add error-exceptions to the log using 
+// Add error-exceptions to the log using
 // $log->addError('log message');
-// or 
+// or
 // $log->addError('ErrorException', array('details'=>'file_get_contents failed'));
 
 // Fetch metadata records.
@@ -153,7 +164,7 @@ $logProblemRecordsStreamHandler = new StreamHandler($problemRecordsLogFilepath);
 $logProblemRecords->pushHandler($logProblemRecordsStreamHandler);
 $logProblemRecords->addInfo('Initializing log', array('configuration' => $settings['CONFIG']));
 
-//Instantiate classes used within main MIK foreach 
+//Instantiate classes used within main MIK foreach
 try {
     $metadataClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
     $parser = new $metadataClass($settings);
@@ -179,7 +190,6 @@ try {
         )
     );
 }
-
 
 $record_num = 0;
 foreach ($records as $record) {
@@ -287,4 +297,3 @@ $time = $time_end - $time_start;
 $timeMessage =  "Completed in " . $time/60 . " minutes." . PHP_EOL;
 echo $timeMessage;
 $logInfo->addInfo($timeMessage);
-

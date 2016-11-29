@@ -23,6 +23,14 @@ class OaipmhOjsPdf extends FileGetter
         $this->fetcher = new \mik\fetchers\Oaipmh($settings);
         $this->temp_directory = $this->settings['temp_directory'];
 
+        if (isset($settings['SYSTEM']['verify_ca']) ){
+            if($settings['SYSTEM']['verify_ca'] == false){
+              $this->verifyCA = false;
+            }
+        } else {
+            $this->verifyCA = true;
+        }
+
         // Set up logger.
         $this->pathToLog = $settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('OaipmhOjsPdf filegetter');
@@ -78,7 +86,7 @@ class OaipmhOjsPdf extends FileGetter
 	// <a href="http://journals.sfu.ca/present/index.php/demojournal/article/view/6/9" class="file" target="_parent">PDF</a>
 	// </div>
         $client = new Client();
-        $response = $client->get($article_url);
+        $response = $client->get($article_url, [$this->verifyCA]);
         $body = $response->getBody();
 
         $dom = new \DOMDocument;

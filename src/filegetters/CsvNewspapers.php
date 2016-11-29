@@ -70,6 +70,10 @@ class CsvNewspapers extends FileGetter
      */
     private function getMasterFiles($inputDirectory, $allowedFileTypes)
     {
+        if ($inputDirectory == '') {
+            return array();
+        }
+
         // Use a static cache to avoid building the source path list
         // multiple times.
         static $potentialObjFiles;

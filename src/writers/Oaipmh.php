@@ -12,12 +12,12 @@ class Oaipmh extends Writer
      * @var array $settings - configuration settings from confugration class.
      */
     public $settings;
-    
+
     /**
      * @var object $fetcher - Fetcher registered in .ini file.
      */
     private $fetcher;
-    
+
     /**
      * @var object File getter registered in .ini file.
      */
@@ -41,6 +41,17 @@ class Oaipmh extends Writer
         } else {
             $this->httpTimeout = 60;
         }
+
+        // Default Mac PHP setups may use Apple's Secure Transport
+        // rather than OpenSSL, causing issues with CA verification.
+        // Allow configuration override of CA verification at users own risk.
+        if (isset($this->settings['SYSTEM']['verify_ca']) ){
+            if($this->settings['SYSTEM']['verify_ca'] == false){
+              $this->verifyCA = false;
+            }
+        } else {
+            $this->verifyCA = true;
+        }
     }
 
     /**
@@ -56,7 +67,8 @@ class Oaipmh extends Writer
         // folder using the filename or record_id identifier
         $source_file_url = $this->fileGetter->getFilePath($record_id);
 
-        $metadata_file_path = $output_path . $record_id . '.xml';
+        $normalized_record_id = $this->normalizeFilename($record_id);
+        $metadata_file_path = $output_path . $normalized_record_id . '.xml';
 
         $this->writeMetadataFile($metadata, $metadata_file_path, true);
 
@@ -66,7 +78,8 @@ class Oaipmh extends Writer
             $response = $client->get($source_file_url,
                 ['stream' => true,
                 'timeout' => $this->httpTimeout,
-                'connect_timeout' => $this->httpTimeout]
+                'connect_timeout' => $this->httpTimeout,
+                'verify' => $this->verifyCA]
             );
 
             // Lazy MimeType => extension mapping: use the last part of the MimeType.
@@ -74,7 +87,7 @@ class Oaipmh extends Writer
             list($type, $extension) = explode('/', $content_types[0]);
             $extension = preg_replace('/;.*$/', '', $extension);
 
-            $content_file_path = $output_path . $record_id . '.' . $extension;
+            $content_file_path = $output_path . $normalized_record_id . '.' . $extension;
 
             $body = $response->getBody();
             while (!$body->eof()) {
@@ -104,5 +117,15 @@ class Oaipmh extends Writer
             }
         }
     }
-    
+
+    /**
+     * Convert %3A (:) in filenames into underscores (_).
+     */
+    public function normalizeFilename($string)
+    {
+        $string = urldecode($string);
+        $string = preg_replace('/:/', '_', $string);
+        return $string;
+    }
+
 }

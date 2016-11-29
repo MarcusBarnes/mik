@@ -72,9 +72,6 @@ class CdmCompound extends Writer
         } else {
            $this->metadataFileName = 'MODS.xml';
         } 
-        if (isset($this->settings['WRITER']['cpd_filename'])) {
-           $this->cdmCpdFileName = $this->settings['WRITER']['cpd_filename'];
-        }
         
         $metadtaClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
         $this->metadataParser = new $metadtaClass($settings);
@@ -98,9 +95,6 @@ class CdmCompound extends Writer
         $this->writeMetadataFile($metadata, $this->parentObjectOutputPath);
 
         $object_structure = $this->cdmCompoundFileGetter->getDocumentStructure($record_key);
-        $islandora_structure = $this->getIslandoraCompoundStructureFile($object_structure);
-        $islandora_structure_path = $this->parentObjectOutputPath . DIRECTORY_SEPARATOR . 'structure.xml';
-        file_put_contents($islandora_structure_path, $islandora_structure);
 
         if (strlen($this->cdmCpdFileName)) {
           $object_structure_path = $this->parentObjectOutputPath . DIRECTORY_SEPARATOR . $this->cdmCpdFileName;
@@ -201,43 +195,4 @@ class CdmCompound extends Writer
             }
         }
     }
-
-    /**
-     * Generates an Islandora compound structure file from a CONTENTdm .cpd file.
-     *
-     * @param string $xml
-     *    The serialized XML .cpd file.
-     *
-     * @return string
-     *    The resulting Islandora compound structure file.
-     */
-    public function getIslandoraCompoundStructureFile($xml)
-    {
-        $input_dom = new \DOMDocument;
-        $input_dom->preserveWhiteSpace = false;
-        $input_dom->formatOutput = true;
-        $input_dom->loadXML($xml);
-
-        $output_dom = new \DOMDocument('1.0', 'utf-8');
-        $output_dom->preserveWhiteSpace = false;
-        $output_dom->formatOutput = true;
-        $root = $output_dom->createElement('islandora_compound_object');
-        $comment = $output_dom->createComment('Islandora compound structure file generated from a CONTENTdm .cpd file.');
-        $root->appendChild($comment);
-
-        $xpath = new \DOMXPath($input_dom);
-        $pagepointers = $xpath->query("//pageptr");
-        foreach ($pagepointers as $pageptr) {
-            $pageptr_value = $pageptr->nodeValue;
-            $child = $output_dom->createElement('child');
-            $content = $output_dom->createAttribute('content');
-            $content->value = $pageptr_value;
-            $child->appendChild($content);
-            $root->appendChild($child);
-        }
-
-        $output_dom->appendChild($root);
-        return $output_dom->saveXML();
-    }
-
 }

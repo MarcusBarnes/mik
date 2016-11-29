@@ -6,7 +6,7 @@ class CdmFetcher extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_fetcher_temp_dir";
+        $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_cdm_fetcher_temp_dir";
 	$this->path_to_log = $this->path_to_temp_dir . DIRECTORY_SEPARATOR . "mik.log";
     }
 		
@@ -30,6 +30,15 @@ class CdmFetcher extends \PHPUnit_Framework_TestCase
         $cdm = new Cdm($settings);
         $record = $cdm->getItemInfo('17');
         $this->assertEquals('1979 04 05', $record['date'], "Record date is not 1979 04 05");
+    }
+
+    protected function tearDown()
+    {
+        $temp_files = glob($this->path_to_temp_dir . '/*');
+        foreach($temp_files as $temp_file) {
+            @unlink($temp_file);
+        }
+        @rmdir($this->path_to_temp_dir);
     }
 
 }
