@@ -1,0 +1,35 @@
+title,"<titleInfo><title>%value%</title></titleInfo>"
+corporate_author,"<name type=""corporate""><namePart>%value%</namePart><role><roleTerm type=""text"" authority=""marcrelator"">author</roleTerm></role></name>"
+corporate_author2,"<name type=""corporate""><namePart>%value%</namePart><role><roleTerm type=""text"" authority=""marcrelator"">author</roleTerm></role></name>"
+document_type,<genre>%value%</genre>
+keywords,"<note type=""author keyword"">%value%</note>"
+disciplines,<subject><topic>%value%</topic></subject>
+abstract,<abstract>%value%</abstract>
+geolocate,<subject><geographic>%value%</geographic></subject>
+coordinates,<subject><cartographics><coordinates>%value%</coordinates></cartographics></subject>
+custom_citation,"<note type=""preferred citation"">%value%</note>"
+comments,"<note type=""content"">%value%</note>"
+peer_reviewed,"<note displayLabel=""Peer reviewed"">%value%</note>"
+journal_statement,"<accessCondition type=""use and reproduction"">%value%</accessCondition>"
+version_allowed,"<physicalDescription authority=""local"">%value%</physicalDescription>"
+pub_conditions,"<note type=""restriction"">%value%</note>"
+calc_url,"<identifier type=""uri"" invalid=""yes"" displayLabel=""Migrated from"">%value%</identifier>"
+distribution_license,"<accessCondition type=""use and reproduction"">%value%</accessCondition>"
+multimedia_url,"<location><url usage=""primary display"">%value%</url></location>"
+course_name,"<note displayLabel=""Course name"">%value%</note>"
+course_number,"<note displayLabel=""Course number"">%value%</note>"
+course_end_date,"<note displayLabel=""Course end date"">%value%</note>"
+multimedia_url,"<location><url usage=""primary display"">%value%</url></location>"
+internal_comments,"<extension><adminComments>%value%</adminComments></extension>"
+degree_granter,"<name type=""corporate"" authority=""lcnaf""><role><roleTerm authority=""marcrelator"" type=""text"">Degree granting institution</roleTerm></role><namePart>%value%</namePart></name>"
+doi,"<identifier type=""doi"">%value%</identifier>"
+null0,null0
+null1,null1
+null2,null2
+null3,null3
+null4,null4
+null5,null5
+null6,null6
+null7,null7
+null8,null8
+null9,null9

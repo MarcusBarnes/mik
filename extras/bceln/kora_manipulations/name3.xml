@@ -1,0 +1,25 @@
+{% if author3_fname %}
+<name type="personal">
+  <namePart type="given">
+	{{ author3_fname }}
+  </namePart>
+  <namePart type="family">
+    {{ author3_lname }}
+  </namePart>
+  {% if author3_suffix %}
+	<termsOfAddress>{{ author3_suffix }}</termsOfAddress>
+  {% endif %}
+  <role>
+    <roleTerm authority="marcrelator">author</roleTerm>
+  </role>
+  {% if author3_email %}
+    <nameIdentifier type="email">{{ author3_email }}</nameIdentifier>
+  {% endif %}
+
+  {% if department %}
+	<affiliation>{{ department }}, {{ faculties }}, {{ author3_institution }}</affiliation>
+  {% elseif author3_institution %}
+    	<affiliation>{{ author3_institution }}</affiliation>
+  {% endif %} 
+</name>
+{% endif %}

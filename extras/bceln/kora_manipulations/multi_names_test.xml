@@ -1,0 +1,192 @@
+{% if author1_fname %}
+<name type="personal">
+  <namePart type="given">
+	{{ author1_fname }}
+  </namePart>
+  <namePart type="family">
+    {{ author1_lname }}
+  </namePart>
+  {% if author1_suffix %}
+	<termsOfAddress>{{ author1_suffix }}</termsOfAddress>
+  {% endif %}
+  <role>
+    <roleTerm authority="marcrelator">author</roleTerm>
+  </role>
+  {% if author1_email %}
+    <nameIdentifier type="email">{{ author1_email }}</nameIdentifier>
+  {% endif %}
+
+  {% if department %}
+	<affiliation>{{ department }}, {{ faculties }}, {{ author1_institution }}</affiliation>
+  {% elseif author1_institution %}
+    	<affiliation>{{ author1_institution }}</affiliation>
+  {% endif %}  
+  
+  {% if author2_fname %}
+  </name>
+    <name type="personal">
+    <namePart type="given">
+	  {{ author2_fname }}
+    </namePart>
+    <namePart type="family">
+      {{ author2_lname }}
+    </namePart>
+    {% if author2_suffix %}
+  	  <termsOfAddress>{{ author2_suffix }}</termsOfAddress>
+    {% endif %}
+    <role>
+      <roleTerm authority="marcrelator">author</roleTerm>
+    </role>
+    {% if author2_email %}
+      <nameIdentifier type="email">{{ author2_email }}</nameIdentifier>
+    {% endif %}
+
+    {% if department %}
+      <affiliation>{{ department }}, {{ faculties }}, {{ author2_institution }}</affiliation>
+    {% elseif author2_institution %}
+      <affiliation>{{ author2_institution }}</affiliation>
+    {% endif %}  
+  {% endif %}
+  
+  {% if author3_fname %}
+    </name>
+    <name type="personal">
+    <namePart type="given">
+	  {{ author3_fname }}
+    </namePart>
+    <namePart type="family">
+      {{ author3_lname }}
+    </namePart>
+    {% if author3_suffix %}
+	  <termsOfAddress>{{ author3_suffix }}</termsOfAddress>
+    {% endif %}
+    <role>
+      <roleTerm authority="marcrelator">author</roleTerm>
+    </role>
+    {% if author3_email %}
+      <nameIdentifier type="email">{{ author3_email }}</nameIdentifier>
+    {% endif %}
+
+    {% if department %}
+	  <affiliation>{{ department }}, {{ faculties }}, {{ author3_institution }}</affiliation>
+    {% elseif author3_institution %}
+      <affiliation>{{ author3_institution }}</affiliation>
+    {% endif %}  
+  {% endif %}
+  
+  {% if author4_fname %}
+  </name>
+  <name type="personal">
+    <namePart type="given">
+	  {{ author4_fname }}
+    </namePart>
+    <namePart type="family">
+      {{ author4_lname }}
+    </namePart>
+    {% if author4_suffix %}
+	  <termsOfAddress>{{ author4_suffix }}</termsOfAddress>
+    {% endif %}
+    <role>
+      <roleTerm authority="marcrelator">author</roleTerm>
+    </role>
+    {% if author4_email %}
+      <nameIdentifier type="email">{{ author4_email }}</nameIdentifier>
+    {% endif %}
+
+    {% if department %}
+	  <affiliation>{{ department }}, {{ faculties }}, {{ author4_institution }}</affiliation>
+    {% elseif author4_institution %}
+      <affiliation>{{ author4_institution }}</affiliation>
+    {% endif %}  
+
+  {% endif %}
+  
+  {% if author5_fname %}
+  </name>
+  <name type="personal">
+    <namePart type="given">
+	  {{ author5_fname }}
+    </namePart>
+    <namePart type="family">
+      {{ author5_lname }}
+    </namePart>
+    {% if author5_suffix %}
+	  <termsOfAddress>{{ author5_suffix }}</termsOfAddress>
+    {% endif %}
+    <role>
+      <roleTerm authority="marcrelator">author</roleTerm>
+    </role>
+    {% if author5_email %}
+      <nameIdentifier type="email">{{ author5_email }}</nameIdentifier>
+    {% endif %}
+
+    {% if department %}
+	  <affiliation>{{ department }}, {{ faculties }}, {{ author5_institution }}</affiliation>
+    {% elseif author5_institution %}
+      <affiliation>{{ author5_institution }}</affiliation>
+    {% endif %}  
+
+  {% endif %}
+  
+  {% if author6_fname %}
+  </name>
+  <name type="personal">
+    <namePart type="given">
+	  {{ author6_fname }}
+    </namePart>
+    <namePart type="family">
+      {{ author6_lname }}
+    </namePart>
+    {% if author6_suffix %}
+	  <termsOfAddress>{{ author6_suffix }}</termsOfAddress>
+    {% endif %}
+    <role>
+      <roleTerm authority="marcrelator">author</roleTerm>
+    </role>
+    {% if author6_email %}
+      <nameIdentifier type="email">{{ author6_email }}</nameIdentifier>
+    {% endif %}
+
+    {% if department %}
+	  <affiliation>{{ department }}, {{ faculties }}, {{ author6_institution }}</affiliation>
+    {% elseif author6_institution %}
+      <affiliation>{{ author6_institution }}</affiliation>
+    {% endif %}  
+
+  {% endif %}
+  
+  {% if author7_fname %}
+  </name>
+  <name type="personal">
+    <namePart type="given">
+	  {{ author7_fname }}
+    </namePart>
+    <namePart type="family">
+      {{ author7_lname }}
+    </namePart>
+    {% if author7_suffix %}
+	  <termsOfAddress>{{ author7_suffix }}</termsOfAddress>
+    {% endif %}
+    <role>
+      <roleTerm authority="marcrelator">author</roleTerm>
+    </role>
+    {% if author7_email %}
+      <nameIdentifier type="email">{{ author7_email }}</nameIdentifier>
+    {% endif %}
+
+    {% if department %}
+	  <affiliation>{{ department }}, {{ faculties }}, {{ author7_institution }}</affiliation>
+    {% elseif author7_institution %}
+      <affiliation>{{ author7_institution }}</affiliation>
+    {% endif %}  
+
+  {% endif %}
+  
+</name>
+{% endif %}
+
+
+
+
+
+

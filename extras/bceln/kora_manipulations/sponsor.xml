@@ -1,0 +1,10 @@
+{% if sponsor %}
+<name type="personal">
+  <namePart>{{ sponsor }}</namePart>
+    <role>
+      <roleTerm type="text" authority="marcrelator">sponsor</roleTerm>
+    </role>
+    <affiliation>{{ sponsor_department }}, Kwantlen Polytechnic University</affiliation>
+    <nameIdentifier type="email">{{ sponsor_email }}</nameIdentifier>
+</name>
+{% endif %}
