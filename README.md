@@ -109,7 +109,7 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
   * code cleanup
   * more tests
 
-## Development
+## Contributing
 
 We welcome community development partners. Some features that would be really great to see include:
 
@@ -121,11 +121,19 @@ We welcome community development partners. Some features that would be really gr
 
 MIK is designed to be extensible. If you have an idea for a useful manipulator or post-write hook script, please let us know.
 
-README_DEV.md contains some information on coding standards, etc.
+CONTRIBUTING.md provides guidelines on how you can contribute to MIK. README_DEV.md contains some information on coding standards, etc.
 
 ## Maintainers/Sponsors
 
-* [Simon Fraser University Library](http://www.lib.sfu.ca/)
-* The [Digital Scholarship Unit (DSU)](https://www.utsc.utoronto.ca/digitalscholarship/)
-at the University of Toronto Scarborough Library
+* Mark Jordan, [Simon Fraser University Library](http://www.lib.sfu.ca/)
+* Marcus Barnes, The [Digital Scholarship Unit (DSU)](https://www.utsc.utoronto.ca/digitalscholarship/) at the University of Toronto Scarborough Library
+
+## Contributors
+
+* [Mark Cooper](https://github.com/mark-cooper)
+* [Pat Dunlavey](https://github.com/patdunlavey)
+* [flummingbird](https://github.com/flummingbird)
+* [Jason Peak](https://github.com/jpeak5)
+* [Brandon Weigel](https://github.com/bondjimbond)
+
 
