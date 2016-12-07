@@ -21,7 +21,7 @@ We love hear about how you want to use MIK! In order to help us understand a new
 
 ***
 
-**Addiitional examples**:
+**Additional examples**:
 * One per list bullet
 
 **Additional Remarks**:
@@ -71,7 +71,7 @@ You may want to read [Syncing a fork](https://help.github.com/articles/syncing-a
 
 ## License Agreements
 
-MIK is licensed under GPL version 3. By opening a pull request or otherwise contributing code to the MIK codebase, you transfer non-exclusive ownership of that code (you retain ownership of your code for other purposes) to the MIK maintainers for the sole purpose of redistributing your contribution within the MIK codebase under the conditions of the GPLv3 license. You also warrant that you have the legal authority to make such a transfer.
+MIK is licensed under GPL version 3 or higher. By opening a pull request or otherwise contributing code to the MIK codebase, you transfer non-exclusive ownership of that code (you retain ownership of your code for other purposes) to the MIK maintainers for the sole purpose of redistributing your contribution within the MIK codebase under the conditions of the GPLv3 license or higher. You also warrant that you have the legal authority to make such a transfer.
 
 ## Thanks
 
