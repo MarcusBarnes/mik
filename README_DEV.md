@@ -2,7 +2,7 @@
 
 ## Autoloading Classes
 
-When creating classes (or modifying the namespaces of existing classes), you may need to regenerate the autoload files.  To do this, run the following from the command-line:
+When creating classes (or modifying the namespaces of existing classes), you may need to regenerate the autoload files. To do this, run the following from the command-line:
 
 `composer dump-autoload`
 
