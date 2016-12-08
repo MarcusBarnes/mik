@@ -250,11 +250,10 @@ class CsvCompound extends Writer
             // compound object metadata made by metadata manipulators. The compound object's
             // MODS file is in the parent directory of the current child object (i.e., its
             // path minus the sequence number).
-            $sequence_directory_pattern = '#' . DIRECTORY_SEPARATOR . $sequence_number . '#';
-            $compound_mods_path = preg_replace($sequence_directory_pattern, '', $path);
+            $compound_mods_dir = dirname($path);
             // Get the first title element from the compound object's MODS.
             $dom = new \DOMDocument;
-            $dom->load($compound_mods_path . DIRECTORY_SEPARATOR . $this->metadata_filename);
+            $dom->load($compound_mods_dir . DIRECTORY_SEPARATOR . $this->metadata_filename);
             $xpath = new \DOMXPath($dom);
             $titles = $xpath->query("//mods:titleInfo/mods:title");
             $parent_title = $titles->item(0)->nodeValue;
