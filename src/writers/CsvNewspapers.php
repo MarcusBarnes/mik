@@ -186,6 +186,7 @@ class CsvNewspapers extends Writer
         $xpath = new \DOMXPath($dom);
         $titles = $xpath->query("//mods:titleInfo/mods:title");
         $page_title = $titles->item(0)->nodeValue . ', page ' . $page_number;
+        $page_title = htmlspecialchars($page_title, ENT_NOQUOTES|ENT_XML1);
         $dates = $xpath->query("//mods:originInfo/mods:dateIssued");
         $page_date = $dates->item(0)->nodeValue;
 
