@@ -258,6 +258,7 @@ class CsvCompound extends Writer
             $titles = $xpath->query("//mods:titleInfo/mods:title");
             $parent_title = $titles->item(0)->nodeValue;
             $child_title = preg_replace('/%parent_title%/', $parent_title, $child_title);
+            $child_title = htmlspecialchars($child_title, ENT_NOQUOTES|ENT_XML1);
         }
         if (preg_match('/%sequence_number%/', $this->child_title)) {
             $child_title = preg_replace('/%sequence_number%/', ltrim($sequence_number, '0'), $child_title);
