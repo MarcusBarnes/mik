@@ -1,0 +1,9 @@
+mik text
+*.php text
+*.csv text
+*.ini text
+*.xml text
+*.twg text
+
+*.tif binary
+*.jpg binary
