@@ -88,6 +88,26 @@ abstract class Writer
             }
         }
 
+        // Instantiate input validator class. By convention, input validators are named
+        // the same as the file getter class, but we provide the option to use custom validators.
+        if (isset($settings['FILE_GETTER']['input_validator_class']) ){
+            $input_validator_class = $settings['FILE_GETTER']['input_validator_class'];
+        } else {
+            $input_validator_class = $settings['FILE_GETTER']['class'];
+        }
+        try {
+            $inputValidatorClass = 'mik\\inputvalidators\\' . $input_validator_class;
+            $this->inputValidator = new $inputValidatorClass($this->settings);
+        } catch (Exception $exception) {
+            $log->addError(
+                'ErrorException',
+                array(
+                  'message' => 'problem instantiating inputValidatorClass',
+                  'details' => $exception
+                )
+            );
+        }
+
         // Set up logger.
         $this->pathToLog = $settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('writer');
