@@ -88,9 +88,9 @@ abstract class Writer
             }
         }
 
-        // Instantiate input validator class. By convention, input validators are named
-        // the same as the file getter class, but we provide the option to use custom validators.
-        if (isset($settings['FILE_GETTER']['input_validator_class']) ){
+        // Instantiate input validator class. By convention, input validators are named the
+        // same as the file getter class, but we provide the option to use custom validators.
+        if (isset($settings['FILE_GETTER']['input_validator_class'])) {
             $input_validator_class = $settings['FILE_GETTER']['input_validator_class'];
         } else {
             $input_validator_class = $settings['FILE_GETTER']['class'];

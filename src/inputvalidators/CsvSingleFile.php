@@ -40,11 +40,7 @@ class CsvSingleFile extends MikInputValidator
                 $validation_results[] = false;
             }
         }
-
-        if ($this->validateInputType == 'strict' && in_array(false, $validation_results)) {
-            print "Input validation (strict mode) failed; details in " . $this->pathToLog . "\n";
-            exit(1);
-        }
+        return $validation_results;
     }
 
     public function validatePackage($record_key, $package_path)
