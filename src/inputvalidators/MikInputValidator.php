@@ -9,15 +9,19 @@ use \Monolog\Logger;
 class MikInputValidator
 {
     /**
+     * @var boolean $validateInput - Whether or not to validate MIK's input.
+     */
+
+    public $validateInput;
+
+    /**
      * Create a new MikInputValidator instance.
      *
      * @param array $settings
      *    Associative array containing the toolchain settings.
      */
-    // public function __construct($configPath)
     public function __construct($settings)
     {
-        // $this->settings = parse_ini_file($configPath, true);
         $this->settings = $settings;
 
         // Set up logger.
@@ -30,19 +34,18 @@ class MikInputValidator
         $this->log = new \Monolog\Logger('input validator');
         $this->logStreamHandler= new \Monolog\Handler\StreamHandler($this->pathToLog, Logger::INFO);
         $this->log->pushHandler($this->logStreamHandler);
+        if (isset($settings['CONFIG'])) {
+            $this->log->addInfo('Initializing log', array('configuration' => $settings['CONFIG']));
+        }
 
         if (isset($this->settings['FILE_GETTER']['validate_input'])) {
-            if ($this->settings['FILE_GETTER']['validate_input'] == false) {
-                $this->validateInput = false;
-            }
+            $this->validateInput = $this->settings['FILE_GETTER']['validate_input'];
         } else {
             $this->validateInput = true;
         }
 
         if (isset($this->settings['FILE_GETTER']['validate_input_type'])) {
-            if ($this->settings['FILE_GETTER']['validate_input_type'] == 'strict') {
-                $this->validateInputType = 'strict';
-            }
+            $this->validateInputType = $this->settings['FILE_GETTER']['validate_input_type'];
         } else {
             $this->validateInputType = 'realtime';
         }

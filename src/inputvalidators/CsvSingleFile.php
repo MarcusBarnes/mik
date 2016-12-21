@@ -25,6 +25,7 @@ class CsvSingleFile extends MikInputValidator
         if (!$this->validateInput) {
             return;
         }
+
         if ($this->validateInputType == 'realtime') {
             return;
         }

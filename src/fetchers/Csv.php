@@ -221,5 +221,4 @@ class Csv extends Fetcher
         }
         return $record;
     }
-
 }

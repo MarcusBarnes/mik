@@ -21,7 +21,12 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
-             ),
+            ),
+            'FILE_GETTER' => array(
+                 'validate_input' => false,
+                 'class' => 'CsvSingleFile',
+                 'file_name_field' => 'File',
+            ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
             ),
@@ -41,7 +46,12 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata_bad_header_row_nonunique.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
-             ),
+            ),
+            'FILE_GETTER' => array(
+                 'validate_input' => false,
+                 'class' => 'CsvSingleFile',
+                 'file_name_field' => 'File',
+            ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
             ),
@@ -61,15 +71,20 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata_bad_header_row_extra_columns.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
-             ),
+            ),
+            'FILE_GETTER' => array(
+                 'validate_input' => false,
+                 'class' => 'CsvSingleFile',
+                 'file_name_field' => 'File',
+            ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
             ),
         );
-        $config = new Config($this->path_to_ini_file);
-        $config->settings = $settings;
+        $this->config = new Config($this->path_to_ini_file);
+        $this->config->settings = $settings;
         $this->expectOutputRegex('/does\snot\shave.*as\sthe\sheader\srow/');
-        $config->checkCsvFile();
+        $this->config->checkCsvFile();
     }
 
     protected function tearDown()

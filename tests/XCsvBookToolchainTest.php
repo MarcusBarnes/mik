@@ -123,6 +123,7 @@ class CsvBookToolchainTest extends \PHPUnit_Framework_TestCase
                 'use_cache' => false
              ),
             'FILE_GETTER' => array(
+                'validate_input' => false,
                 'class' => 'CsvBooks',
                 'input_directory' => dirname(__FILE__) . '/assets/csv/books/files',
                 'temp_directory' => $this->path_to_temp_dir,
