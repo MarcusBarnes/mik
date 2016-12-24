@@ -94,12 +94,17 @@ class MikInputValidator
     /**
      * Recurses a directory tree.
      */
-    public function readDirRecursive($path)
+    public function readDirRecursive($path, $dirs_only = false)
     {
         $file_list = array();
         $directory_iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
         foreach ($directory_iterator as $filepath => $info) {
-            $file_list[] = $filepath;
+            if ($dirs_only && $file->isDir()) {
+                $file_list[] = $filepath;
+            }
+            else {
+                $file_list[] = $filepath;
+            }
         }
         return $file_list;
     }
