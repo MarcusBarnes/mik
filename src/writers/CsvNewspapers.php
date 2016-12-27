@@ -29,6 +29,7 @@ class CsvNewspapers extends Writer
         parent::__construct($settings);
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
+        $this->fetcher = new \mik\fetchers\Csv($settings);
         $this->output_directory = $settings['WRITER']['output_directory'];
         $this->metadata_filename = $settings['WRITER']['metadata_filename'];
         // Default is to generate page-level MODS.xml files.
@@ -62,6 +63,14 @@ class CsvNewspapers extends Writer
         $no_datastreams_setting_flag = false;
         if (count($this->datastreams) == 0) {
             $no_datastreams_setting_flag = true;
+        }
+        $file_name_field = $this->fileGetter->file_name_field;
+        $record = $this->fetcher->getItemInfo($record_id);
+        if ($this->inputValidator->validateInputType == 'realtime' && $this->inputValidator->validateInput) {
+            if (!$this->inputValidator->validatePackage($record_id, $record->{$file_name_field})) {
+                $this->problemLog->addError($record_id);
+                return;
+            }
         }
 
         // Create an issue-level subdirectory in the output directory.

@@ -64,8 +64,11 @@ class CsvSingleFile extends Writer
         // folder using the filename or record_id identifier
         $source_file_path = $this->fileGetter->getFilePath($record_id);
 
-        if ($this->inputValidator->validateInputType == 'realtime') {
-            $this->inputValidator->validatePackage($record_id, $source_file_path);
+        if ($this->inputValidator->validateInputType == 'realtime' && $this->inputValidator->validateInput) {
+            if (!$this->inputValidator->validatePackage($record_id, $source_file_path)) {
+                $this->problemLog->addError($record_id);
+                return;
+            }
         }
 
         // If source filename is empty and $this->require_source_file is false,

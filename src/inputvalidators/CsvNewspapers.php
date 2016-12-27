@@ -20,6 +20,12 @@ class CsvNewspapers extends MikInputValidator
         $this->fetcher = new \mik\fetchers\Csv($settings);
     }
 
+    /**
+     * Wrapper function for validating all input packages.
+     *
+     * @return array
+     *   A list of boolean values, one for each package.
+     */
     public function validateAll()
     {
         if (!$this->validateInput) {
@@ -44,13 +50,22 @@ class CsvNewspapers extends MikInputValidator
         return $validation_results;
     }
 
+    /**
+     * Wrapper function for validating a single input package.
+     *
+     * @param $record_key string
+     *   The package's record key.
+     *
+     * @param $package_path string
+     *   The the package's input directory name (not full path).
+     *
+     * @return boolean
+     *    True if all tests pass for the package, false if any tests failed.
+     */
     public function validatePackage($record_key, $package_path)
     {
-        if (!$this->validateInput) {
-            return;
-        }
-        $cumulative_validation_results = array();
         $issue_directory = $package_path;
+        $cumulative_validation_results = array();
 
         // The issue directory must be named using the yyyy-mm-dd pattern.
         if (!preg_match('/^\d\d\d\d\-\d\d\-\d\d$/', $issue_directory)) {
@@ -91,7 +106,7 @@ class CsvNewspapers extends MikInputValidator
                 );
                 $cumulative_validation_results[] = false;
             }
-            // The page filenames must end in '-x' where 'x' is a number. 
+            // The page filenames must end in '-\d+'.
             if (!$this->checkPageSequenceNumbers($pages)) {
                 $this->log->addError(
                     "Input validation failed",
@@ -124,18 +139,25 @@ class CsvNewspapers extends MikInputValidator
         }
     }
 
+    /**
+     * Recurses down the input directory to find all child directories.
+     *
+     * @return array
+     */
     private function getIssueDirectories()
     {
-        // @todo: Make $input_directories a static variable?
-        $issue_directories = array();
-        $input_directory = $this->settings['FILE_GETTER']['input_directory'];
-        $iterator = new \RecursiveDirectoryIterator($input_directory);
-        $iteratorIterator = new \RecursiveIteratorIterator($iterator);
-        foreach ($iteratorIterator as $file) {
-            if ($file->isDir()) {
-                $path = $file->getPath();
-                if (!in_array($path, $issue_directories)) {
-                    $issue_directories[] = $path;
+        static $issue_directories;
+        if (!isset($issue_directories)) {
+            $issue_directories = array();
+            $input_directory = $this->settings['FILE_GETTER']['input_directory'];
+            $iterator = new \RecursiveDirectoryIterator($input_directory);
+            $iteratorIterator = new \RecursiveIteratorIterator($iterator);
+            foreach ($iteratorIterator as $file) {
+                if ($file->isDir()) {
+                    $path = $file->getPath();
+                    if (!in_array($path, $issue_directories)) {
+                        $issue_directories[] = $path;
+                    }
                 }
             }
         }
@@ -189,7 +211,7 @@ class CsvNewspapers extends MikInputValidator
      *    A list of all the page file names.
      *
      * @return boolean
-     *    True if all files have valid sequence numbers (-n+ at the end), false if not.
+     *    True if all files have valid sequence numbers (-\d$ at the end), false if not.
      */
     private function checkPageSequenceNumbers($files) {
         $valid = true;

@@ -161,7 +161,7 @@ XML;
 
         $this->assertFileExists(
             $this->path_to_output_dir . DIRECTORY_SEPARATOR . 'B1/3/OBJ.tif',
-            "OBJ.tif file was not written by CsvSingleFile toolchain."
+            "OBJ.tif file was not written by CsvBooks toolchain."
         );
     }
 

@@ -46,10 +46,6 @@ class CsvSingleFile extends MikInputValidator
 
     public function validatePackage($record_key, $package_path)
     {
-        if (!$this->validateInput) {
-            return;
-        }
-
         // The only check we make is that the file named in the CSV
         // record exists.
         if (file_exists($package_path) && !is_dir($package_path)) {

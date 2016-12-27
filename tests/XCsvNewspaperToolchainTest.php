@@ -164,11 +164,11 @@ XML;
 
         $this->assertFileExists(
             $this->path_to_output_dir . DIRECTORY_SEPARATOR . 'TT0002/3/OBJ.tif',
-            "OBJ.tif file was not written by CsvSingleFile toolchain."
+            "OBJ.tif file was not written by CsvNewspapers toolchain."
         );
     }
 
-    protected function tearDown()
+    protected function _tearDown()
     {
         $temp_files = glob($this->path_to_temp_dir . '/*');
         foreach ($temp_files as $temp_file) {
