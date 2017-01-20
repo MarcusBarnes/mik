@@ -94,6 +94,14 @@ class CsvCompound extends Writer
         $MODS_expected = in_array('MODS', $this->datastreams);
 
         $cpd_input_dir = $this->fileGetter->getCpdSourcePath($record_id);
+
+        if ($this->inputValidator->validateInputType == 'realtime' && $this->inputValidator->validateInput) {
+            if (!$this->inputValidator->validatePackage($record_id, $cpd_input_dir)) {
+                $this->problemLog->addError($record_id);
+                return;
+            }
+        }
+
         $cpd_output_dir = $this->output_directory . DIRECTORY_SEPARATOR .
             $cpd_item_info->{$this->compound_directory_field};
 

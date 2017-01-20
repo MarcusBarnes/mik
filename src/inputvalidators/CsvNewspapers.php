@@ -4,7 +4,7 @@
 namespace mik\inputvalidators;
 
 /**
- * MikInputValidator class for the MIK CSV single file toolchain.
+ * MikInputValidator class for the MIK CSV newspapers toolchain.
  */
 class CsvNewspapers extends MikInputValidator
 {
@@ -205,7 +205,7 @@ class CsvNewspapers extends MikInputValidator
     }
 
     /**
-     * Gets the filenames of the pages in the issue-level directory.
+     * Validates the filenames of the pages in the issue-level directory.
      *
      * @param $files array
      *    A list of all the page file names.

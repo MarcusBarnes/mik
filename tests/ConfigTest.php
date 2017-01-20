@@ -90,6 +90,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         $temp_files = glob($this->path_to_temp_dir . '/*');
+        @unlink('/tmp/doesnotexist.log');
         foreach($temp_files as $temp_file) {
             @unlink($temp_file);
         }

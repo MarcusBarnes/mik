@@ -168,7 +168,7 @@ XML;
         );
     }
 
-    protected function _tearDown()
+    protected function tearDown()
     {
         $temp_files = glob($this->path_to_temp_dir . '/*');
         foreach ($temp_files as $temp_file) {
