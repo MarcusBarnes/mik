@@ -97,7 +97,9 @@ abstract class Writer
         }
         try {
             $inputValidatorClass = 'mik\\inputvalidators\\' . $input_validator_class;
-            $this->inputValidator = new $inputValidatorClass($this->settings);
+            if (class_exists($inputValidatorClass)) {
+                $this->inputValidator = new $inputValidatorClass($this->settings);
+            }
         } catch (Exception $exception) {
             $log->addError(
                 'ErrorException',
