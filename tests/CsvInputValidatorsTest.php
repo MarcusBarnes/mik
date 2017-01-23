@@ -140,6 +140,58 @@ class CsvInputValidatorsTest extends \PHPUnit_Framework_TestCase
             "CSV Newspapers input validator did not detect invalid page sequences"
         );
     }
+
+    /**
+     * @group inputvalidators
+     */
+    public function testCsvBooksInputValidator()
+    {
+        $settings = array(
+            'FETCHER' => array(
+                'use_cache' => false,
+                'input_file' => dirname(__FILE__) . '/assets/csv/inputvalidators/csvbooks/input.csv',
+                'temp_directory' => $this->path_to_temp_dir,
+                'record_key' => 'Identifier',
+            ),
+            'FILE_GETTER' => array(
+                 'validate_input' => true,
+                 'validate_input_type' => 'strict',
+                 'class' => 'CsvBooks',
+                 'input_directory' => dirname(__FILE__) . '/assets/csv/inputvalidators/csvbooks/files',
+                 'file_name_field' => 'Directory',
+            ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+                'path_to_validator_log' => $this->path_to_input_validator_log,
+            ),
+        );
+
+        $inputValidator = new \mik\inputvalidators\CsvBooks($settings);
+        $inputValidator->validateAll();
+        $log_file_entries = file($this->path_to_input_validator_log);
+        $this->assertCount(5, $log_file_entries, "CSV Books input validator log has the wrong number of entries");
+
+        $this->assertContains(
+            'files/book1","error":"Some files in the book object directory have invalid sequence numbers"',
+            $log_file_entries[0],
+            "CSV Books input validator did not detect invalid sequence numbers"
+        );
+        $this->assertContains(
+            'files/book2","error":"Some files in the book object directory have invalid extensions"',
+            $log_file_entries[1],
+            "CSV Books input validator did not find invalid page file extensions"
+        );
+        $this->assertContains(
+            'files/book3","error":"Book object input directory contains unwanted files"',
+            $log_file_entries[2],
+            "CSV Books input validator did not detect unwanted files"
+        );
+        $this->assertContains(
+            'files/book4","error":"Book object directory not found"',
+            $log_file_entries[4],
+            "CSV Books input validator did not detect empty book-level directory"
+        );
+    }
     
     protected function tearDown()
     {

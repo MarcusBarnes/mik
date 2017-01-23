@@ -24,20 +24,6 @@ class MikInputValidator
     {
         $this->settings = $settings;
 
-        // Set up logger.
-        if (isset($this->settings['LOGGING']['path_to_input_validator_log'])) {
-            $this->pathToLog = $this->settings['LOGGING']['path_to_input_validator_log'];
-        } else {
-            $this->pathToLog = dirname($this->settings['LOGGING']['path_to_log']) .
-                DIRECTORY_SEPARATOR . 'input_validator.log';
-        }
-        $this->log = new \Monolog\Logger('input validator');
-        $this->logStreamHandler= new \Monolog\Handler\StreamHandler($this->pathToLog, Logger::INFO);
-        $this->log->pushHandler($this->logStreamHandler);
-        if (isset($settings['CONFIG'])) {
-            $this->log->addInfo('Initializing log', array('configuration' => $settings['CONFIG']));
-        }
-
         if (isset($this->settings['FILE_GETTER']['validate_input'])) {
             $this->validateInput = $this->settings['FILE_GETTER']['validate_input'];
         } else {
@@ -52,6 +38,20 @@ class MikInputValidator
 
         $fileGetterClass = 'mik\\filegetters\\' . $this->settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($this->settings);
+
+        // Set up logger.
+        if (isset($this->settings['LOGGING']['path_to_input_validator_log'])) {
+            $this->pathToLog = $this->settings['LOGGING']['path_to_input_validator_log'];
+        } else {
+            $this->pathToLog = dirname($this->settings['LOGGING']['path_to_log']) .
+                DIRECTORY_SEPARATOR . 'input_validator.log';
+        }
+        $this->log = new \Monolog\Logger('input validator');
+        $this->logStreamHandler= new \Monolog\Handler\StreamHandler($this->pathToLog, Logger::INFO);
+        $this->log->pushHandler($this->logStreamHandler);
+        if ($this->validateInput && isset($settings['CONFIG'])) {
+            $this->log->addInfo('Initializing log', array('configuration' => $settings['CONFIG']));
+        }
     }
 
     /**
