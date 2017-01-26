@@ -94,8 +94,8 @@ if (ini_get('date.timezone') == null || isset($system_settings['date_default_tim
 // Converts all errors into Exceptions.
 // Set here so that you can pass the configuration settings to the MIK Error Exception class.
 set_error_handler(
-    function ($severity, $file, $line, $message, $code) use ($settings) {
-        throw new mik\exceptions\MikErrorException($severity, $file, $line, $message, $code, $settings);
+    function ($severity, $message, $file, $line, $code) use ($settings) {
+        throw new mik\exceptions\MikErrorException($severity, $message, $file, $line, $code, $settings);
     }
 );
 
