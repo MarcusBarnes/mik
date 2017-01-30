@@ -11,7 +11,7 @@ use Monolog\Handler\StreamHandler;
 class MikErrorException extends \ErrorException
 {
 
-    public function __construct($severity, $file, $line, $message = null, $code = 0, $settings)
+    public function __construct($severity, $message = null, $file, $line, $code = 0, $settings)
     {
         $pathToLog = $settings['LOGGING']['path_to_log'];
         $log = new Logger('ErrorException');
