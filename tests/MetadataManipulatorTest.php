@@ -22,6 +22,11 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
                 'record_key' => 'ID',
                 'use_cache' => false,
             ),
+            'FILE_GETTER' => array(
+                 'validate_input' => false,
+                 'class' => 'CsvSingleFile',
+                 'file_name_field' => 'File',
+            ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
                 'path_to_manipulator_log' => $this->path_to_manipulator_log,
@@ -53,6 +58,11 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
                 'use_cache' => false,
+            ),
+            'FILE_GETTER' => array(
+                 'validate_input' => false,
+                 'class' => 'CsvSingleFile',
+                 'file_name_field' => 'File',
             ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
@@ -99,6 +109,11 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
                 'record_key' => 'ID',
                 'use_cache' => false,
             ),
+            'FILE_GETTER' => array(
+                 'validate_input' => false,
+                 'class' => 'CsvSingleFile',
+                 'file_name_field' => 'File',
+            ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
                 'path_to_manipulator_log' => $this->path_to_manipulator_log,
@@ -127,6 +142,11 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
                 'record_key' => 'ID',
                 'use_cache' => false,
             ),
+            'FILE_GETTER' => array(
+                 'validate_input' => false,
+                 'class' => 'CsvSingleFile',
+                 'file_name_field' => 'File',
+            ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
                 'path_to_manipulator_log' => $this->path_to_manipulator_log,
@@ -153,6 +173,11 @@ class MetadataManipulatorTest extends \PHPUnit_Framework_TestCase
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'Identifier',
                 'use_cache' => false,
+            ),
+            'FILE_GETTER' => array(
+                 'validate_input' => false,
+                 'class' => 'CsvSingleFile',
+                 'file_name_field' => 'File',
             ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
@@ -190,6 +215,11 @@ XML;
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
                 'use_cache' => false,
+            ),
+            'FILE_GETTER' => array(
+                 'validate_input' => false,
+                 'class' => 'CsvSingleFile',
+                 'file_name_field' => 'File',
             ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,

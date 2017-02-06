@@ -22,6 +22,11 @@ class MetadataParserTest extends \PHPUnit_Framework_TestCase
                 'record_key' => 'ID',
                 'use_cache' => false,
             ),
+            'FILE_GETTER' => array(
+                 'validate_input' => false,
+                 'class' => 'CsvSingleFile',
+                 'file_name_field' => 'File',
+            ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
             ),

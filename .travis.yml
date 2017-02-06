@@ -9,4 +9,6 @@ branches:
 before_install:
   - travis_retry composer self-update
   - composer install
-script: phpunit --exclude-group FITS --bootstrap vendor/autoload.php tests
+script:
+  - phpunit --exclude-group inputvalidators --bootstrap vendor/autoload.php tests
+  - phpunit --group inputvalidators --bootstrap vendor/autoload.php tests

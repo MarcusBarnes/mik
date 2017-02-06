@@ -127,6 +127,7 @@ XML;
                 'use_cache' => false
              ),
             'FILE_GETTER' => array(
+                'validate_input' => false,
                 'class' => 'CsvNewspapers',
                 'input_directory' => dirname(__FILE__) . '/assets/csv/newspapers/files/flat',
                 'temp_directory' => $this->path_to_temp_dir,
@@ -163,7 +164,7 @@ XML;
 
         $this->assertFileExists(
             $this->path_to_output_dir . DIRECTORY_SEPARATOR . 'TT0002/3/OBJ.tif',
-            "OBJ.tif file was not written by CsvSingleFile toolchain."
+            "OBJ.tif file was not written by CsvNewspapers toolchain."
         );
     }
 

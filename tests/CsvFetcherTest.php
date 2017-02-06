@@ -18,7 +18,12 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
-             ),
+            ),
+            'FILE_GETTER' => array(
+                 'validate_input' => false,
+                 'class' => 'CsvSingleFile',
+                 'file_name_field' => 'File',
+            ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
             ),
@@ -35,7 +40,12 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
-             ),
+            ),
+            'FILE_GETTER' => array(
+                 'validate_input' => false,
+                 'class' => 'CsvSingleFile',
+                 'file_name_field' => 'File',
+            ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
             ),
@@ -52,7 +62,12 @@ class CsvFetcher extends \PHPUnit_Framework_TestCase
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
                 'record_key' => 'ID',
                 'temp_directory' => $this->path_to_temp_dir,
-             ),
+            ),
+            'FILE_GETTER' => array(
+                 'validate_input' => false,
+                 'class' => 'CsvSingleFile',
+                 'file_name_field' => 'File',
+            ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
             ),						 

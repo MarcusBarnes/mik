@@ -133,6 +133,7 @@ class FetcherManipulatorTest extends \PHPUnit_Framework_TestCase
                 'path_to_manipulator_log' => '',
              ),						 
             'FILE_GETTER' => array(
+                'validate_input' => 'false',
                 'file_name_field' => 'File',
              ),
             'MANIPULATORS' => array(
@@ -158,6 +159,7 @@ class FetcherManipulatorTest extends \PHPUnit_Framework_TestCase
                 'path_to_manipulator_log' => '',
              ),						 
             'FILE_GETTER' => array(
+                'validate_input' => 'false',
                 'file_name_field' => 'File',
              ),
             'MANIPULATORS' => array(

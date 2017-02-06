@@ -1,0 +1,7 @@
+Identifier,Child,Directory,Title,Author,Publication Date
+cpd1,,compound1,"First compound object","Fonebone, F.",1970
+cpd2,,compound2,"Second compound object","Neuman, Alfred E.",1967
+cpd3,01,compound2,"I am the second compound object's first child","Neuman, Alfred E.",1968
+cpd4,02,compound2,"I am the second compound object's second child","Neuman, Alfred E.",1969
+cpd5,,compound4,"I am missing...","",1968
+cpd10,,compound10,"I have only one child","",1969

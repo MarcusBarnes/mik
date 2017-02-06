@@ -45,7 +45,6 @@ class CsvSingleFile extends Writer
      */
     public function writePackages($metadata, $pages, $record_id)
     {
-
         // If there were no datastreams explicitly set in the configuration,
         // set flag so that all datastreams in the writer class are run.
         // $this->datastreams is an empty array by default.
@@ -64,6 +63,13 @@ class CsvSingleFile extends Writer
         // Retrieve the file associated with the document and write it to the output
         // folder using the filename or record_id identifier
         $source_file_path = $this->fileGetter->getFilePath($record_id);
+
+        if ($this->inputValidator->validateInputType == 'realtime' && $this->inputValidator->validateInput) {
+            if (!$this->inputValidator->validatePackage($record_id, $source_file_path)) {
+                $this->problemLog->addError($record_id);
+                return;
+            }
+        }
 
         // If source filename is empty and $this->require_source_file is false,
         // write the metadata file and return.

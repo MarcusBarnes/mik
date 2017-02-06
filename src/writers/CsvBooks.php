@@ -65,6 +65,15 @@ class CsvBooks extends Writer
             $no_datastreams_setting_flag = true;
         }
 
+        $book_level_input_dir = $this->fileGetter->getBookSourcePath($record_id);
+
+        if ($this->inputValidator->validateInputType == 'realtime' && $this->inputValidator->validateInput) {
+            if (!$this->inputValidator->validatePackage($record_id, $book_level_input_dir)) {
+                $this->problemLog->addError($record_id);
+                return;
+            }
+        }
+
         // Create a book-level subdirectory in the output directory.
         $book_level_output_dir = $this->output_directory . DIRECTORY_SEPARATOR . $record_id;
         if (!file_exists($book_level_output_dir)) {
@@ -75,7 +84,6 @@ class CsvBooks extends Writer
         // and all datastreams are expected, or when both MODS and OBJ are explicit.
         // But don't report a missing input dir when MODS is the only datastream and
         // the input directory setting is empty.
-        $book_level_input_dir = $this->fileGetter->getBookSourcePath($record_id);
         if (!file_exists($book_level_input_dir)) {
             if ($this->settings['FILE_GETTER']['input_directory'] !== '' &&
                 ($this->datastreams != array('MODS') xor $no_datastreams_setting_flag)) {

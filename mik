@@ -123,6 +123,40 @@ $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];
 $fetcher = new $fetcherClass($settings);
 $numRecs = $fetcher->getNumRecs();
 
+// Instantiate input validator class for 'strict' mode validation. By convention,
+// input validators are named the same as the file getter class, but we provide
+// the option to use custom validators. In 'realtime' mode the input validator
+// is invoked in the Writer class, not here.
+if (isset($settings['FILE_GETTER']['input_validator_class'])){
+    $input_validator_class = $settings['FILE_GETTER']['input_validator_class'];
+} else {
+    $input_validator_class = $settings['FILE_GETTER']['class'];
+}
+try {
+    $inputValidatorClass = 'mik\\inputvalidators\\' . $input_validator_class;
+    if (isset($settings['FILE_GETTER']['validate_input_type']) &&
+        $settings['FILE_GETTER']['validate_input_type'] == 'strict') {
+        if (class_exists($inputValidatorClass)) {
+            $inputValidator = new $inputValidatorClass($settings);
+            if ($inputValidator->validateInput) {
+                $validation_results = $inputValidator->validateAll();
+                if (in_array(false, $validation_results)) {
+                    print "Input validation (strict mode) failed; details in " . $inputValidator->pathToLog . "\n";
+                    exit(1);
+                }
+            }
+        }
+    }
+} catch (Exception $exception) {
+    $log->addError(
+        'ErrorException',
+        array(
+          'message'=>'problem instantiating inputValidatorClass',
+          'details'=>$exception
+        )
+    );
+}
+
 // Instantiate fileGetter class.
 try {
     $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
