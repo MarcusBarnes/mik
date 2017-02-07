@@ -57,6 +57,14 @@ class CsvCompound extends Writer
             $this->generate_child_modsxml = true;
         }
 
+        // Default minimum child count is 2.
+        if (isset($settings['WRITER']['min_children'])) {
+            $this->min_children = $settings['WRITER']['min_children'];
+        }
+        else {
+            $this->min_children = 2;
+        }
+        
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('Writer');
@@ -78,6 +86,17 @@ class CsvCompound extends Writer
      */
     public function writePackages($metadata, $children, $record_id)
     {
+        if (count($children) < $this->min_children) {
+            $this->log->addError("Number of child files is lower than configured minimum",
+                array(
+                    'record ID' => $record_id,
+                    'number of child files' => count($children),
+                    'configured minimum' => $this->min_children
+                ));
+            $this->problemLog->addError($record_id);
+            return;
+        }
+
         // If there were no datastreams explicitly set in the configuration,
         // set flag so that all datastreams in the writer class are run.
         // $this->datastreams is an empty array by default.
