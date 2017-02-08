@@ -6,7 +6,7 @@ use GuzzleHttp\Client;
 use mik\exceptions\MikErrorException;
 use Monolog\Logger;
 
-class CdmPhpDocuments extends FileGetter
+class CdmPdfDocuments extends FileGetter
 {
     /**
      * @var array $settings - configuration settings from confugration class.
