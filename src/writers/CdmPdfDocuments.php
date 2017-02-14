@@ -2,7 +2,7 @@
 
 namespace mik\writers;
 
-class CdmPhpDocuments extends Writer
+class CdmPdfDocuments extends Writer
 {
     /**
      * @var array $settings - configuration settings from confugration class.

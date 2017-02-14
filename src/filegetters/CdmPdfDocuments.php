@@ -6,7 +6,7 @@ use GuzzleHttp\Client;
 use mik\exceptions\MikErrorException;
 use Monolog\Logger;
 
-class CdmPhpDocuments extends FileGetter
+class CdmPdfDocuments extends FileGetter
 {
     /**
      * @var array $settings - configuration settings from confugration class.
@@ -101,10 +101,20 @@ class CdmPhpDocuments extends FileGetter
         // Retrieve the file associated with the object. In the case of PDF Documents,
         // the file is a single PDF comprised of all the page-level PDFs joined into a
         // single PDF file using the (undocumented) CONTENTdm API call below.
-        $get_file_url = $this->utilsUrl .'getdownloaditem/collection/'
-            . $this->alias . '/id/' . $pointer . '/type/compoundobject/show/1/cpdtype/document-pdf/filename/'
-            . $document_structure['page'][0]['pagefile'] . '/width/0/height/0/mapsto/pdf/filesize/0/title/'
-            . urlencode($document_structure['page'][0]['pagetitle']);
+        // Document-PDFs with only one page have a different structure than multiplage documents.
+        if (array_key_exists('pagefile', $document_structure['page'])) {
+            $get_file_url = $this->utilsUrl .'getdownloaditem/collection/'
+                . $this->alias . '/id/' . $pointer . '/type/compoundobject/show/1/cpdtype/document-pdf/filename/'
+                . $document_structure['page']['pagefile'] . '/width/0/height/0/mapsto/pdf/filesize/0/title/'
+                . urlencode($document_structure['page']['pagetitle']);
+
+        }
+        else {          
+            $get_file_url = $this->utilsUrl .'getdownloaditem/collection/'
+                . $this->alias . '/id/' . $pointer . '/type/compoundobject/show/1/cpdtype/document-pdf/filename/'
+                . $document_structure['page'][0]['pagefile'] . '/width/0/height/0/mapsto/pdf/filesize/0/title/'
+                . urlencode($document_structure['page'][0]['pagetitle']);
+        }
         // Create a new Guzzle client to fetch the PDF as a stream,
         // which will allow us to handle large PDF files.
         $client = new Client();
