@@ -81,29 +81,28 @@ class SplitRepeatedValues extends MetadataManipulator
                 // and add a MODS element for each repeated value.
                 $pattern = '#' . "^(.*)($source_field_value_to_match)(.*)$" . '#';
                 if (strpos($this->getSourceFieldValue(), $this->delimiter) !== false) {
-                  preg_match($pattern, $input, $matches);
-                  $repeated_values = explode($this->delimiter, $source_field_value_to_explode);
-                  $output = '';
-                  foreach ($repeated_values as &$value) {
-                      $value = trim($value);
-                      // Assumes the source field value has not already had special XML
-                      // characters converted to entities. Also, htmlspecialchars()
-                      // inside the metadata parser's createModsXML() method has at this
-                      // point been applied to this method's $input argument but not to
-                      // the value returned by $this->getSourceFieldValue(), which comes
-                      // from the raw cached metadata.
-                      $value = htmlspecialchars($value, ENT_NOQUOTES|ENT_XML1);
-                      if (isset($matches[1]) && isset($matches[3])) {
-                          $output .= $matches[1] . $value . $matches[3];
-                          $this->logSplit('info', $this->getSourceFieldValue(), $dest_elements->item(0), $output);
-                      }
-                      else {
-                          $output = $input;
-                          $this->logSplit('warning', $this->getSourceFieldValue(), $dest_elements->item(0), $pattern);
-                          return $output;
-                      }
-                  }
-                  return $output;
+                    preg_match($pattern, $input, $matches);
+                    if (isset($matches[1]) && isset($matches[3])) {
+                        $repeated_values = explode($this->delimiter, $source_field_value_to_explode);
+                        $output = '';
+                        foreach ($repeated_values as &$value) {
+                            $value = trim($value);
+                            // Assumes the source field value has not already had special XML
+                            // characters converted to entities. Also, htmlspecialchars()
+                            // inside the metadata parser's createModsXML() method has at this
+                            // point been applied to this method's $input argument but not to
+                            // the value returned by $this->getSourceFieldValue(), which comes
+                            // from the raw cached metadata.
+                            $value = htmlspecialchars($value, ENT_NOQUOTES|ENT_XML1);
+                            // $matches[1] is the opening markup, and $matches[3] is the closing markup.
+                            $output .= $matches[1] . $value . $matches[3];
+                        }
+                        return $output;
+                    }
+                    else {
+                      $this->logSplit('warning', $this->getSourceFieldValue(), $dest_elements->item(0), $pattern);
+                      return $input;
+                    }
                 }
                 else {
                     // If current fragment does not contain any delimiters, return it.
