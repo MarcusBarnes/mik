@@ -98,6 +98,7 @@ class SplitRepeatedValues extends MetadataManipulator
                             $value = htmlspecialchars($value, ENT_NOQUOTES|ENT_XML1);
                             // $matches[1] is the opening markup, and $matches[3] is the closing markup.
                             $output .= $matches[1] . $value . $matches[3];
+                            $this->logSplit('info', $this->getSourceFieldValue(), $dest_elements->item(0), $output);
                         }
                         return $output;
                     }
