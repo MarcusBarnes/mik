@@ -54,6 +54,10 @@ class SplitRepeatedValues extends MetadataManipulator
      */
      public function manipulate($input)
      {
+        if (!strlen($input)) {
+            return $input;
+        }
+
         $dom = new \DomDocument();
         // loadxml() throws and exception if $input has already been processed
         // by this manipulator, since the XML snippet is invalid, e.g.,
@@ -78,32 +82,26 @@ class SplitRepeatedValues extends MetadataManipulator
                 $source_field_value_to_explode = $this->getSourceFieldValue();
                 $source_field_value_to_match = preg_quote($this->getSourceFieldValue(), '#');
                 // If the source field value contains the delimter character, split the value
-                // and add a MODS element for each repeated value.
+                // and add a MODS element for each repeated value. Also, to account for HTML/XML
+                // entities (which contain ';', a common delimter) in the values, we apply
+                // html_entity_decode() to the value that we split, then re-encode before assembling
+                // the output.
+                $source_field_value_to_match = html_entity_decode($source_field_value_to_match, ENT_NOQUOTES|ENT_XML1);
                 $pattern = '#' . "^(.*)($source_field_value_to_match)(.*)$" . '#';
                 if (strpos($this->getSourceFieldValue(), $this->delimiter) !== false) {
-                  preg_match($pattern, $input, $matches);
-                  $repeated_values = explode($this->delimiter, $source_field_value_to_explode);
-                  $output = '';
-                  foreach ($repeated_values as &$value) {
-                      $value = trim($value);
-                      // Assumes the source field value has not already had special XML
-                      // characters converted to entities. Also, htmlspecialchars()
-                      // inside the metadata parser's createModsXML() method has at this
-                      // point been applied to this method's $input argument but not to
-                      // the value returned by $this->getSourceFieldValue(), which comes
-                      // from the raw cached metadata.
-                      $value = htmlspecialchars($value, ENT_NOQUOTES|ENT_XML1);
-                      if (isset($matches[1]) && isset($matches[3])) {
-                          $output .= $matches[1] . $value . $matches[3];
-                          $this->logSplit('info', $this->getSourceFieldValue(), $dest_elements->item(0), $output);
-                      }
-                      else {
-                          $output = $input;
-                          $this->logSplit('warning', $this->getSourceFieldValue(), $dest_elements->item(0), $pattern);
-                          return $output;
-                      }
-                  }
-                  return $output;
+                    preg_match($pattern, $input, $matches);
+                    if (isset($matches[1]) && isset($matches[3])) {
+                        $repeated_values = explode($this->delimiter, $source_field_value_to_explode);
+                        $output = '';
+                        foreach ($repeated_values as &$value) {
+                            $value = trim($value);
+                            $value = htmlspecialchars($value, ENT_NOQUOTES|ENT_XML1);
+                            // $matches[1] is the opening markup, and $matches[3] is the closing markup.
+                            $output .= $matches[1] . $value . $matches[3];
+                            $this->logSplit('info', $this->getSourceFieldValue(), $dest_elements->item(0), $output);
+                        }
+                        return $output;
+                    }
                 }
                 else {
                     // If current fragment does not contain any delimiters, return it.

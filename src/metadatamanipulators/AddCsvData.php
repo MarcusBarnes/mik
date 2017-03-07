@@ -57,6 +57,10 @@ class AddCsvData extends MetadataManipulator
      */
     public function manipulate($input)
     {
+        if (!strlen($input)) {
+            return $input;
+        }
+        
         $dom = new \DomDocument();
         $dom->loadxml($input, LIBXML_NSCLEAN);
 
