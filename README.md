@@ -83,7 +83,7 @@ And you're done. In practice, you probably want to do some quality assurance on 
 
 ## Current status
 
-Until the end of 2016, we will be working on what we call the 0.9 release of MIK. We aim for a 1.0 release of MIK in January 2017. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is already being used in production.
+Until the spring of 2017, we will be working on what we call the 0.9 release of MIK. We aim for a 1.0 release of MIK in late spring 2017. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is already being used in production.
 
 So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, file getters, etc.) for creating Islandora import packages from the following:
 
@@ -114,14 +114,14 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
 We welcome community development partners. Some features that would be really great to see include:
 
 * a graphical user interface on top of MIK
-* tools for creating mappings files
+* tools for creating mappings files (in addition to the [Metadata Mappings Helper](https://github.com/MarcusBarnes/mik/wiki/Cookbook:-Using-the-Metadata-Mappings-Helper))
 * toolchains to migrate from DSpace and other repository platforms to Islandora (the OAI-PMH toolchain may already cover DSpace - testers welcome)
 * a toolchain to generate Hydra import packages (yes, it's called Move to Islandora Kit but it's flexible enough to create other types of ingest packages and we'd love to collaborate with some Hydra friends)
   * we have a sample CsvToJson toolchain that demonstrates that it's possible to write out packages that differ from those Islandora uses
 
 MIK is designed to be extensible. If you have an idea for a useful manipulator or post-write hook script, please let us know.
 
-CONTRIBUTING.md provides guidelines on how you can contribute to MIK. README_DEV.md contains some information on coding standards, etc.
+CONTRIBUTING.md provides guidelines on how you can contribute to MIK. Our [Information for Developers](https://github.com/MarcusBarnes/mik/wiki/Information-for-developers) wiki page contains some information on coding standards, class structure, etc.
 
 ## Maintainers/Sponsors
 
