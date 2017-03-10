@@ -352,6 +352,13 @@ class Config
         foreach ($rows as $row) {
             $row_num++;
             $columns_in_row = count($row);
+
+            // Empty row.
+            if ($columns_in_row == 1) {
+                print "Row $row_num in the CSV input file appears to be empty; this is OK, just reporting it in case it's unintentional." . PHP_EOL;
+                continue;
+            }
+
             if ($columns_in_row != $num_header_columns) {
                 $csv_has_errors = true;
                 print "Error with CSV input file: it appears that row $row_num does not have " .
