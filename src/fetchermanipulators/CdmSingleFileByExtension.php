@@ -32,7 +32,7 @@ class CdmSingleFileByExtension extends FetcherManipulator
     public function __construct($settings, $manipulator_settings)
     {
         array_shift($manipulator_settings);
-        $this->extensions = explode('|', $manipulator_settings[0]);
+        $this->extensions = explode(',', $manipulator_settings[0]);
         // To get the value of $onWindows.
         parent::__construct();
     }
