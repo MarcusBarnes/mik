@@ -27,7 +27,7 @@ class CsvSingleFileByExtension extends FetcherManipulator
     {
         // We remove the first member of $manipulator_settings since it contains
         // the classname of this class.
-        $this->allowed_extensions = explode('|', $manipulator_settings[1]);
+        $this->allowed_extensions = explode(',', $manipulator_settings[1]);
         $this->file_name_field = $settings['FILE_GETTER']['file_name_field'];
         // To get the value of $onWindows.
         parent::__construct();        

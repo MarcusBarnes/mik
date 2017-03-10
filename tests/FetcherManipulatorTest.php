@@ -137,7 +137,7 @@ class FetcherManipulatorTest extends \PHPUnit_Framework_TestCase
                 'file_name_field' => 'File',
              ),
             'MANIPULATORS' => array(
-                'fetchermanipulators' => array('CsvSingleFileByExtension|jpg|jpeg'),
+                'fetchermanipulators' => array('CsvSingleFileByExtension|jpg,jpeg'),
              ),
         );
         $csv = new Csv($settings);

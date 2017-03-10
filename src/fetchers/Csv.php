@@ -169,7 +169,7 @@ class Csv extends Fetcher
     private function applyFetchermanipulators($records)
     {
         foreach ($this->fetchermanipulators as $manipulator) {
-            $manipulator_settings_array = explode('|', $manipulator, 2);
+            $manipulator_settings_array = explode('|', $manipulator);
             $manipulator_class = '\\mik\\fetchermanipulators\\' . $manipulator_settings_array[0];
             $fetchermanipulator = new $manipulator_class($this->all_settings,
                 $manipulator_settings_array);
