@@ -32,6 +32,7 @@ If you have a question, please [open an issue](https://github.com/MarcusBarnes/m
   * [Wosk Masterworks Print Collection](arcabc.ca/islandora/object/ecuad:wosk)
 * All of the newspapers in Simon Fraser University Library's [Digitized Newspapers](http://newspapers.lib.sfu.ca/) and [Chinese Times](http://chinesetimes.lib.sfu.ca/) sites
 * All of the collections in Simon Fraser University Library's [Digitized Collections](http://digital.lib.sfu.ca/)
+* [KORA](http://kora.kpu.ca/), Kwantlen Polytechnic University's institutional repository in [Arca](http://arcabc.ca/)
 
 ## Installation
 
@@ -104,7 +105,7 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
 
 ## Roadmap
 
-* Version 1.0 (January 2017)
+* Version 1.0 (late pring 2017)
   * developer documentation
   * code cleanup
   * more tests
