@@ -105,7 +105,7 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
 
 ## Roadmap
 
-* Version 1.0 (late pring 2017)
+* Version 1.0 (late spring 2017)
   * developer documentation
   * code cleanup
   * more tests
