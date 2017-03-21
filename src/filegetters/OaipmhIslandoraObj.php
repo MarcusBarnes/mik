@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * This filegetter is for use in OAI-PMH toolchains that harvest content from
+ * Islandora instances. It makes the following assumptions: 1) that the objects
+ * discovered via the OAI-PMH havest have an OJB datastream (not true in all cases
+ * but should be true of large image, basic image, etc. content models) and 2) the
+ * OBJ datastream is publicly readable. The filegetter is intended as an example
+ * of a specialized filegetter and is primarly for use in workshops and other
+ * training situtions.
+ */
+
 namespace mik\filegetters;
 
 use mik\exceptions\MikErrorException;
