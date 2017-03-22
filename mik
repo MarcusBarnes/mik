@@ -315,6 +315,27 @@ foreach ($records as $record) {
     }
 }
 
+// Run any shutdown hooks.
+if (isset($settings['WRITER']['shutdownhooks'])) {
+  foreach ($settings['WRITER']['shutdownhooks'] as $hook) {
+    $cmd = sprintf("%s %s", $hook, realpath($configPath));
+
+    echo "Running shutdown hook # $hook";
+    $process = new BackgroundProcess($cmd);
+    $process->run();
+
+    // Make sure that each hook completes
+    // before starting the next one.
+    // https://packagist.org/packages/cocur/background-process
+    while ($process->isRunning()) {
+      echo '.';
+      sleep(1);
+    }
+    echo "\n";
+  }
+}
+
+
 echo "Done. Output packages are in " . $settings['WRITER']['output_directory'] .
     ". Log is at "  . $settings['LOGGING']['path_to_log'] . "\n";
 
