@@ -133,7 +133,7 @@ class Config
 
         $reader = Reader::createFromPath($path);
         foreach ($reader as $index => $row) {
-            if (count($row) > 1) {
+            if (count($row) > 1 && !preg_match('/^#/', $row[0]) ) {
                 if (strlen($row[1])) {
                     $doc = new \DOMDocument();
                     if (!@$doc->loadXML($row[1])) {
