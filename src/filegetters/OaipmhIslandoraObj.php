@@ -2,12 +2,10 @@
 
 /**
  * This filegetter is for use in OAI-PMH toolchains that harvest content from
- * Islandora instances. It makes the following assumptions: 1) that the objects
- * discovered via the OAI-PMH havest have an OJB datastream (not true in all cases
- * but should be true of large image, basic image, etc. content models) and 2) the
- * OBJ datastream is publicly readable. The filegetter is intended as an example
- * of a specialized filegetter and is primarly for use in workshops and other
- * training situtions.
+ * Islandora sites. Will harvest the datastreams listed in the config option
+ * [WRITER] datastream_ids. Intended as an example of a specialized, repository-specific
+ * filegetter and is primarly for use in workshops and other training or testing
+ * situtions.
  */
 
 namespace mik\filegetters;
@@ -40,6 +38,7 @@ class OaipmhIslandoraObj extends FileGetter
         $this->log->pushHandler($this->logStreamHandler);
 
         $this->oai_endpoint = $settings['FETCHER']['oai_endpoint'];
+        $this->datastreamIds = $settings['FILE_GETTER']['datastream_ids'];
     }
 
     /**
@@ -51,13 +50,11 @@ class OaipmhIslandoraObj extends FileGetter
     }
 
     /**
-     * Get the URL for the OBJ datastream (PDF, image, etc.).
-     *
-     * Does not check content model for the existence of an OBJ datastream.
+     * Get the URL for the datastream (OBJ, PDF, image, etc.).
      *
      * @param string $record_key
      *
-     * @return string $download_url
+     * @return string $ds_url
      */
     public function getFilePath($record_key)
     {
@@ -78,10 +75,27 @@ class OaipmhIslandoraObj extends FileGetter
                 else {
                     $port = '';
                 }
-                // Assemble the URL of the OBJ datastream and return it.
                 $islandora_host = $islandora_url_info['scheme'] . '://' . $islandora_url_info['host'] . $port;
-                $obj_url = $islandora_host . '/islandora/object/' . $pid . '/datastream/OBJ/download';
-                return $obj_url;
+                // Assemble the URL of each datastream listed in the config and return on the first one
+                // that is available. We loop through DSIDs because not all Islandora content models
+                // require an OBJ datastream, e.g., PDF, video and audio content models.
+                foreach ($this->datastreamIds as $dsid) {
+                    $ds_url = $islandora_host . '/islandora/object/' . $pid . '/datastream/' . $dsid . '/download';
+                    // HEAD is probably more efficient than the default GET.
+                    stream_context_set_default(
+                        array(
+                            'http' => array(
+                                'method' => 'HEAD'
+                             )
+                        )
+                    );
+                    $headers = get_headers($ds_url, 1);
+                    if ($headers[0] == 'HTTP/1.1 200 OK') {
+                        return $ds_url;
+                    }
+                }
+                // If no datastreams are available, return false.
+                return false;
              }
          }
          // If no dc:identifiers contain what appears to be a PID (unlikely, but possible), return false.
