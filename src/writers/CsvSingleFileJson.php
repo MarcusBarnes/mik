@@ -33,7 +33,12 @@ class CsvSingleFileJson extends Writer
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
         $this->output_directory = $settings['WRITER']['output_directory'];
-        $this->preserve_content_filenames = $settings['WRITER']['preserve_content_filenames'];
+        if (isset($settings['WRITER']['preserve_content_filenames'])) {
+            $this->preserve_content_filenames = $settings['WRITER']['preserve_content_filenames'];
+        }
+        else {
+            $this->preserve_content_filenames = false;
+        }
     }
 
     /**

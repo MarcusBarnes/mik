@@ -31,7 +31,12 @@ class CsvSingleFile extends Writer
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
         $this->output_directory = $settings['WRITER']['output_directory'];
-        $this->preserve_content_filenames = $settings['WRITER']['preserve_content_filenames'];
+        if (isset($settings['WRITER']['preserve_content_filenames'])) {
+            $this->preserve_content_filenames = $settings['WRITER']['preserve_content_filenames'];
+        }
+        else {
+            $this->preserve_content_filenames = false;
+        }
         if (isset($settings['WRITER']['require_source_file'])) {
             $this->require_source_file = $settings['WRITER']['require_source_file'];
         }
