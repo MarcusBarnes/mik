@@ -39,6 +39,12 @@ class SimpleReplace extends MetadataManipulator
             // A replacement string.
             $this->replacementText = $paramsArray[1];
         }
+        elseif (count($paramsArray) == 1) {
+            // A PHP preg_ pattern to match the original value on.
+            $this->replacePattern = $paramsArray[0];
+            // Empty replacement.
+            $this->replacementText = '';
+        }
         else {
             $this->log->addInfo("SimpleReplace", array('Wrong parameter count' => count($paramsArray)));
         }
