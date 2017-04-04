@@ -119,8 +119,8 @@ class Config
      */
     public function checkMappingSnippets()
     {
-        $fetchers = array('Cdm', 'Csv');
-        if (!in_array($this->settings['FETCHER']['class'], $fetchers)) {
+        $parsers = array('mods\CsvToMods', 'mods\CdmToMods');
+        if (!in_array($this->settings['METADATA_PARSER']['class'], $parsers)) {
             return;
         }
 
