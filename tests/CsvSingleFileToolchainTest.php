@@ -123,7 +123,6 @@ XML;
             ),
             'WRITER' => array(
                 'output_directory' => $this->path_to_output_dir,
-                'preserve_content_filenames' => true,
              ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
