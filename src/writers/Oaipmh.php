@@ -42,6 +42,13 @@ class Oaipmh extends Writer
             $this->httpTimeout = 60;
         }
 
+        if (isset($this->settings['WRITER']['metadata_only'])) {
+            // Seconds.
+            $this->metadata_only = $this->settings['WRITER']['metadata_only'];
+        } else {
+            $this->metadata_only = false;
+        }
+
         // Default Mac PHP setups may use Apple's Secure Transport
         // rather than OpenSSL, causing issues with CA verification.
         // Allow configuration override of CA verification at users own risk.
@@ -63,15 +70,17 @@ class Oaipmh extends Writer
         $this->createOutputDirectory();
         $output_path = $this->outputDirectory . DIRECTORY_SEPARATOR;
 
+        $normalized_record_id = $this->normalizeFilename($record_id);
+        $metadata_file_path = $output_path . $normalized_record_id . '.xml';
+        $this->writeMetadataFile($metadata, $metadata_file_path, true);
+
+	if ($this->metadata_only) {
+	  return;
+	}
+
         // Retrieve the file associated with the document and write it to the output
         // folder using the filename or record_id identifier
         $source_file_url = $this->fileGetter->getFilePath($record_id);
-
-        $normalized_record_id = $this->normalizeFilename($record_id);
-        $metadata_file_path = $output_path . $normalized_record_id . '.xml';
-
-        $this->writeMetadataFile($metadata, $metadata_file_path, true);
-
         // Retrieve the PDF, etc. using Guzzle.
         if ($source_file_url) {
             $client = new Client();
