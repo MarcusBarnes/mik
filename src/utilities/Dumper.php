@@ -2,8 +2,10 @@
 
 namespace mik\utilities;
 
+use mik\exceptions\MikErrorException;
+
 /**
- * The Dumper...
+ * Utility to dump the value of a variable out to a log.
  */
 class Dumper
 {
@@ -18,14 +20,14 @@ class Dumper
      *   The full path to a log file. Defaults to the system's
      *   temp directory with a filename of 'mik_dumper.txt'.
      */
-    public function dump($variable, $label = '', $destination = null)
+    public function dump($variable, $label = null, $destination = null)
     {
         if (is_null($destination)) {
             $destination = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_dumper.txt";
         }
         $value = var_export($variable, true) . "\n";
-        if (strlen($label)) {
-            $value = $label . ":\n" . $value;
+        if (!is_null($label)) {
+            $value = $label . ":" . PHP_EOL . $value;
         }
         file_put_contents($destination, $value, FILE_APPEND);
     }
