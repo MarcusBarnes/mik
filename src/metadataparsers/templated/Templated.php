@@ -59,6 +59,10 @@ class Templated extends MetadataParser
     {
         $loader = new \Twig_Loader_Filesystem($this->templateDirectory);
         $twig = new \Twig_Environment($loader);
+
+        $truncate_filter = new \Twig_SimpleFilter('TwigTruncate', 'mik\utilities\MikTwigExtension::TwigTruncate');
+        $twig->addFilter($truncate_filter);
+
         $xml_from_template = $twig->render($this->templateFilename, (array) $objectInfo);
 
         if (isset($this->metadatamanipulators)) {
