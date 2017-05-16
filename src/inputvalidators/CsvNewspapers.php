@@ -18,6 +18,16 @@ class CsvNewspapers extends MikInputValidator
     {
         parent::__construct($settings);
         $this->fetcher = new \mik\fetchers\Csv($settings);
+
+        // Default is to use - as the sequence separator in the page filename.
+        // The separator is used here in a regex, so we escape it.
+        if (isset($settings['WRITER']['page_sequence_separator'])) {
+            $this->page_sequence_separator = $settings['WRITER']['page_sequence_separator'];
+        }
+        else {
+            $this->page_sequence_separator = '-';
+        }
+        $this->page_sequence_separator = preg_quote($this->page_sequence_separator);
     }
 
     /**
@@ -218,7 +228,7 @@ class CsvNewspapers extends MikInputValidator
         foreach ($files as $file) {
             $pathinfo = pathinfo($file);
             $filename = $pathinfo['filename'];
-            if (!preg_match('/\-\d+$/', $filename)) {
+            if (!preg_match('/' . $this->page_sequence_separator . '\d+$/', $filename)) {
                 $valid = false;
             }
         }

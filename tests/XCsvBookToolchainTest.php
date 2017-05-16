@@ -130,7 +130,6 @@ class CsvBookToolchainTest extends \PHPUnit_Framework_TestCase
                 'file_name_field' => 'Directory',
              ),
             'METADATA_PARSER' => array(
-                'input_file' => dirname(__FILE__) . '/assets/csv/newspapers/metadata/newspapers_metadata.csv',
                 'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/books/metadata/books_mappings.csv',
             ),
             'WRITER' => array(
@@ -165,8 +164,63 @@ XML;
         );
     }
 
+    public function _testWritePackagesSequenceSeparator()
+    {
+        $settings = array(
+            'FETCHER' => array(
+                'input_file' => dirname(__FILE__) . '/assets/csv/books/metadata/books_metadata.csv',
+                'record_key' => 'Identifier',
+                'temp_directory' => $this->path_to_temp_dir,
+                'use_cache' => false
+             ),
+            'FILE_GETTER' => array(
+                'validate_input' => false,
+                'class' => 'CsvBooks',
+                'input_directory' => dirname(__FILE__) . '/assets/csv/books/files_page_sequence_separator',
+                'temp_directory' => $this->path_to_temp_dir,
+                'file_name_field' => 'Directory',
+             ),
+            'METADATA_PARSER' => array(
+                'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/books/metadata/books_mappings.csv',
+            ),
+            'WRITER' => array(
+                'output_directory' => $this->path_to_output_dir,
+                'metadata_filename' => 'MODS.xml',
+                'page_sequence_separator' => '_',
+             ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+            ),
+        );
+
+        $file_getter = new \mik\filegetters\CsvBooks($settings);
+        $pages = $file_getter->getChildren('B1');
+
+        $parser = new \mik\metadataparsers\mods\CsvToMods($settings);
+        $mods = $parser->metadata('B1');
+
+        $writer = new \mik\writers\CsvBooks($settings);
+        $writer->writePackages($mods, $pages, 'B1');
+
+/*
+        $written_metadata = file_get_contents($this->path_to_output_dir . DIRECTORY_SEPARATOR . 'B1/MODS.xml');
+        $title_element = <<<XML
+  <titleInfo>
+    <title>The Emerald City of Oz</title>
+  </titleInfo>
+XML;
+        $this->assertContains($title_element, $written_metadata, "CSV to MODS metadata parser did not work");
+*/
+
+        $this->assertFileExists(
+            $this->path_to_output_dir . DIRECTORY_SEPARATOR . 'B1/4/OBJ.tif',
+            "OBJ.tif file was not written by CsvBooks toolchain using a configured page sequence separator."
+        );
+    }
+
     protected function tearDown()
     {
+        unset($writer);
         $temp_files = glob($this->path_to_temp_dir . '/*');
         foreach ($temp_files as $temp_file) {
             @unlink($temp_file);

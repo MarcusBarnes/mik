@@ -27,8 +27,15 @@ class CsvBooks extends MikInputValidator
             '.DS_Store',
         );
 
-        // The separator is used in a regex, so we escape it.
-        $this->page_sequence_separator = '\-';
+        // Default is to use - as the sequence separator in the page filename.
+        // The separator is used here in a regex, so we escape it.
+        if (isset($settings['WRITER']['page_sequence_separator'])) {
+            $this->page_sequence_separator = $settings['WRITER']['page_sequence_separator'];
+        }
+        else {
+            $this->page_sequence_separator = '-';
+        }
+        $this->page_sequence_separator = preg_quote($this->page_sequence_separator);
     }
 
     /**
