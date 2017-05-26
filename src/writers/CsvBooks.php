@@ -39,6 +39,13 @@ class CsvBooks extends Writer
         else {
             $this->generate_page_modsxml = true;
         }
+        // Default is to use - as the sequence separator in the page filename.
+        if (isset($settings['WRITER']['page_sequence_separator'])) {
+            $this->page_sequence_separator = $settings['WRITER']['page_sequence_separator'];
+        }
+        else {
+            $this->page_sequence_separator = '-';
+        }
 
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_log'];
@@ -107,7 +114,8 @@ class CsvBooks extends Writer
         foreach ($pages as $page_path) {
             // Get the page number from the filename. It is the last segment.
             $pathinfo = pathinfo($page_path);
-            $filename_segments = explode('-', $pathinfo['filename']);
+            $filename_segments = explode($this->page_sequence_separator, $pathinfo['filename']);
+
             $page_number = ltrim(end($filename_segments), '0');
             $page_level_output_dir = $book_level_output_dir . DIRECTORY_SEPARATOR . $page_number;
             mkdir($page_level_output_dir);

@@ -125,17 +125,17 @@ class CsvBookToolchainTest extends \PHPUnit_Framework_TestCase
             'FILE_GETTER' => array(
                 'validate_input' => false,
                 'class' => 'CsvBooks',
-                'input_directory' => dirname(__FILE__) . '/assets/csv/books/files',
+                'input_directory' => dirname(__FILE__) . '/assets/csv/books/files_page_sequence_separator',
                 'temp_directory' => $this->path_to_temp_dir,
                 'file_name_field' => 'Directory',
              ),
             'METADATA_PARSER' => array(
-                'input_file' => dirname(__FILE__) . '/assets/csv/newspapers/metadata/newspapers_metadata.csv',
                 'mapping_csv_path' => dirname(__FILE__) . '/assets/csv/books/metadata/books_mappings.csv',
             ),
             'WRITER' => array(
                 'output_directory' => $this->path_to_output_dir,
                 'metadata_filename' => 'MODS.xml',
+                'page_sequence_separator' => '_',
              ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
@@ -160,13 +160,14 @@ XML;
         $this->assertContains($title_element, $written_metadata, "CSV to MODS metadata parser did not work");
 
         $this->assertFileExists(
-            $this->path_to_output_dir . DIRECTORY_SEPARATOR . 'B1/3/OBJ.tif',
-            "OBJ.tif file was not written by CsvBooks toolchain."
+            $this->path_to_output_dir . DIRECTORY_SEPARATOR . 'B1/4/OBJ.tif',
+            "OBJ.tif file was not written by CsvBooks toolchain using a configured page sequence separator."
         );
     }
 
     protected function tearDown()
     {
+        unset($writer);
         $temp_files = glob($this->path_to_temp_dir . '/*');
         foreach ($temp_files as $temp_file) {
             @unlink($temp_file);
