@@ -125,7 +125,7 @@ class CsvNewspapers extends MikInputValidator
                 );
                 $cumulative_validation_results[] = false;
             }
-            if (!$this->checkOcrFiles($issue_directory, $pages)) {
+            if (!$this->checkOcrFiles($issue_directory_full_path, $pages)) {
                 $this->log->addError(
                     "Input validation failed",
                     array(
@@ -281,7 +281,7 @@ class CsvNewspapers extends MikInputValidator
         foreach ($files as $file) {
             $pathinfo = pathinfo($file);
             $filename = $pathinfo['filename'];
-            $path_to_ocr_file = $issue_directory_path . DIRECTORY_SEPARATOR .
+            $path_to_ocr_file = realpath($issue_directory_path) . DIRECTORY_SEPARATOR .
                 $filename . $this->ocr_extension;
             if (!file_exists($path_to_ocr_file)) {
                 $valid = false;
