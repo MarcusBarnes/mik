@@ -114,6 +114,9 @@ class CsvInputValidatorsTest extends \PHPUnit_Framework_TestCase
                  'input_directory' => dirname(__FILE__) . '/assets/csv/inputvalidators/csvnewspapers/files',
                  'file_name_field' => 'Directory',
             ),
+            'WRITER' => array(
+                'log_missing_ocr_files' => TRUE,
+            ),
             'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,
                 'path_to_validator_log' => $this->path_to_input_validator_log,
@@ -123,21 +126,26 @@ class CsvInputValidatorsTest extends \PHPUnit_Framework_TestCase
         $inputValidator = new \mik\inputvalidators\CsvNewspapers($settings);
         $inputValidator->validateAll();
         $log_file_entries = file($this->path_to_input_validator_log);
-        $this->assertCount(3, $log_file_entries, "CSV Newspapers input validator log has the wrong number of entries");
+        $this->assertCount(6, $log_file_entries, "CSV Newspapers input validator log has the wrong number of entries");
         $this->assertContains(
             '"issue directory":"1900-0102","error":"Issue directory name is not in yyyy-mm-dd format"',
-            $log_file_entries[0],
+            $log_file_entries[1],
             "CSV Newspapers input validator did not detect non-yyyy-mm-dd directory name"
         );
         $this->assertContains(
             '"issue directory":"1900-01-03","error":"Issue directory not found in list of possible input directories"',
-            $log_file_entries[1],
+            $log_file_entries[3],
             "CSV Newspapers input validator did not find issue directory in input directories"
         );
         $this->assertContains(
             '"issue directory":"1900-01-04","error":"Some pages in issue directory have invalid sequence numbers"',
-            $log_file_entries[2],
+            $log_file_entries[5],
             "CSV Newspapers input validator did not detect invalid page sequences"
+        );
+        $this->assertContains(
+            '"issue directory":"1900-01-04","error":"Issue directory is missing one or more OCR files"',
+            $log_file_entries[4],
+            "CSV Newspapers input validator did not detect missing OCR files"
         );
     }
 

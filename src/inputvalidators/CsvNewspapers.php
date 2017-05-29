@@ -28,6 +28,15 @@ class CsvNewspapers extends MikInputValidator
             $this->page_sequence_separator = '-';
         }
         $this->page_sequence_separator = preg_quote($this->page_sequence_separator);
+
+        $this->ocr_extension = '.txt';
+        // Default is to not log the absence of page-level OCR files.
+        if (isset($settings['WRITER']['log_missing_ocr_files'])) {
+            $this->log_missing_ocr_files= $settings['WRITER']['log_missing_ocr_files'];
+        }
+        else {
+            $this->log_missing_ocr_files = FALSE;
+        }
     }
 
     /**
@@ -112,6 +121,17 @@ class CsvNewspapers extends MikInputValidator
                         'record ID' => $record_key,
                         'issue directory' => $issue_directory,
                         'error' => 'Issue directory contains no page files'
+                    )
+                );
+                $cumulative_validation_results[] = false;
+            }
+            if (!$this->checkOcrFiles($issue_directory, $pages)) {
+                $this->log->addError(
+                    "Input validation failed",
+                    array(
+                        'record ID' => $record_key,
+                        'issue directory' => $issue_directory,
+                        'error' => 'Issue directory is missing one or more OCR files'
                     )
                 );
                 $cumulative_validation_results[] = false;
@@ -204,14 +224,21 @@ class CsvNewspapers extends MikInputValidator
      *    The full path to the issue-level directory.
      *
      * @return array
-     *    A list of all the page file names.
+     *    A list of all the page file names. Files must have one of
+     *    following extensions: tif, tiff, jp2.
      */
     private function getPageFiles($dir) {
+        $page_files = array();
         $files = $this->readDir($dir);
-        foreach ($files as &$file) {
-            $file = basename($file);
+        foreach ($files as $file) {
+            $pathinfo = pathinfo($file);
+            $page_file = $pathinfo['basename'];
+            $ext = $pathinfo['extension'];
+            if (in_array($ext, array('tif','tiff', 'jp2'))) {
+                $page_files[] = $page_file;
+            }
         }
-        return $files;
+        return $page_files;
     }
 
     /**
@@ -229,6 +256,34 @@ class CsvNewspapers extends MikInputValidator
             $pathinfo = pathinfo($file);
             $filename = $pathinfo['filename'];
             if (!preg_match('/' . $this->page_sequence_separator . '\d+$/', $filename)) {
+                $valid = false;
+            }
+        }
+        return $valid;
+    }
+
+    /**
+     * Checks for the existence of page-level OCR files.
+     *
+     * @param $issue_directory_path string
+     *    The absolute path to the issue-level directory.
+     * @param $files array
+     *    A list of all the page file names in the directory.
+     *
+     * @return boolean
+     *    True if all image files have corresponding OCR files.
+     */
+    private function checkOcrFiles($issue_directory_path, $files) {
+        $valid = true;
+        if (!$this->log_missing_ocr_files) {
+            return $valid;
+        }
+        foreach ($files as $file) {
+            $pathinfo = pathinfo($file);
+            $filename = $pathinfo['filename'];
+            $path_to_ocr_file = $issue_directory_path . DIRECTORY_SEPARATOR .
+                $filename . $this->ocr_extension;
+            if (!file_exists($path_to_ocr_file)) {
                 $valid = false;
             }
         }
