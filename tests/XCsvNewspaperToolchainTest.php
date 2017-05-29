@@ -166,6 +166,11 @@ XML;
             $this->path_to_output_dir . DIRECTORY_SEPARATOR . 'TT0002/3/OBJ.tif',
             "OBJ.tif file was not written by CsvNewspapers toolchain."
         );
+
+        $this->assertFileExists(
+            $this->path_to_output_dir . DIRECTORY_SEPARATOR . 'TT0002/3/OCR.txt',
+            "OCR.txt file was not written by CsvNewspapers toolchain."
+        );
     }
 
     protected function tearDown()
@@ -182,6 +187,7 @@ XML;
         foreach ($page_dirs as $page_dir) {
             $page_dir_path = $issue_dir . '/' . $page_dir;
             @unlink($page_dir_path . '/OBJ.tif');
+            @unlink($page_dir_path . '/OCR.txt');
             @unlink($page_dir_path . '/MODS.xml');
             @rmdir($page_dir_path);
         }

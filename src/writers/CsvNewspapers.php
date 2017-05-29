@@ -53,6 +53,15 @@ class CsvNewspapers extends Writer
         $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
             Logger::INFO);
         $this->log->pushHandler($this->logStreamHandler);
+
+        $this->ocr_extension = '.txt';
+        // Default is to not log the absence of page-level OCR files.
+        if (isset($settings['WRITER']['log_missing_ocr_files'])) {
+            $this->log_missing_ocr_files= $settings['WRITER']['log_missing_ocr_files'];
+        }
+        else {
+            $this->log_missing_ocr_files = FALSE;
+        }
     }
 
     /**
@@ -102,28 +111,6 @@ class CsvNewspapers extends Writer
              }
          }
 
-
-
-/*
-        // Create an issue-level subdirectory in the output directory, but only if there is
-        // a corresponding input directory.
-        $issue_level_input_dir = $this->fileGetter->getIssueSourcePath($record_id);
-        if (file_exists($issue_level_input_dir)) {
-            $issue_level_output_dir = $this->output_directory . DIRECTORY_SEPARATOR . $record_id;
-            if (!file_exists($issue_level_output_dir)) {
-                mkdir($issue_level_output_dir);
-            }
-        }
-        else {
-            if ($this->datastreams != array('MODS')) {
-                $this->log->addWarning("CSV Newspapers warning",
-                    array('Issue-level input directory does not exist' => $issue_level_input_dir));
-                return;
-            }
-        }
-*/
-
-
         $MODS_expected = in_array('MODS', $this->datastreams);
         if ($MODS_expected xor $no_datastreams_setting_flag) {
             $metadata_file_path = $issue_level_output_dir . DIRECTORY_SEPARATOR .
@@ -132,9 +119,8 @@ class CsvNewspapers extends Writer
         }
 
         // @todo: Add error handling on mkdir and copy.
-        // @todo: Write page level MODS.xml file, after testing ingest as is.
         foreach ($pages as $page_path) {
-            // Get the page number from the filename. It is the last se
+            // Get the sequence number from the last segment of the filename.
             $pathinfo = pathinfo($page_path);
             $filename_segments = explode($this->page_sequence_separator, $pathinfo['filename']);
             $page_number = ltrim(end($filename_segments), '0');
@@ -145,9 +131,28 @@ class CsvNewspapers extends Writer
                 $OBJ_expected = in_array('OBJ', $this->datastreams);
                 if ($OBJ_expected xor $no_datastreams_setting_flag) {
                     $extension = $pathinfo['extension'];
-                    $page_output_file_path = $page_level_output_dir . DIRECTORY_SEPARATOR .
+                    $page_output_path = $page_level_output_dir . DIRECTORY_SEPARATOR .
                         'OBJ.' . $extension;
-                    copy($page_path, $page_output_file_path);
+                    copy($page_path, $page_output_path);
+                }
+            }
+
+            // If the datastreams lis only 'MODS' we're generating metadata only.
+            if ($this->datastreams != array('MODS')) {
+                $OCR_expected = in_array('OCR', $this->datastreams);
+                if ($OCR_expected xor $no_datastreams_setting_flag) {
+                    $ocr_input_path = $pathinfo['dirname'] . DIRECTORY_SEPARATOR .
+                        $pathinfo['filename'] . $this->ocr_extension;
+                    $ocr_output_path = $page_level_output_dir . DIRECTORY_SEPARATOR .
+                        'OCR' . $this->ocr_extension;
+                    if (file_exists($ocr_input_path)) {
+                        copy($ocr_input_path, $ocr_output_path);
+                    } else {
+                        if ($this->log_missing_ocr_files) {
+                            $this->log->addWarning("CSV Newspapers warning",
+                                array('Page-level OCR file does not exist' => $ocr_input_path));
+                        }
+                    }
                 }
             }
 
