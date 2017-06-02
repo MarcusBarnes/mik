@@ -69,6 +69,24 @@ Take a look at [Creating a pull request](https://help.github.com/articles/creati
 
 You may want to read [Syncing a fork](https://help.github.com/articles/syncing-a-fork) for instructions on how to keep your fork up to date with the latest changes of the upstream (official) `mik` repository.
 
+### Workflow for testing and merging pull requests
+
+Part of opening a pull request is to describe how reviewers should test your work. MIK uses two different test workflows, "smoke test" and "testable":
+
+* Smoke tests are required if the work you are contributing is not fully covered by PHPUnit tests. In other words, a human needs to test your work to confirm it does what it is intended to do and that it doesn't introduce any side effects. If your work needs to be tested using a smoke test, you are expected to provide sample configuration files and input data to allow the reviewer to perform the smoke tests.
+* Testable work is work that can be tested by existing or new PHPUnit tests.
+
+The following is the standard workflow that reviewers of pull requests against MIK use:
+
+1. Person working on issue must incorporate the change into one of the existing PHPUnit tests, or provide new tests as applicable.
+1. Person working on the issue must:
+    1. state in the PR template that the tests pass on their local dev copy,
+    1. summarize how the tests apply to the code changes in the PR, and
+    1. indicate the expected number of successful tests and assertions.
+1. Person reviewing PR clones branch, and runs the tests.
+1. If the tests pass on the reviewer's local copy, and the reviewer agrees that the test code does in fact covers the code changes, the reviewer can decide if they want to merge into master without performing further smoke tests. Reviewer also has the option of deciding that the tests are not sufficient or that a smoke test involving sample data and configuration is justified.
+1. If the person working on the issue does not provide a PHPUnit test, a smoke test is required prior to merging.
+
 ## License Agreements
 
 MIK is licensed under GPL version 3 or higher. By opening a pull request or otherwise contributing code to the MIK codebase, you transfer non-exclusive ownership of that code (you retain ownership of your code for other purposes) to the MIK maintainers for the sole purpose of redistributing your contribution within the MIK codebase under the conditions of the GPLv3 license or higher. You also warrant that you have the legal authority to make such a transfer.
