@@ -80,9 +80,9 @@ The following is the standard workflow that reviewers of pull requests against M
 
 1. Person working on issue must incorporate the change into one of the existing PHPUnit tests, or provide new tests as applicable.
 1. Person working on the issue must:
-    a. state in the PR template that the tests pass on their local dev copy,
-    b. summarize how the tests apply to the code changes in the PR, and
-    c. indicate the expected number of successful tests and assertions.
+    1. state in the PR template that the tests pass on their local dev copy,
+    1. summarize how the tests apply to the code changes in the PR, and
+    1. indicate the expected number of successful tests and assertions.
 1. Person reviewing PR clones branch, and runs the tests.
 1. If the tests pass on the reviewer's local copy, and the reviewer agrees that the test code does in fact covers the code changes, the reviewer can decide if they want to merge into master without performing further smoke tests. Reviewer also has the option of deciding that the tests are not sufficient or that a smoke test involving sample data and configuration is justified.
 1. If the person working on the issue does not provide a PHPUnit test, a smoke test is required prior to merging.
