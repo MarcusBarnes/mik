@@ -101,6 +101,11 @@ class Csv extends Fetcher
             ->fetchAssoc();
 
             foreach ($records as $index => &$record) {
+                // Commenting out rows only works if the # is the first
+                // character in the record key field.
+                if (preg_match('/^#/', $record[$this->record_key])) {
+                    unset($records[$index]);
+                }
                 if (!is_null($record[$this->record_key]) || strlen($record[$this->record_key])) {
                     $record = (object) $record;
                     $record->key = $record->{$this->record_key};
