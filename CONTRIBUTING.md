@@ -73,19 +73,19 @@ You may want to read [Syncing a fork](https://help.github.com/articles/syncing-a
 
 Part of opening a pull request is to describe how reviewers should test your work. MIK uses two different test workflows, "smoke test" and "testable":
 
-* Smoke tests are required if the work you are contributing is not fully covered by PHPUnit tests. In other words, a human needs to test your work to confirm it does what it is intended to do, without introducing any side effects. If your work needs to be tested using a smoke test, you are expected to provide sample configuration files and input data to allow the reviewer to perform the smoke tests.
+* Smoke tests are required if the work you are contributing is not fully covered by PHPUnit tests. In other words, a human needs to test your work to confirm it does what it is intended to do and that it doesn't introduce any side effects. If your work needs to be tested using a smoke test, you are expected to provide sample configuration files and input data to allow the reviewer to perform the smoke tests.
 * Testable work is work that can be tested by existing or new PHPUnit tests.
 
 The following is the standard workflow that reviewers of pull requests against MIK use;
 
 1. Person working on issue must incorporate the change into one of the existing PHPUnit tests, or provide new tests as applicable.
 1. Person working on the issue must:
-  a. state in the PR template that the tests pass on their local dev copy,
-  b. summarize how the tests apply to the code changes in the PR, and
-  c. indicate the expected number of successful tests and assertions.
+    a. state in the PR template that the tests pass on their local dev copy,
+    b. summarize how the tests apply to the code changes in the PR, and
+    c. indicate the expected number of successful tests and assertions.
 1. Person reviewing PR clones branch, and runs the tests.
 1. If the tests pass on the reviewer's local copy, and the reviewer agrees that the test code does in fact covers the code changes, the reviewer can decide if they want to merge into master without performing further smoke tests. Reviewer also has the option of deciding that the tests are not sufficient or that a smoke test involving sample data and configuration is justified.
-1. If the person working on the issue does not provide a PHPUnit test, a smoke test is required prior to merging (i.e., the current workflow applies).
+1. If the person working on the issue does not provide a PHPUnit test, a smoke test is required prior to merging.
 
 ## License Agreements
 
