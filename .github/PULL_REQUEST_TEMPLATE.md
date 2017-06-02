@@ -27,7 +27,7 @@ To help reviewers test your work:
 
 * Indicate whether your work requires a smoke test or is covered by PHPUnit tests (see CONTRIBUTING.md for more information).
 * If your work is covered by PHPUnit tests, indicate how many successful tests and assertions the reviewer should see when they run your tests.
-* If your work requires a smoke test, pprovide sample configuration files and data for reviewers.
+* If your work requires a smoke test, provide sample configuration files and data for reviewers.
 * Be as detailed as possible.
 * Good testing instructions and sample confiruation files/data help get your PR completed faster.
 
