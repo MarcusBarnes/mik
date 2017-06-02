@@ -76,7 +76,7 @@ Part of opening a pull request is to describe how reviewers should test your wor
 * Smoke tests are required if the work you are contributing is not fully covered by PHPUnit tests. In other words, a human needs to test your work to confirm it does what it is intended to do and that it doesn't introduce any side effects. If your work needs to be tested using a smoke test, you are expected to provide sample configuration files and input data to allow the reviewer to perform the smoke tests.
 * Testable work is work that can be tested by existing or new PHPUnit tests.
 
-The following is the standard workflow that reviewers of pull requests against MIK use;
+The following is the standard workflow that reviewers of pull requests against MIK use:
 
 1. Person working on issue must incorporate the change into one of the existing PHPUnit tests, or provide new tests as applicable.
 1. Person working on the issue must:
