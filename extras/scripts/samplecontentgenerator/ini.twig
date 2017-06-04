@@ -1,0 +1,40 @@
+{% autoescape false %}
+; MIK configuration file for {{ sample_id }}
+
+; You will want to move the .ini, metadata, and mapping file outside of {{ output_path }}.
+
+[SYSTEM]
+
+[CONFIG]
+config_id = "{{ sample_id }}"
+last_updated_on = "{{ last_updated_on }}"
+last_updated_by = "A script."
+
+[FETCHER]
+class = Csv
+input_file = "{{ sample_id }}_metadata.csv"
+temp_directory = "{{ output_path }}_temp"
+record_key = Identifier
+
+[METADATA_PARSER]
+class = mods\CsvToMods
+mapping_csv_path = "{{ sample_id }}_mappings.csv"
+repeatable_wrapper_elements[] = subject
+
+[FILE_GETTER]
+class = {{ class }}
+input_directory = "{{ output_path }}"
+temp_directory = "{{ output_path }}_temp"
+file_name_field = File
+
+[WRITER]
+class = {{ class }}
+utput_directory = "{{ output_path }}"
+
+[MANIPULATORS]
+metadatamanipulators[] = "SplitRepeatedValues|Subjects|/subject/topic|;"
+
+[LOGGING]
+path_to_log = "{{ output_path }}/mik.log"
+path_to_manipulator_log= "{{ output_path }}/manipulator.log"
+{% endautoescape %}
