@@ -44,7 +44,7 @@ $cmd->option('mappings_file')
     ->aka('mf')
     ->describedAs('Mappings file filename. File must exist in the extras/scripts/samplecontentgenerator directory. ' .
     'Default is "mappings.csv".')
-    ->default('metadata.twig');
+    ->default('mappings.csv');
 $cmd->option()
     ->require(true)
     ->describedAs('Absolute or relative path to the directory to save the sample data to. Trailing slash is optional.');
