@@ -28,7 +28,11 @@ repeatable_wrapper_elements[] = subject
 class = {{ class }}
 input_directory = "{{ output_path }}"
 temp_directory = "{{ output_path }}_temp"
+{% if class == 'CsvCompound' %}
+compound_directory_field = File
+{% else %}
 file_name_field = File
+{% endif %}
 
 [WRITER]
 class = {{ class }}
