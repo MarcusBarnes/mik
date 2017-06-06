@@ -15,6 +15,9 @@ class = Csv
 input_file = "{{ sample_id }}_metadata.csv"
 temp_directory = "{{ output_path }}_temp"
 record_key = Identifier
+{% if class == 'CsvCompound' %}
+child_key = Childkey
+{% endif %}
 
 [METADATA_PARSER]
 class = mods\CsvToMods
@@ -29,12 +32,12 @@ file_name_field = File
 
 [WRITER]
 class = {{ class }}
-output_directory = "{{ output_path }}"
+output_directory = "{{ output_path }}_output"
 
 [MANIPULATORS]
 metadatamanipulators[] = "SplitRepeatedValues|Subjects|/subject/topic|;"
 
 [LOGGING]
-path_to_log = "{{ output_path }}/mik.log"
-path_to_manipulator_log= "{{ output_path }}/manipulator.log"
+path_to_log = "{{ output_path }}_output/mik.log"
+path_to_manipulator_log= "{{ output_path }}_output/manipulator.log"
 {% endautoescape %}

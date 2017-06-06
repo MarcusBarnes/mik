@@ -1,6 +1,6 @@
-Identifier,File,Title,Creator,Date taken,Subjects,Note
-"id_01","{{ filename1 }}","Small boats in Havana Harbour","Jordan, Mark","2015-03-08","Boats; water","Taken on vacation in Cuba."
-"id_02","{{ filename2 }}","Manhatten Island","Jordan, Mark","2015-09-13","Cityscapes","Taken from the ferry from downtown New York to Highlands, NJ. Weather was windy."
-"id_03","{{ filename3 }}","Looking across Burrard Inlet","Jordan, Mark","2011-08-01",,"View from Deep Cove to Burnaby Mountain. Simon Fraser University is visible on the top of the mountain in the distance."
-"id_04","{{ filename4 }}","Amsterdam waterfront","Jordan, Mark","2013-01-17",,"Amsterdam waterfront on an overcast day."
-"id_05","{{ filename5 }}","Alcatraz Island","Jordan, Mark","2014-01-14","Alcatraz Federal Penitentiary; islands","Taken from Fisherman's Wharf, San Francisco."
+Identifier,File{% if filename1 matches '/^compound/' %},Childkey{% endif %},Title,Creator,Date taken,Subjects,Note
+"id_01","{{ filename1 }}"{% if filename1 matches '/^compound/' %},""{% endif %},"Small boats in Havana Harbour","Jordan, Mark","2015-03-08","Boats; water","Taken on vacation in Cuba."
+"id_02","{{ filename2 }}"{% if filename2 matches '/^compound/' %},""{% endif %},"Manhatten Island","Jordan, Mark","2015-09-13","Cityscapes","Taken from the ferry from downtown New York to Highlands, NJ. Weather was windy."
+"id_03","{{ filename3 }}"{% if filename3 matches '/^compound/' %},""{% endif %},"Looking across Burrard Inlet","Jordan, Mark","2011-08-01",,"View from Deep Cove to Burnaby Mountain. Simon Fraser University is visible on the top of the mountain in the distance."
+"id_04","{{ filename4 }}"{% if filename4 matches '/^compound/' %},""{% endif %},"Amsterdam waterfront","Jordan, Mark","2013-01-17",,"Amsterdam waterfront on an overcast day."
+"id_05","{{ filename5 }}"{% if filename5 matches '/^compound/' %},""{% endif %},"Alcatraz Island","Jordan, Mark","2014-01-14","Alcatraz Federal Penitentiary; islands","Taken from Fisherman's Wharf, San Francisco."
