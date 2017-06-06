@@ -36,6 +36,9 @@ file_name_field = File
 
 [WRITER]
 class = {{ class }}
+{% if class != 'CsvSingleFile' %}
+metadata_filename = "MODS.xml"
+{% endif %}
 output_directory = "{{ output_path }}_output"
 
 [MANIPULATORS]
