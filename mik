@@ -317,22 +317,13 @@ foreach ($records as $record) {
 
 // Run any shutdown hooks.
 if (isset($settings['WRITER']['shutdownhooks'])) {
+  echo PHP_EOL; 
   foreach ($settings['WRITER']['shutdownhooks'] as $hook) {
     $cmd = sprintf("%s %s", $hook, realpath($configPath));
-
-    echo "Running shutdown hook # $hook";
-    $process = new BackgroundProcess($cmd);
-    $process->run();
-
-    // Make sure that each hook completes
-    // before starting the next one.
-    // https://packagist.org/packages/cocur/background-process
-    while ($process->isRunning()) {
-      echo '.';
-      sleep(1);
-    }
-    echo "\n";
+    echo "Running shutdown hook # $hook" . PHP_EOL;
+    exec($cmd);
   }
+  echo PHP_EOL; 
 }
 
 
