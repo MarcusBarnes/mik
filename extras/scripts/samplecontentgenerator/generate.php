@@ -13,9 +13,6 @@
 
 require 'vendor/autoload.php';
 
-use \Commando;
-use \Twig\Twig;
-
 $cmd = new \Commando\Command();
 $cmd->option('sample_id')
     ->aka('id')
