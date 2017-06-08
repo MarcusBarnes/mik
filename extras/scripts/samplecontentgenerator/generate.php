@@ -13,9 +13,6 @@
 
 require 'vendor/autoload.php';
 
-use \Commando;
-use \Twig\Twig;
-
 $cmd = new \Commando\Command();
 $cmd->option('sample_id')
     ->aka('id')
@@ -31,16 +28,23 @@ $cmd->option('content_model')
         return in_array($cmodel, $cmodels);
     });
 $cmd->option('ini_template_name')
-    ->aka('t')
-    ->describedAs('.ini template filename. File must exist in the extras/scripts/samplecontentgenerator directory. Derault is "metadata.twig".')
+    ->aka('it')
+    ->describedAs('.ini template filename. File must exist in the extras/scripts/samplecontentgenerator directory. ' .
+      'Default is "metadata.twig".')
     ->default('ini.twig');
 $cmd->option('metadata_template_name')
     ->aka('mt')
-    ->describedAs('Metadata file template filename. File must exist in the extras/scripts/samplecontentgenerator directory. Derault is "metadata.twig".')
-    ->default('ini.twig');
+    ->describedAs('Metadata file template filename. File must exist in the extras/scripts/samplecontentgenerator directory. ' .
+    'Default is "metadata.twig".')
+    ->default('metadata.twig');
+$cmd->option('mappings_file')
+    ->aka('mf')
+    ->describedAs('Mappings file filename. File must exist in the extras/scripts/samplecontentgenerator directory. ' .
+    'Default is "mappings.csv".')
+    ->default('mappings.csv');
 $cmd->option()
     ->require(true)
-    ->describedAs('Ablsolute or relative path to the directory to save the sample data to. Trailing slash is optional.');
+    ->describedAs('Absolute or relative path to the directory to save the sample data to. Trailing slash is optional.');
 
 $output_dir = trim(rtrim($cmd[0]));
 @mkdir($output_dir);
@@ -89,7 +93,7 @@ $metadata_path = $output_dir . DIRECTORY_SEPARATOR . $cmd['sample_id'] . '_metad
 
 file_put_contents($ini_path, $ini_content);
 file_put_contents($metadata_path, $metadata_content);
-copy('extras/scripts/samplecontentgenerator/mappings.csv', $output_dir . DIRECTORY_SEPARATOR . $cmd['sample_id'] . '_mappings.csv');
+copy('extras/scripts/samplecontentgenerator/' . $cmd['mappings_file'], $output_dir . DIRECTORY_SEPARATOR . $cmd['sample_id'] . '_mappings.csv');
 
 generate_sample_object_input($output_dir, $cmd['sample_id'], $cmd['content_model']);
 
@@ -115,13 +119,31 @@ function get_metadata_values($cmodel) {
             'filename5' => 'file5.jpg',
         );
     }
-    else{
+    elseif ($cmodel == 'compound') {
         return $metadata_values = array(
-            'filename1' => 'dir1',
-            'filename2' => 'dir2',
-            'filename3' => 'dir3',
-            'filename4' => 'dir4',
-            'filename5' => 'dir5',
+            'filename1' => 'compoundobject1',
+            'filename2' => 'compoundobject2',
+            'filename3' => 'compoundobject3',
+            'filename4' => 'compoundobject4',
+            'filename5' => 'compoundobject5',
+        );
+    }
+    elseif ($cmodel == 'books') {
+        return $metadata_values = array(
+            'filename1' => 'book1',
+            'filename2' => 'book2',
+            'filename3' => 'book3',
+            'filename4' => 'book4',
+            'filename5' => 'book5',
+        );
+    }
+    elseif ($cmodel == 'newspapers') {
+        return $metadata_values = array(
+            'filename1' => '1920-06-01',
+            'filename2' => '1920-06-02',
+            'filename3' => '1920-06-03',
+            'filename4' => '1920-06-04',
+            'filename5' => '1920-06-05',
         );
     }
 }
@@ -166,7 +188,7 @@ function generate_sample_object_input($output_dir, $sample_id, $cmodel) {
  *
  * @param
  *   $output_dir string
- *      The output directoty path passed in on the command line.
+ *      The output directory path passed in on the command line.
  *   $records array
  *      The list of metadata records parsed from the sample metadata CSV file.
  */
@@ -184,13 +206,21 @@ function generate_single_object_files($output_dir, $records) {
  *
  * @param
  *   $output_dir string
- *      The output directoty path passed in on the command line.
+ *      The output directory path passed in on the command line.
  *   $records array
  *      The list of metadata records parsed from the sample metadata CSV file.
  */
 function generate_compound_object_files($output_dir, $records) {
-    echo "Generating compound object sample data is not available yet\n";
-    exit;
+    foreach($records as $row) {
+        $record = explode(',', $row);
+        $dirname = trim($record[1], '"');
+        $compound_object_dir = $output_dir . DIRECTORY_SEPARATOR . $dirname;
+        mkdir($compound_object_dir);
+        $child_filenames = array('image_01.tif', 'image_02.tif');
+        foreach ($child_filenames as $filename) {
+            file_put_contents($compound_object_dir . DIRECTORY_SEPARATOR . $filename, "fake content"); 
+        }
+    }
 }
 
 /**
@@ -198,13 +228,21 @@ function generate_compound_object_files($output_dir, $records) {
  *
  * @param
  *   $output_dir string
- *      The output directoty path passed in on the command line.
+ *      The output directory path passed in on the command line.
  *   $records array
  *      The list of metadata records parsed from the sample metadata CSV file.
  */
 function generate_book_object_files($output_dir, $records) {
-    echo "Generating book sample data is not available yet\n";
-    exit;
+    foreach($records as $row) {
+        $record = explode(',', $row);
+        $dirname = trim($record[1], '"');
+        $book_object_dir = $output_dir . DIRECTORY_SEPARATOR . $dirname;
+        mkdir($book_object_dir);
+        $page_filenames = array('page-01.tif', 'page-02.tif', 'page-03.tif');
+        foreach ($page_filenames as $filename) {
+            file_put_contents($book_object_dir . DIRECTORY_SEPARATOR . $filename, "fake content"); 
+        }
+    }
 }
 
 /**
@@ -212,11 +250,19 @@ function generate_book_object_files($output_dir, $records) {
  *
  * @param
  *   $output_dir string
- *      The output directoty path passed in on the command line.
+ *      The output directory path passed in on the command line.
  *   $records array
  *      The list of metadata records parsed from the sample metadata CSV file.
  */
 function generate_newspaper_object_files($output_dir, $records) {
-    echo "Generating newspaper sample data is not available yet\n";
-    exit;
+    foreach($records as $row) {
+        $record = explode(',', $row);
+        $dirname = trim($record[1], '"');
+        $issue_object_dir = $output_dir . DIRECTORY_SEPARATOR . $dirname;
+        mkdir($issue_object_dir);
+        $page_filenames = array('page-01.tif', 'page-02.tif', 'page-03.tif');
+        foreach ($page_filenames as $filename) {
+            file_put_contents($issue_object_dir . DIRECTORY_SEPARATOR . $filename, "fake content"); 
+        }
+    }
 }
