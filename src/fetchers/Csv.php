@@ -55,7 +55,7 @@ class Csv extends Fetcher
 
 		if (!$this->createTempDirectory()) {
 		    $this->log->addError("CSV fetcher",
-                array('Cannot create temp_directory' => $e->getMessage()));
+                array('Cannot create temp_directory'));
 		}
 
         if (isset($settings['FETCHER']['use_cache'])) {
