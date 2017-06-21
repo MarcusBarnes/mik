@@ -63,7 +63,7 @@ class Oaipmh extends Fetcher
 
         if (!$this->createTempDirectory()) {
             $this->log->addError("OAI-PMH fetcher",
-                array('Cannot create temp_directory' => $e->getMessage()));
+                array('Cannot create temp_directory'));
         }
 
         if (isset($settings['FETCHER']['use_cache'])) {
