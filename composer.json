@@ -14,6 +14,7 @@
         "monolog/monolog": "~1.13",
         "squizlabs/php_codesniffer":"~2.3",
         "league/csv":"~7.1",
+        "box/spout":"*",
         "league/climate":"~3.1",
         "caseyamcl/phpoaipmh": "~2.0",
         "guzzlehttp/guzzle": "~6.0",
