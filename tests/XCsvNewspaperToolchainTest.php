@@ -50,6 +50,7 @@ class CsvNewspaperToolchainTest extends \PHPUnit_Framework_TestCase
         // Define settings here, not in a configuration file.
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'input_file' => dirname(__FILE__) . '/assets/csv/newspapers/metadata/newspapers_metadata.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'Identifier',
@@ -68,6 +69,7 @@ class CsvNewspaperToolchainTest extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'input_file' => dirname(__FILE__) . '/assets/csv/newspapers/metadata/newspapers_metadata.csv',
                 'record_key' => 'Identifier',
                 'temp_directory' => $this->path_to_temp_dir,
@@ -86,6 +88,7 @@ class CsvNewspaperToolchainTest extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'input_file' => dirname(__FILE__) . '/assets/csv/newspapers/metadata/newspapers_metadata.csv',
                 'record_key' => 'Identifier',
                 'temp_directory' => $this->path_to_temp_dir,
@@ -121,6 +124,7 @@ XML;
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'input_file' => dirname(__FILE__) . '/assets/csv/newspapers/metadata/newspapers_metadata.csv',
                 'record_key' => 'Identifier',
                 'temp_directory' => $this->path_to_temp_dir,

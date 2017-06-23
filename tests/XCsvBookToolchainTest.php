@@ -50,6 +50,7 @@ class CsvBookToolchainTest extends \PHPUnit_Framework_TestCase
         // Define settings here, not in a configuration file.
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'input_file' => dirname(__FILE__) . '/assets/csv/books/metadata/books_metadata.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'Identifier',
@@ -68,6 +69,7 @@ class CsvBookToolchainTest extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'input_file' => dirname(__FILE__) . '/assets/csv/books/metadata/books_metadata.csv',
                 'record_key' => 'Identifier',
                 'temp_directory' => $this->path_to_temp_dir,
@@ -86,6 +88,7 @@ class CsvBookToolchainTest extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'input_file' => dirname(__FILE__) . '/assets/csv/books/metadata/books_metadata.csv',
                 'record_key' => 'Identifier',
                 'temp_directory' => $this->path_to_temp_dir,
@@ -117,6 +120,7 @@ class CsvBookToolchainTest extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'input_file' => dirname(__FILE__) . '/assets/csv/books/metadata/books_metadata.csv',
                 'record_key' => 'Identifier',
                 'temp_directory' => $this->path_to_temp_dir,
