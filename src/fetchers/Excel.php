@@ -78,8 +78,14 @@ class Excel extends Fetcher
                         if (count($header_row) === 0) {
                             $header_row[] = $row;
                             $column_names = array_values($header_row[0]);
+                            foreach ($column_names as &$column_name) {
+                                $column_name = trim($column_name);
+                            }
                          }
                          else {
+                             foreach ($row as &$metadata_value) {
+                                 $metadata_value = trim($metadata_value);
+                             }
                              $row_assoc = array_combine($column_names, $row);
                              if (is_null($limit)) {
                                  $records[] = $row_assoc;
