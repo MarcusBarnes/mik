@@ -267,15 +267,22 @@ class Config
         $filegetters = array('CdmNewspapers', 'CdmBooks', 'CdmSingleFile', 'CdmPhpDocuments');
         if (in_array($this->settings['FILE_GETTER']['class'], $filegetters)) {
             if (isset($this->settings['FILE_GETTER']['input_directories'])) {
+                $input_dirs = $this->settings['FILE_GETTER']['input_directories'];
+            }
+
+            if (is_array($input_dirs) && count($input_dirs)) {
                 $input_directories = $this->settings['FILE_GETTER']['input_directories'];
                 foreach ($input_directories as $input_directory) {
                     if (!file_exists(realpath($input_directory))) {
                         exit("Error: Can't find input directory $input_directory\n");
                     }
                 }
+                print "Input directory paths are OK.\n";
+            }
+            else {
+                print "No input directory paths are defined.\n";
             }
 
-            print "Input directory paths are OK.\n";
         }
 
         // For Csv toolchains, where a single input directory is allowed.
