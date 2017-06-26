@@ -32,7 +32,8 @@ class CsvCompound extends Writer
     public function __construct($settings)
     {
         parent::__construct($settings);
-        $this->fetcher = new \mik\fetchers\Csv($settings);
+        $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];
+        $this->fetcher = new $fetcherClass($settings);
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
         $metadataParserClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];

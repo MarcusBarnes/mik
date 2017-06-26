@@ -29,7 +29,8 @@ class CsvNewspapers extends Writer
         parent::__construct($settings);
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
-        $this->fetcher = new \mik\fetchers\Csv($settings);
+        $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];
+        $this->fetcher = new $fetcherClass($settings);
         $this->output_directory = $settings['WRITER']['output_directory'];
         $this->metadata_filename = $settings['WRITER']['metadata_filename'];
         // Default is to generate page-level MODS.xml files.

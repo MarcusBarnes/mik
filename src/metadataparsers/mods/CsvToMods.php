@@ -38,7 +38,9 @@ class CsvToMods extends Mods
 
         parent::__construct($settings);
 
-        $this->fetcher = new \mik\fetchers\Csv($settings);
+        // Fetcher could be Csv or Excel.
+        $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];
+        $this->fetcher = new $fetcherClass($settings);
 
         $this->record_key = $this->fetcher->record_key;
 

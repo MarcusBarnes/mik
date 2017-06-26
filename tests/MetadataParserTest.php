@@ -17,6 +17,7 @@ class MetadataParserTest extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
