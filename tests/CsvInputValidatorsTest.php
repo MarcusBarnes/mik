@@ -19,6 +19,7 @@ class CsvInputValidatorsTest extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'use_cache' => false,
                 'input_file' => dirname(__FILE__) . '/assets/csv/inputvalidators/csvsinglefile/input.csv',
                 'temp_directory' => $this->path_to_temp_dir,
@@ -50,6 +51,7 @@ class CsvInputValidatorsTest extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'use_cache' => false,
                 'input_file' => dirname(__FILE__) . '/assets/csv/inputvalidators/csvcompound/input.csv',
                 'temp_directory' => $this->path_to_temp_dir,
@@ -102,6 +104,7 @@ class CsvInputValidatorsTest extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'use_cache' => false,
                 'input_file' => dirname(__FILE__) . '/assets/csv/inputvalidators/csvnewspapers/input.csv',
                 'temp_directory' => $this->path_to_temp_dir,
@@ -156,6 +159,7 @@ class CsvInputValidatorsTest extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'use_cache' => false,
                 'input_file' => dirname(__FILE__) . '/assets/csv/inputvalidators/csvbooks/input.csv',
                 'temp_directory' => $this->path_to_temp_dir,
