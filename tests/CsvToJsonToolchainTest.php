@@ -22,6 +22,7 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
         // Define settings here, not in a configuration file.
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
@@ -44,6 +45,7 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
                 'record_key' => 'ID',
                 'temp_directory' => $this->path_to_temp_dir,
@@ -66,6 +68,7 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
                 'record_key' => 'ID',
                 'temp_directory' => $this->path_to_temp_dir,
@@ -89,6 +92,7 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'FETCHER' => array(
+                'class' => 'Csv',
                 'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
                 'record_key' => 'ID',
                 'temp_directory' => $this->path_to_temp_dir,

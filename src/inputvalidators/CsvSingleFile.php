@@ -17,7 +17,8 @@ class CsvSingleFile extends MikInputValidator
     public function __construct($settings)
     {
         parent::__construct($settings);
-        $this->fetcher = new \mik\fetchers\Csv($settings);
+        $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];
+        $this->fetcher = new $fetcherClass($settings);
     }
 
     public function validateAll()
