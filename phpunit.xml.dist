@@ -5,5 +5,13 @@
             <directory>tests</directory>
         </testsuite>
     </testsuites>
-
+<!--    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter>
+    <logging>
+        <!- -<log type="coverage-clover" target="coverage.xml"/>- ->
+        <log type="coverage-html" target="reports"/>
+    </logging>-->
 </phpunit>

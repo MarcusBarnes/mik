@@ -6,14 +6,14 @@ use \Monolog\Logger;
 
 /**
  * Fetcher (abstract):
- *    Browse, read, and gather information about records 
+ *    Browse, read, and gather information about records
  *    that comprise a given collection.
  *
  *    Extend this abstract class with for specific implemenations.
  *    For example, see fetchers/Cdm.php and fecthers/Csv.php.
  *
- *    Note that methods marked as abstract must be defined in 
- *    the extending class.   
+ *    Note that methods marked as abstract must be defined in
+ *    the extending class.
  *
  *    Abstract methods:
  *        - getNumRecs
@@ -33,15 +33,20 @@ abstract class Fetcher
     public function __construct($settings)
     {
         $this->settings = $settings['FETCHER'];
-        $this->tempDirectory = $this->settings['temp_directory'];
         // Make a copy of all setting to pass to fetcher manipulators.
         $this->all_settings = $settings;
 
         // Set up logger.
         $this->pathToLog = $settings['LOGGING']['path_to_log'];
+        if (isset($settings['LOGGING']['log_level'])) {
+            eval("\$logLevel = \Monolog\Logger::" . strtoupper($settings['LOGGING']['log_level']) . ";");
+        } else {
+            $logLevel = Logger::INFO;
+        }
+
         $this->log = new \Monolog\Logger('fetcher');
-        $this->logStreamHandler= new \Monolog\Handler\StreamHandler($this->pathToLog, Logger::INFO);
-        $this->log->pushHandler($this->logStreamHandler); 
+        $this->logStreamHandler= new \Monolog\Handler\StreamHandler($this->pathToLog, $logLevel);
+        $this->log->pushHandler($this->logStreamHandler);
     }
 
     /**
@@ -49,6 +54,7 @@ abstract class Fetcher
      */
     public function createTempDirectory()
     {
+        $this->tempDirectory = $this->settings['temp_directory'];
         if (file_exists($this->tempDirectory)) {
             return true; // directory already exists.
         } else {
@@ -81,7 +87,7 @@ abstract class Fetcher
      * @return array or object of record info.
      */
     abstract public function getItemInfo($recordKey);
-    
+
     /**
     * Return an object of records.
     *
