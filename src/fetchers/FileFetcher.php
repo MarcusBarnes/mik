@@ -126,7 +126,8 @@ class FileFetcher extends Fetcher
         $files = [];
         $this->log->debug("iterateDirectory ({$directory})");
         if ($this->recurse_directories) {
-            $RDIterator = new \RecursiveDirectoryIterator($directory,
+            $RDIterator = new \RecursiveDirectoryIterator(
+                $directory,
                 \FilesystemIterator::KEY_AS_PATHNAME |
                 \FilesystemIterator::CURRENT_AS_FILEINFO |
                 \FilesystemIterator::SKIP_DOTS
@@ -145,7 +146,10 @@ class FileFetcher extends Fetcher
                     $this->log->error("Duplicate file/path found -> " . $fileInfo->getPathname());
                     throw new \Exception("Duplicate file/path found -> " . $fileInfo->getPathname());
                 }
-                $files[$fileInfo->getPathname()] = ['filename' => $fileInfo->getFilename(), 'fullpath' => $fileInfo->getPathname() ];
+                $files[$fileInfo->getPathname()] = [
+                    'filename' => $fileInfo->getFilename(),
+                    'fullpath' => $fileInfo->getPathname()
+                ];
             }
         }
         return $files;
@@ -174,13 +178,14 @@ class FileFetcher extends Fetcher
         if (!isset($settings['FETCHER']['source_file_regex'])) {
             $this->log->info("No source_file_regex specified, fetching all files.");
             $this->source_file_regex = null;
-        } else if (@preg_match($settings['FETCHER']['source_file_regex'], 'Wubalubalubdub') === false) {
+        } elseif (@preg_match($settings['FETCHER']['source_file_regex'], 'Wubalubalubdub') === false) {
             $this->log->error("FileFetcher.source_file_regex pattern fails to compile.");
             throw new \Exception("FileFetcher.source_file_regex pattern fails to compile.");
         } else {
             $this->source_file_regex = $settings['FETCHER']['source_file_regex'];
         }
-        if (!isset($settings['FETCHER']['recurse_directories']) || !is_bool($settings['FETCHER']['recurse_directories'])) {
+        if (!isset($settings['FETCHER']['recurse_directories']) ||
+            !is_bool($settings['FETCHER']['recurse_directories'])) {
             $this->recurse_directories = false;
         } else {
             $this->recurse_directories = (bool)$settings['FETCHER']['recurse_directories'];
@@ -188,6 +193,5 @@ class FileFetcher extends Fetcher
         if ($this->recurse_directories) {
             $this->log->info("Recurse directories set to TRUE");
         }
-
     }
 }

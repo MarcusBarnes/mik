@@ -26,6 +26,10 @@ class FileFetcherTest extends TestCase
      */
     private $log_path;
 
+    /**
+     * Common settings for testing.
+     * @var array
+     */
     private $settings;
 
 
@@ -202,5 +206,4 @@ class FileFetcherTest extends TestCase
         }
         @rmdir($this->temp_dir);
     }
-
 }
