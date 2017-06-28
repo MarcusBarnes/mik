@@ -264,24 +264,25 @@ class Config
      public function checkInputDirectories()
      {
         // For Cdm toolchains, where multiple input directories are allowed.
-        $filegetters = array('CdmNewspapers', 'CdmSingleFile', 'CdmPhpDocuments');
+        $filegetters = array('CdmNewspapers', 'CdmBooks', 'CdmSingleFile', 'CdmPhpDocuments');
         if (in_array($this->settings['FILE_GETTER']['class'], $filegetters)) {
-            if (!isset($this->settings['FILE_GETTER']['input_directories'])) {
-                print "No input directories are defined in the FILE_GETTER section.\n";
-                return;
-            }
-            if (strlen($this->settings['FILE_GETTER']['input_directories'][0]) == 0) {
-                print "No input directories are defined in the FILE_GETTER section.\n";
-                return;
-            }
-            $input_directories = $this->settings['FILE_GETTER']['input_directories'];
-            foreach ($input_directories as $input_directory) {
-                if (!file_exists(realpath($input_directory))) {
-                    exit("Error: Can't find input directory $input_directory\n");
-                }
+            if (isset($this->settings['FILE_GETTER']['input_directories'])) {
+                $input_dirs = $this->settings['FILE_GETTER']['input_directories'];
             }
 
-            print "Input directory paths are OK.\n";
+            if (is_array($input_dirs) && count($input_dirs)) {
+                $input_directories = $this->settings['FILE_GETTER']['input_directories'];
+                foreach ($input_directories as $input_directory) {
+                    if (!file_exists(realpath($input_directory))) {
+                        exit("Error: Can't find input directory $input_directory\n");
+                    }
+                }
+                print "Input directory paths are OK.\n";
+            }
+            else {
+                print "No input directory paths are defined.\n";
+            }
+
         }
 
         // For Csv toolchains, where a single input directory is allowed.
