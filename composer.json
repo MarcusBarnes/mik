@@ -4,7 +4,11 @@
     "type": "project",
     "description": "Move to Islandora Kit",
     "autoload": {
-        "classmap": ["src/"]
+        "classmap": ["src/"],
+        "psr-4": {
+            "mik\\tests\\": "tests/",
+            "mik\\" : "src/"
+        }
     },
     "require-dev": {
         "phpunit/phpunit":"4.8.*"

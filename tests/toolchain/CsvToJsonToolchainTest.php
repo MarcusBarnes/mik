@@ -1,29 +1,40 @@
 <?php
 
-namespace mik\fetchers;
+namespace mik\tests\toolchain;
 
-namespace mik\filegetters;
+use mik\fetchers\Csv;
+use mik\metadataparsers\json\CsvToJson;
+use mik\tests\MikTestBase;
+use mik\writers\CsvSingleFileJson;
 
-namespace mik\metadataparsers\json;
-
-namespace mik\writers;
-
-class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
+/**
+ * Class CsvToJsonToolchain
+ * @package mik\tests\toolchain
+ * @group toolchain
+ */
+class CsvToJsonToolchain extends MikTestBase
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
+        parent::setUp();
         $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_json_temp_dir";
         $this->path_to_output_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_json_output_dir";
         $this->path_to_log = $this->path_to_temp_dir . DIRECTORY_SEPARATOR . "mik.log";
     }
 
+    /**
+     * @covers \mik\fetchers\Csv::getRecords()
+     */
     public function testGetRecords()
     {
         // Define settings here, not in a configuration file.
         $settings = array(
             'FETCHER' => array(
                 'class' => 'Csv',
-                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
+                'input_file' => $this->asset_base_dir . '/csv/sample_metadata.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
             ),
@@ -36,17 +47,20 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
                 'path_to_log' => $this->path_to_log,
             ),
         );
-        $csv = new \mik\fetchers\Csv($settings);
+        $csv = new Csv($settings);
         $records = $csv->getRecords();
         $this->assertCount(20, $records);
     }
-    
+
+    /**
+     * @covers \mik\fetchers\Csv::getItemInfo()
+     */
     public function testGetItemInfo()
     {
         $settings = array(
             'FETCHER' => array(
                 'class' => 'Csv',
-                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
+                'input_file' => $this->asset_base_dir . '/csv/sample_metadata.csv',
                 'record_key' => 'ID',
                 'temp_directory' => $this->path_to_temp_dir,
             ),
@@ -59,17 +73,20 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
                 'path_to_log' => $this->path_to_log,
             ),
         );
-        $csv = new \mik\fetchers\Csv($settings);
+        $csv = new Csv($settings);
         $record = $csv->getItemInfo('postcard_3');
         $this->assertEquals('1947', $record->Date, "Record date is not 1947");
     }
 
+    /**
+     * @covers \mik\metadataparsers\json\CsvToJson::metadata()
+     */
     public function testCreateMetadata()
     {
         $settings = array(
             'FETCHER' => array(
                 'class' => 'Csv',
-                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
+                'input_file' => $this->asset_base_dir . '/csv/sample_metadata.csv',
                 'record_key' => 'ID',
                 'temp_directory' => $this->path_to_temp_dir,
             ),
@@ -82,12 +99,15 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
                 'path_to_log' => $this->path_to_log,
             ),
         );
-        $parser = new \mik\metadataparsers\json\CsvToJson($settings);
+        $parser = new CsvToJson($settings);
         $json = $parser->metadata('postcard_1');
         $json_as_array = json_decode($json, true);
         $this->assertEquals('1954', $json_as_array['Date'], "Record date is not 1954");
     }
 
+    /**
+     * @covers \mik\writers\CsvSingleFileJson::writePackages()
+     */
     public function testWritePackages()
     {
         $settings = array(
@@ -100,7 +120,7 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
             'FILE_GETTER' => array(
                  'validate_input' => false,
                  'class' => 'CsvSingleFile',
-                 'input_directory' => dirname(__FILE__) . '/assets/csv',
+                 'input_directory' => $this->asset_base_dir . '/csv',
                  'file_name_field' => 'File',
              ),
             'WRITER' => array(
@@ -111,10 +131,10 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
             ),
         );
 
-        $parser = new \mik\metadataparsers\json\CsvToJson($settings);
+        $parser = new CsvToJson($settings);
         $json = $parser->metadata('postcard_1');
 
-        $writer = new \mik\writers\CsvSingleFileJson($settings);
+        $writer = new CsvSingleFileJson($settings);
         $writer->writePackages($json, array(), 'postcard_1');
 
         $written_metadata = file_get_contents($this->path_to_output_dir . DIRECTORY_SEPARATOR . 'postcard_1.json');
@@ -125,20 +145,5 @@ class CsvToJsonToolchain extends \PHPUnit_Framework_TestCase
             $this->path_to_output_dir . DIRECTORY_SEPARATOR . 'postcard_1.jpg',
             "Postcard_1.jpg file was not written by CsvToJson toolchain."
         );
-    }
-
-    protected function tearDown()
-    {
-        $temp_files = glob($this->path_to_temp_dir . '/*');
-        foreach ($temp_files as $temp_file) {
-            @unlink($temp_file);
-        }
-        @rmdir($this->path_to_temp_dir);
-
-        $output_files = glob($this->path_to_output_dir . '/*');
-        foreach ($output_files as $output_file) {
-            @unlink($output_file);
-        }
-        @rmdir($this->path_to_output_dir);
     }
 }
