@@ -56,17 +56,17 @@ class CsvToMods extends Mods
         $record_key_column = $this->record_key;
         $record_key = $objectInfo->$record_key_column;
 
-        $modsOpeningTag = sprintf('<mods xmlns="%s" xmlns:mods="%s" xmlns:xsi="%s" xmlns:xlink="%s">',
-            MODS::$MODS_NAMESPACE_URI, MODS::$MODS_NAMESPACE_URI, "http://www.w3.org/2001/XMLSchema-instance",
-            "http://www.w3.org/1999/xlink");
-        //$modsOpeningTag = '<mods xmlns="http://www.loc.gov/mods/v3" ';
-        //$modsOpeningTag .= 'xmlns:mods="http://www.loc.gov/mods/v3" ';
-        //$modsOpeningTag .= 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
-        //$modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
+        $modsOpeningTag = sprintf(
+            '<mods xmlns="%s" xmlns:mods="%s" xmlns:xsi="%s" xmlns:xlink="%s">',
+            MODS::$MODS_NAMESPACE_URI,
+            MODS::$MODS_NAMESPACE_URI,
+            "http://www.w3.org/2001/XMLSchema-instance",
+            "http://www.w3.org/1999/xlink"
+        );
 
         foreach ($collectionMappingArray as $field => $fieldMappings) {
             if (preg_match('/^#/', $fieldMappings[0])) {
-              continue;
+                continue;
             }
             $csvFieldName = $fieldMappings[0];
             if (property_exists($objectInfo, $csvFieldName)) {
@@ -100,7 +100,6 @@ class CsvToMods extends Mods
                 }
 
                 $modsOpeningTag .= $xmlSnippet;
-
             } elseif (!empty($xmlSnippet) & !is_array($fieldValue)) {
                 // @ToDo - move into metadatamanipulator
                 // check fieldValue for <br> characters.  If present, wrap in fieldValue
@@ -149,7 +148,7 @@ class CsvToMods extends Mods
             $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
             $manipulatorParams = $metadatamanipulatorClassAndParams;
             $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
-            $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams,  $record_key);
+            $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams, $record_key);
             $metadatamanipulator->fieldName = $field_name;
             $xmlSnippet = $metadatamanipulator->manipulate($xmlSnippet);
         }

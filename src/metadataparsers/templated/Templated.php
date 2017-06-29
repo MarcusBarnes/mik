@@ -29,13 +29,9 @@ class Templated extends MetadataParser
     }
 
     /**
-     * Wrapper mmethod called from within the mik script.
+     * {@inheritdoc}
      *
-     * @param string $record_key
-     *   The current item's record key.
-     *
-     * @return string
-     *   The output of the template.
+     *  Returns the output of the template.
      */
     public function metadata($record_key)
     {
@@ -91,11 +87,10 @@ class Templated extends MetadataParser
             $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
             $manipulatorParams = $metadatamanipulatorClassAndParams;
             $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
-            $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams,  $record_key);
+            $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams, $record_key);
             $modified_xml = $metadatamanipulator->manipulate($xml);
         }
 
         return $modified_xml;
     }
-
 }

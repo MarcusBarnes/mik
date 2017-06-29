@@ -9,7 +9,7 @@ use mik\metadataparsers\MetadataParser;
 abstract class Mods extends MetadataParser
 {
 
-    protected static $MODS_NAMESPACE_URI = "http://www.loc.gov/mods/v3";
+    public static $MODS_NAMESPACE_URI = "http://www.loc.gov/mods/v3";
     /**
      * @var array $collectionMappingArray - array containing the source
      * to MODS XML mapping.
@@ -103,7 +103,7 @@ abstract class Mods extends MetadataParser
             $elementAttributesMap = array();
             $attributesNodeMap = $node->attributes;
             $len = $attributesNodeMap->length;
-            for($i = 0 ; $i < $len; ++$i) {
+            for ($i = 0; $i < $len; ++$i) {
                 $attributeItem = $attributesNodeMap->item($i);
                 $attributeName = $attributeItem->name;
                 $attributeValue = $attributeItem->value;
@@ -135,7 +135,6 @@ abstract class Mods extends MetadataParser
         $wrapperDomNodes = array();
         // Grab the elements.
         foreach ($uniqueChildNodeSignatureArray as $nodeSignatureString) {
-
             // Turn node signature string into parts element name + element attributes.
             $nodeSignature = $this->elementSignatureFromString($nodeSignatureString);
 
@@ -172,16 +171,15 @@ abstract class Mods extends MetadataParser
      */
     public function consolidateWrapperElements($wrapperElementArray)
     {
-        $consolidatedWrapperElementsArray = array();
+
         $elementNameTrackingArray = array();
         $elementSignatureTrackingArray = array();
         foreach ($wrapperElementArray as $wrapperElement) {
-
             $elementName = $wrapperElement->nodeName;
             $elementAttributesMap = array();
             $attributesNodeMap = $wrapperElement->attributes;
             $len = $attributesNodeMap->length;
-            for($i = 0 ; $i < $len; ++$i) {
+            for ($i = 0; $i < $len; ++$i) {
                 $attributeItem = $attributesNodeMap->item($i);
                 $attributeName = $attributeItem->name;
                 $attributeValue = $attributeItem->value;
@@ -217,10 +215,10 @@ abstract class Mods extends MetadataParser
         $signatureString = $elementSignature[0];
         $attributesKeyValuesArray = $elementSignature[1];
 
-        if(count($attributesKeyValuesArray) > 0){
+        if (count($attributesKeyValuesArray) > 0) {
             $signatureString .=  "?";
-            foreach($attributesKeyValuesArray as $key => $value) {
-               $signatureString .= $key . "=" . $value . "|";
+            foreach ($attributesKeyValuesArray as $key => $value) {
+                $signatureString .= $key . "=" . $value . "|";
             }
         }
 
@@ -276,9 +274,9 @@ abstract class Mods extends MetadataParser
             $elementAttributes = $elementSignature[1];
 
             $wrapperElement = $xml->createElementNS(MODS::MODS_NAMESPACE_URI, $elementName);
-            if (!empty($elementAttributes)){
+            if (!empty($elementAttributes)) {
                 // Add attributes and values.
-                foreach($elementAttributes as $key => $value) {
+                foreach ($elementAttributes as $key => $value) {
                     $wrapperElement->setAttribute($key, $value);
                 }
             }
@@ -300,22 +298,23 @@ abstract class Mods extends MetadataParser
      * @param string $elementSignatureString example elementName?attribute0=value0|attribute1=value1|attribute2=value2
      * @return array [elementNmae, array(attribute0=>value0, attribute1=value1, attribute2=value2, )]
      */
-    public function elementSignatureFromString($elementSignatureString){
+    public function elementSignatureFromString($elementSignatureString)
+    {
             $elementNameAttributesArray = explode('?', $elementSignatureString);
             $elementName = $elementNameAttributesArray[0];
             $elementAttributeKeyValueArray = array();
-            if(count($elementNameAttributesArray) > 1){
-                // Element has attributes.
-                $elementAttributesArray = explode('|', $elementNameAttributesArray[1]);
-                // Remove empty, false, or null values from the array.
-                $elementAttributesArray = array_filter($elementAttributesArray);
-                foreach($elementAttributesArray as $attributeValue){
-                    $attributeValuePair = explode('=', $attributeValue);
-                    $attributeName = $attributeValuePair[0];
-                    $attributeValue = $attributeValuePair[1];
-                    $elementAttributeKeyValueArray[$attributeName] = $attributeValue;
-                }
+        if (count($elementNameAttributesArray) > 1) {
+            // Element has attributes.
+            $elementAttributesArray = explode('|', $elementNameAttributesArray[1]);
+            // Remove empty, false, or null values from the array.
+            $elementAttributesArray = array_filter($elementAttributesArray);
+            foreach ($elementAttributesArray as $attributeValue) {
+                $attributeValuePair = explode('=', $attributeValue);
+                $attributeName = $attributeValuePair[0];
+                $attributeValue = $attributeValuePair[1];
+                $elementAttributeKeyValueArray[$attributeName] = $attributeValue;
             }
+        }
             return array($elementName, $elementAttributeKeyValueArray);
     }
 }
