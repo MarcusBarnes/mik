@@ -273,7 +273,7 @@ abstract class Mods extends MetadataParser
             $elementName = $elementSignature[0];
             $elementAttributes = $elementSignature[1];
 
-            $wrapperElement = $xml->createElementNS(Mods::MODS_NAMESPACE_URI, $elementName);
+            $wrapperElement = $xml->createElementNS(Mods::$MODS_NAMESPACE_URI, $elementName);
             if (!empty($elementAttributes)) {
                 // Add attributes and values.
                 foreach ($elementAttributes as $key => $value) {
