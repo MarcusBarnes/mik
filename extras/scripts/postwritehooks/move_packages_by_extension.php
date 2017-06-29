@@ -19,7 +19,7 @@ $children_record_keys_string = trim($argv[2]);
 $config_path = trim($argv[3]);
 $config = parse_ini_file($config_path, true);
 
-// Define vvarious file paths.
+// Define various file paths.
 $mik_output_dir = $config['WRITER']['output_directory'];
 $file_path_with_no_ext = $mik_output_dir . DIRECTORY_SEPARATOR . $record_key;
 $files_with_name = glob($file_path_with_no_ext . ".*");
