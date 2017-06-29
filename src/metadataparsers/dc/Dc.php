@@ -5,13 +5,13 @@ namespace mik\metadataparsers\dc;
 
 use mik\metadataparsers\MetadataParser;
 
-class Dc extends MetadataParser
+abstract class Dc extends MetadataParser
 {
     /**
      * @var array $settings - configuration settings from confugration class.
      */
     public $settings;
-      
+
     /**
      * Create a new DC Instance
      * @param array $settings configuration settings.
