@@ -3,10 +3,13 @@
 
 namespace mik\metadataparsers\mods;
 
+use League\Csv\Reader;
 use mik\metadataparsers\MetadataParser;
 
 abstract class Mods extends MetadataParser
 {
+
+    protected static $MODS_NAMESPACE_URI = "http://www.loc.gov/mods/v3";
     /**
      * @var array $collectionMappingArray - array containing the source
      * to MODS XML mapping.
@@ -27,18 +30,37 @@ abstract class Mods extends MetadataParser
         parent::__construct($settings);
     }
 
-    private function getMappingsArray($mappingCSVpath)
+    /**
+     * Convert CSV Mappings file contents to an array.
+     *
+     * @param $mappingCSVpath
+     *   File path to the CSV mappings file.
+     * @return array
+     *   Associative array of the mappings.
+     */
+    protected function getMappingsArray($mappingCSVpath)
     {
-        return $collectionMappingArray;
+
+        $filename = $mappingCSVpath;
+
+        $reader = Reader::createFromPath($filename);
+        $this->collectionMappingArray = array();
+        foreach ($reader as $index => $row) {
+            $this->collectionMappingArray[$row[0]] = $row;
+        }
+
+        return $this->collectionMappingArray;
     }
 
     /**
      *  Create MODS XML.
      *
-     *  @param array $colletionMappyingArray
+     *  @param array $collectionMappingArray
      *    Collection mappings
      *  @param array $objectInfo
      *    Array of info about the object that the MODS XML will be created for
+     * @return string
+     *    The MODS XML as a string.
      */
     abstract public function createModsXML($collectionMappingArray, $objectInfo);
 
@@ -75,7 +97,7 @@ abstract class Mods extends MetadataParser
         $xml = new \DomDocument();
         $xml->loadXML($xmlString);
 
-        $childNodesElementSignatureStringArray = array();
+        $childNodesElementSignatureArray = array();
         foreach ($xml->documentElement->childNodes as $node) {
             $elementName = $node->nodeName;
             $elementAttributesMap = array();
@@ -118,7 +140,6 @@ abstract class Mods extends MetadataParser
             $nodeSignature = $this->elementSignatureFromString($nodeSignatureString);
 
             $nodeName = $nodeSignature[0];
-            $nodeAttributes = $nodeSignature[1];
             //DOMNodeList
             $nodeListObj = $xml->getElementsByTagName($nodeName);
             if ($nodeListObj->length >= 2 && !in_array($nodeName, $this->repeatableWrapperElements)) {
@@ -155,14 +176,6 @@ abstract class Mods extends MetadataParser
         $elementNameTrackingArray = array();
         $elementSignatureTrackingArray = array();
         foreach ($wrapperElementArray as $wrapperElement) {
-            $name = $wrapperElement->nodeName;
-            $attributesNodeMap = $wrapperElement->attributes;
-            $length = $attributesNodeMap->length;
-            for($i=0; $i < $length; ++$i){
-               $attributeItem = $attributesNodeMap->item($i);
-               $attributeName = $attributeItem->name;
-               $attributeValue = $attributeItem->value;
-            }
 
             $elementName = $wrapperElement->nodeName;
             $elementAttributesMap = array();
@@ -262,7 +275,7 @@ abstract class Mods extends MetadataParser
             $elementName = $elementSignature[0];
             $elementAttributes = $elementSignature[1];
 
-            $wrapperElement = $xml->createElementNS('http://www.loc.gov/mods/v3', $elementName);
+            $wrapperElement = $xml->createElementNS(MODS::MODS_NAMESPACE_URI, $elementName);
             if (!empty($elementAttributes)){
                 // Add attributes and values.
                 foreach($elementAttributes as $key => $value) {
