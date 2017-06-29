@@ -2,9 +2,10 @@
 // src/metadataparsers/MetadataParser.php
 
 namespace mik\metadataparsers;
+
 use \Monolog\Logger;
 
-class MetadataParser
+abstract class MetadataParser
 {
     /**
      * @var array $settings - configuration settings from confugration class.
@@ -53,6 +54,5 @@ class MetadataParser
      * @return string
      *   The object's metadata.
      */
-    public abstract function metadata($record_key);
-
+    abstract public function metadata($record_key);
 }
