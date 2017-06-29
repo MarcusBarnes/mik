@@ -201,11 +201,11 @@ class CdmToMods extends Mods
         $page_title,
         $xmlSnippet = '<extension><CONTENTdmData></CONTENTdmData></extension>'
     ) {
-    
+
         $modsOpeningTag = sprintf(
             '<mods xmlns="%s" xmlns:mods="%s" xmlns:xsi="%s" xmlns:xlink="%s">',
-            MODS::$MODS_NAMESPACE_URI,
-            MODS::$MODS_NAMESPACE_URI,
+            Mods::$MODS_NAMESPACE_URI,
+            Mods::$MODS_NAMESPACE_URI,
             "http://www.w3.org/2001/XMLSchema-instance",
             "http://www.w3.org/1999/xlink"
         );
