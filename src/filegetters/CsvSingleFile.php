@@ -18,7 +18,8 @@ class CsvSingleFile extends FileGetter
         $this->settings = $settings['FILE_GETTER'];
         $this->input_directory = $this->settings['input_directory'];
         $this->file_name_field = $this->settings['file_name_field'];
-        $this->fetcher = new \mik\fetchers\Csv($settings);
+        $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];
+        $this->fetcher = new $fetcherClass($settings);
     }
 
     /**
