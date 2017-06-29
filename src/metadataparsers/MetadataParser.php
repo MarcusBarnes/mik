@@ -10,25 +10,25 @@ class MetadataParser
      * @var array $settings - configuration settings from confugration class.
      */
     public $settings;
-    
-    /** 
-     * @var string $pathToLog 
-     *     Full path to log directory.
-     */ 
-    public $pathToLog;
-    
+
     /**
-     * @var obj $log 
+     * @var string $pathToLog
+     *     Full path to log directory.
+     */
+    public $pathToLog;
+
+    /**
+     * @var obj $log
      *    Logger object
      */
     public $log;
-    
+
     /**
      * @var obj $logStreamHandler
      *    Logger stream handler object
      */
     public $logStreamHandler;
-    
+
     /**
      * Create a new Metadata Instance
      * @param array $settings configuration settings.
@@ -43,4 +43,16 @@ class MetadataParser
         $this->logStreamHandler= new \Monolog\Handler\StreamHandler($this->pathToLog, Logger::WARNING);
         $this->log->pushHandler($this->logStreamHandler);
     }
+
+    /**
+     * Gets the metadata for a specific object.
+     *
+     * @param string $record_key
+     *   The object's record key.
+     *
+     * @return string
+     *   The object's metadata.
+     */
+    public abstract function metadata($record_key);
+
 }
