@@ -5,10 +5,12 @@ php:
   - 7.0 
 branches:
   only:
-    master
+    - master
+    - new_master
 before_install:
   - travis_retry composer self-update
   - composer install
 script:
-  - phpunit --exclude-group inputvalidators --bootstrap vendor/autoload.php tests
-  - phpunit --group inputvalidators --bootstrap vendor/autoload.php tests
+  - phpunit --process-isolation
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
