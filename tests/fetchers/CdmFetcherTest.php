@@ -7,7 +7,7 @@ use mik\tests\MikTestBase;
 /**
  * Class CdmFetcher
  * @package mik\fetchers
- * @coversDefaultClass \mik\fetchers\CdmFetcher
+ * @coversDefaultClass \mik\fetchers\Cdm
  * @group fetchers
  */
 class CdmFetcherTest extends MikTestBase

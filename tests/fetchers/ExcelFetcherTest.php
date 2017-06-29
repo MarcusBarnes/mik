@@ -7,7 +7,7 @@ use mik\tests\MikTestBase;
 /**
  * Class ExcelFetcher
  * @package mik\fetchers
- * @coversDefaultClass \mik\fetchers\ExcelFetcher
+ * @coversDefaultClass \mik\fetchers\Excel
  * @group fetchers
  */
 class ExcelFetcherTest extends MikTestBase
