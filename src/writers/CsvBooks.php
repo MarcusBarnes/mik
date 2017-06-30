@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\writers;
+
 use Monolog\Logger;
 
 class CsvBooks extends Writer
@@ -35,23 +36,23 @@ class CsvBooks extends Writer
         // Default is to generate page-level MODS.xml files.
         if (isset($settings['WRITER']['generate_page_modsxml'])) {
             $this->generate_page_modsxml = $settings['WRITER']['generate_page_modsxml'];
-        }
-        else {
+        } else {
             $this->generate_page_modsxml = true;
         }
         // Default is to use - as the sequence separator in the page filename.
         if (isset($settings['WRITER']['page_sequence_separator'])) {
             $this->page_sequence_separator = $settings['WRITER']['page_sequence_separator'];
-        }
-        else {
+        } else {
             $this->page_sequence_separator = '-';
         }
 
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('Writer');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::INFO);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::INFO
+        );
         $this->log->pushHandler($this->logStreamHandler);
     }
 
@@ -95,8 +96,10 @@ class CsvBooks extends Writer
             if ($this->settings['FILE_GETTER']['input_directory'] !== '' &&
                 ($this->datastreams != array('MODS') xor $no_datastreams_setting_flag)) {
                 if ($no_datastreams_setting_flag) {
-                    $this->log->addWarning("CSV Books warning",
-                        array('Book-level input directory does not exist' => $book_level_input_dir));
+                    $this->log->addWarning(
+                        "CSV Books warning",
+                        array('Book-level input directory does not exist' => $book_level_input_dir)
+                    );
                     return;
                 }
             }
@@ -155,8 +158,10 @@ class CsvBooks extends Writer
         if ($path !='') {
             $fileCreationStatus = file_put_contents($path, $metadata);
             if ($fileCreationStatus === false) {
-                $this->log->addWarning("There was a problem writing the book-level metadata to a file",
-                    array('file' => $path));
+                $this->log->addWarning(
+                    "There was a problem writing the book-level metadata to a file",
+                    array('file' => $path)
+                );
             }
         }
     }
@@ -183,8 +188,15 @@ class CsvBooks extends Writer
         $dates = $xpath->query("//mods:originInfo/mods:dateIssued");
         $page_date = $dates->item(0)->nodeValue;
 
+        $namespace = sprintf(
+            'xmlns="%s" xmlns:mods="%s" xmlns:xsi="%s" xmlns:xlink="%s"',
+            "http://www.loc.gov/mods/v3",
+            "http://www.loc.gov/mods/v3",
+            "http://www.w3.org/2001/XMLSchema-instance",
+            "http://www.w3.org/1999/xlink"
+        );
         $page_mods = <<<EOQ
-<mods xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink">
+<mods {$namespace}>
   <titleInfo>
     <title>{$page_title}</title>
   </titleInfo>
@@ -202,10 +214,11 @@ EOQ;
         if ($path !='') {
             $fileCreationStatus = file_put_contents($path, $metadata);
             if ($fileCreationStatus === false) {
-                $this->log->addWarning("There was a problem writing the page-level metadata to a file",
-                    array('file' => $path));
+                $this->log->addWarning(
+                    "There was a problem writing the page-level metadata to a file",
+                    array('file' => $path)
+                );
             }
         }
     }
-
 }

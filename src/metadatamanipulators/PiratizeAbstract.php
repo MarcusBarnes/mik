@@ -2,6 +2,7 @@
 // src/metadatamanipulators/PiratizeAbstract.php
 
 namespace mik\metadatamanipulators;
+
 use GuzzleHttp\Client;
 use \Monolog\Logger;
 
@@ -17,7 +18,7 @@ class PiratizeAbstract extends MetadataManipulator
     /**
      * Create a new metadata manipulator instance.
      */
-    public function __construct($settings = null, $paramsArray, $record_key)
+    public function __construct($settings, $paramsArray, $record_key)
     {
         parent::__construct($settings, $paramsArray, $record_key);
         $this->record_key = $record_key;
@@ -27,8 +28,10 @@ class PiratizeAbstract extends MetadataManipulator
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
         $this->log = new \Monolog\Logger('config');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::INFO);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::INFO
+        );
         $this->log->pushHandler($this->logStreamHandler);
     }
 
@@ -41,8 +44,8 @@ class PiratizeAbstract extends MetadataManipulator
      * @return string
      *     Manipulated string
      */
-     public function manipulate($input)
-     {
+    public function manipulate($input)
+    {
         $dom = new \DomDocument();
         $dom->loadxml($input, LIBXML_NSCLEAN);
 
@@ -57,8 +60,10 @@ class PiratizeAbstract extends MetadataManipulator
                 $response = $client->get($this->arrpiUrl . $query);
             // If there is a Guzzle error, log it and return the original snippet.
             } catch (Exception $e) {
-                $this->log->addWarning("PiratizeAbstract",
-                    array('HTTP request error' => $e->getMessage()));
+                $this->log->addWarning(
+                    "PiratizeAbstract",
+                    array('HTTP request error' => $e->getMessage())
+                );
                 return $input;
             }
             $body = $response->getBody();
@@ -67,7 +72,8 @@ class PiratizeAbstract extends MetadataManipulator
 
             // Log any instances where the translation differs from the original text.
             if (urldecode($original_text) != $abstract->nodeValue) {
-                $this->log->addInfo("PiratizeAbstract",
+                $this->log->addInfo(
+                    "PiratizeAbstract",
                     array(
                         'Record key' => $this->record_key,
                         'Source abstract text' => urldecode($original_text),
@@ -78,10 +84,9 @@ class PiratizeAbstract extends MetadataManipulator
 
             // We're done, so return the modified snippet.
             return $dom->saveXML($dom->documentElement);
-        }
-        // If the current snippet isn't <abstract>, return the input snippet.
+        } // If the current snippet isn't <abstract>, return the input snippet.
         else {
             return $input;
         }
-     }
+    }
 }

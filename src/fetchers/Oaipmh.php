@@ -1,15 +1,12 @@
 <?php
 
 namespace mik\fetchers;
+
 use Phpoaipmh\Client;
 use Phpoaipmh\Endpoint;
 
 class Oaipmh extends Fetcher
 {
-    /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
 
     /**
      * @var array $fetchermanipulators - the fetchermanipulors from config,
@@ -28,49 +25,39 @@ class Oaipmh extends Fetcher
 
         if (isset($settings['FETCHER']['metadata_prefix'])) {
             $this->metadataPrefix = $settings['FETCHER']['metadata_prefix'];
-        }
-        else {
+        } else {
             $this->metadataPrefix = 'oai_dc';
         }
 
         if (isset($settings['FETCHER']['from'])) {
             $this->from = $settings['FETCHER']['from'];
-        }
-        else {
+        } else {
             $this->from = null;
         }
 
         if (isset($settings['FETCHER']['until'])) {
             $this->until = $settings['FETCHER']['until'];
-        }
-        else {
+        } else {
             $this->until = null;
         }
 
         if (isset($settings['FETCHER']['set_spec'])) {
             $this->setSpec = $settings['FETCHER']['set_spec'];
-        }
-        else {
+        } else {
             $this->setSpec = null;
         }
 
         if (isset($settings['MANIPULATORS']['fetchermanipulators'])) {
             $this->fetchermanipulators = $settings['MANIPULATORS']['fetchermanipulators'];
-        }
-        else {
+        } else {
             $this->fetchermanipulators = null;
         }
 
         if (!$this->createTempDirectory()) {
-            $this->log->addError("OAI-PMH fetcher",
-                array('Cannot create temp_directory'));
-        }
-
-        if (isset($settings['FETCHER']['use_cache'])) {
-            $this->use_cache = $settings['FETCHER']['use_cache'];
-        }
-        else {
-            $this->use_cache = true;
+            $this->log->addError(
+                "OAI-PMH fetcher",
+                array('Cannot create temp_directory')
+            );
         }
     }
 
@@ -86,12 +73,13 @@ class Oaipmh extends Fetcher
     {
         static $filtered_records;
         if (!isset($filtered_records) || $this->use_cache == false) {
-            $client = new \Phpoaipmh\Client($this->endpoint);
-            $endpoint = new \Phpoaipmh\Endpoint($client);
+            $client = new Client($this->endpoint);
+            $endpoint = new Endpoint($client);
             $records = $endpoint->listRecords($this->metadataPrefix, $this->from, $this->until, $this->setSpec);
-            foreach($records as $rec) {
+            foreach ($records as $rec) {
                 $identifier = urlencode($rec->header->identifier);
-                file_put_contents($this->tempDirectory . DIRECTORY_SEPARATOR . $identifier . '.metadata', $rec->asXML());
+                file_put_contents($this->tempDirectory . DIRECTORY_SEPARATOR . $identifier .
+                    '.metadata', $rec->asXML());
                 // MIK expects each record to be an object with a ->key property.
                 $record = new \stdClass();
                 $record->key = $identifier;
@@ -161,5 +149,4 @@ class Oaipmh extends Fetcher
         }
         return $records;
     }
-
 }

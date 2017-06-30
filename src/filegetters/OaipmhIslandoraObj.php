@@ -17,25 +17,22 @@ use Monolog\Logger;
 class OaipmhIslandoraObj extends FileGetter
 {
     /**
-     * @var array $settings - configuration settings from configuration class.
-     */
-    public $settings;
-
-    /**
      * Create a new OAI Single File Fetcher Instance.
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FILE_GETTER'];
+        parent::__construct($settings);
         $this->fetcher = new \mik\fetchers\Oaipmh($settings);
         $this->temp_directory = $this->settings['temp_directory'];
 
         // Set up logger.
         $this->pathToLog = $settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('OaipmhIslandoraObj filegetter');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::ERROR);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::ERROR
+        );
         $this->log->pushHandler($this->logStreamHandler);
 
         $this->oai_endpoint = $settings['FETCHER']['oai_endpoint'];
@@ -78,8 +75,7 @@ class OaipmhIslandoraObj extends FileGetter
         $islandora_url_info = parse_url($this->oai_endpoint);
         if (isset($islandora_url_info['port'])) {
             $port = $islandora_url_info['port'];
-        }
-        else {
+        } else {
             $port = '';
         }
         $islandora_host = $islandora_url_info['scheme'] . '://' . $islandora_url_info['host'] . $port;

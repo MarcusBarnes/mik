@@ -33,16 +33,16 @@ abstract class Writer
     public $overwrite_content_files;
 
     /**
-     * @var array $datastreams - array of expected datastreams; empty if no datastreams 
+     * @var array $datastreams - array of expected datastreams; empty if no datastreams
      * in the config were set.
-     */ 
+     */
     public $datastreams = array();
 
-    /** 
+    /**
      * @var $OBJ_file_extension - the file extension to use for the OBJ datastream.
-     * Default to using TIFF for newspaper OBJ files if not stated explicitily in the 
+     * Default to using TIFF for newspaper OBJ files if not stated explicitily in the
      * configuration settings. (See the constructor.)
-     */ 
+     */
     public $OBJ_file_extension;
 
     /**
@@ -55,21 +55,21 @@ abstract class Writer
         $this->settings = $settings;
         $this->outputDirectory = $this->settings['WRITER']['output_directory'];
         if (isset($this->settings['WRITER']['metadata_filename'])) {
-          $this->metadataFileName = $this->settings['WRITER']['metadata_filename'];
+            $this->metadataFileName = $this->settings['WRITER']['metadata_filename'];
         }
 
         if (isset($this->settings['WRITER']['datastreams'])) {
             $this->datastreams = $this->settings['WRITER']['datastreams'];
         }
-        
+
         if (isset($this->settings['WRITER']['skip_obj'])) {
             $this->skip_obj = $this->settings['WRITER']['skip_obj'];
-        }  else {
+        } else {
             // default flag to false - do not skip OBJ file creation.
             $this->skip_obj = false;
         }
 
-        if (isset($this->settings['WRITER']['OBJ_file_extension'])){
+        if (isset($this->settings['WRITER']['OBJ_file_extension'])) {
             $this->OBJ_file_extension = $this->settings['WRITER']['OBJ_file_extension'];
         }
 
@@ -80,7 +80,7 @@ abstract class Writer
                 $this->overwrite_metadata_files = false;
             }
         }
-        
+
         $this->overwrite_content_files = true;
         if (isset($this->settings['WRITER']['overwrite_content_files'])) {
             if ($this->settings['WRITER']['overwrite_content_files'] == false) {
@@ -117,7 +117,8 @@ abstract class Writer
         $this->log->pushHandler($this->logStreamHandler);
 
         // Set up problem logger.
-        $this->pathToProblemLog = dirname($settings['LOGGING']['path_to_log']) . DIRECTORY_SEPARATOR . 'problem_records.log';
+        $this->pathToProblemLog = dirname($settings['LOGGING']['path_to_log']) . DIRECTORY_SEPARATOR .
+            'problem_records.log';
         $this->problemLog = new \Monolog\Logger('ProblemRecords');
         $this->problemLogStreamHandler= new \Monolog\Handler\StreamHandler($this->pathToProblemLog, Logger::ERROR);
         $this->problemLog->pushHandler($this->problemLogStreamHandler);
@@ -162,6 +163,5 @@ abstract class Writer
      *   The unique key for this object.
      *
      */
-    abstract function writePackages($metadata, $pages, $record_key);
-
+    abstract public function writePackages($metadata, $pages, $record_key);
 }

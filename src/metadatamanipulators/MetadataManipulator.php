@@ -10,7 +10,7 @@ namespace mik\metadatamanipulators;
  *    Extend this abstract class with for specific implemenations.
  *    For example, see metadatamanipulators/SimpleReplace.php.
  *
- *    Note that methods marked as abstract must be defined in 
+ *    Note that methods marked as abstract must be defined in
  *    the extending class.
  *
  *    Abstract methods:

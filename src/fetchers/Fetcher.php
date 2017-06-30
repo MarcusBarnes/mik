@@ -22,9 +22,16 @@ use \Monolog\Logger;
 abstract class Fetcher
 {
     /**
-     * @var array $settings - configuration settings from confugration class.
+     * Configuration settings from configuration class.
+     * @var array
      */
     public $settings;
+
+    /**
+     * Whether to use the static cache, should be set to false for unit tests.
+     * @var boolean
+     */
+    protected $use_cache;
 
     /**
      * Create a new Fetcher Instance
@@ -47,6 +54,12 @@ abstract class Fetcher
         $this->log = new \Monolog\Logger('fetcher');
         $this->logStreamHandler= new \Monolog\Handler\StreamHandler($this->pathToLog, $logLevel);
         $this->log->pushHandler($this->logStreamHandler);
+
+        if (isset($this->settings['use_cache'])) {
+            $this->use_cache = $this->settings['use_cache'];
+        } else {
+            $this->use_cache = true;
+        }
     }
 
     /**

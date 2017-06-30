@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\fetchermanipulators;
+
 use League\CLImate\CLImate;
 
 /**
@@ -21,7 +22,7 @@ class CsvSingleFileByExtension extends FetcherManipulator
      *   An array of all of the settings for the current manipulator,
      *   with the manipulator class name in the first position and
      *   the list of allowed extensions, without the leading period,
-     *   as the second member. 
+     *   as the second member.
      */
     public function __construct($settings, $manipulator_settings)
     {
@@ -30,7 +31,7 @@ class CsvSingleFileByExtension extends FetcherManipulator
         $this->allowed_extensions = explode(',', $manipulator_settings[1]);
         $this->file_name_field = $settings['FILE_GETTER']['file_name_field'];
         // To get the value of $onWindows.
-        parent::__construct();        
+        parent::__construct();
     }
 
     /**
@@ -60,17 +61,16 @@ class CsvSingleFileByExtension extends FetcherManipulator
             if (in_array($ext, $this->allowed_extensions)) {
                 $filtered_records[] = $record;
             }
-            $record_num++;  
+            $record_num++;
             if ($this->onWindows) {
                 print '.';
-            }
-            else {
+            } else {
                 $progress->current($record_num);
             }
         }
         if ($this->onWindows) {
             print "\n";
-        }        
+        }
         return $filtered_records;
     }
 }

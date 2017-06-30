@@ -23,8 +23,7 @@ class CsvNewspapers extends MikInputValidator
         // The separator is used here in a regex, so we escape it.
         if (isset($settings['WRITER']['page_sequence_separator'])) {
             $this->page_sequence_separator = $settings['WRITER']['page_sequence_separator'];
-        }
-        else {
+        } else {
             $this->page_sequence_separator = '-';
         }
         $this->page_sequence_separator = preg_quote($this->page_sequence_separator);
@@ -33,9 +32,8 @@ class CsvNewspapers extends MikInputValidator
         // Default is to not log the absence of page-level OCR files.
         if (isset($settings['WRITER']['log_missing_ocr_files'])) {
             $this->log_missing_ocr_files= $settings['WRITER']['log_missing_ocr_files'];
-        }
-        else {
-            $this->log_missing_ocr_files = FALSE;
+        } else {
+            $this->log_missing_ocr_files = false;
         }
     }
 
@@ -148,8 +146,7 @@ class CsvNewspapers extends MikInputValidator
                 );
                 $cumulative_validation_results[] = false;
             }
-        }
-        else {
+        } else {
             $this->log->addError(
                 "Input validation failed",
                 array(
@@ -163,8 +160,7 @@ class CsvNewspapers extends MikInputValidator
 
         if (in_array(false, $cumulative_validation_results)) {
             return false;
-        }
-        else {
+        } else {
             return true;
         }
     }
@@ -205,7 +201,8 @@ class CsvNewspapers extends MikInputValidator
      * @return $path string|boolean
      *    The full directory path, if found; false if not.
      */
-    private function getIssueDirPath($issue_directory) {
+    private function getIssueDirPath($issue_directory)
+    {
         $this->issue_directories = $this->getIssueDirectories();
         foreach ($this->issue_directories as $path) {
             //  Find the first path that ends in the issue directory name.
@@ -227,7 +224,8 @@ class CsvNewspapers extends MikInputValidator
      *    A list of all the page file names. Files must have one of
      *    following extensions: tif, tiff, jp2.
      */
-    private function getPageFiles($dir) {
+    private function getPageFiles($dir)
+    {
         $page_files = array();
         $files = $this->readDir($dir);
         foreach ($files as $file) {
@@ -250,7 +248,8 @@ class CsvNewspapers extends MikInputValidator
      * @return boolean
      *    True if all files have valid sequence numbers (-\d$ at the end), false if not.
      */
-    private function checkPageSequenceNumbers($files) {
+    private function checkPageSequenceNumbers($files)
+    {
         $valid = true;
         foreach ($files as $file) {
             $pathinfo = pathinfo($file);
@@ -273,7 +272,8 @@ class CsvNewspapers extends MikInputValidator
      * @return boolean
      *    True if all image files have corresponding OCR files.
      */
-    private function checkOcrFiles($issue_directory_path, $files) {
+    private function checkOcrFiles($issue_directory_path, $files)
+    {
         $valid = true;
         if (!$this->log_missing_ocr_files) {
             return $valid;

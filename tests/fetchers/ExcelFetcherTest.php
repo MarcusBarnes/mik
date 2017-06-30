@@ -31,11 +31,13 @@ class ExcelFetcherTest extends MikTestBase
                 'input_file' => $this->asset_base_dir . '/excel/sample_metadata.xlsx',
                 'record_key' => 'ID',
                 'temp_directory' => $this->path_to_temp_dir,
+                'use_cache' => false,
             ],
             'FILE_GETTER' => [
                 'validate_input' => false,
                 'class' => 'CsvSingleFile',
                 'file_name_field' => 'File',
+                'use_cache' => false,
             ],
             'LOGGING' => [
                 'path_to_log' => $this->path_to_log,

@@ -5,17 +5,12 @@ namespace mik\filegetters;
 class CsvSingleFile extends FileGetter
 {
     /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
-
-    /**
      * Create a new CSV Fetcher Instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FILE_GETTER'];
+        parent::__construct($settings);
         $this->input_directory = $this->settings['input_directory'];
         $this->file_name_field = $this->settings['file_name_field'];
         $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];

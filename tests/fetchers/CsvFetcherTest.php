@@ -33,11 +33,13 @@ class CsvFetcherTest extends MikTestBase
                 'input_file' => $this->asset_base_dir . '/csv/sample_metadata.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
+                'use_cache' => false,
             ],
             'FILE_GETTER' => [
                 'validate_input' => false,
                 'class' => 'CsvSingleFile',
                 'file_name_field' => 'File',
+                'use_cache' => false,
             ],
             'LOGGING' => [
                 'path_to_log' => $this->path_to_log,

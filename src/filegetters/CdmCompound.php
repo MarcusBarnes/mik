@@ -9,11 +9,6 @@ use Monolog\Logger;
 class CdmCompound extends FileGetter
 {
     /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
-
-    /**
      * @var string $utilsUrl - CDM utils url.
      */
     public $utilsUrl;
@@ -29,7 +24,7 @@ class CdmCompound extends FileGetter
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FILE_GETTER'];
+        parent::__construct($settings);
         $this->utilsUrl = $this->settings['utils_url'];
         $this->alias = $this->settings['alias'];
         $this->temp_directory = (!isset($settings['FILE_GETTER']['temp_directory'])) ?
@@ -43,9 +38,9 @@ class CdmCompound extends FileGetter
         // Default Mac PHP setups may use Apple's Secure Transport
         // rather than OpenSSL, causing issues with CA verification.
         // Allow configuration override of CA verification at users own risk.
-        if (isset($settings['SYSTEM']['verify_ca']) ){
-            if($settings['SYSTEM']['verify_ca'] == false){
-              $this->verifyCA = false;
+        if (isset($settings['SYSTEM']['verify_ca'])) {
+            if ($settings['SYSTEM']['verify_ca'] == false) {
+                $this->verifyCA = false;
             }
         } else {
             $this->verifyCA = true;
@@ -54,14 +49,15 @@ class CdmCompound extends FileGetter
         // Set up logger.
         $this->pathToLog = $settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('CdmPhpDocuments filegetter');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::ERROR);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::ERROR
+        );
         $this->log->pushHandler($this->logStreamHandler);
-
     }
 
     /**
-     * Gets a compound item's children pointers. 
+     * Gets a compound item's children pointers.
      */
     public function getChildren($pointer)
     {
@@ -72,8 +68,7 @@ class CdmCompound extends FileGetter
             $structure = simplexml_load_string($item_structure);
             if ($structure->code == '-2') {
                 return $children_pointers;
-            }
-            else {
+            } else {
                 $pages = $structure->xpath('//page');
                 foreach ($pages as $page) {
                     $children_pointers[] = (string) $page->pageptr;
@@ -102,19 +97,19 @@ class CdmCompound extends FileGetter
 
         $client = new Client();
         try {
-            $response = $client->get($query_url,
+            $response = $client->get(
+                $query_url,
                 ['timeout' => $this->settings['http_timeout'],
                 'connect_timeout' => $this->settings['http_timeout'],
                 'verify' => $this->verifyCA]
             );
             $item_structure = $response->getBody();
-        }
-        catch (RequestException $e) {
+        } catch (RequestException $e) {
             $this->log->addError("CdmCompound Guzzle error", array('HTTP request error' => $e->getRequest()));
             if ($e->hasResponse()) {
                 $this->log->addError("CdmCompound Guzzle error", array('HTTP request response' => $e->getResponse()));
             }
-        }        
+        }
 
         if ($format == 'json') {
             return json_decode($item_structure, true);
@@ -124,5 +119,4 @@ class CdmCompound extends FileGetter
         }
         return false;
     }
-
 }

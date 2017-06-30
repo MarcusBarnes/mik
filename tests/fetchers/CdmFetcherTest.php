@@ -34,6 +34,7 @@ class CdmFetcherTest extends MikTestBase
                 'ws_url' => '',
                 'alias' => '',
                 'temp_directory' => $this->asset_base_dir . '/cdm/metadata/',
+                'use_cache' => false,
              ),
            'LOGGING' => array(
                 'path_to_log' => $this->path_to_log,

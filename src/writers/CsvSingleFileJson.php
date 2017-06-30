@@ -18,7 +18,7 @@ class CsvSingleFileJson extends Writer
     public $settings;
     
     /**
-     * @var object cdmPhpDocumentsFileGetter - filegetter class for 
+     * @var object cdmPhpDocumentsFileGetter - filegetter class for
      * getting files related to CDM PHP documents.
      */
     private $fileGetter;
@@ -35,8 +35,7 @@ class CsvSingleFileJson extends Writer
         $this->output_directory = $settings['WRITER']['output_directory'];
         if (isset($settings['WRITER']['preserve_content_filenames'])) {
             $this->preserve_content_filenames = $settings['WRITER']['preserve_content_filenames'];
-        }
-        else {
+        } else {
             $this->preserve_content_filenames = false;
         }
     }
@@ -66,13 +65,15 @@ class CsvSingleFileJson extends Writer
         // folder using the filename or record_id identifier
         $source_file_path = $this->fileGetter->getFilePath($record_id);
 
-	// But first, check to see if the source file exists, and if it doesn't, log
-	// that fact and skip writing the package.
+    // But first, check to see if the source file exists, and if it doesn't, log
+    // that fact and skip writing the package.
         if (!file_exists($source_file_path)) {
-            $this->log->addWarning("Source file does not exist, skipping writing package",
-                array('source_file' => $source_file_path));
+            $this->log->addWarning(
+                "Source file does not exist, skipping writing package",
+                array('source_file' => $source_file_path)
+            );
             return;
-	}
+        }
 
         $source_file_name = pathinfo($source_file_path, PATHINFO_FILENAME);
         $source_file_extension = pathinfo($source_file_path, PATHINFO_EXTENSION);
@@ -90,14 +91,14 @@ class CsvSingleFileJson extends Writer
             // The default is to overwrite the metadata file.
             if ($this->overwrite_metadata_files) {
                 $this->writeMetadataFile($metadata, $metadata_file_path, true);
-            }
-            else {
+            } else {
                 // But if the config says not to, we log the existence of the file.
                 if (file_exists($metadata_file_path)) {
-                    $this->log->addWarning("Metadata file already exists, not overwriting it",
-                        array('file' => $metadata_file_path));
-                }
-                else {
+                    $this->log->addWarning(
+                        "Metadata file already exists, not overwriting it",
+                        array('file' => $metadata_file_path)
+                    );
+                } else {
                     $this->writeMetadataFile($metadata, $metadata_file_path, true);
                 }
             }
@@ -111,41 +112,43 @@ class CsvSingleFileJson extends Writer
             // The default is to overwrite the content file (but not if generating metadata only)
             if ($this->overwrite_content_files && ! $enforce_metadata_only) {
                 copy($source_file_path, $content_file_path);
-            }
-            else {
+            } else {
                 // But if the config says not to, or source and content paths match,
                 // we log the existence of the file.
                 if (file_exists($content_file_path)) {
                     $warning = ($enforce_metadata_only) ?
                         "Source and content paths match, generating metadata only" :
                         "Content file already exists, not overwriting it" ;
-                    $this->log->addWarning($warning,
-                        array('file' => $content_file_path));
-                }
-                else {
+                    $this->log->addWarning(
+                        $warning,
+                        array('file' => $content_file_path)
+                    );
+                } else {
                     copy($source_file_path, $content_file_path);
                 }
             }
         }
-
     }
 
     public function writeMetadataFile($metadata, $path, $overwrite = true)
     {
         // file_put_contents() overwrites by default.
         if (!$overwrite) {
-            $this->log->addWarning("Metadata file exists, and overwrite is set to false",
-                array('file' => $path));
+            $this->log->addWarning(
+                "Metadata file exists, and overwrite is set to false",
+                array('file' => $path)
+            );
             return;
         }
 
         if ($path !='') {
             $fileCreationStatus = file_put_contents($path, $metadata);
             if ($fileCreationStatus === false) {
-                $this->log->addWarning("There was a problem writing the metadata to a file",
-                    array('file' => $path));
+                $this->log->addWarning(
+                    "There was a problem writing the metadata to a file",
+                    array('file' => $path)
+                );
             }
         }
     }
-    
 }

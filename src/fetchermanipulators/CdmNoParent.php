@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\fetchermanipulators;
+
 use League\CLImate\CLImate;
 use GuzzleHttp\Client;
 use \Monolog\Logger;
@@ -13,7 +14,7 @@ use \Monolog\Logger;
  * are included in the fetch. For CONTENTdm fetches, we alreadt supress
  * child objects in the query to get all objects, so the separate check
  * here for GetParent is probably redundant.
- */ 
+ */
 
 class CdmNoParent extends FetcherManipulator
 {
@@ -40,9 +41,11 @@ class CdmNoParent extends FetcherManipulator
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
         $this->log = new \Monolog\Logger('config');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::INFO);
-        $this->log->pushHandler($this->logStreamHandler);        
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::INFO
+        );
+        $this->log->pushHandler($this->logStreamHandler);
     }
 
     /**
@@ -67,7 +70,7 @@ class CdmNoParent extends FetcherManipulator
 
         $record_num = 0;
         $filtered_records = array();
-        foreach ($all_records as $record) {  
+        foreach ($all_records as $record) {
             if (property_exists($record, 'key') &&
                 property_exists($record, 'filetype') &&
                 is_string($record->filetype) &&
@@ -82,8 +85,7 @@ class CdmNoParent extends FetcherManipulator
                 $record_num++;
                 if ($this->onWindows) {
                     print '.';
-                }
-                else {
+                } else {
                     $progress->current($record_num);
                 }
             }
@@ -113,22 +115,22 @@ class CdmNoParent extends FetcherManipulator
           $url = $this->settings['METADATA_PARSER']['ws_url'] .
               'GetParent/' . $this->alias . '/' . $pointer . '/json';
           $client = new Client();
-          try {
-              $response = $client->get($url);
-          } catch (Exception $e) {
-              $this->log->addInfo("CdmNoParent",
-                  array('HTTP request error' => $e->getMessage()));
-              return true;
-          }
+        try {
+            $response = $client->get($url);
+        } catch (Exception $e) {
+            $this->log->addInfo(
+                "CdmNoParent",
+                array('HTTP request error' => $e->getMessage())
+            );
+            return true;
+        }
           $body = $response->getBody();
-          $parent_info = json_decode($body, true);       
+          $parent_info = json_decode($body, true);
 
-          if ($parent_info['parent'] == '-1') {
-              return false;
-          }
-          else {
-              return $parent_info['parent'];
-          }
-    }    
-
+        if ($parent_info['parent'] == '-1') {
+            return false;
+        } else {
+            return $parent_info['parent'];
+        }
+    }
 }

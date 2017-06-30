@@ -9,11 +9,6 @@ use Monolog\Logger;
 class CdmSingleFile extends FileGetter
 {
     /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
-
-    /**
      * @var string $utilsUrl - CDM utils url.
      */
     public $utilsUrl;
@@ -31,19 +26,25 @@ class CdmSingleFile extends FileGetter
     public $filegettermanipulators;
 
     /**
+     * Configurable http timeout.
+     * @var int
+     */
+    private $http_timeout = 60;
+
+    /**
      * Create a new CONTENTdm Fetcher Instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
     {
-        $this->settings = $settings;
-        $this->utilsUrl = $this->settings['FILE_GETTER']['utils_url'];
-        $this->alias = $this->settings['FILE_GETTER']['alias'];
-        $this->temp_directory = (!isset($settings['FILE_GETTER']['temp_directory'])) ?
-            '/tmp' : $settings['FILE_GETTER']['temp_directory'];
+        parent::__construct($settings);
+        $this->utilsUrl = $this->settings['utils_url'];
+        $this->alias = $this->settings['alias'];
+        $this->temp_directory = (!isset($this->settings['temp_directory'])) ?
+            '/tmp' : $this->settings['temp_directory'];
 
-        if (isset($settings['FILE_GETTER']['input_directories'])) {
-            $this->input_directories = $settings['FILE_GETTER']['input_directories'];
+        if (isset($this->settings['input_directories'])) {
+            $this->input_directories = $this->settings['input_directories'];
         } else {
             $this->input_directories = false;
         }
@@ -54,17 +55,17 @@ class CdmSingleFile extends FileGetter
             $this->filegettermanipulators = null;
         }
 
-        if (!isset($this->settings['http_timeout'])) {
+        if (isset($this->settings['http_timeout'])) {
             // Seconds.
-            $this->settings['http_timeout'] = 60;
+            $this->http_timeout = $this->settings['http_timeout'];
         }
 
         // Default Mac PHP setups may use Apple's Secure Transport
         // rather than OpenSSL, causing issues with CA verification.
         // Allow configuration override of CA verification at users own risk.
-        if (isset($settings['SYSTEM']['verify_ca']) ){
-            if($settings['SYSTEM']['verify_ca'] == false){
-              $this->verifyCA = false;
+        if (isset($settings['SYSTEM']['verify_ca'])) {
+            if ($settings['SYSTEM']['verify_ca'] == false) {
+                $this->verifyCA = false;
             }
         } else {
             $this->verifyCA = true;
@@ -73,10 +74,11 @@ class CdmSingleFile extends FileGetter
         // Set up logger.
         $this->pathToLog = $settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('CdmSingleFile filegetter');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::ERROR);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::ERROR
+        );
         $this->log->pushHandler($this->logStreamHandler);
-
     }
 
     /**
@@ -109,22 +111,19 @@ class CdmSingleFile extends FileGetter
         $client = new Client();
         try {
             $response = $client->get($get_file_url, ['stream' => true,
-                'timeout' => $this->settings['http_timeout'],
-                'connect_timeout' => $this->settings['http_timeout'],
-                'verify' => $this->verifyCA]
-            );
+                'timeout' => $this->http_timeout,
+                'connect_timeout' => $this->http_timeout,
+                'verify' => $this->verifyCA]);
             $body = $response->getBody();
             while (!$body->eof()) {
                 file_put_contents($temp_file_path, $body->read(2048), FILE_APPEND);
             }
             if (file_exists($temp_file_path)) {
                 return $temp_file_path;
-            }
-            else {
+            } else {
                 return false;
             }
-        }
-        catch (RequestException $e) {
+        } catch (RequestException $e) {
             $this->log->addError("CdmSingleFile Guzzle error", array('HTTP request error' => $e->getRequest()));
             if ($e->hasResponse()) {
                 $this->log->addError("CdmSingleFile Guzzle error", array('HTTP request response' => $e->getResponse()));
@@ -161,9 +160,14 @@ class CdmSingleFile extends FileGetter
             }
         }
         // Throw an exception if no master file was found.
-        throw new \mik\exceptions\MikErrorException('WARNING', 'src/filegetters/CdmSingleFile.php', __LINE__, "No master file found for pointer $pointer", 1, $this->settings);
+        throw new \mik\exceptions\MikErrorException(
+            'WARNING',
+            'src/filegetters/CdmSingleFile.php',
+            __LINE__,
+            "No master file found for pointer $pointer",
+            1,
+            $this->settings
+        );
         return false;
     }
-
 }
-

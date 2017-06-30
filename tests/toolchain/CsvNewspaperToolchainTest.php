@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is named XCsvNewspaperToolchainTest.php so that it is run after
+ * This file is named CsvNewspaperToolchainTest.php so that it is run after
  * CsvSingleFileToolchainTest.php and CsvToJsonToolchain.php. Otherwise,
  * the following errors occur:
  *
@@ -162,6 +162,7 @@ XML;
                 'input_directory' => $this->asset_base_dir . '/csv/newspapers/files/flat',
                 'temp_directory' => $this->path_to_temp_dir,
                 'file_name_field' => 'Directory',
+                'use_cache' => false,
              ),
             'METADATA_PARSER' => array(
                 'mapping_csv_path' => $this->asset_base_dir . '/csv/newspapers/metadata/newspapers_mappings.csv',

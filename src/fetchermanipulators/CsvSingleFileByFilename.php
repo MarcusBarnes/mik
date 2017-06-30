@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\fetchermanipulators;
+
 use League\CLImate\CLImate;
 
 /**
@@ -27,7 +28,7 @@ class CsvSingleFileByFilename extends FetcherManipulator
         $this->allowed_pattern = $manipulator_settings[1];
         $this->file_name_field = $settings['FILE_GETTER']['file_name_field'];
         // To get the value of $onWindows.
-        parent::__construct();        
+        parent::__construct();
     }
 
     /**
@@ -55,17 +56,16 @@ class CsvSingleFileByFilename extends FetcherManipulator
             if (preg_match('/' . $this->allowed_pattern . '/', $filename)) {
                 $filtered_records[] = $record;
             }
-            $record_num++;  
+            $record_num++;
             if ($this->onWindows) {
                 print '.';
-            }
-            else {
+            } else {
                 $progress->current($record_num);
             }
         }
         if ($this->onWindows) {
             print "\n";
-        }        
+        }
         return $filtered_records;
     }
 }

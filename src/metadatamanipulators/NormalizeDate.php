@@ -2,6 +2,7 @@
 // src/metadatamanipulators/NormalizeDate.php
 
 namespace mik\metadatamanipulators;
+
 use \Monolog\Logger;
 
 /**
@@ -18,7 +19,7 @@ class NormalizeDate extends MetadataManipulator
     /**
      * Create a new metadata manipulator instance.
      */
-    public function __construct($settings = null, $paramsArray, $record_key)
+    public function __construct($settings, $paramsArray, $record_key)
     {
         parent::__construct($settings, $paramsArray, $record_key);
         $this->record_key = $record_key;
@@ -26,8 +27,10 @@ class NormalizeDate extends MetadataManipulator
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
         $this->log = new \Monolog\Logger('config');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::INFO);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::INFO
+        );
         $this->log->pushHandler($this->logStreamHandler);
 
         if (count($paramsArray) == 2) {
@@ -37,8 +40,7 @@ class NormalizeDate extends MetadataManipulator
             $this->sourceDateField = $paramsArray[0];
             $this->destDateElement = $paramsArray[1];
             $this->preference = $paramsArray[2];
-        }
-        else {
+        } else {
             $this->log->addInfo("NormalizeDate", array('Wrong parameter count' => count($paramsArray)));
         }
     }
@@ -51,8 +53,8 @@ class NormalizeDate extends MetadataManipulator
      * @return string
      *     Manipulated string
      */
-     public function manipulate($input)
-     {
+    public function manipulate($input)
+    {
         $dom = new \DomDocument();
         $dom->loadxml($input, LIBXML_NSCLEAN);
 
@@ -93,8 +95,7 @@ class NormalizeDate extends MetadataManipulator
                 if (isset($this->preference) && $this->preference == 'm') {
                     // Interpret as mm-dd-yyyy. Reassemble the value as yyyy-mm-dd.
                     list($month, $day, $year) = explode('-', $matches[0]);
-                }
-                else {
+                } else {
                     // Interpret as dd-mm-yyyy (this is the default). Reassemble the value as yyyy-mm-dd.
                     list($day, $month, $year) = explode('-', $matches[0]);
                 }
@@ -111,8 +112,7 @@ class NormalizeDate extends MetadataManipulator
                 $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
                 $this->logInvalidDate($year, $month, $day);
                 return $dom->saveXML($origin_info_element);
-            }
-            /**
+            } /**
              * Check for dates like 1/8/1930. Leading zeros on day and month optional, as are
              * the position of month and day.
              */
@@ -121,8 +121,7 @@ class NormalizeDate extends MetadataManipulator
                 if (isset($this->preference) && $this->preference == 'm') {
                     // Interpret as mm/dd/yyyy. Reassemble the value as yyyy-mm-dd.
                     list($month, $day, $year) = explode('/', $matches[0]);
-                }
-                else {
+                } else {
                     // Interpret as dd/mm/yyyy (this is the default). Reassemble the value as yyyy-mm-dd.
                     list($day, $month, $year) = explode('/', $matches[0]);
                 }
@@ -139,8 +138,7 @@ class NormalizeDate extends MetadataManipulator
                 $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
                 $this->logInvalidDate($year, $month, $day);
                 return $dom->saveXML($origin_info_element);
-            }
-            /**
+            } /**
              * Check for dates like 1930 10 15. Assumes leading zeros on month and day and that
              * the incoming date is in format yyyy mm dd.
              */
@@ -152,8 +150,7 @@ class NormalizeDate extends MetadataManipulator
                 $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
                 $this->logInvalidDate($year, $month, $day);
                 return $dom->saveXML($origin_info_element);
-            }
-            /**
+            } /**
              * Check for dates like 1930/10/15. Assumes leading zeros on month and day and that
              * the incoming date is in format yyyy/mm/dd.
              */
@@ -165,8 +162,7 @@ class NormalizeDate extends MetadataManipulator
                 $this->logNormalization($this->sourceDateFieldValue, $origin_info_element, $dom);
                 $this->logInvalidDate($year, $month, $day);
                 return $dom->saveXML($origin_info_element);
-            }
-            /**
+            } /**
              * Check for dates in the format we want yyyy-mm-dd but which have puncutation
              * around the date, and removes the puncutation.
              */
@@ -177,21 +173,21 @@ class NormalizeDate extends MetadataManipulator
                 list($year, $month, $day) = explode('-', $matches[1]);
                 $this->logInvalidDate($year, $month, $day);
                 return $dom->saveXML($origin_info_element);
-            }
-            /**
+            } /**
              * Check for date value that is empty or not string. Just log it.
              */
             elseif (!is_string($this->sourceDateFieldValue) || !strlen($this->sourceDateFieldValue)) {
-                $this->log->addWarning("NormalizeDate",
+                $this->log->addWarning(
+                    "NormalizeDate",
                     array(
                         'Record key' => $this->record_key,
                         'Message' => 'Source date value is empty or not a string'
                         )
                 );
                 return $input;
-            }
-            else {
-                $this->log->addWarning("NormalizeDate",
+            } else {
+                $this->log->addWarning(
+                    "NormalizeDate",
                     array(
                         'Record key' => $this->record_key,
                         'Source date value does not match any pattern' => $this->sourceDateFieldValue,
@@ -199,12 +195,11 @@ class NormalizeDate extends MetadataManipulator
                 );
                 return $input;
             }
-        }
-        else {
+        } else {
             // If current fragment does not match our XPath expression, return it.
             return $input;
         }
-     }
+    }
 
     /**
      * Get the value of the source date field for the current object.
@@ -212,10 +207,10 @@ class NormalizeDate extends MetadataManipulator
      * @return string
      *     The value of the source date field.
      */
-     public function getSourceDateFieldValue()
-     {
+    public function getSourceDateFieldValue()
+    {
         $raw_metadata_cache_path = $this->settings['FETCHER']['temp_directory'] .
-            DIRECTORY_SEPARATOR . $this->record_key . '.metadata';
+          DIRECTORY_SEPARATOR . $this->record_key . '.metadata';
         $raw_metadata_cache = file_get_contents($raw_metadata_cache_path);
 
         // Cached metadata for CSV toolchains is a serialized CSV object.
@@ -234,11 +229,10 @@ class NormalizeDate extends MetadataManipulator
             }
         }
         // If we haven't returned at this point, log failure.
-        $this->log->addWarning("NormalizeDate",array(
-            'Record key' => $this->record_key,
-            'Source date field not set' => $this->sourceDateField)
-        );
-     }
+        $this->log->addWarning("NormalizeDate", array(
+          'Record key' => $this->record_key,
+          'Source date field not set' => $this->sourceDateField));
+    }
 
     /**
      * Write a successful normalization entry to the manipulator log.
@@ -250,16 +244,17 @@ class NormalizeDate extends MetadataManipulator
      * @param object
      *     The DOM.
      */
-     public function logNormalization($source_value, $element, $dom)
-     {
-         $this->log->addInfo("NormalizeDate",
-             array(
-                 'Record key' => $this->record_key,
-                 'Source date value' => $source_value,
-                 'Normalized MODS XML element' => $dom->saveXML($element),
-             )
-         );
-     }
+    public function logNormalization($source_value, $element, $dom)
+    {
+        $this->log->addInfo(
+            "NormalizeDate",
+            array(
+               'Record key' => $this->record_key,
+               'Source date value' => $source_value,
+               'Normalized MODS XML element' => $dom->saveXML($element),
+            )
+        );
+    }
 
     /**
      * Validates a date and logs invalid ones.
@@ -271,18 +266,18 @@ class NormalizeDate extends MetadataManipulator
      * @param int
      *     The normalized day.
      */
-     public function logInvalidDate($year, $month, $day)
-     {
-         if (checkdate($month, $day, $year)) {
-           return;
-         }
+    public function logInvalidDate($year, $month, $day)
+    {
+        if (checkdate($month, $day, $year)) {
+            return;
+        }
 
-         $this->log->addWarning("NormalizeDate",
-             array(
-                 'Record key' => $this->record_key,
-                 'Normalized date value is not a valid date' => $year . '-' . $month . '-' . $day,
-             )
-         );
-     }
-
+        $this->log->addWarning(
+            "NormalizeDate",
+            array(
+               'Record key' => $this->record_key,
+               'Normalized date value is not a valid date' => $year . '-' . $month . '-' . $day,
+            )
+        );
+    }
 }

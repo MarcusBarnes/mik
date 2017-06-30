@@ -2,6 +2,7 @@
 // src/metadatamanipulators/SimpleReplaceTemplated.php
 
 namespace mik\metadatamanipulators;
+
 use \Monolog\Logger;
 
 /**
@@ -23,7 +24,7 @@ class SimpleReplaceTemplated extends MetadataManipulator
     /**
      * Create a new metadata manipulator instance.
      */
-    public function __construct($settings = null, $paramsArray, $record_key)
+    public function __construct($settings, $paramsArray, $record_key)
     {
         parent::__construct($settings, $paramsArray, $record_key);
         $this->record_key = $record_key;
@@ -31,8 +32,10 @@ class SimpleReplaceTemplated extends MetadataManipulator
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
         $this->log = new \Monolog\Logger('config');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::INFO);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::INFO
+        );
         $this->log->pushHandler($this->logStreamHandler);
 
         if (count($paramsArray) == 2) {
@@ -40,14 +43,12 @@ class SimpleReplaceTemplated extends MetadataManipulator
             $this->replacePattern = $paramsArray[0];
             // A replacement string.
             $this->replacementText = $paramsArray[1];
-        }
-        elseif (count($paramsArray) == 1) {
+        } elseif (count($paramsArray) == 1) {
             // A PHP preg_ pattern to match the original value on.
             $this->replacePattern = $paramsArray[0];
             // Empty replacement.
             $this->replacementText = '';
-        }
-        else {
+        } else {
             $this->log->addInfo("SimpleReplaceTemplated", array('Wrong parameter count' => count($paramsArray)));
         }
     }
@@ -60,8 +61,8 @@ class SimpleReplaceTemplated extends MetadataManipulator
      * @return string
      *     Manipulated string
      */
-     public function manipulate($input)
-     {
+    public function manipulate($input)
+    {
         if (preg_match($this->replacePattern, $input)) {
             $modified_input = preg_replace($this->replacePattern, $this->replacementText, $input);
             $this->log->addInfo("SimpleReplaceTemplated", array('Record key' => $this->record_key,
@@ -69,10 +70,9 @@ class SimpleReplaceTemplated extends MetadataManipulator
                 'Modified version' => $modified_input
                 ));
             return $modified_input;
-        }
-        else {
+        } else {
             // If current XML file does not match our regex, return it.
             return $input;
         }
-     }
+    }
 }

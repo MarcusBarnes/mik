@@ -22,11 +22,10 @@ class FetcherManipulator
      */
     public function __construct($settings = null)
     {
-    	// Determine whether we're running on Windows.
+        // Determine whether we're running on Windows.
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $this->onWindows = true;
-        }
-        else {
+        } else {
             $this->onWindows = false;
         }
     }

@@ -10,6 +10,5 @@ class FileManipulator
      */
     public function __construct($settings)
     {
-
     }
 }

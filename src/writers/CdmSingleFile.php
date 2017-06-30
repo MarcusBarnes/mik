@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\writers;
+
 use Monolog\Logger;
 
 class CdmSingleFile extends Writer
@@ -41,8 +42,10 @@ class CdmSingleFile extends Writer
         // Set up logger.
         $this->pathToLog = $settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('CdmSingleFile writer');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::ERROR);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::ERROR
+        );
         $this->log->pushHandler($this->logStreamHandler);
     }
 
@@ -78,7 +81,7 @@ class CdmSingleFile extends Writer
         // datastream IDs are specified in the datastreams[] configuration option or
         // if OBJ (which is what the file that is not an .xml file is) is specified.
         if (!$this->cdmSingleFileFileGetter->input_directories) {
-            if (in_array('OBJ', $this->datastreams) || $no_datastreams_setting_flag ) {
+            if (in_array('OBJ', $this->datastreams) || $no_datastreams_setting_flag) {
                 $temp_file_path = $this->cdmSingleFileFileGetter
                     ->getFileContent($record_id);
                 // Get the filename used by CONTENTdm (stored in the 'find' field)
@@ -86,11 +89,11 @@ class CdmSingleFile extends Writer
                 $item_info = $this->fetcher->getItemInfo($record_id);
                 $source_file_extension = pathinfo($item_info['find'], PATHINFO_EXTENSION);
                 if ($temp_file_path) {
-                  $output_file_path = $object_path . $record_id . '.' . $source_file_extension;
-                  rename($temp_file_path, $output_file_path);
-                }
-                else {
-                    $this->log->addInfo("Cannot rename OBJ datastream file",
+                    $output_file_path = $object_path . $record_id . '.' . $source_file_extension;
+                    rename($temp_file_path, $output_file_path);
+                } else {
+                    $this->log->addInfo(
+                        "Cannot rename OBJ datastream file",
                         array(
                             'Record ID' => $record_id,
                             'Temp file path' => $temp_file_path,
@@ -110,11 +113,11 @@ class CdmSingleFile extends Writer
                 $master_file_path = $this->cdmSingleFileFileGetter->getMasterFilePath($record_id);
                 $source_file_extension = pathinfo($master_file_path, PATHINFO_EXTENSION);
                 if ($master_file_path) {
-                  $output_file_path = $object_path . $record_id . '.' . $source_file_extension;
-                  copy($master_file_path, $output_file_path);
-                }
-                else {
-                    $this->log->addInfo("Cannot copy OBJ datastream file",
+                    $output_file_path = $object_path . $record_id . '.' . $source_file_extension;
+                    copy($master_file_path, $output_file_path);
+                } else {
+                    $this->log->addInfo(
+                        "Cannot copy OBJ datastream file",
                         array(
                             'Record ID' => $record_id,
                             'Master file path' => $master_file_path,
@@ -144,5 +147,4 @@ class CdmSingleFile extends Writer
             }
         }
     }
-
 }

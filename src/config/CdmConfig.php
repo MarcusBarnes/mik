@@ -20,7 +20,7 @@ class CdmConfig extends Config
     public $mappingCSVpath;
 
     /**
-     * @var string $outputBaseDir The directory where item-level directories 
+     * @var string $outputBaseDir The directory where item-level directories
      * will be created.
      */
     //public $outputBaseDir;

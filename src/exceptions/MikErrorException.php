@@ -11,8 +11,15 @@ use Monolog\Handler\StreamHandler;
 class MikErrorException extends \ErrorException
 {
 
-    public function __construct($severity, $message = null, $file, $line, $code = 0, $settings)
-    {
+    public function __construct(
+        $severity = E_ERROR,
+        $message = null,
+        $file = null,
+        $line = 0,
+        $code = 0,
+        $settings = []
+    ) {
+    
         $pathToLog = $settings['LOGGING']['path_to_log'];
         $log = new Logger('ErrorException');
         $logStreamHandler= new StreamHandler($pathToLog, Logger::ERROR);
@@ -31,7 +38,6 @@ class MikErrorException extends \ErrorException
         //$this->message("MikErrorException class constructed" . PHP_EOL);
         //$previous = Exception::getPrevious;
         //parent::__construct($message, $code, $previous = null);
-        
     }
 
     public function message($message = "")

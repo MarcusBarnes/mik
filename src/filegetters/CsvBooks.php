@@ -4,10 +4,6 @@ namespace mik\filegetters;
 
 class CsvBooks extends FileGetter
 {
-    /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
 
     /**
      * @var array allowed_file_extensions_for_OBJ - array of file extensions when searching
@@ -22,7 +18,7 @@ class CsvBooks extends FileGetter
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FILE_GETTER'];
+        parent::__construct($settings);
         $this->input_directory = $this->settings['input_directory'];
         $this->file_name_field = $this->settings['file_name_field'];
         $this->fetcher = new \mik\fetchers\Csv($settings);
@@ -76,7 +72,7 @@ class CsvBooks extends FileGetter
         // Use a static cache to avoid building the source path list
         // multiple times.
         static $potentialObjFiles;
-        if (!isset($potentialObjFiles)) {
+        if (!isset($potentialObjFiles) || $this->use_cache === false) {
             $potentialObjFiles = array();
             $potentialFilesArray = array();
             $iterator = new \RecursiveDirectoryIterator($inputDirectory);
@@ -164,5 +160,4 @@ class CsvBooks extends FileGetter
             }
         }
     }
-
 }

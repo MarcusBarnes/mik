@@ -15,7 +15,7 @@ class CdmPdfDocuments extends Writer
     private $fetcher;
     
     /**
-     * @var object cdmPhpDocumentsFileGetter - filegetter class for 
+     * @var object cdmPhpDocumentsFileGetter - filegetter class for
      * getting files related to CDM PHP documents.
      */
     private $cdmPhpDocumentsFileGetter;
@@ -58,21 +58,20 @@ class CdmPdfDocuments extends Writer
 
         $MODS_expected = in_array('MODS', $this->datastreams);
         $DC_expected = in_array('DC', $this->datastreams);
-        if ($MODS_expected xor $DC_expected xor $no_datastreams_setting_flag) {        
+        if ($MODS_expected xor $DC_expected xor $no_datastreams_setting_flag) {
             $this->writeMetadataFile($metadata, $object_path . $record_id . '.xml');
         }
 
         // Retrieve the PDF file associated with the document and write it to the
         // output folder, using the CONTENTdm pointer as the file basename.
         $OBJ_expected = in_array('OBJ', $this->datastreams);
-        if ($OBJ_expected xor $no_datastreams_setting_flag) {        
+        if ($OBJ_expected xor $no_datastreams_setting_flag) {
             $temp_file_path = $this->cdmPhpDocumentsFileGetter
                 ->getDocumentLevelPDFContent($record_id);
             if ($temp_file_path) {
-              $pdf_output_file_path = $object_path . $record_id . '.pdf';
-              rename($temp_file_path, $pdf_output_file_path);
-            }
-            else {
+                $pdf_output_file_path = $object_path . $record_id . '.pdf';
+                rename($temp_file_path, $pdf_output_file_path);
+            } else {
               // @todo: Log failure.
             }
         }
@@ -99,5 +98,4 @@ class CdmPdfDocuments extends Writer
             }
         }
     }
-
 }

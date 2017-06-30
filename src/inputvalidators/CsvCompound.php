@@ -28,16 +28,14 @@ class CsvCompound extends MikInputValidator
         // Default is to derive child sequence number by splitting filename on '_'.
         if (isset($settings['WRITER']['child_sequence_separator'])) {
             $this->child_sequence_separator = $settings['WRITER']['child_sequence_separator'];
-        }
-        else {
+        } else {
             $this->child_sequence_separator = '_';
         }
 
         // Default minimum child count is 2.
         if (isset($settings['WRITER']['min_children'])) {
             $this->min_children = $settings['WRITER']['min_children'];
-        }
-        else {
+        } else {
             $this->min_children = 2;
         }
     }
@@ -146,8 +144,7 @@ class CsvCompound extends MikInputValidator
                 );
                 $cumulative_validation_results[] = false;
             }
-        }
-        else {
+        } else {
             $this->log->addError(
                 "Input validation failed",
                 array(
@@ -163,8 +160,7 @@ class CsvCompound extends MikInputValidator
 
         if (in_array(false, $cumulative_validation_results)) {
             return false;
-        }
-        else {
+        } else {
             return true;
         }
     }

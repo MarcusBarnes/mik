@@ -26,5 +26,12 @@
         "cocur/background-process": "^0.5.0",
         "nategood/commando": "*",
         "twig/twig": "~1.0"
+    },
+    "scripts": {
+        "check": "phpcs --standard=PSR2 src tests",
+        "test": [
+            "@check",
+            "phpunit"
+        ]
     }
 }
