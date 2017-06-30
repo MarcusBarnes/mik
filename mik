@@ -79,17 +79,18 @@ if ($onWindows) {
 // it will create an E_WARNING, which will be turned into an excption
 // in the set_error_handler function halting the program.
 // Provide a default timezone if date.timezone is null in the the PHP INI.
-// Load [SYSTEM] stettings for user-defined default timeszone using config path
-$system_settings = parse_ini_file($configPath, true)['SYSTEM'];
-if (ini_get('date.timezone') == null || isset($system_settings['date_default_timezone'])) {
-    if(isset($system_settings['date_default_timezone'])){
-        $date_timezone = $system_settings['date_default_timezone'];
+// Load [SYSTEM] settings for user-defined default timezone using config path
+if (ini_get('date.timezone') == null || (
+        isset($settings['SYSTEM']) && isset($settings['SYSTEM']['date_default_timezone']))
+) {
+    if (isset($settings['SYSTEM']) && isset($settings['SYSTEM']['date_default_timezone'])) {
+        $date_timezone = $settings['SYSTEM']['date_default_timezone'];
         date_default_timezone_set($date_timezone);
     } else {
         // Use a default time-zone.
         date_default_timezone_set('America/Vancouver');
     }
-};
+}
 
 // Converts all errors into Exceptions.
 // Set here so that you can pass the configuration settings to the MIK Error Exception class.
@@ -317,13 +318,13 @@ foreach ($records as $record) {
 
 // Run any shutdown hooks.
 if (isset($settings['WRITER']['shutdownhooks'])) {
-  echo PHP_EOL; 
+  echo PHP_EOL;
   foreach ($settings['WRITER']['shutdownhooks'] as $hook) {
     $cmd = sprintf("%s %s", $hook, realpath($configPath));
     echo "Running shutdown hook # $hook" . PHP_EOL;
     exec($cmd);
   }
-  echo PHP_EOL; 
+  echo PHP_EOL;
 }
 
 
