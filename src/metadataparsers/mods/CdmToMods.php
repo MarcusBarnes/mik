@@ -189,9 +189,9 @@ class CdmToMods extends Mods
      * @param string $page_pointer
      *   CONTENTdm page level pointer.
      * @param string $page_title
-     *   title for the page.
+     *   Title for the page.
      * @param string $xmlSnippet
-     *   ???
+     *   A MODS XML snippet that can be turned into a valid XML document.
      *
      * @return string
      *   MODS Page level XML.
