@@ -47,8 +47,8 @@ class CsvBookToolchainTest extends MikTestBase
      */
     protected function setUp()
     {
-        parent::setUp();
         $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_book_temp_dir";
+        parent::setUp();
         $this->path_to_output_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_book_output_dir";
         @mkdir($this->path_to_output_dir);
         $this->path_to_log = $this->path_to_temp_dir . DIRECTORY_SEPARATOR . "mik.log";

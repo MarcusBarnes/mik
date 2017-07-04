@@ -19,8 +19,8 @@ class CsvToJsonToolchain extends MikTestBase
      */
     protected function setUp()
     {
-        parent::setUp();
         $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_json_temp_dir";
+        parent::setUp();
         $this->path_to_output_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_csv_json_output_dir";
         $this->path_to_log = $this->path_to_temp_dir . DIRECTORY_SEPARATOR . "mik.log";
     }
@@ -119,7 +119,7 @@ class CsvToJsonToolchain extends MikTestBase
         $settings = array(
             'FETCHER' => array(
                 'class' => 'Csv',
-                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
+                'input_file' => $this->asset_base_dir . '/csv/sample_metadata.csv',
                 'record_key' => 'ID',
                 'temp_directory' => $this->path_to_temp_dir,
                 'use_cache' => false,

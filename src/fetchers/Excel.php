@@ -38,21 +38,10 @@ class Excel extends Fetcher
         if (!$this->createTempDirectory()) {
             $this->log->addError("Excel fetcher", array('Cannot create temp_directory'));
         }
-
-        if (isset($settings['FETCHER']['use_cache'])) {
-            $this->use_cache = $settings['FETCHER']['use_cache'];
-        } else {
-            $this->use_cache = true;
-        }
     }
 
     /**
-    * Return an array of records.
-    *
-    * @param $limit int
-    *   The number of records to get.
-    *
-    * @return object The records.
+    * {@inheritdoc}
     */
     public function getRecords($limit = null)
     {
@@ -119,14 +108,7 @@ class Excel extends Fetcher
     }
 
     /**
-     * Implements fetchers\Fetcher::getNumRecs.
-     *
-     * Returns the number of records under consideration.
-     *    For Excel, this will be the number_format(number)ber of rows of data with a unique index.
-     *
-     * @return total number of records
-     *
-     * Note that extending classes must define this method.
+     * {@inheritdoc}
      */
     public function getNumRecs()
     {
@@ -135,13 +117,7 @@ class Excel extends Fetcher
     }
 
     /**
-     * Implements fetchers\Fetcher::getItemInfo
-     * Returns a hashed array or object containing a record's information.
-     *
-     * @param string $recordKey the unique record_key
-     *      For Excel, this will the the unique id assisgned to a row of data.
-     *
-     * @return object The record.
+     * {@inheritdoc}
      */
     public function getItemInfo($recordKey)
     {
