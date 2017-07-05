@@ -1,6 +1,6 @@
 Title,"<titleInfo><title>%value%</title></titleInfo>"
 Creator,"<name type=""personal""><namePart>%value%</namePart><role><roleTerm type=""text"">photographer</roleTerm></role></name>"
-Date taken,"<originInfo><dateCreated encoding=""w3cdtf"" keyDate=""yes"">%value%</dateCreated></originInfo>"
+Date taken,"<originInfo><dateIssued encoding=""w3cdtf"" keyDate=""yes"">%value%</dateIssued></originInfo>"
 Subjects,"<subject><topic>%value%</topic></subject>"
 Identifier,"<identifier type=""local"" displayLabel=""Local identifier"">%value%</identifier>"
 Note, "<note>%value%</note>"
