@@ -41,6 +41,7 @@ metadata_filename = "MODS.xml"
 {% endif %}
 {% if class == 'CsvCompound' %}
 child_title = "%parent_title%, part %sequence_number%"
+shutdownhooks[] = 'php extras/scripts/shutdownhooks/create_structure_files.php'
 {% endif %}
 output_directory = "{{ output_path }}_output"
 

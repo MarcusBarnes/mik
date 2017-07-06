@@ -180,17 +180,12 @@ class CsvBooks extends Writer
         $titles = $xpath->query("//mods:titleInfo/mods:title");
         $page_title = $titles->item(0)->nodeValue . ', page ' . $page_number;
         $page_title = htmlspecialchars($page_title, ENT_NOQUOTES|ENT_XML1);
-        $dates = $xpath->query("//mods:originInfo/mods:dateIssued");
-        $page_date = $dates->item(0)->nodeValue;
 
         $page_mods = <<<EOQ
 <mods xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink">
   <titleInfo>
     <title>{$page_title}</title>
   </titleInfo>
-  <originInfo>
-    <dateIssued encoding="w3cdtf">{$page_date}</dateIssued>
-  </originInfo>
 </mods>
 EOQ;
         $path = $path . DIRECTORY_SEPARATOR . $this->metadata_filename;
