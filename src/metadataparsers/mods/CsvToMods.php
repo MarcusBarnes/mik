@@ -3,21 +3,8 @@
 
 namespace mik\metadataparsers\mods;
 
-use League\Csv\Reader;
-
 class CsvToMods extends Mods
 {
-    /**
-     * @var array $collectionMappingArray - array containing CSV
-     * to MODS XML mapping.
-     */
-    public $collectionMappingArray;
-
-    /**
-     *  @var string $mappingCSVpath path to CSV metadata to MODS XML CSV file.
-     */
-    public $mappingCSVpath;
-
     /**
      * @var array $metadatamanipulators - array of metadatamanimpulors from config.
      */
@@ -61,37 +48,25 @@ class CsvToMods extends Mods
         }
     }
 
-    private function getMappingsArray($mappingCSVpath, $numOfFields = 3)
-    {
-
-        $filename = $mappingCSVpath;
-
-        $reader = Reader::createFromPath($filename);
-        $collectionMappingArray = array();
-        foreach ($reader as $index => $row) {
-            $collectionMappingArray[$row[0]] = $row;
-        }
-
-        return $collectionMappingArray;
-    }
-
     /**
+     * {@inheritdoc}
      */
     public function createModsXML($collectionMappingArray, $objectInfo)
     {
         $record_key_column = $this->record_key;
         $record_key = $objectInfo->$record_key_column;
 
-        $modsString = '';
-
-        $modsOpeningTag = '<mods xmlns="http://www.loc.gov/mods/v3" ';
-        $modsOpeningTag .= 'xmlns:mods="http://www.loc.gov/mods/v3" ';
-        $modsOpeningTag .= 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
-        $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
+        $modsOpeningTag = sprintf(
+            '<mods xmlns="%s" xmlns:mods="%s" xmlns:xsi="%s" xmlns:xlink="%s">',
+            Mods::$MODS_NAMESPACE_URI,
+            Mods::$MODS_NAMESPACE_URI,
+            "http://www.w3.org/2001/XMLSchema-instance",
+            "http://www.w3.org/1999/xlink"
+        );
 
         foreach ($collectionMappingArray as $field => $fieldMappings) {
             if (preg_match('/^#/', $fieldMappings[0])) {
-              continue;
+                continue;
             }
             $csvFieldName = $fieldMappings[0];
             if (property_exists($objectInfo, $csvFieldName)) {
@@ -101,7 +76,7 @@ class CsvToMods extends Mods
                 }
             } elseif (preg_match("/(null)\d+/i", $field)) {
                 // Special source field name for mappings to static snippets
-                $fiedlValue = '';
+                $fieldValue = '';
             } else {
                 // Log mismatch between mapping file and source CSV fields.
                 $logMessage = "Mappings file contains a row that ";
@@ -125,7 +100,6 @@ class CsvToMods extends Mods
                 }
 
                 $modsOpeningTag .= $xmlSnippet;
-
             } elseif (!empty($xmlSnippet) & !is_array($fieldValue)) {
                 // @ToDo - move into metadatamanipulator
                 // check fieldValue for <br> characters.  If present, wrap in fieldValue
@@ -174,7 +148,7 @@ class CsvToMods extends Mods
             $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
             $manipulatorParams = $metadatamanipulatorClassAndParams;
             $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
-            $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams,  $record_key);
+            $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams, $record_key);
             $metadatamanipulator->fieldName = $field_name;
             $xmlSnippet = $metadatamanipulator->manipulate($xmlSnippet);
         }

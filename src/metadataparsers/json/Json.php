@@ -24,9 +24,13 @@ abstract class Json extends MetadataParser
     }
 
     /**
-     *  Create JSON.
+     * Converts the object's metadata into JSON.
      *
-     *  @param array $objectInfo array of info about the object that the JSON file will be created for.
+     * @param object $objectInfo
+     *   The object's metadata.
+     *
+     * @return string
+     *   The serialized JSON version of the object's metadata.
      */
     abstract public function createJson($objectInfo);
 

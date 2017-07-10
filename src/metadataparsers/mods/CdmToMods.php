@@ -3,16 +3,8 @@
 
 namespace mik\metadataparsers\mods;
 
-use League\Csv\Reader;
-
 class CdmToMods extends Mods
 {
-    /**
-     * @var array $collectionMappingArray - array containing CONTENTdm
-     * to MODS XML mapping.
-     */
-    public $collectionMappingArray;
-
     /**
      *  @var array $CONTENTdmFieldValuesArray array with field values of proper name
      *  as $keys rather than 'nick' keys.
@@ -23,11 +15,6 @@ class CdmToMods extends Mods
      * @var bool $include_migrated_from_uri
      */
     public $includeMigratedFromUri;
-
-    /**
-     *  @var string $mappingCSVpath path to CONTENTdm to MODS XML CSV file.
-     */
-    public $mappingCSVpath;
 
     /**
      * @var string $alias - CONTENTdm collection alias
@@ -81,21 +68,6 @@ class CdmToMods extends Mods
         }
     }
 
-    private function getMappingsArray($mappingCSVpath, $numOfFields = 3)
-    {
-
-        $filename = $mappingCSVpath;
-
-        $reader = Reader::createFromPath($filename);
-        $collectionMappingArray = array();
-        foreach ($reader as $index => $row) {
-            $collectionMappingArray[$row[0]] = $row;
-
-        }
-
-        return $collectionMappingArray;
-    }
-
     /**
      *  @param $objectInfo CONTENTdm get_item_info
      */
@@ -113,9 +85,7 @@ class CdmToMods extends Mods
     }
 
     /**
-     *  Create MODS XML
-     *  @param array $colletionMappyingArray collection mappings
-     *  @param array $objectInfo array of info. about the object that the MODS XML will be created for
+     *  {@inheritdoc}
      */
     public function createModsXML($collectionMappingArray, $objectInfo)
     {
@@ -123,16 +93,17 @@ class CdmToMods extends Mods
 
         $pointer = $objectInfo['pointer'];
 
-        $modsString = '';
-
-        $modsOpeningTag = '<mods xmlns="http://www.loc.gov/mods/v3" ';
-        $modsOpeningTag .= 'xmlns:mods="http://www.loc.gov/mods/v3" ';
-        $modsOpeningTag .= 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
-        $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
+        $modsOpeningTag = sprintf(
+            '<mods xmlns="%s" xmlns:mods="%s" xmlns:xsi="%s" xmlns:xlink="%s">',
+            MODS::$MODS_NAMESPACE_URI,
+            MODS::$MODS_NAMESPACE_URI,
+            "http://www.w3.org/2001/XMLSchema-instance",
+            "http://www.w3.org/1999/xlink"
+        );
 
         foreach ($collectionMappingArray as $key => $valueArray) {
             if (preg_match('/^#/', $valueArray[0])) {
-              continue;
+                continue;
             }
             $CONTENTdmField = $valueArray[0];
             if (isset($CONTENTdmFieldValuesArray[$CONTENTdmField])) {
@@ -214,17 +185,30 @@ class CdmToMods extends Mods
 
     /**
      * Creates basic page level mods for compounds items such as newspapers and books.
-     * @param string $page_pointer CONTENTdm page level pointer.
-     * @param string $page_title title for the page.
+     *
+     * @param string $page_pointer
+     *   CONTENTdm page level pointer.
+     * @param string $page_title
+     *   Title for the page.
+     * @param string $xmlSnippet
+     *   A MODS XML snippet that can be turned into a valid XML document.
+     *
+     * @return string
+     *   MODS Page level XML.
      */
-    public function createPageLevelModsXML($page_pointer, $page_title, $xmlSnippet = '<extension><CONTENTdmData></CONTENTdmData></extension>')
-    {
-        $modsString = '';
+    public function createPageLevelModsXML(
+        $page_pointer,
+        $page_title,
+        $xmlSnippet = '<extension><CONTENTdmData></CONTENTdmData></extension>'
+    ) {
 
-        $modsOpeningTag = '<mods xmlns="http://www.loc.gov/mods/v3" ';
-        $modsOpeningTag .= 'xmlns:mods="http://www.loc.gov/mods/v3" ';
-        $modsOpeningTag .= 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
-        $modsOpeningTag .= 'xmlns:xlink="http://www.w3.org/1999/xlink">';
+        $modsOpeningTag = sprintf(
+            '<mods xmlns="%s" xmlns:mods="%s" xmlns:xsi="%s" xmlns:xlink="%s">',
+            Mods::$MODS_NAMESPACE_URI,
+            Mods::$MODS_NAMESPACE_URI,
+            "http://www.w3.org/2001/XMLSchema-instance",
+            "http://www.w3.org/1999/xlink"
+        );
 
         $modsOpeningTag .= '<titleInfo><title>' . $page_title . '</title></titleInfo>';
 
