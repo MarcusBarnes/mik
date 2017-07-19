@@ -133,6 +133,8 @@ class Oaipmh extends Writer
     public function normalizeFilename($string)
     {
         $string = urldecode($string);
+        $pattern = '#'.DIRECTORY_SEPARATOR.'#';
+        $string = preg_replace($pattern, '-', $string);
         $string = preg_replace('/:/', '_', $string);
         return $string;
     }
