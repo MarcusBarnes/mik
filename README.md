@@ -1,11 +1,4 @@
-# MIK, the Move to Islandora Kit. [![Build Status](https://travis-ci.org/MarcusBarnes/mik.png?branch=master)](https://travis-ci.org/MarcusBarnes/mik)
-
-> Important: As of commit  72b5d88 (Oct. 21, 2016), MIK's command syntax has changed slightly. Previously, MIK's command-line options used an equal sign (`=`) to separate the option name from its value; after commit  72b5d88, options use a space instead of an equals sign.
-
-> * Before: `./mik --config=foo.ini --checkconfig=all --limit=10`
-> * After: `./mik --config foo.ini --checkconfig all --limit 10`
-
-> This change also introduces short forms of the options, e.g., `./mik -c foo.ini -l 10`
+# MIK, the Move to Islandora Kit. [![Build Status](https://travis-ci.org/MarcusBarnes/mik.png?branch=master)](https://travis-ci.org/MarcusBarnes/mik) [![Contributing Guidelines](https://camo.githubusercontent.com/c894b931be82a2485adc42f44327b27b0ad29c9d/687474703a2f2f696d672e736869656c64732e696f2f62616467652f434f4e545249425554494e472d47756964656c696e65732d626c75652e737667)](CONTRIBUTING.md)
 
 ## Overview
 
@@ -27,12 +20,13 @@ If you have a question, please [open an issue](https://github.com/MarcusBarnes/m
 
 ## Islandora content that has been prepared using MIK
 
-* Some of Emily Carr University of Art and Design's collections in [Arca](http://arcabc.ca/)
-  * [Academic Calendars](http://arcabc.ca/islandora/object/ecuad:cals)
-  * [Wosk Masterworks Print Collection](arcabc.ca/islandora/object/ecuad:wosk)
+* Some collections in [Arca](http://arcabc.ca/)
+  * Emily Carr University's [Academic Calendars](http://arcabc.ca/islandora/object/ecuad:cals)
+  * Emily Carr University's [Wosk Masterworks Print Collection](http://arcabc.ca/islandora/object/ecuad:wosk)
+  * University of the Fraser Valley's [Abbotsford Sumas and Matsqui News](http://ufv.arcabc.ca/islandora/object/ufv%3A255)
+  * [KORA](http://kora.kpu.ca/), Kwantlen Polytechnic University's institutional repository
 * All of the newspapers in Simon Fraser University Library's [Digitized Newspapers](http://newspapers.lib.sfu.ca/) and [Chinese Times](http://chinesetimes.lib.sfu.ca/) sites
-* All of the collections in Simon Fraser University Library's [Digitized Collections](http://digital.lib.sfu.ca/)
-* [KORA](http://kora.kpu.ca/), Kwantlen Polytechnic University's institutional repository in [Arca](http://arcabc.ca/)
+* Most of the collections in Simon Fraser University Library's [Digitized Collections](http://digital.lib.sfu.ca/)
 
 ## Installation
 
@@ -84,7 +78,7 @@ And you're done. In practice, you probably want to do some quality assurance on 
 
 ## Current status
 
-Until the spring of 2017, we will be working on what we call the 0.9 release of MIK. We aim for a 1.0 release of MIK in late spring 2017. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is already being used in production.
+We aim for a 1.0 release of MIK in fall 2017. Please note that the only differences between version 0.9 and 1.0 will be the addition of more features, automated tests, and code cleanup. Version 0.9 is already being used in production.
 
 So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, file getters, etc.) for creating Islandora import packages from the following:
 
@@ -99,16 +93,10 @@ So far, we have "toolchains" (complete sets of MIK fetchers, metadata parsers, f
   * metadata and content files from a local filesystem for compound objects
   * metadata and content files from a local filesystem for books
   * metadata and content files from a local filesystem for newspaper issues
+    * We also have an [Excel fetcher](https://github.com/MarcusBarnes/mik/wiki/Cookbook:-Using-the-Excel-fetcher) and a [Filesystem fetcher](https://github.com/MarcusBarnes/mik/wiki/Cookbook:-Using-the-Filesystem-fetcher) that can be used with CSV toolchains
 * OAI-PMH
   * metadata and one PDF per article from an Open Journal Systems journal
   * metadata and one file per resource described in each OAI-PMH record if the record includes the URL to the file
-
-## Roadmap
-
-* Version 1.0 (late spring 2017)
-  * developer documentation
-  * code cleanup
-  * more tests
 
 ## Contributing
 
@@ -117,7 +105,7 @@ We welcome community development partners. Some features that would be really gr
 * a graphical user interface on top of MIK
 * tools for creating mappings files (in addition to the [Metadata Mappings Helper](https://github.com/MarcusBarnes/mik/wiki/Cookbook:-Using-the-Metadata-Mappings-Helper))
 * toolchains to migrate from DSpace and other repository platforms to Islandora (the OAI-PMH toolchain may already cover DSpace - testers welcome)
-* a toolchain to generate Hydra import packages (yes, it's called Move to Islandora Kit but it's flexible enough to create other types of ingest packages and we'd love to collaborate with some Hydra friends)
+* a toolchain to generate Samvera import packages (yes, it's called Move to Islandora Kit but it's flexible enough to create other types of ingest packages and we'd love to collaborate with some Samvera friends)
   * we have a sample CsvToJson toolchain that demonstrates that it's possible to write out packages that differ from those Islandora uses
 
 MIK is designed to be extensible. If you have an idea for a useful manipulator or post-write hook script, please let us know.
@@ -136,5 +124,6 @@ CONTRIBUTING.md provides guidelines on how you can contribute to MIK. Our [Infor
 * [flummingbird](https://github.com/flummingbird)
 * [Jason Peak](https://github.com/jpeak5)
 * [Brandon Weigel](https://github.com/bondjimbond)
+* [Jared Whiklo](https://github.com/whikloj)
 
 
