@@ -11,5 +11,6 @@ before_install:
   - composer install
 script:
   - composer test
+  - vendor/bin/phpcs --standard=PSR2 src
 after_success:
   - bash <(curl -s https://codecov.io/bash)
