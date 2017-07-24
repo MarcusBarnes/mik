@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\fetchermanipulators;
+
 use League\CLImate\CLImate;
 use \Monolog\Logger;
 
@@ -54,8 +55,7 @@ class SpecificSet extends FetcherManipulator
         $this->settings = $settings;
         if (preg_match('/\|/', $manipulator_settings[1])) {
             $parameters = explode('|', $manipulator_settings[1]);
-        }
-        else {
+        } else {
             $parameters = array($manipulator_settings[1]);
         }
 
@@ -66,8 +66,10 @@ class SpecificSet extends FetcherManipulator
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
         $this->log = new \Monolog\Logger('config');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::INFO);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::INFO
+        );
         $this->log->pushHandler($this->logStreamHandler);
     }
 
@@ -100,8 +102,7 @@ class SpecificSet extends FetcherManipulator
                 if (!in_array($record->key, $specificSet)) {
                     $filtered_records[] = $record;
                 }
-            }
-            // Keep records that are listed in the input file.
+            } // Keep records that are listed in the input file.
             else {
                 if (in_array($record->key, $specificSet)) {
                     $filtered_records[] = $record;
@@ -111,8 +112,7 @@ class SpecificSet extends FetcherManipulator
             $record_num++;
             if ($this->onWindows) {
                 print '.';
-            }
-            else {
+            } else {
                 $progress->current($record_num);
             }
         }
@@ -134,13 +134,12 @@ class SpecificSet extends FetcherManipulator
     {
         if (!file_exists($this->pathToInputFile)) {
             $this->log->addInfo("SpecificSet", array(
-                'Input file not found' => $this->pathToInputFile)
-            );
+                'Input file not found' => $this->pathToInputFile));
             return array();
         }
 
         $record_keys = file($this->pathToInputFile);
-        $record_keys = array_filter($record_keys, array($this, 'remove_comments'));
+        $record_keys = array_filter($record_keys, array($this, 'removeComments'));
 
         foreach ($record_keys as &$id) {
             $id = trim($id);
@@ -153,9 +152,8 @@ class SpecificSet extends FetcherManipulator
      * Callback function that removes elements from an array
      * that start with '#'.
      */
-    private function remove_comments($item)
+    private function removeComments($item)
     {
         return !preg_match('/^#/', $item);
     }
-
 }

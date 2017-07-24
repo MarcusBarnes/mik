@@ -8,25 +8,22 @@ use Monolog\Logger;
 class OaipmhXpath extends FileGetter
 {
     /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
-
-    /**
      * Create a new OAI Single File Fetcher Instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FILE_GETTER'];
+        parent::__construct($settings);
         $this->fetcher = new \mik\fetchers\Oaipmh($settings);
         $this->temp_directory = $this->settings['temp_directory'];
 
         // Set up logger.
         $this->pathToLog = $settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('OaipmhXpath filegetter');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::ERROR);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::ERROR
+        );
         $this->log->pushHandler($this->logStreamHandler);
 
         // This XPath expression must return a single element, and the value
@@ -67,10 +64,8 @@ class OaipmhXpath extends FileGetter
         if ($download_url_elements->length == 1) {
             $download_url = trim($download_url_elements->item(0)->nodeValue);
             return $download_url;
-        }
-        else {
+        } else {
             return false;
         }
-
     }
 }

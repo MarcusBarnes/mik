@@ -34,9 +34,9 @@ class Config
         // Default Mac PHP setups may use Apple's Secure Transport
         // rather than OpenSSL, causing issues with CA verification.
         // Allow configuration override of CA verification at users own risk.
-        if (isset($this->settings['SYSTEM']['verify_ca']) ){
-            if($this->settings['SYSTEM']['verify_ca'] == false){
-              $this->verifyCA = false;
+        if (isset($this->settings['SYSTEM']['verify_ca'])) {
+            if ($this->settings['SYSTEM']['verify_ca'] == false) {
+                $this->verifyCA = false;
             }
         } else {
             $this->verifyCA = true;
@@ -45,8 +45,7 @@ class Config
         // Define some options for the CSV fetcher.
         if (isset($this->settings['FETCHER']['field_delimiter'])) {
             $this->csv_field_delimiter = $this->settings['FETCHER']['field_delimiter'];
-        }
-        else {
+        } else {
             $this->csv_field_delimiter = ',';
         }
         // Default enclosure is double quotation marks.
@@ -101,11 +100,11 @@ class Config
                 $this->checkAliases();
                 exit;
                 break;
-            case 'input_directories';
+            case 'input_directories':
                 $this->checkInputDirectories();
                 exit;
                 break;
-            case 'csv';
+            case 'csv':
                 $this->checkCsvFile();
                 exit;
                 break;
@@ -133,7 +132,7 @@ class Config
 
         $reader = Reader::createFromPath($path);
         foreach ($reader as $index => $row) {
-            if (count($row) > 1 && !preg_match('/^#/', $row[0]) ) {
+            if (count($row) > 1 && !preg_match('/^#/', $row[0])) {
                 if (strlen($row[1])) {
                     $doc = new \DOMDocument();
                     if (!@$doc->loadXML($row[1])) {
@@ -171,12 +170,12 @@ class Config
                     try {
                         $response = $client->get($value, ['verify' => $this->verifyCA]);
                         $code = $response->getStatusCode();
-                    }
-                    catch (RequestException $e) {
+                    } catch (RequestException $e) {
                         if ($key == 'utils_url') {
                             $value = preg_replace('/getthumbnail$/', '', $value);
                         }
-                        exit("Error: The URL $value (defined in configuration setting $key) appears to be a bad URL (response code $code).\n");
+                        exit("Error: The URL $value (defined in configuration setting $key) appears" .
+                            "to be a bad URL (response code $code).\n");
                     }
                 }
             }
@@ -199,8 +198,7 @@ class Config
         try {
             $response = $client->get($base_url);
             $code = $response->getStatusCode();
-        }
-        catch (RequestException $e) {
+        } catch (RequestException $e) {
             exit("Error: The OAI endpoint URL $base_url appears to be invalid.\n");
         }
         print "URLs are OK\n";
@@ -216,7 +214,8 @@ class Config
             foreach ($section as $key => $value) {
                 if (preg_match('/(_path|_directory)$/', $key) && strlen($value)) {
                     if (!file_exists($value)) {
-                        print "The path $value (defined in configuration setting $key) does not exist but will be created for you.\n";
+                        print "The path $value (defined in configuration setting $key) does not exist but will be " .
+                            "created for you.\n";
                     }
                 }
             }
@@ -250,8 +249,7 @@ class Config
         if (count($aliases) > 1) {
             $aliases_string = trim(implode(', ', $aliases));
             exit("Error: The values for CONTENTdm 'alias' settings are not unique: $aliases_string.\n");
-        }
-        else {
+        } else {
             print "CONTENTdm aliases are OK\n";
         }
     }
@@ -261,8 +259,8 @@ class Config
      *
      * See https://github.com/MarcusBarnes/mik/issues/169
      */
-     public function checkInputDirectories()
-     {
+    public function checkInputDirectories()
+    {
         // For Cdm toolchains, where multiple input directories are allowed.
         $filegetters = array('CdmNewspapers', 'CdmBooks', 'CdmSingleFile', 'CdmPhpDocuments');
         if (in_array($this->settings['FILE_GETTER']['class'], $filegetters)) {
@@ -278,11 +276,9 @@ class Config
                     }
                 }
                 print "Input directory paths are OK.\n";
-            }
-            else {
+            } else {
                 print "No input directory paths are defined.\n";
             }
-
         }
 
         // For Csv toolchains, where a single input directory is allowed.
@@ -303,7 +299,7 @@ class Config
 
             print "Input directory paths are OK.\n";
         }
-     }
+    }
 
     /**
      * Tests whether the CSV input file is valid.
@@ -356,7 +352,8 @@ class Config
 
             // Empty row.
             if ($columns_in_row == 1) {
-                print "Row $row_num in the CSV input file appears to be empty; this is OK, just reporting it in case it's unintentional." . PHP_EOL;
+                print "Row $row_num in the CSV input file appears to be empty; this is OK, just reporting it " .
+                    "in case it's unintentional." . PHP_EOL;
                 continue;
             }
 
@@ -371,5 +368,4 @@ class Config
             print "CSV input file appears to be OK.". PHP_EOL;
         }
     }
-
 }

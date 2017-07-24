@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\fetchermanipulators;
+
 use GuzzleHttp\Client;
 use League\CLImate\CLImate;
 
@@ -69,8 +70,7 @@ class CdmCompound extends FetcherManipulator
             $record_num++;
             if ($this->onWindows) {
                 print '.';
-            }
-            else {
+            } else {
                 $progress->current($record_num);
             }
         }

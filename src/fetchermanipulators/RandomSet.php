@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\fetchermanipulators;
+
 use League\CLImate\CLImate;
 
 /**
@@ -39,7 +40,7 @@ class RandomSet extends FetcherManipulator
     {
         $this->setSize = $manipulator_settings[1];
         if (isset($manipulator_settings[2])) {
-            $this->outputFile = $manipulator_settings[2];          
+            $this->outputFile = $manipulator_settings[2];
             $now = date("F j, Y, g:i a");
             $message = "# Output of the MIK Random Set fetcher manipulator, generated $now" . PHP_EOL;
             if (file_exists($this->outputFile)) {
@@ -91,8 +92,7 @@ class RandomSet extends FetcherManipulator
             $record_num++;
             if ($this->onWindows) {
                 print '.';
-            }
-            else {
+            } else {
                 $progress->current($record_num);
             }
         }
@@ -138,7 +138,7 @@ class RandomSet extends FetcherManipulator
             // if we need some extras for making up a full $set. We
             // reset the indexes of this array before we pass it off
             // to getExtraRandom().
-            $unchosen_record_nums = array_values($unchosen_record_nums);            
+            $unchosen_record_nums = array_values($unchosen_record_nums);
             $extras = $this->getExtraRandom($unchosen_record_nums, $shortfall);
             sort($randomSet, SORT_NUMERIC);
             $randomSet = array_merge($randomSet, $extras);
@@ -166,6 +166,5 @@ class RandomSet extends FetcherManipulator
         shuffle($discards);
         $flipped_discards = array_flip($discards);
         return (array) array_rand($flipped_discards, $quantity);
-    }    
-
+    }
 }

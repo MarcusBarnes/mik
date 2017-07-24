@@ -9,11 +9,6 @@ use Monolog\Logger;
 class CdmPdfDocuments extends FileGetter
 {
     /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
-
-    /**
      * @var string $utilsUrl - CDM utils url.
      */
     public $utilsUrl;
@@ -29,7 +24,7 @@ class CdmPdfDocuments extends FileGetter
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FILE_GETTER'];
+        parent::__construct($settings);
         $this->utilsUrl = $this->settings['utils_url'];
         $this->alias = $this->settings['alias'];
         $this->temp_directory = (!isset($settings['FILE_GETTER']['temp_directory'])) ?
@@ -43,9 +38,9 @@ class CdmPdfDocuments extends FileGetter
         // Default Mac PHP setups may use Apple's Secure Transport
         // rather than OpenSSL, causing issues with CA verification.
         // Allow configuration override of CA verification at users own risk.
-        if (isset($settings['SYSTEM']['verify_ca']) ){
-            if($settings['SYSTEM']['verify_ca'] == false){
-              $this->verifyCA = false;
+        if (isset($settings['SYSTEM']['verify_ca'])) {
+            if ($settings['SYSTEM']['verify_ca'] == false) {
+                $this->verifyCA = false;
             }
         } else {
             $this->verifyCA = true;
@@ -54,10 +49,11 @@ class CdmPdfDocuments extends FileGetter
         // Set up logger.
         $this->pathToLog = $settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('CdmPhpDocuments filegetter');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::ERROR);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::ERROR
+        );
         $this->log->pushHandler($this->logStreamHandler);
-
     }
 
     /**
@@ -79,7 +75,7 @@ class CdmPdfDocuments extends FileGetter
         $query_url = $ws_url . 'dmGetCompoundObjectInfo/' . $alias . '/' .  $pointer . '/json';
         $item_structure = file_get_contents($query_url);
         $item_structure = json_decode($item_structure, true);
-        
+
         return $item_structure;
     }
 
@@ -107,9 +103,7 @@ class CdmPdfDocuments extends FileGetter
                 . $this->alias . '/id/' . $pointer . '/type/compoundobject/show/1/cpdtype/document-pdf/filename/'
                 . $document_structure['page']['pagefile'] . '/width/0/height/0/mapsto/pdf/filesize/0/title/'
                 . urlencode($document_structure['page']['pagetitle']);
-
-        }
-        else {          
+        } else {
             $get_file_url = $this->utilsUrl .'getdownloaditem/collection/'
                 . $this->alias . '/id/' . $pointer . '/type/compoundobject/show/1/cpdtype/document-pdf/filename/'
                 . $document_structure['page'][0]['pagefile'] . '/width/0/height/0/mapsto/pdf/filesize/0/title/'
@@ -122,23 +116,23 @@ class CdmPdfDocuments extends FileGetter
             $response = $client->get($get_file_url, ['stream' => true,
                 'timeout' => $this->settings['http_timeout'],
                 'connect_timeout' => $this->settings['http_timeout'],
-                'verify' => $this->verifyCA]
-            );
+                'verify' => $this->verifyCA]);
             $body = $response->getBody();
             while (!$body->eof()) {
                 file_put_contents($temp_file_path, $body->read(2048), FILE_APPEND);
             }
             if (file_exists($temp_file_path)) {
                 return $temp_file_path;
-            }
-            else {
+            } else {
                 return false;
             }
-        }
-        catch (RequestException $e) {
+        } catch (RequestException $e) {
             $this->log->addError("CdmPhpDocuments Guzzle error", array('HTTP request error' => $e->getRequest()));
             if ($e->hasResponse()) {
-                $this->log->addError("CdmPhpDocuments Guzzle error", array('HTTP request response' => $e->getResponse()));
+                $this->log->addError(
+                    "CdmPhpDocuments Guzzle error",
+                    array('HTTP request response' => $e->getResponse())
+                );
             }
         }
     }

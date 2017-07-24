@@ -101,8 +101,7 @@ class MikInputValidator
         foreach ($directory_iterator as $filepath => $info) {
             if ($dirs_only && $file->isDir()) {
                 $file_list[] = $filepath;
-            }
-            else {
+            } else {
                 $file_list[] = $filepath;
             }
         }

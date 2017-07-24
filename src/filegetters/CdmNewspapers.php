@@ -9,15 +9,10 @@ use Monolog\Logger;
 class CdmNewspapers extends FileGetter
 {
     /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
-
-    /**
      * @var string $inputDirectory - path to newspaper collection.
      */
     //public $inputDirectory;
-    
+
     /**
      * @var array $inputDirectories - array of paths to files for newspaper collection.
      */
@@ -27,7 +22,7 @@ class CdmNewspapers extends FileGetter
      * @var array (dict) $OBJFilePaths - paths to OBJ files for collection
      */
     public $OBJFilePaths;
-    
+
     /**
      * @var string $utilsUrl - CDM utils url.
      */
@@ -37,7 +32,7 @@ class CdmNewspapers extends FileGetter
      * @var string $alias - CDM alias
      */
     public $alias;
-    
+
     /**
      * @var object $thumbnail - filemanipulators class for helping
      * create thumbnails from CDM
@@ -45,8 +40,10 @@ class CdmNewspapers extends FileGetter
     private $thumbnail;
 
     /**
-     * @var array allowed_file_extensions_for_OBJ - array of file extensions when searching for Master files (for OBJ datastreams).
-     * This helps handle the situaiton where the same file types are given different file extensions due to OS or applicatoin differences.
+     * Array of file extensions when searching for Master files (for OBJ datastreams).
+     * @var array
+     * This helps handle the situation where the same file types are given different file extensions due to OS or
+     * application differences.
      * For example, tiff and tif for normal tiff files.
      */
     public $allowed_file_extensions_for_OBJ = array('tiff', 'tif');
@@ -57,10 +54,10 @@ class CdmNewspapers extends FileGetter
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FILE_GETTER'];
+        parent::__construct($settings);
         $this->utilsUrl = $this->settings['utils_url'];
         $this->alias = $this->settings['alias'];
-        
+
         if (!isset($this->settings['http_timeout'])) {
             // Seconds.
             $this->settings['http_timeout'] = 60;
@@ -69,9 +66,9 @@ class CdmNewspapers extends FileGetter
         // Default Mac PHP setups may use Apple's Secure Transport
         // rather than OpenSSL, causing issues with CA verification.
         // Allow configuration override of CA verification at users own risk.
-        if (isset($settings['SYSTEM']['verify_ca']) ){
-            if($settings['SYSTEM']['verify_ca'] == false){
-              $this->verifyCA = false;
+        if (isset($settings['SYSTEM']['verify_ca'])) {
+            if ($settings['SYSTEM']['verify_ca'] == false) {
+                $this->verifyCA = false;
             }
         } else {
             $this->verifyCA = true;
@@ -82,20 +79,22 @@ class CdmNewspapers extends FileGetter
         }
 
         $this->inputDirectories = $this->settings['input_directories'];
-        
+
         // Interate over inputDirectories to create $potentialObjFiles array.
         $potentialObjFiles = $this->getMasterFiles($this->inputDirectories, $this->allowed_file_extensions_for_OBJ);
 
         $this->OBJFilePaths = $this->determineObjItems($potentialObjFiles);
-        
+
         // information and methods for thumbnail minipulation
         $this->thumbnail = new \mik\filemanipulators\ThumbnailFromCdm($settings);
 
         // Set up logger.
         $this->pathToLog = $settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('CdmNewspapers filegetter');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::ERROR);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::ERROR
+        );
         $this->log->pushHandler($this->logStreamHandler);
     }
 
@@ -121,21 +120,21 @@ class CdmNewspapers extends FileGetter
 
         $client = new Client();
         try {
-            $response = $client->get($query_url,
-                ['timeout' => $this->settings['http_timeout'], 
+            $response = $client->get(
+                $query_url,
+                ['timeout' => $this->settings['http_timeout'],
                 'connect_timeout' => $this->settings['http_timeout'],
                 'verify' => $this->verifyCA]
             );
             $item_structure = $response->getBody();
             $item_structure = json_decode($item_structure, true);
-        }
-        catch (RequestException $e) {
+        } catch (RequestException $e) {
             $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request error' => $e->getRequest()));
             if ($e->hasResponse()) {
                 $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request response' => $e->getResponse()));
             }
         }
-        
+
         // @ToDo - deal with different item structures.
         if (isset($item_structure['page'])) {
             $children = $item_structure['page'];
@@ -157,7 +156,6 @@ class CdmNewspapers extends FileGetter
 
         $key = DIRECTORY_SEPARATOR . $issueDate . DIRECTORY_SEPARATOR;
         return $this->OBJFilePaths[$key];
-        
     }
 
     private function getMasterFiles($inputDirectories, $allowedFileTypes)
@@ -165,22 +163,22 @@ class CdmNewspapers extends FileGetter
         // Use a static cache to avoid building the source path list
         // multiple times.
         static $potentialObjFiles;
-        if (!isset($potentialObjFiles)) {
+        if (!isset($potentialObjFiles) || $this->use_cache === false) {
             $potentialObjFiles = array();
-            foreach($inputDirectories as $inputDirectory) {
+            foreach ($inputDirectories as $inputDirectory) {
                 $potentialFilesArray = array();
                 $iterator = new \RecursiveDirectoryIterator($inputDirectory);
                 $display = $allowedFileTypes;
                 $iteratorIterator = new \RecursiveIteratorIterator($iterator);
-                
+
                 foreach ($iteratorIterator as $file) {
                     $file_parts = explode('.', $file);
                     if (in_array(strtolower(array_pop($file_parts)), $display)) {
                         $potentialFilesArray[] = $file->__toString();
                     }
                 }
-                
-                $potentialObjFiles = array_merge($potentialObjFiles, $potentialFilesArray);           
+
+                $potentialObjFiles = array_merge($potentialObjFiles, $potentialFilesArray);
             }
             $potentialObjFiles = array_unique($potentialObjFiles);
         }
@@ -245,19 +243,19 @@ class CdmNewspapers extends FileGetter
 
         try {
             $client = new Client();
-            $response = $client->get($get_image_url_thumbnail,
+            $response = $client->get(
+                $get_image_url_thumbnail,
                 ['timeout' => $this->settings['http_timeout'],
                 'connect_timeout' => $this->settings['http_timeout'],
                 'verify' => $this->verifyCA]
             );
             $thumbnail_content = $response->getBody();
-        }
-        catch (RequestException $e) {
+        } catch (RequestException $e) {
             $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request error' => $e->getRequest()));
             if ($e->hasResponse()) {
                 $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request response' => $e->getResponse()));
             }
-        } 
+        }
 
         return $thumbnail_content;
     }
@@ -277,20 +275,20 @@ class CdmNewspapers extends FileGetter
 
         $client = new Client();
         try {
-            $response = $client->get($get_image_url_jpg,
+            $response = $client->get(
+                $get_image_url_jpg,
                 ['timeout' => $this->settings['http_timeout'],
                 'connect_timeout' => $this->settings['http_timeout'],
                 'verify' => $this->verifyCA]
             );
             $jpg_content = $response->getBody();
             return $jpg_content;
-        }
-        catch (RequestException $e) {
+        } catch (RequestException $e) {
             $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request error' => $e->getRequest()));
             if ($e->hasResponse()) {
                 $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request response' => $e->getResponse()));
             }
-        }        
+        }
     }
 
     public function getChildLevelFileContent($page_pointer, $page_object_info)
@@ -303,20 +301,20 @@ class CdmNewspapers extends FileGetter
 
         $client = new Client();
         try {
-            $response = $client->get($get_file_url,
+            $response = $client->get(
+                $get_file_url,
                 ['timeout' => $this->settings['http_timeout'],
                 'connect_timeout' => $this->settings['http_timeout'],
                 'verify' => $this->verifyCA]
             );
             $content = $response->getBody();
             return $content;
-        }
-        catch (RequestException $e) {
+        } catch (RequestException $e) {
             $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request error' => $e->getRequest()));
             if ($e->hasResponse()) {
                 $this->log->addError("CdmNewspapers Guzzle error", array('HTTP request response' => $e->getResponse()));
             }
-        }        
+        }
     }
 
     public function getPageOBJfileContent($pathToFile, $page_number)
@@ -337,9 +335,8 @@ class CdmNewspapers extends FileGetter
         }
 
         return $obj_content;
-
     }
-   
+
     public function checkNewspaperPageFilePath($pathToFile, $page_number)
     {
         // Check path page tiffs should be in the format yyyy-mm-dd-pp.
@@ -353,9 +350,8 @@ class CdmNewspapers extends FileGetter
         } else {
             return false;
         }
-        
     }
-    
+
     public function getCpdFile($pointer)
     {
         $ws_url = $this->settings['ws_url'];
@@ -364,5 +360,4 @@ class CdmNewspapers extends FileGetter
         $cpd_content = file_get_contents($query_url);
         return $cpd_content;
     }
-
 }

@@ -9,23 +9,18 @@ use Monolog\Logger;
 class OaipmhOjsPdf extends FileGetter
 {
     /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
-
-    /**
      * Create a new OAI Single File Fetcher Instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FILE_GETTER'];
+        parent::__construct($settings);
         $this->fetcher = new \mik\fetchers\Oaipmh($settings);
         $this->temp_directory = $this->settings['temp_directory'];
 
-        if (isset($settings['SYSTEM']['verify_ca']) ){
-            if($settings['SYSTEM']['verify_ca'] == false){
-              $this->verifyCA = false;
+        if (isset($settings['SYSTEM']['verify_ca'])) {
+            if ($settings['SYSTEM']['verify_ca'] == false) {
+                $this->verifyCA = false;
             }
         } else {
             $this->verifyCA = true;
@@ -34,8 +29,10 @@ class OaipmhOjsPdf extends FileGetter
         // Set up logger.
         $this->pathToLog = $settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('OaipmhOjsPdf filegetter');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::ERROR);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::ERROR
+        );
         $this->log->pushHandler($this->logStreamHandler);
     }
 
@@ -73,18 +70,13 @@ class OaipmhOjsPdf extends FileGetter
         if ($dc_identifiers->length > 0) {
             foreach ($dc_identifiers as $identifier) {
                 if (preg_match('/^http/', $identifier->nodeValue)) {
-                   $article_url = $identifier->nodeValue;
-                   break;
+                    $article_url = $identifier->nodeValue;
+                    break;
                 }
             }
         }
 
         // From the HTML at that location (snippet below), get the value of the <a> tage with the text value "PDF":
-	// <div id="articleFullText">
-	// <h4>Full Text:</h4>
-	// <a href="http://journals.sfu.ca/present/index.php/demojournal/article/view/6/8" class="file" target="_parent">HTML</a>
-	// <a href="http://journals.sfu.ca/present/index.php/demojournal/article/view/6/9" class="file" target="_parent">PDF</a>
-	// </div>
         $client = new Client();
         $response = $client->get($article_url, [$this->verifyCA]);
         $body = $response->getBody();
@@ -96,16 +88,13 @@ class OaipmhOjsPdf extends FileGetter
         if ($file_urls->length > 0) {
             foreach ($file_urls as $file_url) {
                 if (preg_match('/PDF/', $file_url->nodeValue)) {
-                   $pdf_galley_url = $file_url->getAttribute('href');
-                   break;
+                    $pdf_galley_url = $file_url->getAttribute('href');
+                    break;
                 }
             }
         }
 
         // From the document at $pdf_galley_url, get the href value from the <a> with id="pdfDownloadLink":
-     	// <div id="pdfDownloadLinkContainer">
-	// <a class="action pdf" id="pdfDownloadLink" target="_parent" href="http://journals.sfu.ca/present/index.php/demojournal/article/download/6/9">Download this PDF file</a>
-        // </div>
         $client = new Client();
         $response = $client->get($pdf_galley_url);
         $body = $response->getBody();

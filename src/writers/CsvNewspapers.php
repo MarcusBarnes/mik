@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\writers;
+
 use Monolog\Logger;
 
 class CsvNewspapers extends Writer
@@ -36,32 +37,31 @@ class CsvNewspapers extends Writer
         // Default is to generate page-level MODS.xml files.
         if (isset($settings['WRITER']['generate_page_modsxml'])) {
             $this->generate_page_modsxml = $settings['WRITER']['generate_page_modsxml'];
-        }
-        else {
+        } else {
             $this->generate_page_modsxml = true;
         }
         // Default is to use - as the sequence separator in the page filename.
         if (isset($settings['WRITER']['page_sequence_separator'])) {
             $this->page_sequence_separator = $settings['WRITER']['page_sequence_separator'];
-        }
-        else {
+        } else {
             $this->page_sequence_separator = '-';
         }
 
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('Writer');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::INFO);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::INFO
+        );
         $this->log->pushHandler($this->logStreamHandler);
 
         $this->ocr_extension = '.txt';
         // Default is to not log the absence of page-level OCR files.
         if (isset($settings['WRITER']['log_missing_ocr_files'])) {
             $this->log_missing_ocr_files= $settings['WRITER']['log_missing_ocr_files'];
-        }
-        else {
-            $this->log_missing_ocr_files = FALSE;
+        } else {
+            $this->log_missing_ocr_files = false;
         }
     }
 
@@ -105,12 +105,14 @@ class CsvNewspapers extends Writer
             if ($this->settings['FILE_GETTER']['input_directory'] !== '' &&
                 ($this->datastreams != array('MODS') xor $no_datastreams_setting_flag)) {
                 if ($no_datastreams_setting_flag) {
-                    $this->log->addWarning("CSV Newspapers warning",
-                        array('Issue-level input directory does not exist' => $issue_level_input_dir));
+                    $this->log->addWarning(
+                        "CSV Newspapers warning",
+                        array('Issue-level input directory does not exist' => $issue_level_input_dir)
+                    );
                     return;
                 }
-             }
-         }
+            }
+        }
 
         $MODS_expected = in_array('MODS', $this->datastreams);
         if ($MODS_expected xor $no_datastreams_setting_flag) {
@@ -150,8 +152,10 @@ class CsvNewspapers extends Writer
                         copy($ocr_input_path, $ocr_output_path);
                     } else {
                         if ($this->log_missing_ocr_files) {
-                            $this->log->addWarning("CSV Newspapers warning",
-                                array('Page-level OCR file does not exist' => $ocr_input_path));
+                            $this->log->addWarning(
+                                "CSV Newspapers warning",
+                                array('Page-level OCR file does not exist' => $ocr_input_path)
+                            );
                         }
                     }
                 }
@@ -184,8 +188,10 @@ class CsvNewspapers extends Writer
         if ($path !='') {
             $fileCreationStatus = file_put_contents($path, $metadata);
             if ($fileCreationStatus === false) {
-                $this->log->addWarning("There was a problem writing the issue-level metadata to a file",
-                    array('file' => $path));
+                $this->log->addWarning(
+                    "There was a problem writing the issue-level metadata to a file",
+                    array('file' => $path)
+                );
             }
         }
     }
@@ -212,8 +218,15 @@ class CsvNewspapers extends Writer
         $dates = $xpath->query("//mods:originInfo/mods:dateIssued");
         $page_date = $dates->item(0)->nodeValue;
 
+        $namespace = sprintf(
+            'xmlns="%s" xmlns:mods="%s" xmlns:xsi="%s" xmlns:xlink="%s"',
+            "http://www.loc.gov/mods/v3",
+            "http://www.loc.gov/mods/v3",
+            "http://www.w3.org/2001/XMLSchema-instance",
+            "http://www.w3.org/1999/xlink"
+        );
         $page_mods = <<<EOQ
-<mods xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink">
+<mods {$namespace}>
   <titleInfo>
     <title>{$page_title}</title>
   </titleInfo>
@@ -231,10 +244,11 @@ EOQ;
         if ($path !='') {
             $fileCreationStatus = file_put_contents($path, $metadata);
             if ($fileCreationStatus === false) {
-                $this->log->addWarning("There was a problem writing the page-level metadata to a file",
-                    array('file' => $path));
+                $this->log->addWarning(
+                    "There was a problem writing the page-level metadata to a file",
+                    array('file' => $path)
+                );
             }
         }
     }
-
 }

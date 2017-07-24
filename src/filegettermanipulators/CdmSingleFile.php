@@ -2,6 +2,7 @@
 // src/filegettermanipulators/CdmSingleFile.php
 
 namespace mik\filegettermanipulators;
+
 use \Monolog\Logger;
 
 /**
@@ -12,15 +13,17 @@ class CdmSingleFile extends Filegettermanipulator
     /**
      * Create a new CdmSingleFile instance
      */
-    public function __construct($settings = null, $paramsArray, $record_key)
+    public function __construct($settings, $paramsArray, $record_key)
     {
         parent::__construct($settings, $paramsArray, $record_key);
 
         // Set up logger.
         $this->pathToLog = $settings['LOGGING']['path_to_manipulator_log'];
         $this->log = new \Monolog\Logger('config');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::INFO);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::INFO
+        );
         $this->log->pushHandler($this->logStreamHandler);
 
         // This manipulator expects two parameters, a metadata field name and
@@ -30,17 +33,19 @@ class CdmSingleFile extends Filegettermanipulator
             $extensions = $paramsArray[1];
             $this->extensions = explode(',', $extensions);
         } else {
-          $this->log->addError("CdmSingleFile",
-              array('Incorrect number of parameters' => count($paramsArray)));
+            $this->log->addError(
+                "CdmSingleFile",
+                array('Incorrect number of parameters' => count($paramsArray))
+            );
         }
     }
-  
+
     /*
      * Generates possible filepaths for master files.
      *
      * @return mixed
-     *    An array of possible file paths, or false if none can be genreated. 
-     */ 
+     *    An array of possible file paths, or false if none can be genreated.
+     */
     public function getMasterFilePaths()
     {
         $possibleMasterFilePaths = array();
@@ -63,21 +68,21 @@ class CdmSingleFile extends Filegettermanipulator
                     }
                 }
                 return $possibleMasterFilePaths;
-            }
-            else {
+            } else {
                 // Log that we can't get the sourcefield.
-                $this->log->addError("CdmSingleFile",
-                    array('Metadata error' => "Can't get value of source field"));
+                $this->log->addError(
+                    "CdmSingleFile",
+                    array('Metadata error' => "Can't get value of source field")
+                );
                 return false;
             }
-        }
-        else {
+        } else {
             // Log that there is no input directory.
-            $this->log->addError("CdmSingleFile",
-                array('Configuration error' => "No input directory is defined."));
+            $this->log->addError(
+                "CdmSingleFile",
+                array('Configuration error' => "No input directory is defined.")
+            );
             return false;
         }
     }
-
 }
-

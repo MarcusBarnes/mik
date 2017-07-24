@@ -2,6 +2,7 @@
 // src/metadatamanipulators/AddUuidToMods.php
 
 namespace mik\metadatamanipulators;
+
 use \Monolog\Logger;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
@@ -25,15 +26,17 @@ class AddUuidToMods extends MetadataManipulator
     /**
      * Create a new metadata manipulator Instance.
      */
-    public function __construct($settings = null, $paramsArray, $record_key)
+    public function __construct($settings, $paramsArray, $record_key)
     {
         parent::__construct($settings, $paramsArray, $record_key);
 
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
         $this->log = new \Monolog\Logger('config');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::INFO);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::INFO
+        );
         $this->log->pushHandler($this->logStreamHandler);
     }
 
@@ -70,12 +73,16 @@ class AddUuidToMods extends MetadataManipulator
             // manipulator will add a new one, since we are processing the MODS
             // on an element by element basis, not the entire MODS document.
             if (strlen($uuid_identifier->nodeValue) &&
-                preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i', $uuid_identifier->nodeValue)) {
-                $this->log->addError("AddUuidToMods",
-                    array('UUID already present' => $uuid_identifier->nodeValue));
+                preg_match(
+                    '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i',
+                    $uuid_identifier->nodeValue
+                )) {
+                $this->log->addError(
+                    "AddUuidToMods",
+                    array('UUID already present' => $uuid_identifier->nodeValue)
+                );
                 return $input;
-            }
-            // If our incoming fragment is the template element from the mappings file,
+            } // If our incoming fragment is the template element from the mappings file,
             // populate it and return it.
             else {
                 try {
@@ -83,14 +90,15 @@ class AddUuidToMods extends MetadataManipulator
                     $uuid4_string = $uuid4->toString();
                 } catch (UnsatisfiedDependencyException $e) {
                     // Log error and return $input.
-                    $this->log->addError("AddUuidToMods",
-                        array('UUID generation error' => $e->getMessage()));
+                    $this->log->addError(
+                        "AddUuidToMods",
+                        array('UUID generation error' => $e->getMessage())
+                    );
                 }
                 $uuid_identifier->nodeValue = $uuid4_string;
                 return $dom->saveXML($dom->documentElement);
             }
-        }
-        else {
+        } else {
             // If current fragment is not <identifier type="uuid">,
             // with or without a valid UUID v4 as a value, return it unmodified.
             return $input;

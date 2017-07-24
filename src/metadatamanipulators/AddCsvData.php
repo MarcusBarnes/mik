@@ -2,6 +2,7 @@
 // src/metadatamanipulators/AddCsvData.php
 
 namespace mik\metadatamanipulators;
+
 use \Monolog\Logger;
 
 /**
@@ -28,7 +29,7 @@ class AddCsvData extends MetadataManipulator
     /**
      * Create a new metadata manipulator Instance.
      */
-    public function __construct($settings = null, $paramsArray, $record_key)
+    public function __construct($settings, $paramsArray, $record_key)
     {
         parent::__construct($settings, $paramsArray, $record_key);
         $this->record_key = $record_key;
@@ -36,8 +37,10 @@ class AddCsvData extends MetadataManipulator
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
         $this->log = new \Monolog\Logger('config');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::INFO);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::INFO
+        );
         $this->log->pushHandler($this->logStreamHandler);
     }
 
@@ -60,7 +63,7 @@ class AddCsvData extends MetadataManipulator
         if (!strlen($input)) {
             return $input;
         }
-        
+
         $dom = new \DomDocument();
         $dom->loadxml($input, LIBXML_NSCLEAN);
 
@@ -71,57 +74,55 @@ class AddCsvData extends MetadataManipulator
         // There should only be one <CSVData> fragment in the incoming
         // XML. If there is 0 or more than 1, return the original.
         if ($csvdatas->length === 1) {
-          $csvdata = $csvdatas->item(0);
+            $csvdata = $csvdatas->item(0);
 
-          $csvid = $dom->createElement('id_in_csv', $this->record_key);
-          $csvdata->appendChild($csvid);          
+            $csvid = $dom->createElement('id_in_csv', $this->record_key);
+            $csvdata->appendChild($csvid);
 
-          $timestamp = date("Y-m-d H:i:s");
+            $timestamp = date("Y-m-d H:i:s");
 
           // Add the <CSVRecord> element.
-          $csvrecord = $dom->createElement('CSVRecord');
-          $now = $dom->createAttribute('timestamp');
-          $now->value = $timestamp;
-          $csvrecord->appendChild($now);
-          $mimetype = $dom->createAttribute('mimetype');
-          $mimetype->value = 'application/json';
-          $csvrecord->appendChild($mimetype);
+            $csvrecord = $dom->createElement('CSVRecord');
+            $now = $dom->createAttribute('timestamp');
+            $now->value = $timestamp;
+            $csvrecord->appendChild($now);
+            $mimetype = $dom->createAttribute('mimetype');
+            $mimetype->value = 'application/json';
+            $csvrecord->appendChild($mimetype);
 
-          try {
-              $metadata_path = $this->settings['FETCHER']['temp_directory'] . DIRECTORY_SEPARATOR .
+            try {
+                $metadata_path = $this->settings['FETCHER']['temp_directory'] . DIRECTORY_SEPARATOR .
                   $this->record_key . '.metadata';
-              $metadata_contents = file_get_contents($metadata_path);
-              $metadata_contents = unserialize($metadata_contents);
-              $metadata_contents = json_encode($metadata_contents);
-          }
-          catch (Exception $e) {
-              $message = "Problem creating <CSVRecord> element for object " . $this->record_key . ":" . $e->getMessage();
-              $this->log->addInfo("AddCsvData", array('CSV metadata warning' => $message));
-              return '';
-          }
+                $metadata_contents = file_get_contents($metadata_path);
+                $metadata_contents = unserialize($metadata_contents);
+                $metadata_contents = json_encode($metadata_contents);
+            } catch (Exception $e) {
+                $message = "Problem creating <CSVRecord> element for object " . $this->record_key . ":" .
+                    $e->getMessage();
+                $this->log->addInfo("AddCsvData", array('CSV metadata warning' => $message));
+                return '';
+            }
 
           // If the metadata contains the CDATA end delimiter, log and return.
-          if (preg_match('/\]\]>/', $metadata_contents)) {
-              $message = "CSV metadata for object " . $this->record_key . ' contains the CDATA end delimiter ]]>'; 
-              $this->log->addInfo("AddCsvData", array('CSV metadata warning' => $message));
-              return '';
-          }
+            if (preg_match('/\]\]>/', $metadata_contents)) {
+                $message = "CSV metadata for object " . $this->record_key . ' contains the CDATA end delimiter ]]>';
+                $this->log->addInfo("AddCsvData", array('CSV metadata warning' => $message));
+                return '';
+            }
 
           // If we've made it this far, add the metadata to <CcvData> as
           // CDATA and return the modified XML fragment.
-          if (strlen($metadata_contents)) {
-              $cdata = $dom->createCDATASection($metadata_contents);
-              $csvrecord->appendChild($cdata);
-              $csvdata->appendChild($csvrecord);
-          }
+            if (strlen($metadata_contents)) {
+                $cdata = $dom->createCDATASection($metadata_contents);
+                $csvrecord->appendChild($cdata);
+                $csvdata->appendChild($csvrecord);
+            }
 
-          return $dom->saveXML($dom->documentElement);
-        }
-        else {
+            return $dom->saveXML($dom->documentElement);
+        } else {
             // If current fragment is not <extension><CSVData>, return it
             // unmodified.
             return $input;
         }
     }
-
 }

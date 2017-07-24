@@ -1,15 +1,12 @@
 <?php
 
 namespace mik\fetchers;
+
 use Box\Spout\Reader\ReaderFactory;
 use Box\Spout\Common\Type;
 
 class Excel extends Fetcher
 {
-    /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
 
     /**
      * @var array $fetchermanipulators - the fetchermanipulors from config,
@@ -34,37 +31,24 @@ class Excel extends Fetcher
 
         if (isset($settings['MANIPULATORS']['fetchermanipulators'])) {
             $this->fetchermanipulators = $settings['MANIPULATORS']['fetchermanipulators'];
-        }
-        else {
+        } else {
             $this->fetchermanipulators = null;
         }
 
-	if (!$this->createTempDirectory()) {
-	    $this->log->addError("Excel fetcher", array('Cannot create temp_directory'));
-	}
-
-        if (isset($settings['FETCHER']['use_cache'])) {
-            $this->use_cache = $settings['FETCHER']['use_cache'];
-        }
-        else {
-            $this->use_cache = true;
+        if (!$this->createTempDirectory()) {
+            $this->log->addError("Excel fetcher", array('Cannot create temp_directory'));
         }
     }
 
     /**
-    * Return an array of records.
-    *
-    * @param $limit int
-    *   The number of records to get.
-    *
-    * @return object The records.
+    * {@inheritdoc}
     */
     public function getRecords($limit = null)
     {
         // Use a static cache to avoid reading the Excel file multiple times.
         static $filtered_records;
         if (!isset($filtered_records) || $this->use_cache == false) {
-            $inputExcel = ReaderFactory::create(Type::XLSX); 
+            $inputExcel = ReaderFactory::create(Type::XLSX);
             $inputExcel->open($this->input_file);
 
             $header_row = array();
@@ -81,21 +65,19 @@ class Excel extends Fetcher
                             foreach ($column_names as &$column_name) {
                                 $column_name = trim($column_name);
                             }
-                         }
-                         else {
-                             foreach ($row as &$metadata_value) {
-                                 $metadata_value = trim($metadata_value);
-                             }
-                             $row_assoc = array_combine($column_names, $row);
-                             if (is_null($limit)) {
-                                 $records[] = $row_assoc;
-                             }
-                             else {
-                                 if ($row_num <= $limit) {
-                                     $records[] = $row_assoc;
-                                 }
-                             }
-                         }
+                        } else {
+                            foreach ($row as &$metadata_value) {
+                                $metadata_value = trim($metadata_value);
+                            }
+                            $row_assoc = array_combine($column_names, $row);
+                            if (is_null($limit)) {
+                                $records[] = $row_assoc;
+                            } else {
+                                if ($row_num <= $limit) {
+                                    $records[] = $row_assoc;
+                                }
+                            }
+                        }
                     }
                     $row_num++;
                 }
@@ -111,16 +93,14 @@ class Excel extends Fetcher
                 if (!is_null($record[$this->record_key]) || strlen($record[$this->record_key])) {
                     $record = (object) $record;
                     $record->key = $record->{$this->record_key};
-                }
-                else {
+                } else {
                     unset($records[$index]);
                 }
             }
 
             if ($this->fetchermanipulators) {
                 $filtered_records = $this->applyFetchermanipulators($records);
-            }
-            else {
+            } else {
                 $filtered_records = $records;
             }
         }
@@ -128,14 +108,7 @@ class Excel extends Fetcher
     }
 
     /**
-     * Implements fetchers\Fetcher::getNumRecs.
-     *
-     * Returns the number of records under consideration.
-     *    For Excel, this will be the number_format(number)ber of rows of data with a unique index.
-     *
-     * @return total number of records
-     *
-     * Note that extending classes must define this method.
+     * {@inheritdoc}
      */
     public function getNumRecs()
     {
@@ -144,13 +117,7 @@ class Excel extends Fetcher
     }
 
     /**
-     * Implements fetchers\Fetcher::getItemInfo
-     * Returns a hashed array or object containing a record's information.
-     *
-     * @param string $recordKey the unique record_key
-     *      For Excel, this will the the unique id assisgned to a row of data.
-     *
-     * @return object The record.
+     * {@inheritdoc}
      */
     public function getItemInfo($recordKey)
     {
@@ -163,8 +130,7 @@ class Excel extends Fetcher
                     return $record;
                 }
             }
-        }
-        else {
+        } else {
             return unserialize(file_get_contents($raw_metadata_cache));
         }
     }
@@ -183,5 +149,4 @@ class Excel extends Fetcher
         }
         return $records;
     }
-
 }

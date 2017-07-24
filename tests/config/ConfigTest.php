@@ -2,23 +2,44 @@
 
 namespace mik\config;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+use mik\tests\MikTestBase;
+
+/**
+ * Class ConfigTest
+ * @package mik\config
+ * @coversDefaultClass \mik\config\Config
+ * @group config
+ */
+class ConfigTest extends MikTestBase
 {
+    /**
+     * Path to config.ini file.
+     * @var string
+     */
+    private $path_to_ini_file;
+
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
+        parent::setUp();
         $this->path_to_temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "mik_config_temp_dir";
         // The Config class's constructor takes a path to an ini file as a parameter.
-        $this->path_to_ini_file = dirname(__FILE__) . '/assets/csv/configtest.ini';
+        $this->path_to_ini_file = $this->asset_base_dir . '/csv/configtest.ini';
         $this->path_to_log = $this->path_to_temp_dir . DIRECTORY_SEPARATOR . "mik.log";
     }
 
+    /**
+     * @covers ::checkCsvFile()
+     */
     public function testCheckCsvFileGood()
     {
         // Define settings here, not in a configuration file.
         $settings = array(
             'FETCHER' => array(
                 'class' => 'Csv',
-                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata.csv',
+                'input_file' => $this->asset_base_dir . '/csv/sample_metadata.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
             ),
@@ -36,14 +57,17 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->expectOutputRegex('/appears\sto\sbe\sOK/');
         $config->checkCsvFile();
     }
-    
+
+    /**
+     * @covers ::checkCsvFile()
+     */
     public function testCheckCsvFileRepeatedHeaderNames()
     {
         // Define settings here, not in a configuration file.
         $settings = array(
             'FETCHER' => array(
                 'class' => 'Csv',
-                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata_bad_header_row_nonunique.csv',
+                'input_file' => $this->asset_base_dir. '/csv/sample_metadata_bad_header_row_nonunique.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
             ),
@@ -62,13 +86,16 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $config->checkCsvFile();
     }
 
+    /**
+     * @covers ::checkCsvFile()
+     */
     public function testCheckCsvFileExtraColumns()
     {
         // Define settings here, not in a configuration file.
         $settings = array(
             'FETCHER' => array(
                 'class' => 'Csv',
-                'input_file' => dirname(__FILE__) . '/assets/csv/sample_metadata_bad_header_row_extra_columns.csv',
+                'input_file' => $this->asset_base_dir . '/csv/sample_metadata_bad_header_row_extra_columns.csv',
                 'temp_directory' => $this->path_to_temp_dir,
                 'record_key' => 'ID',
             ),
@@ -81,20 +108,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 'path_to_log' => $this->path_to_log,
             ),
         );
-        $this->config = new Config($this->path_to_ini_file);
-        $this->config->settings = $settings;
+        $config = new Config($this->path_to_ini_file);
+        $config->settings = $settings;
         $this->expectOutputRegex('/does\snot\shave.*as\sthe\sheader\srow/');
-        $this->config->checkCsvFile();
+        $config->checkCsvFile();
     }
-
-    protected function tearDown()
-    {
-        $temp_files = glob($this->path_to_temp_dir . '/*');
-        @unlink('/tmp/doesnotexist.log');
-        foreach($temp_files as $temp_file) {
-            @unlink($temp_file);
-        }
-        @rmdir($this->path_to_temp_dir);
-    }
-
 }

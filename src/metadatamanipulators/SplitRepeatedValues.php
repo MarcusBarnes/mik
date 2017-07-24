@@ -2,6 +2,7 @@
 // src/metadatamanipulators/SplitRepeatedValues.php
 
 namespace mik\metadatamanipulators;
+
 use \Monolog\Logger;
 
 /**
@@ -22,7 +23,7 @@ class SplitRepeatedValues extends MetadataManipulator
     /**
      * Create a new metadata manipulator instance.
      */
-    public function __construct($settings = null, $paramsArray, $record_key)
+    public function __construct($settings, $paramsArray, $record_key)
     {
         parent::__construct($settings, $paramsArray, $record_key);
         $this->record_key = $record_key;
@@ -30,16 +31,17 @@ class SplitRepeatedValues extends MetadataManipulator
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
         $this->log = new \Monolog\Logger('config');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::INFO);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::INFO
+        );
         $this->log->pushHandler($this->logStreamHandler);
 
         if (count($paramsArray) == 3) {
             $this->sourceField = $paramsArray[0];
             $this->destFieldXpath = $paramsArray[1];
             $this->delimiter = $paramsArray[2];
-        }
-        else {
+        } else {
             $this->log->addInfo("SplitRepeatedValues", array('Wrong parameter count' => count($paramsArray)));
         }
     }
@@ -52,8 +54,8 @@ class SplitRepeatedValues extends MetadataManipulator
      * @return string
      *     Manipulated string
      */
-     public function manipulate($input)
-     {
+    public function manipulate($input)
+    {
         if (!strlen($input)) {
             return $input;
         }
@@ -102,19 +104,17 @@ class SplitRepeatedValues extends MetadataManipulator
                         }
                         return $output;
                     }
-                }
-                else {
+                } else {
                     // If current fragment does not contain any delimiters, return it.
                     return $input;
                 }
-            }
-            else {
+            } else {
                 // If current fragment does not match theh configure XPath expression,
                 // return it.
                 return $input;
             }
-         }
-     }
+        }
+    }
 
     /**
      * Get the value of the source metadata field for the current object.
@@ -122,10 +122,10 @@ class SplitRepeatedValues extends MetadataManipulator
      * @return string
      *     The value of the source metadata field.
      */
-     public function getSourceFieldValue()
-     {
+    public function getSourceFieldValue()
+    {
         $raw_metadata_cache_path = $this->settings['FETCHER']['temp_directory'] .
-            DIRECTORY_SEPARATOR . $this->record_key . '.metadata';
+          DIRECTORY_SEPARATOR . $this->record_key . '.metadata';
         $raw_metadata_cache = file_get_contents($raw_metadata_cache_path);
 
         // Cached metadata for CSV toolchains is a serialized CSV object.
@@ -144,11 +144,10 @@ class SplitRepeatedValues extends MetadataManipulator
             }
         }
         // If we haven't returned at this point, log failure.
-        $this->log->addWarning("SplitRepeatedValues",array(
-            'Record key' => $this->record_key,
-            'Source field not set' => $this->sourceField)
-        );
-     }
+        $this->log->addWarning("SplitRepeatedValues", array(
+          'Record key' => $this->record_key,
+          'Source field not set' => $this->sourceField));
+    }
 
     /**
      * Write a successful split operation to the manipulator log.
@@ -162,28 +161,29 @@ class SplitRepeatedValues extends MetadataManipulator
      * @param string
      *     The XML output, or the failed regex pattern.
      */
-     public function logSplit($level, $source_value, $element, $extra)
-     {
-         if ($level == 'info') {
-             $this->log->addInfo("SplitRepeatedValues",
-                 array(
-                     'Record key' => $this->record_key,
-                     'Source field name' => $this->sourceField,
-                     'Source field value' => $source_value,
-                     'Output' => $extra,
-                 )
-             );
-         }
-         if ($level == 'warning') {
-             $this->log->addWarning("SplitRepeatedValues",
-                 array(
-                     'Record key' => $this->record_key,
-                     'Source field name' => $this->sourceField,
-                     'Source field value' => $source_value,
-                     'Failed regex' => $extra,
-                 )
-             );
-         }
-     }
-
+    public function logSplit($level, $source_value, $element, $extra)
+    {
+        if ($level == 'info') {
+            $this->log->addInfo(
+                "SplitRepeatedValues",
+                array(
+                    'Record key' => $this->record_key,
+                    'Source field name' => $this->sourceField,
+                    'Source field value' => $source_value,
+                    'Output' => $extra,
+                )
+            );
+        }
+        if ($level == 'warning') {
+            $this->log->addWarning(
+                "SplitRepeatedValues",
+                array(
+                    'Record key' => $this->record_key,
+                    'Source field name' => $this->sourceField,
+                    'Source field value' => $source_value,
+                    'Failed regex' => $extra,
+                )
+            );
+        }
+    }
 }

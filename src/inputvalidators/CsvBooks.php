@@ -31,8 +31,7 @@ class CsvBooks extends MikInputValidator
         // The separator is used here in a regex, so we escape it.
         if (isset($settings['WRITER']['page_sequence_separator'])) {
             $this->page_sequence_separator = $settings['WRITER']['page_sequence_separator'];
-        }
-        else {
+        } else {
             $this->page_sequence_separator = '-';
         }
         $this->page_sequence_separator = preg_quote($this->page_sequence_separator);

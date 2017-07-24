@@ -8,15 +8,10 @@ namespace mik\filegetters;
 class CdmBooks extends FileGetter
 {
     /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
-
-    /**
      * @var string $inputDirectory - path to book collection.
      */
     //public $inputDirectory;
-    
+
     /**
      * @var array $inputDirectories - array of paths to files for book collection.
      */
@@ -26,7 +21,7 @@ class CdmBooks extends FileGetter
      * @var array (dict) $OBJFilePaths - paths to OBJ files for collection
      */
     public $OBJFilePaths;
-    
+
     /**
      * @var string $utilsUrl - CDM utils url.
      */
@@ -36,7 +31,7 @@ class CdmBooks extends FileGetter
      * @var string $alias - CDM alias
      */
     public $alias;
-    
+
     /**
      * @var object $thumbnail - filemanipulators class for helping
      * create thumbnails from CDM
@@ -49,12 +44,12 @@ class CdmBooks extends FileGetter
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FILE_GETTER'];
+        parent::__construct($settings);
         $this->utilsUrl = $this->settings['utils_url'];
         $this->alias = $this->settings['alias'];
-        
+
         $this->inputDirectories = $this->settings['input_directories'];
-        
+
         // interate over inputDirectories to create $potentialObjFiles array.
         $potentialObjFiles = array();
         foreach ($this->inputDirectories as $inputDirectory) {
@@ -81,34 +76,32 @@ class CdmBooks extends FileGetter
 
         $item_structure = file_get_contents($query_url);
         $item_structure = json_decode($item_structure, true);
-        
-        /* CONTENTdm supports hierarchical books.  "Flatten" structure of hierarchical 
-           source books for importing into Islandora since Islandora's Book Solution Pack 
+
+        /* CONTENTdm supports hierarchical books.  "Flatten" structure of hierarchical
+           source books for importing into Islandora since Islandora's Book Solution Pack
            currently only supports flat books.
         */
-        if($item_structure['type'] == 'Monograph') {
-            // flatten document structure 
+        if ($item_structure['type'] == 'Monograph') {
+            // flatten document structure
             // hierarchy based on nodes
-            $children_pointers = array();            
-            // Iterator snippet below based on 
+            $children_pointers = array();
+            // Iterator snippet below based on
             // http://stackoverflow.com/a/1019534/850828
             // @ToDo snippet produces duplicate pointers - why?
             $arrIt = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($item_structure));
             foreach ($arrIt as $sub) {
                 $subArray = $arrIt->getSubIterator();
-                if (isset($subArray['pageptr'] )) {
+                if (isset($subArray['pageptr'])) {
                     $children_pointers[] = $subArray['pageptr'];
                 }
-            }            
+            }
             // remove duplicate pointers
-            $children_pointers = array_unique($children_pointers);            
+            $children_pointers = array_unique($children_pointers);
             // reindex the array.
             $children_pointers = array_values($children_pointers);
-            
-        } 
-                  
-        if($item_structure['type'] == 'Document') {
-                
+        }
+
+        if ($item_structure['type'] == 'Document') {
             if (isset($item_structure['page'])) {
                 $children = $item_structure['page'];
             } else {
@@ -119,7 +112,7 @@ class CdmBooks extends FileGetter
                 $children_pointers[] = $child['pageptr'];
             }
         }
- 
+
         return $children_pointers;
     }
 
@@ -132,7 +125,6 @@ class CdmBooks extends FileGetter
 
         $key = DIRECTORY_SEPARATOR . $record_key . DIRECTORY_SEPARATOR;
         return $this->OBJFilePaths[$key];
-        
     }
 
     private function getBookMasterFiles($pathToBook, $allowedFileTypes = array('tiff', 'tif'))
@@ -144,7 +136,6 @@ class CdmBooks extends FileGetter
         $iteratorIterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iteratorIterator as $file) {
-
             $file_parts = explode('.', $file);
             if (in_array(strtolower(array_pop($file_parts)), $display)) {
                 $potentialFilesArray[] = $file->__toString();
@@ -157,11 +148,11 @@ class CdmBooks extends FileGetter
     private function determineObjItems($arrayOfFilesToPreserve)
     {
         // For book pages
-        
+
         /*
             This regex will looks for a pattern like book_nick001 in the path for the files
             of a particular book.
-            
+
             Pattern assumption:  ../record_pointer/file.extension
         */
         $regex_pattern = '%[/\\\\][0-9]*[/\\\\]%';
@@ -189,7 +180,7 @@ class CdmBooks extends FileGetter
                 $dictOfItems[$keyIdentifier] = $tempItemList;
             }
         }
-        
+
         return $dictOfItems;
     }
 
@@ -237,7 +228,7 @@ class CdmBooks extends FileGetter
             . $this->alias . '/id/' . $page_pointer . '/filename/'
             . $page_object_info['find'];
         $content = file_get_contents($get_file_url);
-        
+
         return $content;
     }
 
@@ -260,9 +251,8 @@ class CdmBooks extends FileGetter
         }
 
         return $obj_content;
-
     }
-   
+
     public function checkBookPageFilePath($pathToFile, $page_number)
     {
         // Check path page tiffs should be in the format yyyy-mm-dd-pp.
@@ -277,7 +267,6 @@ class CdmBooks extends FileGetter
         } else {
             return false;
         }
-        
     }
 
     public function getCpdFile($pointer)
@@ -288,5 +277,4 @@ class CdmBooks extends FileGetter
         $cpd_content = file_get_contents($query_url);
         return $cpd_content;
     }
-
 }

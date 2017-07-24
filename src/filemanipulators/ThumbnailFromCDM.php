@@ -27,15 +27,15 @@ class ThumbnailFromCdm extends FileManipulator
     {
         $this->settings = $settings['FILE_GETTER'];
         if (isset($this->settings['alias'])) {
-	        $this->alias = $this->settings['alias'];
-	    } else {
-	    	$this->alias = null;
-	    }
-        if (isset($this->settings['ws_url'])){
-	        $this->wsUrl = $this->settings['ws_url'];
-	    } else {
-	    	$this->wsUrl = null;	
-	    }
+            $this->alias = $this->settings['alias'];
+        } else {
+            $this->alias = null;
+        }
+        if (isset($this->settings['ws_url'])) {
+            $this->wsUrl = $this->settings['ws_url'];
+        } else {
+            $this->wsUrl = null;
+        }
     }
 
     public function getImageScalingInfo($pointer)
