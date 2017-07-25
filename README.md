@@ -1,5 +1,5 @@
 # MIK, the Move to Islandora Kit. 
-[![Build Status](https://travis-ci.org/MarcusBarnes/mik.png?branch=master)](https://travis-ci.org/MarcusBarnes/mik) [![Contributing Guidelines](https://camo.githubusercontent.com/c894b931be82a2485adc42f44327b27b0ad29c9d/687474703a2f2f696d672e736869656c64732e696f2f62616467652f434f4e545249425554494e472d47756964656c696e65732d626c75652e737667)](CONTRIBUTING.md)[![DOI](https://zenodo.org/badge/33207077.svg)](https://zenodo.org/badge/latestdoi/33207077)
+[![Build Status](https://travis-ci.org/MarcusBarnes/mik.png?branch=master)](https://travis-ci.org/MarcusBarnes/mik) [![Contributing Guidelines](https://camo.githubusercontent.com/c894b931be82a2485adc42f44327b27b0ad29c9d/687474703a2f2f696d672e736869656c64732e696f2f62616467652f434f4e545249425554494e472d47756964656c696e65732d626c75652e737667)](CONTRIBUTING.md) [![DOI](https://zenodo.org/badge/33207077.svg)](https://zenodo.org/badge/latestdoi/33207077)
 
 ## Overview
 
