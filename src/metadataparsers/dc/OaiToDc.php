@@ -22,7 +22,7 @@ class OaiToDc extends Dc
     }
 
     /**
-     * Parse the DC XML out of the raw OAI record.
+     * Pass the OAI record and through the configured XSLT.
      *
      * @param string $objectInfo
      *   The raw OAI record XML.
@@ -30,7 +30,7 @@ class OaiToDc extends Dc
      * @return string
      *   The OAI DC XML.
      */
-    public function createDcXML($objectInfo)
+    public function createDcXML($MappingArray, $objectInfo)
     {
         $xml_doc = new \DOMDocument();
         $xml_doc->loadXML($objectInfo);
@@ -78,7 +78,7 @@ class OaiToDc extends Dc
     public function metadata($record_key)
     {
         $objectInfo = $this->fetcher->getItemInfo($record_key);
-        $metadata = $this->createDcXML($objectInfo);
+        $metadata = $this->createDcXML(array(), $objectInfo);
         return $metadata;
     }
 }
