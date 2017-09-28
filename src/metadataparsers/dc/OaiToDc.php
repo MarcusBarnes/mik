@@ -23,12 +23,6 @@ class OaiToDc extends Dc
 
     /**
      * Pass the OAI record and through the configured XSLT.
-     *
-     * @param string $objectInfo
-     *   The raw OAI record XML.
-     *
-     * @return string
-     *   The OAI DC XML.
      */
     public function createDcXML($MappingArray, $objectInfo)
     {
