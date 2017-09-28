@@ -74,7 +74,7 @@ class OaipmhIslandoraObj extends FileGetter
         // endpoint is on the same host as the datastream files.
         $islandora_url_info = parse_url($this->oai_endpoint);
         if (isset($islandora_url_info['port'])) {
-            $port = $islandora_url_info['port'];
+            $port = ':' . $islandora_url_info['port'];
         } else {
             $port = '';
         }

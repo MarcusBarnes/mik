@@ -1,9 +1,9 @@
 <?php
-// src/metadataparsers/dc/OaiToDc.php
+// src/metadataparsers/dc/OaiToMods.php
 
-namespace mik\metadataparsers\dc;
+namespace mik\metadataparsers\mods;
 
-class OaiToDc extends Dc
+class OaiToMods extends Mods
 {
 
     /**
@@ -22,30 +22,32 @@ class OaiToDc extends Dc
     }
 
     /**
-     * Parse the DC XML out of the raw OAI record.
+     * Parse the MODS XML out of the raw OAI record.
      *
+     * @param array $array
+     *   Placeholder array.
      * @param string $objectInfo
      *   The raw OAI record XML.
      *
      * @return string
-     *   The OAI DC XML.
+     *   The MODS XML.
      */
-    public function createDcXML($objectInfo)
+    public function createModsXML($array, $objectInfo)
     {
         $xml_doc = new \DOMDocument();
         $xml_doc->loadXML($objectInfo);
         $xpath = new \DOMXPath($xml_doc);
         $xpath->registerNamespace("oai", "http://www.openarchives.org/OAI/2.0/");
-        $xpath->registerNamespace("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
+        $xpath->registerNamespace("mods", "http://www.loc.gov/mods/v3");
         $result = $xpath->query('//oai:metadata/*', $xml_doc);
-        $dc_xml_nodelist = $result->item(0);
-        $dc_xml = $xml_doc->saveXML($dc_xml_nodelist);
+        $mods_xml_nodelist = $result->item(0);
+        $mods_xml = $xml_doc->saveXML($mods_xml_nodelist);
 
         if (!is_null($this->metadatamanipulators)) {
-            $dc_xml = $this->applyMetadatamanipulators($dc_xml, $record_key);
+            $mods_xml = $this->applyMetadatamanipulators($mods_xml, $record_key);
         }
 
-        return $dc_xml;
+        return $mods_xml;
     }
 
     /**
@@ -78,7 +80,7 @@ class OaiToDc extends Dc
     public function metadata($record_key)
     {
         $objectInfo = $this->fetcher->getItemInfo($record_key);
-        $metadata = $this->createDcXML($objectInfo);
+        $metadata = $this->createModsXML(array(), $objectInfo);
         return $metadata;
     }
 }
