@@ -67,14 +67,15 @@ class Config
     /**
      * Wrapper function for calling other functions that validate configuration data.
      *
-     * @param $type string
-     *   One of 'of 'snippets', 'urls', 'paths', 'aliases', 'input_directories', or 'all'.
+     * @param $cmd object
+     *   The Commando command object.
      */
-    public function validate($type = 'all')
+    public function validate($cmd)
     {
-        switch ($type) {
+        // One of 'of 'snippets', 'urls', 'paths', 'aliases', 'input_directories', or 'all'.
+        switch ($cmd['checkconfig']) {
             case 'all':
-                $this->checkMappingSnippets();
+                $this->checkMappingSnippets($cmd);
                 $this->checkPaths();
                 $this->checkOaiEndpoint();
                 $this->checkAliases();
@@ -84,7 +85,7 @@ class Config
                 exit;
                 break;
             case 'snippets':
-                $this->checkMappingSnippets();
+                $this->checkMappingSnippets($cmd);
                 exit;
                 break;
             case 'urls':
@@ -116,7 +117,7 @@ class Config
     /**
      * Tests metadata mapping snippets for well-formedness.
      */
-    public function checkMappingSnippets()
+    public function checkMappingSnippets($cmd)
     {
         $parsers = array('mods\CsvToMods', 'mods\CdmToMods');
         if (!in_array($this->settings['METADATA_PARSER']['class'], $parsers)) {
@@ -132,11 +133,14 @@ class Config
 
         $reader = Reader::createFromPath($path);
         foreach ($reader as $index => $row) {
-            if (count($row) > 1 && !preg_match('/^#/', $row[0])) {
-                if (strlen($row[1])) {
-                    $doc = new \DOMDocument();
-                    if (!@$doc->loadXML($row[1])) {
-                        exit("Error: Mapping snippet $row[1] appears to be not well formed\n");
+            if ($cmd['ignore_null_mappings'] && preg_match('/^null/', $row[0]) && preg_match('/^null/', $row[1])) {
+                continue;
+                if (count($row) > 1 && !preg_match('/^#/', $row[0])) {
+                    if (strlen($row[0])) {
+                        $doc = new \DOMDocument();
+                        if (!@$doc->loadXML($row[1])) {
+                            exit("Error: Mapping snippet $row[1] appears to be not well formed\n");
+                        }
                     }
                 }
             }
