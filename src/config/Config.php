@@ -133,14 +133,14 @@ class Config
 
         $reader = Reader::createFromPath($path);
         foreach ($reader as $index => $row) {
-            if ($cmd['ignore_null_mappings'] && preg_match('/^null/', $row[0]) && preg_match('/^null/', $row[1])) {
+            if ($cmd['ignore_null_mappings'] && preg_match('/^null/', $row[1])) {
                 continue;
-                if (count($row) > 1 && !preg_match('/^#/', $row[0])) {
-                    if (strlen($row[0])) {
-                        $doc = new \DOMDocument();
-                        if (!@$doc->loadXML($row[1])) {
-                            exit("Error: Mapping snippet $row[1] appears to be not well formed\n");
-                        }
+            }
+            if (count($row) > 1 && !preg_match('/^#/', $row[0])) {
+                if (strlen($row[0])) {
+                    $doc = new \DOMDocument();
+                    if (!@$doc->loadXML($row[1])) {
+                        exit("Error: Mapping snippet $row[1] appears to be not well formed\n");
                     }
                 }
             }
