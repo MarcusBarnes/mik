@@ -35,6 +35,12 @@ $cmd->option('checkconfig')
         return in_array($cc_option, $cc_options);
     });
 
+$cmd->option('ignore_null_mappings')
+    ->aka('i')
+    ->describedAs('Ingore validating null mappings. If omitted, null mappings will be validated.')
+    ->boolean()
+    ->default(FALSE);
+
 $cmd->option('limit')
     ->aka('l')
     ->describedAs('Number of objects to process. If omitted, all objects will be processed.')
@@ -49,7 +55,7 @@ $settings = $mikConfig->settings;
 echo "Commencing MIK." . PHP_EOL;
 
 if ($cmd['checkconfig']) {
-    $mikConfig->validate($cmd['checkconfig']);
+    $mikConfig->validate($cmd);
 }
 
 if ($cmd['limit']) {
