@@ -43,6 +43,9 @@ class OaiToMods extends Mods
         $mods_xml_nodelist = $result->item(0);
         $mods_xml = $xml_doc->saveXML($mods_xml_nodelist);
 
+        $identifiers = $xml_doc->getElementsByTagNameNS('http://www.openarchives.org/OAI/2.0/', 'identifier');
+        $record_key = urlencode($identifiers->item(0)->nodeValue);
+
         if (!is_null($this->metadatamanipulators)) {
             $mods_xml = $this->applyMetadatamanipulators($mods_xml, $record_key);
         }
@@ -51,17 +54,17 @@ class OaiToMods extends Mods
     }
 
     /**
-     * @todo: Loop through the registered manipulators, just like wth Cdm and CSV,
-     *        but these manuipulators should apply to the entire XML document,
-     *        not snippets.
+     * Applies metadatamanipulators listed in the config to provided serialized XML document.
      *
-     * Applies metadatamanipulators listed in the config to provided XML snippet.
-     * @param string $xmlSnippet
-     *     An XML snippet that can be turned into a valid XML document.
+     * @param string $xml
+     *     The XML document as it was rendered by the Twig template.
+     * @param string $record_key
+     *   The current item's record_key.
+     *
      * @return string
-     *     XML snippet as string that whose nodes have been manipulated if applicable.
+     *     The modified XML document.
      */
-    private function applyMetadatamanipulators($xmlSnippet, $record_key)
+    private function applyMetadatamanipulators($xml, $record_key)
     {
         foreach ($this->metadatamanipulators as $metadatamanipulator) {
             $metadatamanipulatorClassAndParams = explode('|', $metadatamanipulator);
@@ -69,9 +72,10 @@ class OaiToMods extends Mods
             $manipulatorParams = $metadatamanipulatorClassAndParams;
             $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
             $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams, $record_key);
-            $xmlSnippet = $metadatamanipulator->manipulate($xmlSnippet);
+            $modified_xml = $metadatamanipulator->manipulate($xml);
         }
-        return $xmlSnippet;
+
+        return $modified_xml;
     }
 
     /**
