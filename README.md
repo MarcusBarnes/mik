@@ -116,7 +116,7 @@ CONTRIBUTING.md provides guidelines on how you can contribute to MIK. Our [Infor
 ## Maintainers/Sponsors
 
 * Mark Jordan, [Simon Fraser University Library](http://www.lib.sfu.ca/)
-* [Brandon Weigel](https://github.com/bondjimbond)
+* Brandon Weigel, [BC Electronic Library Network](http://bceln.ca)
 * Marcus Barnes, The [Digital Scholarship Unit (DSU)](https://www.utsc.utoronto.ca/digitalscholarship/) at the University of Toronto Scarborough Library
 
 ## Contributors
