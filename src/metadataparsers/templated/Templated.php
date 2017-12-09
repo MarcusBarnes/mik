@@ -70,7 +70,7 @@ class Templated extends MetadataParser
     }
 
     /**
-     * Applies metadatamanipulators listed in the config to provided XML snippet.
+     * Applies metadatamanipulators listed in the config to provided serialized XML document.
      *
      * @param string $record_key
      *   The current item's record_key.
