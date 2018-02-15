@@ -26,8 +26,12 @@ If you have a question, please [open an issue](https://github.com/MarcusBarnes/m
   * Emily Carr University's [Wosk Masterworks Print Collection](http://arcabc.ca/islandora/object/ecuad:wosk)
   * University of the Fraser Valley's [Abbotsford Sumas and Matsqui News](http://ufv.arcabc.ca/islandora/object/ufv%3A255)
   * [KORA](http://kora.kpu.ca/), Kwantlen Polytechnic University's institutional repository
-* All of the newspapers in Simon Fraser University Library's [Digitized Newspapers](http://newspapers.lib.sfu.ca/) and [Chinese Times](http://chinesetimes.lib.sfu.ca/) sites
+* Most of the newspapers in Simon Fraser University Library's [Digitized Newspapers](http://newspapers.lib.sfu.ca/) site
 * Most of the collections in Simon Fraser University Library's [Digitized Collections](http://digital.lib.sfu.ca/)
+* All of the collections initially launched in [The Louisiana Digital Library](http://louisianadigitallibrary.org/). Some examples include:
+  * [Free People of Color in Louisiana](http://louisianadigitallibrary.org/islandora/object/fpoc-p16313coll51%3Acollection)
+  * [John Norris Teunisson Photographs](http://louisianadigitallibrary.org/islandora/object/lsm-jnt:collection)
+  * [Louisiana State Museum Hurricane Katrina Oral History Project](http://louisianadigitallibrary.org/islandora/object/lsm-koh:collection)
 
 ## Installation
 
