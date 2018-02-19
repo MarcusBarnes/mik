@@ -217,7 +217,7 @@ class CdmBooks extends Writer
             if ($JPEG_expected xor $no_datastreams_setting_flag) {
                 $jpg_content = $this->cdmNewspapersFileGetter
                                 ->getPreviewJPGContent($page_pointer);
-                $jpg_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'JPEG.jpg';
+                $jpg_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'JPG.jpg';
                 file_put_contents($jpg_output_file_path, $jpg_content);
             }
 
