@@ -202,11 +202,11 @@ class CdmNewspapers extends Writer
 
             // Get a JPEG to use as the Islandora preview image,
             //which should be 800 pixels high. The filename should be JPG.jpg.
-            $JPEG_expected = in_array('JPEG', $this->datastreams);
+            $JPEG_expected = in_array('JPG', $this->datastreams);
             if ($JPEG_expected xor $no_datastreams_setting_flag) {
                 $jpg_content = $this->cdmNewspapersFileGetter
                                 ->getPreviewJPGContent($page_pointer);
-                $jpg_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'JPEG.jpg';
+                $jpg_output_file_path = $page_dir . DIRECTORY_SEPARATOR . 'JPG.jpg';
                 file_put_contents($jpg_output_file_path, $jpg_content);
             }
 
