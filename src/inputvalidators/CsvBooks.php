@@ -35,6 +35,14 @@ class CsvBooks extends MikInputValidator
             $this->page_sequence_separator = '-';
         }
         $this->page_sequence_separator = preg_quote($this->page_sequence_separator);
+
+        $this->ocr_extension = '.txt';
+        // Default is to not log the absence of page-level OCR files.
+        if (isset($settings['WRITER']['log_missing_ocr_files'])) {
+            $this->log_missing_ocr_files= $settings['WRITER']['log_missing_ocr_files'];
+        } else {
+            $this->log_missing_ocr_files = false;
+        }
     }
 
     /**
@@ -74,7 +82,7 @@ class CsvBooks extends MikInputValidator
      *   The package's record key.
      *
      * @param $package_path string
-     *   The the package's input directory name (not full path).
+     *   The package's input directory name (not full path).
      *
      * @return boolean
      *    True if all tests pass for the package, false if any tests failed.
@@ -135,6 +143,18 @@ class CsvBooks extends MikInputValidator
                 $cumulative_validation_results[] = false;
             }
 
+            if (!$this->checkOcrFiles($package_path, $pages)) {
+                $this->log->addError(
+                    "Input validation failed",
+                    array(
+                        'record ID' => $record_key,
+                        'issue directory' => $package_path,
+                        'error' => 'Book directory is missing one or more OCR files'
+                    )
+                );
+                $cumulative_validation_results[] = false;
+            }
+
             // Files in book directory must be named such that their last
             // filename segment is numeric.
             if (!$this->checkPageSequenceNumbers($pages)) {
@@ -180,18 +200,28 @@ class CsvBooks extends MikInputValidator
      */
     private function getPageFiles($dir)
     {
+        $page_files = array();
         $files = $this->readDir($dir);
         foreach ($files as &$file) {
             $file = basename($file);
+            foreach ($files as $file) {
+                $pathinfo = pathinfo($file);
+                $page_file = $pathinfo['basename'];
+                $ext = $pathinfo['extension'];
+                if (in_array($ext, array('tif','tiff', 'jp2'))) {
+                    $page_files[] = $page_file;
+                }
+            }
         }
-        return $files;
+        return $page_files;
     }
 
     /**
      * Validates the extensions of the pages in the book-level directory.
      *
      * @param $files array
-     *    A list of all the page file names.
+     *    A list of all the page file names.Files must have one of
+     *    following extensions: tif, tiff, jp2.
      *
      * @return boolean
      *    True if all files have an allowed file extension, false if not.
@@ -228,6 +258,35 @@ class CsvBooks extends MikInputValidator
                 if (!preg_match('/' . $this->page_sequence_separator . '\d+$/', $filename)) {
                     $valid = false;
                 }
+            }
+        }
+        return $valid;
+    }
+
+    /**
+     * Checks for the existence of page-level OCR files.
+     *
+     * @param $book_directory_path string
+     *    The absolute path to the book-level directory.
+     * @param $files array
+     *    A list of all the page file names in the directory.
+     *
+     * @return boolean
+     *    True if all image files have corresponding OCR files.
+     */
+    private function checkOcrFiles($book_directory_path, $files)
+    {
+        $valid = true;
+        if (!$this->log_missing_ocr_files) {
+            return $valid;
+        }
+        foreach ($files as $file) {
+            $pathinfo = pathinfo($file);
+            $filename = $pathinfo['filename'];
+            $path_to_ocr_file = realpath($book_directory_path) . DIRECTORY_SEPARATOR .
+                $filename . $this->ocr_extension;
+            if (!file_exists($path_to_ocr_file)) {
+                $valid = false;
             }
         }
         return $valid;
