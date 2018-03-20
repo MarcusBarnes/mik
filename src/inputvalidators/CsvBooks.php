@@ -231,9 +231,11 @@ class CsvBooks extends MikInputValidator
             $ext = $pathinfo['extension'];
             if ($this->log_missing_ocr_files) {
                 $ocr_extension = ltrim($this->ocr_extension, '.');
-                $allowed_extensions = array_merge($this->fileGetter->allowed_file_extensions_for_OBJ, array($ocr_extension));
-            }
-            else {
+                $allowed_extensions = array_merge(
+                    $this->fileGetter->allowed_file_extensions_for_OBJ,
+                    array($ocr_extension)
+                );
+            } else {
                 $allowed_extensions = $this->fileGetter->allowed_file_extensions_for_OBJ;
             }
             if (!in_array($ext, $allowed_extensions)) {
