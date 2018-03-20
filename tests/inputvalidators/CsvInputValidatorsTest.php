@@ -217,6 +217,11 @@ class CsvInputValidatorsTest extends MikTestBase
             "CSV Books input validator did not detect unwanted files"
         );
         $this->assertContains(
+            'files/book3","error":"Some files in the book object directory have invalid extensions"',
+            $log_file_entries[3],
+            "CSV Books input validator did not find invalid page file extensions"
+        );
+        $this->assertContains(
             'files/book4","error":"Book object directory not found"',
             $log_file_entries[4],
             "CSV Books input validator did not detect empty book-level directory"

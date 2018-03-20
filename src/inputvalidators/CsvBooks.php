@@ -190,13 +190,13 @@ class CsvBooks extends MikInputValidator
     }
 
     /**
-     * Gets the filenames of the page files in the book-level directory.
+     * Gets the filenames of the files in the book-level directory.
      *
      * @param $dir string
      *    The full path to the book-level directory.
      *
      * @return array
-     *    A list of all the page file names.
+     *    A list of all the file names (not just page images).
      */
     private function getPageFiles($dir)
     {
@@ -207,10 +207,7 @@ class CsvBooks extends MikInputValidator
             foreach ($files as $file) {
                 $pathinfo = pathinfo($file);
                 $page_file = $pathinfo['basename'];
-                $ext = $pathinfo['extension'];
-                if (in_array($ext, array('tif','tiff', 'jp2'))) {
-                    $page_files[] = $page_file;
-                }
+                $page_files[] = $page_file;
             }
         }
         return $page_files;
