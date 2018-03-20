@@ -39,7 +39,7 @@ class CsvBooks extends MikInputValidator
         $this->ocr_extension = '.txt';
         // Default is to not log the absence of page-level OCR files.
         if (isset($settings['WRITER']['log_missing_ocr_files'])) {
-            $this->log_missing_ocr_files= $settings['WRITER']['log_missing_ocr_files'];
+            $this->log_missing_ocr_files = $settings['WRITER']['log_missing_ocr_files'];
         } else {
             $this->log_missing_ocr_files = false;
         }
@@ -229,7 +229,14 @@ class CsvBooks extends MikInputValidator
         foreach ($files as $file) {
             $pathinfo = pathinfo($file);
             $ext = $pathinfo['extension'];
-            if (!in_array($ext, $this->fileGetter->allowed_file_extensions_for_OBJ)) {
+            if ($this->log_missing_ocr_files) {
+                $ocr_extension = ltrim($this->ocr_extension, '.');
+                $allowed_extensions = array_merge($this->fileGetter->allowed_file_extensions_for_OBJ, array($ocr_extension));
+            }
+            else {
+                $allowed_extensions = $this->fileGetter->allowed_file_extensions_for_OBJ;
+            }
+            if (!in_array($ext, $allowed_extensions)) {
                 $valid = false;
             }
         }
