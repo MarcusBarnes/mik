@@ -247,7 +247,7 @@ foreach ($records as $record) {
     // Create metadata to return an XML file that can be passed
     // on to the writer.
     try {
-        $metadata = $parser->metadata($record_key) . "\n";
+        $metadata = $parser->metadata($record_key);
     } catch (Exception $exception) {
         $log->addError(
             'ErrorException',
