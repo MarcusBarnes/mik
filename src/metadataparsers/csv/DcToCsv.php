@@ -21,11 +21,20 @@ class DcToCsv extends Csv
         // Call Metadata.php contructor
         parent::__construct($settings);
 
+        if (isset($this->settings['WRITER']['metadata_only'])) {
+            $this->metadata_only = $this->settings['WRITER']['metadata_only'];
+        } else {
+            $this->metadata_only = false;
+        }
+
         // The CSV writer that writes out object metadata is instantiated in the writer.
         $headings = $this->settings['METADATA_PARSER']['dc_elements'];
         array_unshift($headings, $this->settings['METADATA_PARSER']['record_key']);
         $output_file_path = $this->settings['WRITER']['output_file'];
         $output_csv_writer = Writer::createFromPath($output_file_path, 'a');
+        if (!$this->metadata_only) {
+            array_push($headings, 'File');
+        }
         $output_csv_writer->insertOne($headings);
     }
 

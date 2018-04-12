@@ -75,48 +75,55 @@ class OaipmhCsv extends \mik\writers\Writer
         $output_path = $this->outputDirectory . DIRECTORY_SEPARATOR;
 
         $normalized_record_id = $this->normalizeFilename($record_id);
-        $this->writeMetadataFile($metadata);
 
-        if ($this->metadata_only) {
-              return;
-        }
+        if (!$this->metadata_only) {
+            // Retrieve the file associated with the document and write it to the output
+            // folder using the filename or record_id identifier
+            $source_file_url = $this->fileGetter->getFilePath($record_id);
+            // Retrieve the PDF, etc. using Guzzle.
+            if ($source_file_url) {
+                $client = new Client();
+                $response = $client->get(
+                    $source_file_url,
+                    ['stream' => true,
+                    'timeout' => $this->httpTimeout,
+                    'connect_timeout' => $this->httpTimeout,
+                    'verify' => $this->verifyCA]
+                );
 
-        // Retrieve the file associated with the document and write it to the output
-        // folder using the filename or record_id identifier
-        $source_file_url = $this->fileGetter->getFilePath($record_id);
-        // Retrieve the PDF, etc. using Guzzle.
-        if ($source_file_url) {
-            $client = new Client();
-            $response = $client->get(
-                $source_file_url,
-                ['stream' => true,
-                'timeout' => $this->httpTimeout,
-                'connect_timeout' => $this->httpTimeout,
-                'verify' => $this->verifyCA]
-            );
+                // Lazy MimeType => extension mapping: use the last part of the MimeType.
+                $content_types = $response->getHeader('Content-Type');
+                list($type, $extension) = explode('/', $content_types[0]);
+                $extension = preg_replace('/;.*$/', '', $extension);
 
-            // Lazy MimeType => extension mapping: use the last part of the MimeType.
-            $content_types = $response->getHeader('Content-Type');
-            list($type, $extension) = explode('/', $content_types[0]);
-            $extension = preg_replace('/;.*$/', '', $extension);
+                $content_file_path = $output_path . $normalized_record_id . '.' . $extension;
 
-            $content_file_path = $output_path . $normalized_record_id . '.' . $extension;
-
-            $body = $response->getBody();
-            while (!$body->eof()) {
-                file_put_contents($content_file_path, $body->read(2048), FILE_APPEND);
+                $body = $response->getBody();
+                while (!$body->eof()) {
+                    file_put_contents($content_file_path, $body->read(2048), FILE_APPEND);
+                }
+            } else {
+                $this->log->addWarning(
+                    "No content file found in OAI-PMH record",
+                    array('record' => $record_id)
+                );
             }
-        } else {
-            $this->log->addWarning(
-                "No content file found in OAI-PMH record",
-                array('record' => $record_id)
-            );
         }
+
+
+        if (!$this->metadata_only) {
+            array_push($metadata, $normalized_record_id . '.' . $extension);
+        }
+        $this->writeMetadataFile($metadata);
     }
 
     /**
      * Adds a row to CSV file (unlike other Writers' writeMetadataFile(),
      * which writes out an entire metadata XML file.
+     *
+     * @param array $metadata
+     *   An array of values to add to the CSV file, matching the order of
+     *   the column headings.
      */
     public function writeMetadataFile($metadata, $output_file_path = '')
     {
