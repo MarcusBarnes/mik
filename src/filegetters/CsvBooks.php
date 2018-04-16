@@ -37,10 +37,14 @@ class CsvBooks extends FileGetter
      */
     public function getChildren($record_key)
     {
+        $item_info = $this->fetcher->getItemInfo($record_key);
+        $book_directory = $item_info->{$this->file_name_field};
+      
         $page_paths = array();
         $book_input_path = $this->getBookSourcePath($record_key);
         foreach ($this->OBJFilePaths as $path) {
-            if (strpos($path, $book_input_path) === 0) {
+            $current_book_dirname = dirname($path);
+            if ($current_book_dirname === $this->input_directory . DIRECTORY_SEPARATOR . $book_directory) {
                 $page_paths[] = $path;
             }
         }
