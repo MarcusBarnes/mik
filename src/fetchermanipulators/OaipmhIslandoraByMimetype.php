@@ -90,7 +90,8 @@ class OaipmhIslandoraByMimetype extends FetcherManipulator
     public function getMimeType($record_key)
     {
         // Get the OAI record from the temp directory.
-        $raw_metadata_path = $this->settings['FETCHER']['temp_directory'] . DIRECTORY_SEPARATOR . $record_key . '.metadata';
+        $raw_metadata_path = $this->settings['FETCHER']['temp_directory'] .
+            DIRECTORY_SEPARATOR . $record_key . '.metadata';
         $dom = new \DOMDocument;
         $xml = file_get_contents($raw_metadata_path);
         $dom->loadXML($xml);
@@ -119,9 +120,9 @@ class OaipmhIslandoraByMimetype extends FetcherManipulator
             // HEAD is more efficient than the default GET.
             stream_context_set_default(array('http' => array('method' => 'HEAD')));
             $headers = get_headers($ds_url, 1);
-            if ($dsid == $this->dsid && $headers[0] == 'HTTP/1.1 200 OK' && isset($headers['Content-Type'])) {
+            if ($dsid == $this->dsid && preg_match('#200\sOK#', $headers[0]) && isset($headers['Content-Type'])) {
                 return $headers['Content-Type'];
-            } 
+            }
         }
     }
 }
