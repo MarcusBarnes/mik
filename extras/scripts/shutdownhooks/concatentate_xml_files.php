@@ -10,7 +10,7 @@ $config_path = trim($argv[1]);
 $config = parse_ini_file($config_path, TRUE);
 $temp_dir = $config['FETCHER']['temp_directory'];
 
-$wrapper_element_name = 'migrate_plus_source';
+$wrapper_element_name = 'modsCollection';
 
 $dir = $config['WRITER']['output_directory'];
 $dir = rtrim($dir, DIRECTORY_SEPARATOR);
