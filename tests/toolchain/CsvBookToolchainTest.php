@@ -242,6 +242,6 @@ XML;
         // Includes 4 page subdirectoried, MODS.xml, and the directory links (. and ..).
         $book_dir_members = scandir($this->path_to_output_dir . DIRECTORY_SEPARATOR . 'B1');
         $num_book_dir_members= count($book_dir_members);
-        $this->assertEquals(7, $num_book_dir_members, "Incorrect number of book directory memebers.");
+        $this->assertEquals(7, $num_book_dir_members, "Incorrect number of book directory members.");
     }
 }
