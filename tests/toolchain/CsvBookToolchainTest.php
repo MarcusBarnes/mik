@@ -195,4 +195,52 @@ XML;
             "OBJ.tif file was not written by CsvBooks toolchain using a configured page sequence separator."
         );
     }
+
+    /**
+     * @covers \mik\writers\CsvBooks::writePackages()
+     */
+    public function testWritePackagesIssue466()
+    {
+        $settings = array(
+            'FETCHER' => array(
+                'class' => 'Csv',
+                'input_file' => $this->asset_base_dir . '/csv/books_issue_466/metadata/books_metadata.csv',
+                'record_key' => 'Identifier',
+                'temp_directory' => $this->path_to_temp_dir,
+                'use_cache' => false,
+             ),
+            'FILE_GETTER' => array(
+                'validate_input' => false,
+                'class' => 'CsvBooks',
+                'input_directory' => $this->asset_base_dir . '/csv/books_issue_466/files',
+                'temp_directory' => $this->path_to_temp_dir,
+                'file_name_field' => 'Directory',
+                'use_cache' => false,
+             ),
+            'METADATA_PARSER' => array(
+                'mapping_csv_path' => $this->asset_base_dir . '/csv/books_issue_466/metadata/books_mappings.csv',
+            ),
+            'WRITER' => array(
+                'output_directory' => $this->path_to_output_dir,
+                'metadata_filename' => 'MODS.xml',
+                'page_sequence_separator' => '_',
+             ),
+            'LOGGING' => array(
+                'path_to_log' => $this->path_to_log,
+            ),
+        );
+
+        $file_getter = new CsvBooksGetter($settings);
+        $pages = $file_getter->getChildren('B1');
+
+        $parser = new CsvToMods($settings);
+        $mods = $parser->metadata('B1');
+
+        $writer = new CsvBooksWriter($settings);
+        $writer->writePackages($mods, $pages, 'B1');
+
+        $pages = scandir($this->path_to_output_dir . DIRECTORY_SEPARATOR . 'B1');
+        $num_pages = count($pages);
+        $this->assertEquals(7, $num_pages, "Incorrect number of pages for book.");
+    }
 }
