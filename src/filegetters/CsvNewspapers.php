@@ -39,12 +39,15 @@ class CsvNewspapers extends FileGetter
      */
     public function getChildren($record_key)
     {
+        $item_info = $this->fetcher->getItemInfo($record_key);
+        $issue_directory = $item_info->{$this->file_name_field};
+
         $page_paths = array();
         $issue_input_path = $this->getIssueSourcePath($record_key);
         foreach ($this->OBJFilePaths as $paths) {
             foreach ($paths as $path) {
-                // If there's a match, we expect it to start at position 0.
-                if (strpos($path, $issue_input_path) === 0) {
+                $current_issue_dirname = dirname($path);
+                if ($current_issue_dirname === $this->input_directory . DIRECTORY_SEPARATOR . $issue_directory) {
                     $page_paths[] = $path;
                 }
             }
