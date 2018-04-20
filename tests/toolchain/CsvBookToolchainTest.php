@@ -239,8 +239,9 @@ XML;
         $writer = new CsvBooksWriter($settings);
         $writer->writePackages($mods, $pages, 'B1');
 
-        $pages = scandir($this->path_to_output_dir . DIRECTORY_SEPARATOR . 'B1');
-        $num_pages = count($pages);
-        $this->assertEquals(7, $num_pages, "Incorrect number of pages for book.");
+        // Includes 4 page subdirectoried, MODS.xml, and the directory links (. and ..).
+        $book_dir_members = scandir($this->path_to_output_dir . DIRECTORY_SEPARATOR . 'B1');
+        $num_book_dir_members= count($book_dir_members);
+        $this->assertEquals(7, $num_book_dir_members, "Incorrect number of book directory memebers.");
     }
 }
