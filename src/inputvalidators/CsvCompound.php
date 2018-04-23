@@ -25,11 +25,11 @@ class CsvCompound extends MikInputValidator
             '.DS_Store',
         );
 
-        // Default is to derive child sequence number by splitting filename on '_'.
+        // Default is to derive child sequence number by splitting filename on '-'.
         if (isset($settings['WRITER']['child_sequence_separator'])) {
             $this->child_sequence_separator = $settings['WRITER']['child_sequence_separator'];
         } else {
-            $this->child_sequence_separator = '_';
+            $this->child_sequence_separator = '-';
         }
 
         // Default minimum child count is 2.

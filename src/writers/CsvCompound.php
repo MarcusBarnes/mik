@@ -44,11 +44,11 @@ class CsvCompound extends Writer
         $this->compound_directory_field = $settings['FILE_GETTER']['compound_directory_field'];
         $this->child_key = $settings['FETCHER']['child_key'];
         $this->child_title = $settings['WRITER']['child_title'];
-        // Default is to derive child sequence number by splitting filename on '_'.
+        // Default is to derive child sequence number by splitting filename on '-'.
         if (isset($settings['WRITER']['child_sequence_separator'])) {
             $this->child_sequence_separator = $settings['WRITER']['child_sequence_separator'];
         } else {
-            $this->child_sequence_separator = '_';
+            $this->child_sequence_separator = '-';
         }
         // Default is to generate page-level MODS.xml files.
         if (isset($settings['WRITER']['generate_child_modsxml'])) {
