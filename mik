@@ -28,9 +28,9 @@ $cmd->option('config')
 $cmd->option('checkconfig')
     ->aka('cc')
     ->describedAs("Applies checks to configuration, does not process objects. " .
-        "Must be one of 'snippets', 'urls', 'paths', 'aliases', " .
-        "'input_directories', 'csv', or 'all'.")
-    ->must(function($cc_option) {
+          "Must be one of 'snippets', 'urls', 'paths', 'aliases', " .
+          "'input_directories', 'csv', or 'all'.")
+    ->must(function ($cc_option) {
         $cc_options = array('snippets', 'urls', 'paths', 'aliases', 'input_directories', 'csv', 'all');
         return in_array($cc_option, $cc_options);
     });
@@ -39,12 +39,12 @@ $cmd->option('ignore_null_mappings')
     ->aka('i')
     ->describedAs('Ingore validating null mappings. If omitted, null mappings will be validated.')
     ->boolean()
-    ->default(FALSE);
+    ->default(false);
 
 $cmd->option('limit')
     ->aka('l')
     ->describedAs('Number of objects to process. If omitted, all objects will be processed.')
-    ->must(function($limit_value) {
+    ->must(function ($limit_value) {
         return preg_match('/^\d+$/', $limit_value);
     });
 
@@ -134,7 +134,7 @@ $numRecs = $fetcher->getNumRecs();
 // input validators are named the same as the file getter class, but we provide
 // the option to use custom validators. In 'realtime' mode the input validator
 // is invoked in the Writer class, not here.
-if (isset($settings['FILE_GETTER']['input_validator_class'])){
+if (isset($settings['FILE_GETTER']['input_validator_class'])) {
     $input_validator_class = $settings['FILE_GETTER']['input_validator_class'];
 } else {
     $input_validator_class = $settings['FILE_GETTER']['class'];
@@ -234,6 +234,11 @@ try {
 
 $record_num = 0;
 foreach ($records as $record) {
+    $record_num++;
+    if (!is_null($limit) && $record_num > $limit) {
+        break;
+    }
+
     $record_key = $record->key;
     if (strlen($record_key) == 0) {
         continue;
@@ -296,7 +301,6 @@ foreach ($records as $record) {
         continue;
     }
 
-    $record_num++;
     if ($onWindows) {
         print '.';
     } else {
@@ -308,29 +312,28 @@ foreach ($records as $record) {
         $config_path = realpath($configPath);
         if (count($children)) {
             $children_record_ids = implode(',', $children);
-        }
-        else {
+        } else {
             // If there are no children record IDs, pass a null
             // string as a placeholder.
             $children_record_ids = 'null';
         }
         foreach ($settings['WRITER']['postwritehooks'] as $hook) {
-          $cmd = "$hook $record_key $children_record_ids $config_path";
-          $process = new BackgroundProcess($cmd);
-          $process->run();
+            $cmd = "$hook $record_key $children_record_ids $config_path";
+            $process = new BackgroundProcess($cmd);
+            $process->run();
         }
     }
 }
 
 // Run any shutdown hooks.
 if (isset($settings['WRITER']['shutdownhooks'])) {
-  echo PHP_EOL;
-  foreach ($settings['WRITER']['shutdownhooks'] as $hook) {
-    $cmd = sprintf("%s %s", $hook, realpath($configPath));
-    echo "Running shutdown hook # $hook" . PHP_EOL;
-    exec($cmd);
-  }
-  echo PHP_EOL;
+    echo PHP_EOL;
+    foreach ($settings['WRITER']['shutdownhooks'] as $hook) {
+        $cmd = sprintf("%s %s", $hook, realpath($configPath));
+        echo "Running shutdown hook # $hook" . PHP_EOL;
+        exec($cmd);
+    }
+    echo PHP_EOL;
 }
 
 
