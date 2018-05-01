@@ -59,6 +59,17 @@ class CsvFetcherTest extends MikTestBase
     }
 
     /**
+     * @covers ::getRecords()
+     */
+    public function testGetRecordsWithLimit()
+    {
+        $settings = $this->settings;
+        $csv = new Csv($settings);
+        $records = $csv->getRecords(10);
+        $this->assertCount(10, $records);
+    }
+
+    /**
      * @covers ::getNumRecs()
      */
     public function testGetNumRecs()

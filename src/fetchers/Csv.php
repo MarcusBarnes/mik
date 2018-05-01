@@ -66,7 +66,6 @@ class Csv extends Fetcher
     */
     public function getRecords($limit = null)
     {
-
         // Use a static cache to avoid reading the CSV file multiple times.
         static $filtered_records;
         if (!isset($filtered_records) || $this->use_cache == false) {
@@ -90,18 +89,21 @@ class Csv extends Fetcher
             ->setLimit($limit)
             ->fetchAssoc();
 
-            foreach ($records as $index => &$record) {
-                // Commenting out rows only works if the # is the first
-                // character in the record key field.
-                if (preg_match('/^#/', $record[$this->record_key])) {
-                    unset($records[$index]);
-                }
+            $current_records = array();
+            foreach ($records as $index => $record) {
                 if (!is_null($record[$this->record_key]) || strlen($record[$this->record_key])) {
-                    $record = (object) $record;
-                    $record->key = $record->{$this->record_key};
-                } else {
-                    unset($records[$index]);
+                    // Commenting out rows only works if the # is the first
+                    // character in the record key field.
+                    if (!preg_match('/^#/', $record[$this->record_key])) {
+                        $record = (object) $record;
+                        $record->key = $record->{$this->record_key};
+                        $current_records[] = $record;
+                    }
                 }
+            }
+            $records = $current_records;
+            if ($limit != -1) {
+                $records = array_slice($records, 0, $limit);
             }
 
             if ($this->fetchermanipulators) {
