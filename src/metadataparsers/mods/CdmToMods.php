@@ -143,8 +143,6 @@ class CdmToMods extends Mods
                     $fieldValue = '<![CDATA[' . $fieldValue . ']]>';
                 }
 
-
-
                 $stringToReplace = '%value%';
                 $xmlSnippet = str_replace($stringToReplace, $fieldValue, $xmlSnippet);
                 if (isset($this->metadatamanipulators)) {
@@ -196,22 +194,6 @@ class CdmToMods extends Mods
         );
 
         $modsOpeningTag .= '<titleInfo><title>' . $page_title . '</title></titleInfo>';
-
-/*
-        if (isset($this->metadatamanipulators)) {
-            foreach ($this->metadatamanipulators as $index => $manipulator) {
-                if (preg_match('/^AddContentdmSourceUrl/', $manipulator)) {
-                    $metadatamanipulatorClassAndParams = explode('|', $manipulator);
-                    $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
-                    $manipulatorParams = $metadatamanipulatorClassAndParams;
-                    $metadatamanipulator = new \mik\metadatamanipulators\AddContentdmSourceUrl($this->settings, $manipulatorParams, $page_pointer);
-                    $xmlFromTemplate = $metadatamanipulator->manipulate('');
-                    $modsOpeningTag .= $xmlFromTemplate;
-                    // unset($this->metadatamanipulators[$index]);
-                }
-            } 
-        }
-*/
 
         if (isset($this->metadatamanipulators)) {
             $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $page_pointer, '');
