@@ -56,6 +56,9 @@ class AddUuidToMods extends MetadataManipulator
         if (!strlen($input)) {
             return $input;
         }
+        if (!preg_match('/^</', $input)) {
+            return $input;
+        }
 
         $dom = new \DomDocument();
         $dom->loadxml($input, LIBXML_NSCLEAN);

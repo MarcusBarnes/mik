@@ -12,11 +12,6 @@ class CdmToMods extends Mods
     public $CONTENTdmFieldValuesArray;
 
     /**
-     * @var bool $include_migrated_from_uri
-     */
-    public $includeMigratedFromUri;
-
-    /**
      * @var string $alias - CONTENTdm collection alias
      */
     public $alias;
@@ -49,7 +44,6 @@ class CdmToMods extends Mods
         parent::__construct($settings);
 
         $this->fetcher = new \mik\fetchers\Cdm($settings);
-        $this->includeMigratedFromUri = $this->settings['METADATA_PARSER']['include_migrated_from_uri'];
         $this->mappingCSVpath = $this->settings['METADATA_PARSER']['mapping_csv_path'];
         $this->wsUrl = $this->settings['METADATA_PARSER']['ws_url'];
         $this->alias = $this->settings['METADATA_PARSER']['alias'];
@@ -149,6 +143,8 @@ class CdmToMods extends Mods
                     $fieldValue = '<![CDATA[' . $fieldValue . ']]>';
                 }
 
+
+
                 $stringToReplace = '%value%';
                 $xmlSnippet = str_replace($stringToReplace, $fieldValue, $xmlSnippet);
                 if (isset($this->metadatamanipulators)) {
@@ -158,17 +154,6 @@ class CdmToMods extends Mods
             } else {
                 // Determine if we need to store the CONTENTdm_field as an identifier.
             }
-        }
-
-        $includeMigratedFromUri = $this->includeMigratedFromUri;
-        $itemId = $pointer;
-        $collectionAlias = $this->alias;
-        if ($includeMigratedFromUri == true) {
-            $CONTENTdmItemUrl = '<identifier type="uri" invalid="yes" ';
-            $CONTENTdmItemUrl .= 'displayLabel="Migrated From">';
-            $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection/';
-            $CONTENTdmItemUrl .= $collectionAlias. '/id/'. $itemId .'</identifier>';
-            $modsOpeningTag .= $CONTENTdmItemUrl;
         }
 
         $modsString = $modsOpeningTag . '</mods>';
@@ -212,15 +197,21 @@ class CdmToMods extends Mods
 
         $modsOpeningTag .= '<titleInfo><title>' . $page_title . '</title></titleInfo>';
 
-        $includeMigratedFromUri = $this->includeMigratedFromUri;
-        $collectionAlias = $this->alias;
-        if ($includeMigratedFromUri == true) {
-            $CONTENTdmItemUrl = '<identifier type="uri" invalid="yes" ';
-            $CONTENTdmItemUrl .= 'displayLabel="Migrated From">';
-            $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection/';
-            $CONTENTdmItemUrl .= $collectionAlias . '/id/'. $page_pointer .'</identifier>';
-            $modsOpeningTag .= $CONTENTdmItemUrl;
+/*
+        if (isset($this->metadatamanipulators)) {
+            foreach ($this->metadatamanipulators as $index => $manipulator) {
+                if (preg_match('/^AddContentdmSourceUrl/', $manipulator)) {
+                    $metadatamanipulatorClassAndParams = explode('|', $manipulator);
+                    $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
+                    $manipulatorParams = $metadatamanipulatorClassAndParams;
+                    $metadatamanipulator = new \mik\metadatamanipulators\AddContentdmSourceUrl($this->settings, $manipulatorParams, $page_pointer);
+                    $xmlFromTemplate = $metadatamanipulator->manipulate('');
+                    $modsOpeningTag .= $xmlFromTemplate;
+                    // unset($this->metadatamanipulators[$index]);
+                }
+            } 
         }
+*/
 
         if (isset($this->metadatamanipulators)) {
             $xmlSnippet = $this->applyMetadatamanipulators($xmlSnippet, $page_pointer, '');

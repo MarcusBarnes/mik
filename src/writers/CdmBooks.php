@@ -23,15 +23,15 @@ class CdmBooks extends Writer
     private $thumbnail;
 
     /**
+     * @var boolean $skip_obj - whether we want to skip copying a page OBJ.
+     */
+    public $skip_obj;
+
+    /**
      * @var object cdmNewspapersFileGetter - filegetter class for
      * getting files related to CDM Newspaper issues.
      */
     private $cdmNewspapersFileGetter;
-
-    /**
-     *  @var $issueDate - newspaper issue date.
-     */
-    public $issueDate = '0000-00-00';
 
     /**
      * @var $alias - collection alias
@@ -49,7 +49,7 @@ class CdmBooks extends Writer
     public $metadataParser;
 
     /**
-     * Create a new newspaper writer Instance
+     * Create a new books writer Instance
      * @param array $settings configuration settings.
      */
     public function __construct($settings)
@@ -65,6 +65,12 @@ class CdmBooks extends Writer
             $this->metadataFileName = $this->settings['metadata_filename'];
         } else {
             $this->metadataFileName = 'MODS.xml';
+        }
+
+        if (!isset($settings['WRITER']['skip_obj'])) {
+            $this->skip_obj = false;
+        } else {
+            $this->skip_obj = $settings['WRITER']['skip_obj'];
         }
 
         // If OBJ_file_extension was not set in the configuration, default to tiff.
@@ -112,8 +118,8 @@ class CdmBooks extends Writer
         if ($OBJ_expected xor $no_datastreams_setting_flag) {
              $OBJFilesArray = $this->cdmNewspapersFileGetter
                  ->getIssueLocalFilesForOBJ($record_key);
-            // Array of paths to tiffs for OBJ for newspaper issue pages may not be sorted
-            // on some systems.  Sort.
+            // Array of paths to tiffs for OBJ for book pages may not be sorted
+            // on some systems.
             sort($OBJFilesArray);
         } else {
             // No OBJ source files
@@ -124,7 +130,7 @@ class CdmBooks extends Writer
         foreach ($pages as $page_pointer) {
             $sub_dir_num++;
 
-            // Create subdirectory for each page of newspaper issue
+            // Create subdirectory for each page of the book.
             $page_object_info = $this->fetcher->getItemInfo($page_pointer);
 
             //var_dump($page_object_info);
@@ -151,7 +157,7 @@ class CdmBooks extends Writer
 
             $page_dir = $issueObjectPath  . DIRECTORY_SEPARATOR . $directoryNumber;
             //var_dump($page_dir);
-            // Create a directory for each day of the newspaper.
+            // Create a directory for each book.
             if (!file_exists($page_dir)) {
                 mkdir($page_dir, 0777, true);
             }
@@ -178,8 +184,7 @@ class CdmBooks extends Writer
                 file_put_contents($ocr_output_file_path, $ocr);
             }
 
-            // Retrieve the file associated with the child-level object. In the case of
-            // the Chinese Times and some other newspapers, this is a JPEG2000 file.
+            // Retrieve the file associated with the page object.
             $JP2_expected = in_array('JP2', $this->datastreams);
             if ($JP2_expected xor $no_datastreams_setting_flag) {
                 $jp2_content = $this->cdmNewspapersFileGetter
@@ -205,7 +210,7 @@ class CdmBooks extends Writer
                 file_put_contents($thumbnail_output_file_path, $thumbnail_content);
                 if ($sub_dir_num == 1) {
                     // Use the first thumbnail for the first page as thumbnail for the
-                    // entire newspaper issue.
+                    // entire book.
                     $book_thumbnail_path = $issueObjectPath  . DIRECTORY_SEPARATOR . 'TN.jpg';
                     copy($thumbnail_output_file_path, $book_thumbnail_path);
                 }
@@ -351,7 +356,7 @@ class CdmBooks extends Writer
         while (file_exists($issueObjectPath) == true) {
             // log that the issue directory already exists and may indicate that the
             // book may already exit in the output directory or that more than one Cdm
-            // pointer refers to the same newspaper issue (multiple Cdm upload for same
+            // pointer refers to the same book (multiple Cdm upload for same
             // book).
             $this->log->addInfo(
                 "CdmBook writer",
