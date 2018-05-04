@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\writers;
+
 use Monolog\Logger;
 
 class CsvCompound extends Writer
@@ -32,7 +33,8 @@ class CsvCompound extends Writer
     public function __construct($settings)
     {
         parent::__construct($settings);
-        $this->fetcher = new \mik\fetchers\Csv($settings);
+        $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];
+        $this->fetcher = new $fetcherClass($settings);
         $fileGetterClass = 'mik\\filegetters\\' . $settings['FILE_GETTER']['class'];
         $this->fileGetter = new $fileGetterClass($settings);
         $metadataParserClass = 'mik\\metadataparsers\\' . $settings['METADATA_PARSER']['class'];
@@ -42,26 +44,33 @@ class CsvCompound extends Writer
         $this->compound_directory_field = $settings['FILE_GETTER']['compound_directory_field'];
         $this->child_key = $settings['FETCHER']['child_key'];
         $this->child_title = $settings['WRITER']['child_title'];
-        // Default is to derive child sequence number by splitting filename on '_'.
+        // Default is to derive child sequence number by splitting filename on '-'.
         if (isset($settings['WRITER']['child_sequence_separator'])) {
             $this->child_sequence_separator = $settings['WRITER']['child_sequence_separator'];
-        }
-        else {
-            $this->child_sequence_separator = '_';
+        } else {
+            $this->child_sequence_separator = '-';
         }
         // Default is to generate page-level MODS.xml files.
         if (isset($settings['WRITER']['generate_child_modsxml'])) {
             $this->generate_child_modsxml = $settings['WRITER']['generate_child_modsxml'];
-        }
-        else {
+        } else {
             $this->generate_child_modsxml = true;
+        }
+
+        // Default minimum child count is 2.
+        if (isset($settings['WRITER']['min_children'])) {
+            $this->min_children = $settings['WRITER']['min_children'];
+        } else {
+            $this->min_children = 2;
         }
 
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_log'];
         $this->log = new \Monolog\Logger('Writer');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::INFO);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::INFO
+        );
         $this->log->pushHandler($this->logStreamHandler);
     }
 
@@ -78,6 +87,19 @@ class CsvCompound extends Writer
      */
     public function writePackages($metadata, $children, $record_id)
     {
+        if (count($children) < $this->min_children) {
+            $this->log->addError(
+                "Number of child files is lower than configured minimum",
+                array(
+                    'record ID' => $record_id,
+                    'number of child files' => count($children),
+                    'configured minimum' => $this->min_children
+                )
+            );
+            $this->problemLog->addError($record_id);
+            return;
+        }
+
         // If there were no datastreams explicitly set in the configuration,
         // set flag so that all datastreams in the writer class are run.
         // $this->datastreams is an empty array by default.
@@ -92,18 +114,36 @@ class CsvCompound extends Writer
         // for rows that contain child metadata.
         $cpd_item_info = $this->fetcher->getItemInfo($record_id);
         $MODS_expected = in_array('MODS', $this->datastreams);
+
         $cpd_input_dir = $this->fileGetter->getCpdSourcePath($record_id);
-        if (file_exists($cpd_input_dir) && strlen($cpd_item_info->{$this->child_key}) === 0) {
-            $cpd_output_dir = $this->output_directory . DIRECTORY_SEPARATOR .
-                $cpd_item_info->{$this->compound_directory_field};
+
+        if ($this->inputValidator->validateInputType == 'realtime' && $this->inputValidator->validateInput) {
+            if (!$this->inputValidator->validatePackage($record_id, $cpd_input_dir)) {
+                $this->problemLog->addError($record_id);
+                return;
+            }
+        }
+
+        $cpd_output_dir = $this->output_directory . DIRECTORY_SEPARATOR .
+            $cpd_item_info->{$this->compound_directory_field};
+
+        // Allow source file to not exist if 'MODS' is the only member of
+        // $this->datastreams (to allow for testing).
+        if ($this->datastreams == array('MODS')) {
             if (!file_exists($cpd_output_dir)) {
                 mkdir($cpd_output_dir);
+                // Generate MODS for parent compound object.
+                $this->writeMetadataFile($metadata, $cpd_output_dir);
             }
+        } else {
+            if (file_exists($cpd_input_dir) && strlen($cpd_item_info->{$this->child_key}) === 0) {
+                if (!file_exists($cpd_output_dir)) {
+                    mkdir($cpd_output_dir);
+                }
 
-            if ($MODS_expected xor $no_datastreams_setting_flag) {
-                if (file_exists($cpd_output_dir)) {
+                if ($MODS_expected xor $no_datastreams_setting_flag) {
                     if (file_exists($cpd_output_dir)) {
-                        // Generate MODS for child for parent compound object.
+                        // Generate MODS for parent compound object.
                         $this->writeMetadataFile($metadata, $cpd_output_dir);
                     }
                 }
@@ -115,6 +155,12 @@ class CsvCompound extends Writer
         // them outside of the foreach child loop below.
         $child_item_info = $this->fetcher->getItemInfo($record_id);
         if (strlen($child_item_info->{$this->child_key})) {
+            // There are no input files so we can't create corresponding
+            // output directories.
+            if ($this->settings['FILE_GETTER']['input_directory'] == '' &&
+                $this->datastreams == array('MODS')) {
+                return;
+            }
             $sequence_number = $child_item_info->{$this->child_key};
             $cpd_output_dir = $this->output_directory . DIRECTORY_SEPARATOR .
                 $child_item_info->{$this->compound_directory_field};
@@ -131,6 +177,12 @@ class CsvCompound extends Writer
         // MODS file.
         $children_paths = $this->fileGetter->getChildren($record_id);
         foreach ($children_paths as $child_path) {
+            // There are no input files so we can't create corresponding
+            // output directories.
+            if ($this->settings['FILE_GETTER']['input_directory'] == '' &&
+                $this->datastreams == array('MODS')) {
+                return;
+            }
             $pathinfo = pathinfo($child_path);
             // Get the sequence number from the last segment of the child filename,
             // split on value of $this->child_sequence_separator.
@@ -181,8 +233,10 @@ class CsvCompound extends Writer
             $metadata_file_path = $path . DIRECTORY_SEPARATOR . $this->metadata_filename;
             $fileCreationStatus = file_put_contents($metadata_file_path, $metadata);
             if ($fileCreationStatus === false) {
-                $this->log->addWarning("There was a problem writing the compound-level metadata to a file",
-                    array('file' => $path));
+                $this->log->addWarning(
+                    "There was a problem writing the compound-level metadata to a file",
+                    array('file' => $path)
+                );
             }
         }
     }
@@ -212,8 +266,10 @@ class CsvCompound extends Writer
                 $sequence_number . DIRECTORY_SEPARATOR . $this->metadata_filename;
             $fileCreationStatus = file_put_contents($path, $metadata);
             if ($fileCreationStatus === false) {
-                $this->log->addWarning("There was a problem writing the child-level metadata to its file",
-                    array('file' => $path));
+                $this->log->addWarning(
+                    "There was a problem writing the child-level metadata to its file",
+                    array('file' => $path)
+                );
             }
             return;
         }
@@ -227,22 +283,29 @@ class CsvCompound extends Writer
             // compound object metadata made by metadata manipulators. The compound object's
             // MODS file is in the parent directory of the current child object (i.e., its
             // path minus the sequence number).
-            $sequence_directory_pattern = '#' . DIRECTORY_SEPARATOR . $sequence_number . '#';
-            $compound_mods_path = preg_replace($sequence_directory_pattern, '', $path);
+            $compound_mods_dir = dirname($path);
             // Get the first title element from the compound object's MODS.
             $dom = new \DOMDocument;
-            $dom->load($compound_mods_path . DIRECTORY_SEPARATOR . $this->metadata_filename);
+            $dom->load($compound_mods_dir . DIRECTORY_SEPARATOR . $this->metadata_filename);
             $xpath = new \DOMXPath($dom);
             $titles = $xpath->query("//mods:titleInfo/mods:title");
             $parent_title = $titles->item(0)->nodeValue;
             $child_title = preg_replace('/%parent_title%/', $parent_title, $child_title);
+            $child_title = htmlspecialchars($child_title, ENT_NOQUOTES|ENT_XML1);
         }
         if (preg_match('/%sequence_number%/', $this->child_title)) {
             $child_title = preg_replace('/%sequence_number%/', ltrim($sequence_number, '0'), $child_title);
         }
 
+        $namespace = sprintf(
+            'xmlns="%s" xmlns:mods="%s" xmlns:xsi="%s" xmlns:xlink="%s"',
+            "http://www.loc.gov/mods/v3",
+            "http://www.loc.gov/mods/v3",
+            "http://www.w3.org/2001/XMLSchema-instance",
+            "http://www.w3.org/1999/xlink"
+        );
         $child_mods = <<<EOQ
-<mods xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink">
+<mods {$namespace}>
   <titleInfo>
     <title>{$child_title}</title>
   </titleInfo>
@@ -257,10 +320,11 @@ EOQ;
         if ($path !='') {
             $fileCreationStatus = file_put_contents($path, $metadata);
             if ($fileCreationStatus === false) {
-                $this->log->addWarning("There was a problem writing the child-level metadata to its file",
-                    array('file' => $path));
+                $this->log->addWarning(
+                    "There was a problem writing the child-level metadata to its file",
+                    array('file' => $path)
+                );
             }
         }
     }
-
 }

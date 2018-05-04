@@ -28,17 +28,23 @@ $cmd->option('config')
 $cmd->option('checkconfig')
     ->aka('cc')
     ->describedAs("Applies checks to configuration, does not process objects. " .
-        "Must be one of 'snippets', 'urls', 'paths', 'aliases', " .
-        "'input_directories', 'csv', or 'all'.")
-    ->must(function($cc_option) {
+          "Must be one of 'snippets', 'urls', 'paths', 'aliases', " .
+          "'input_directories', 'csv', or 'all'.")
+    ->must(function ($cc_option) {
         $cc_options = array('snippets', 'urls', 'paths', 'aliases', 'input_directories', 'csv', 'all');
         return in_array($cc_option, $cc_options);
     });
 
+$cmd->option('ignore_null_mappings')
+    ->aka('i')
+    ->describedAs('Ingore validating null mappings. If omitted, null mappings will be validated.')
+    ->boolean()
+    ->default(false);
+
 $cmd->option('limit')
     ->aka('l')
     ->describedAs('Number of objects to process. If omitted, all objects will be processed.')
-    ->must(function($limit_value) {
+    ->must(function ($limit_value) {
         return preg_match('/^\d+$/', $limit_value);
     });
 
@@ -49,7 +55,7 @@ $settings = $mikConfig->settings;
 echo "Commencing MIK." . PHP_EOL;
 
 if ($cmd['checkconfig']) {
-    $mikConfig->validate($cmd['checkconfig']);
+    $mikConfig->validate($cmd);
 }
 
 if ($cmd['limit']) {
@@ -79,23 +85,24 @@ if ($onWindows) {
 // it will create an E_WARNING, which will be turned into an excption
 // in the set_error_handler function halting the program.
 // Provide a default timezone if date.timezone is null in the the PHP INI.
-// Load [SYSTEM] stettings for user-defined default timeszone using config path
-$system_settings = parse_ini_file($configPath, true)['SYSTEM'];
-if (ini_get('date.timezone') == null || isset($system_settings['date_default_timezone'])) {
-    if(isset($system_settings['date_default_timezone'])){
-        $date_timezone = $system_settings['date_default_timezone'];
+// Load [SYSTEM] settings for user-defined default timezone using config path
+if (ini_get('date.timezone') == null || (
+        isset($settings['SYSTEM']) && isset($settings['SYSTEM']['date_default_timezone']))
+) {
+    if (isset($settings['SYSTEM']) && isset($settings['SYSTEM']['date_default_timezone'])) {
+        $date_timezone = $settings['SYSTEM']['date_default_timezone'];
         date_default_timezone_set($date_timezone);
     } else {
         // Use a default time-zone.
         date_default_timezone_set('America/Vancouver');
     }
-};
+}
 
 // Converts all errors into Exceptions.
 // Set here so that you can pass the configuration settings to the MIK Error Exception class.
 set_error_handler(
-    function ($severity, $file, $line, $message, $code) use ($settings) {
-        throw new mik\exceptions\MikErrorException($severity, $file, $line, $message, $code, $settings);
+    function ($severity, $message, $file, $line, $code) use ($settings) {
+        throw new mik\exceptions\MikErrorException($severity, $message, $file, $line, $code, $settings);
     }
 );
 
@@ -122,6 +129,40 @@ $logInfo->addInfo($startTimeMessage);
 $fetcherClass = 'mik\\fetchers\\' . $settings['FETCHER']['class'];
 $fetcher = new $fetcherClass($settings);
 $numRecs = $fetcher->getNumRecs();
+
+// Instantiate input validator class for 'strict' mode validation. By convention,
+// input validators are named the same as the file getter class, but we provide
+// the option to use custom validators. In 'realtime' mode the input validator
+// is invoked in the Writer class, not here.
+if (isset($settings['FILE_GETTER']['input_validator_class'])) {
+    $input_validator_class = $settings['FILE_GETTER']['input_validator_class'];
+} else {
+    $input_validator_class = $settings['FILE_GETTER']['class'];
+}
+try {
+    $inputValidatorClass = 'mik\\inputvalidators\\' . $input_validator_class;
+    if (isset($settings['FILE_GETTER']['validate_input_type']) &&
+        $settings['FILE_GETTER']['validate_input_type'] == 'strict') {
+        if (class_exists($inputValidatorClass)) {
+            $inputValidator = new $inputValidatorClass($settings);
+            if ($inputValidator->validateInput) {
+                $validation_results = $inputValidator->validateAll();
+                if (in_array(false, $validation_results)) {
+                    print "Input validation (strict mode) failed; details in " . $inputValidator->pathToLog . "\n";
+                    exit(1);
+                }
+            }
+        }
+    }
+} catch (Exception $exception) {
+    $log->addError(
+        'ErrorException',
+        array(
+          'message'=>'problem instantiating inputValidatorClass',
+          'details'=>$exception
+        )
+    );
+}
 
 // Instantiate fileGetter class.
 try {
@@ -193,6 +234,11 @@ try {
 
 $record_num = 0;
 foreach ($records as $record) {
+    $record_num++;
+    if (!is_null($limit) && $record_num > $limit) {
+        break;
+    }
+
     $record_key = $record->key;
     if (strlen($record_key) == 0) {
         continue;
@@ -255,7 +301,6 @@ foreach ($records as $record) {
         continue;
     }
 
-    $record_num++;
     if ($onWindows) {
         print '.';
     } else {
@@ -267,19 +312,30 @@ foreach ($records as $record) {
         $config_path = realpath($configPath);
         if (count($children)) {
             $children_record_ids = implode(',', $children);
-        }
-        else {
+        } else {
             // If there are no children record IDs, pass a null
             // string as a placeholder.
             $children_record_ids = 'null';
         }
         foreach ($settings['WRITER']['postwritehooks'] as $hook) {
-          $cmd = "$hook $record_key $children_record_ids $config_path";
-          $process = new BackgroundProcess($cmd);
-          $process->run();
+            $cmd = "$hook $record_key $children_record_ids $config_path";
+            $process = new BackgroundProcess($cmd);
+            $process->run();
         }
     }
 }
+
+// Run any shutdown hooks.
+if (isset($settings['WRITER']['shutdownhooks'])) {
+    echo PHP_EOL;
+    foreach ($settings['WRITER']['shutdownhooks'] as $hook) {
+        $cmd = sprintf("%s %s", $hook, realpath($configPath));
+        echo "Running shutdown hook # $hook" . PHP_EOL;
+        exec($cmd);
+    }
+    echo PHP_EOL;
+}
+
 
 echo "Done. Output packages are in " . $settings['WRITER']['output_directory'] .
     ". Log is at "  . $settings['LOGGING']['path_to_log'] . "\n";

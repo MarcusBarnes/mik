@@ -6,11 +6,6 @@ class Cdm extends Fetcher
 {
 
     /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
-
-    /**
      * @var string $key - record identifier, id, key
      * For CONTENTdm, this is the pointer CONTENTdm property.
      * For csv input, this may be the row number.
@@ -31,7 +26,7 @@ class Cdm extends Fetcher
      *
      */
     protected $last_rec = 0;
-    
+
     /**
      *
      */
@@ -77,14 +72,15 @@ class Cdm extends Fetcher
 
         if (isset($settings['MANIPULATORS']['fetchermanipulators'])) {
             $this->fetchermanipulators = $settings['MANIPULATORS']['fetchermanipulators'];
-        }
-        else {
+        } else {
             $this->fetchermanipulators = null;
         }
 
         if (!$this->createTempDirectory()) {
-            $this->log->addError("Cdm fetcher",
-                array('Cannot create temp_directory' => $this->tempDirectory));
+            $this->log->addError(
+                "Cdm fetcher",
+                array('Cannot create temp_directory' => $this->tempDirectory)
+            );
         }
     }
 
@@ -102,8 +98,8 @@ class Cdm extends Fetcher
     {
         $totalRecs = $this->getNumRecs();
         // Account for CONTENTdm's limit of only returning 1024 records per
-        // query. We add one chunk, then round down using sprintf().        
-        $num_chunks = $totalRecs / $this->chunk_size + 1; 
+        // query. We add one chunk, then round down using sprintf().
+        $num_chunks = $totalRecs / $this->chunk_size + 1;
         $num_chunks = sprintf('%d', $num_chunks);
 
         // Limit the number of records.
@@ -116,13 +112,13 @@ class Cdm extends Fetcher
             // so the number of chunks is 1.
             $num_chunks = 1;
         }
-        
-        if($limit > 1024) {
+
+        if ($limit > 1024) {
             echo "The optional limit argument must not exceed 1024 when fetching data from CONTENTdm.";
             echo PHP_EOL . "Terminating MIK processing." . PHP_EOL;
             exit();
         }
-        
+
         $qm = $this->browseQueryMap;
         $output = new \StdClass();
         $output->records = array();
@@ -147,7 +143,7 @@ class Cdm extends Fetcher
         }
         return $output;
     }
-    
+
     /**
      * Adds key property to record properties.
      * In the case of CONTENTdm, this will be the value of the pointer property.
@@ -160,7 +156,6 @@ class Cdm extends Fetcher
         $arrayOfRecordObjects = array();
 
         foreach ($propertiesOfRecordsObj->records as $recordProperties) {
-
             if (isset($recordProperties->pointer)) {
                 $record_key = $this->key;
                 $recordProperties->key = $recordProperties->$record_key;
@@ -191,16 +186,15 @@ class Cdm extends Fetcher
             // @todo: Log failure.
             return false;
         }
-
     }
-    
+
     /**
      * Gets the item's info from CONTENTdm.
      *
      * @param string $pointer
      *  The CONTENTdm pointer for the current object.
      *
-     * @return array|bool 
+     * @return array|bool
      */
     public function getItemInfo($pointer)
     {
@@ -213,8 +207,7 @@ class Cdm extends Fetcher
             $response = file_get_contents($queryUrl);
             $itemInfo = json_decode($response, true);
             file_put_contents($raw_metadata_cache, serialize($itemInfo));
-        }
-        else {
+        } else {
             $itemInfo = unserialize(file_get_contents($raw_metadata_cache));
         }
         if (is_array($itemInfo)) {
@@ -237,8 +230,7 @@ class Cdm extends Fetcher
         $results = $this->queryContentdm($limit);
         if ($this->fetchermanipulators) {
             $filtered_records = $this->applyFetchermanipulators($results->records);
-        }
-        else {
+        } else {
             $filtered_records = $results->records;
         }
         return $filtered_records;
@@ -258,5 +250,4 @@ class Cdm extends Fetcher
         }
         return $records;
     }
-
 }

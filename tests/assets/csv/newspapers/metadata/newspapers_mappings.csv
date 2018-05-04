@@ -1,0 +1,6 @@
+"Issue Title","<titleInfo><title>%value%</title></titleInfo>",   
+"Date","<originInfo><dateIssued encoding='w3cdtf' keyDate='yes'>%value%</dateIssued></originInfo>",
+"Identifier","<identifier type='local'>%value%</identifier>",
+"null0","<accessCondition type='use and reproduction'>Public domain</accessCondition>",
+"null1","<genre authority='lcgft'>newspapers</genre>",
+"null2","<typeOfResource>text</typeOfResource>",

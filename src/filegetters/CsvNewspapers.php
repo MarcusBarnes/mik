@@ -5,11 +5,6 @@ namespace mik\filegetters;
 class CsvNewspapers extends FileGetter
 {
     /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
-
-    /**
      * @var array allowed_file_extensions_for_OBJ - array of file extensions when searching
      * for master files (for OBJ datastreams).
      */
@@ -22,7 +17,7 @@ class CsvNewspapers extends FileGetter
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FILE_GETTER'];
+        parent::__construct($settings);
         $this->input_directory = $this->settings['input_directory'];
         $this->file_name_field = $this->settings['file_name_field'];
         $this->fetcher = new \mik\fetchers\Csv($settings);
@@ -44,12 +39,15 @@ class CsvNewspapers extends FileGetter
      */
     public function getChildren($record_key)
     {
+        $item_info = $this->fetcher->getItemInfo($record_key);
+        $issue_directory = $item_info->{$this->file_name_field};
+
         $page_paths = array();
         $issue_input_path = $this->getIssueSourcePath($record_key);
         foreach ($this->OBJFilePaths as $paths) {
             foreach ($paths as $path) {
-                // If there's a match, we expect it to start at position 0.
-                if (strpos($path, $issue_input_path) === 0) {
+                $current_issue_dirname = dirname($path);
+                if ($current_issue_dirname === $this->input_directory . DIRECTORY_SEPARATOR . $issue_directory) {
                     $page_paths[] = $path;
                 }
             }
@@ -70,10 +68,14 @@ class CsvNewspapers extends FileGetter
      */
     private function getMasterFiles($inputDirectory, $allowedFileTypes)
     {
+        if ($inputDirectory == '') {
+            return array();
+        }
+
         // Use a static cache to avoid building the source path list
         // multiple times.
         static $potentialObjFiles;
-        if (!isset($potentialObjFiles)) {
+        if (!isset($potentialObjFiles) || $this->use_cache === false) {
             $potentialObjFiles = array();
             $potentialFilesArray = array();
             $iterator = new \RecursiveDirectoryIterator($inputDirectory);
@@ -148,8 +150,8 @@ class CsvNewspapers extends FileGetter
         // Get the path to the issue.
         $item_info = $this->fetcher->getItemInfo($record_key);
         $issue_directory = $item_info->{$this->file_name_field};
-        $escaped_issue_directory = preg_replace('/\-/', '\-', $issue_directory);
-        $directory_regex = '#' . DIRECTORY_SEPARATOR . $escaped_issue_directory . DIRECTORY_SEPARATOR . '#';
+        $directory_regex = '#' . DIRECTORY_SEPARATOR . $issue_directory . DIRECTORY_SEPARATOR . '#';
+        $directory_regex = preg_quote($directory_regex);
         foreach ($this->OBJFilePaths as $paths) {
             foreach ($paths as $path) {
                 if (preg_match($directory_regex, $path)) {
@@ -158,5 +160,4 @@ class CsvNewspapers extends FileGetter
             }
         }
     }
-
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\fetchermanipulators;
+
 use League\CLImate\CLImate;
 
 /**
@@ -32,7 +33,7 @@ class CdmSingleFileByExtension extends FetcherManipulator
     public function __construct($settings, $manipulator_settings)
     {
         array_shift($manipulator_settings);
-        $this->extensions = explode('|', $manipulator_settings[0]);
+        $this->extensions = explode(',', $manipulator_settings[0]);
         // To get the value of $onWindows.
         parent::__construct();
     }
@@ -70,8 +71,7 @@ class CdmSingleFileByExtension extends FetcherManipulator
                 $record_num++;
                 if ($this->onWindows) {
                     print '.';
-                }
-                else {
+                } else {
                     $progress->current($record_num);
                 }
             }
@@ -81,5 +81,4 @@ class CdmSingleFileByExtension extends FetcherManipulator
         }
         return $filtered_records;
     }
-
 }

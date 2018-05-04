@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\fetchermanipulators;
+
 use League\CLImate\CLImate;
 
 /**
@@ -38,6 +39,15 @@ class RandomSet extends FetcherManipulator
     public function __construct($settings, $manipulator_settings)
     {
         $this->setSize = $manipulator_settings[1];
+        if (isset($manipulator_settings[2])) {
+            $this->outputFile = $manipulator_settings[2];
+            $now = date("F j, Y, g:i a");
+            $message = "# Output of the MIK Random Set fetcher manipulator, generated $now" . PHP_EOL;
+            if (file_exists($this->outputFile)) {
+                $message = PHP_EOL . $message;
+            }
+            file_put_contents($this->outputFile, $message, FILE_APPEND);
+        }
         // To get the value of $onWindows.
         parent::__construct();
     }
@@ -68,11 +78,21 @@ class RandomSet extends FetcherManipulator
             if (in_array($record_num, $randomSet)) {
                 $filtered_records[] = $record;
             }
+
+            if (isset($this->outputFile)) {
+                if ($record_num < count($randomSet) - 1) {
+                    $record->key = $record->key . PHP_EOL;
+                    file_put_contents($this->outputFile, $record->key, FILE_APPEND);
+                }
+                if ($record_num === count($randomSet)) {
+                    file_put_contents($this->outputFile, $record->key, FILE_APPEND);
+                }
+            }
+
             $record_num++;
             if ($this->onWindows) {
                 print '.';
-            }
-            else {
+            } else {
                 $progress->current($record_num);
             }
         }
@@ -118,7 +138,7 @@ class RandomSet extends FetcherManipulator
             // if we need some extras for making up a full $set. We
             // reset the indexes of this array before we pass it off
             // to getExtraRandom().
-            $unchosen_record_nums = array_values($unchosen_record_nums);            
+            $unchosen_record_nums = array_values($unchosen_record_nums);
             $extras = $this->getExtraRandom($unchosen_record_nums, $shortfall);
             sort($randomSet, SORT_NUMERIC);
             $randomSet = array_merge($randomSet, $extras);
@@ -146,6 +166,5 @@ class RandomSet extends FetcherManipulator
         shuffle($discards);
         $flipped_discards = array_flip($discards);
         return (array) array_rand($flipped_discards, $quantity);
-    }    
-
+    }
 }

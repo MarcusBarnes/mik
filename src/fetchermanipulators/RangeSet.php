@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\fetchermanipulators;
+
 use League\CLImate\CLImate;
 use \Monolog\Logger;
 
@@ -36,7 +37,7 @@ use \Monolog\Logger;
  * fetchermanipulators[] = "RangeSet|50,100".
  *
  * This example selects a set of 50 records starting at
- * the 100th record in the entire set of records. 
+ * the 100th record in the entire set of records.
  */
 
 class RangeSet extends FetcherManipulator
@@ -57,8 +58,7 @@ class RangeSet extends FetcherManipulator
         $this->settings = $settings;
         if (preg_match('/\|/', $manipulator_settings[1])) {
             $parameters = explode('|', $manipulator_settings[1]);
-        }
-        else {
+        } else {
             $parameters = array($manipulator_settings[1]);
         }
 
@@ -68,8 +68,10 @@ class RangeSet extends FetcherManipulator
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
         $this->log = new \Monolog\Logger('config');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::INFO);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::INFO
+        );
         $this->log->pushHandler($this->logStreamHandler);
     }
 
@@ -93,18 +95,18 @@ class RangeSet extends FetcherManipulator
 
         // Determine what type of range test we will apply.
         if (preg_match('/^>/', $this->range)) {
-            $filter = 'greaterThan';        
+            $filter = 'greaterThan';
         }
         if (preg_match('/^</', $this->range)) {
-            $filter = 'lessThan';        
+            $filter = 'lessThan';
         }
         if (preg_match('/@/', $this->range)) {
-            $filter = 'between';        
+            $filter = 'between';
         }
         // The limit filter uses position in full record set,
         // not value of record key.
         if (preg_match('/,/', $this->range)) {
-            $filter = 'limit';        
+            $filter = 'limit';
         }
 
         $record_num = 0;
@@ -117,8 +119,7 @@ class RangeSet extends FetcherManipulator
 
             if ($this->onWindows) {
                 print '.';
-            }
-            else {
+            } else {
                 $progress->current($record_num);
             }
         }
@@ -129,13 +130,13 @@ class RangeSet extends FetcherManipulator
 
         if (count($filtered_records) === 0) {
             $this->log->addError("RangeSet", array(
-                'Empty record set' => "The range " . $this->range . " has filtered out all records.")
-            );
+                'Empty record set' => "The range " . $this->range . " has filtered out all records."));
         }
         return $filtered_records;
     }
 
-    public function greaterThan($record_key, $range) {
+    public function greaterThan($record_key, $range)
+    {
         $boundary = substr($range, 1);
         $score = strnatcmp($record_key, $boundary);
         if ($score > 0) {
@@ -143,7 +144,8 @@ class RangeSet extends FetcherManipulator
         }
     }
 
-    public function lessThan($record_key, $range) {
+    public function lessThan($record_key, $range)
+    {
         $boundary = substr($range, 1);
         $score = strnatcmp($record_key, $boundary);
         if ($score < 0) {
@@ -151,14 +153,16 @@ class RangeSet extends FetcherManipulator
         }
     }
 
-    public function between($record_key, $range) {
+    public function between($record_key, $range)
+    {
         list($lower_boundary, $upper_boundary) = explode('@', $range);
         if (strnatcmp($record_key, $lower_boundary) > 0 && strnatcmp($record_key, $upper_boundary) < 0) {
             return true;
         }
     }
 
-    public function limit($record_key, $range, $recnum) {
+    public function limit($record_key, $range, $recnum)
+    {
         list($limit, $offset) = explode(',', $range);
         static $limit_count = 1;
         if ($recnum >= $offset && $limit_count <= $limit) {
@@ -166,5 +170,4 @@ class RangeSet extends FetcherManipulator
             return true;
         }
     }
-
 }

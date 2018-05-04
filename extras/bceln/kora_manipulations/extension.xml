@@ -1,0 +1,8 @@
+{% if degree_level %}
+<extension xmlns:etd="http://www.ndltd.org/standards/metadata/etdms/1.0">
+	<etd:degree>
+		<etd:level>{{ degree_level }}</etd:level>
+		<etd:discipline>{{ etd_department }}</etd:discipline>
+	</etd:degree>
+</extension>
+{% endif %}

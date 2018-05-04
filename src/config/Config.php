@@ -34,12 +34,27 @@ class Config
         // Default Mac PHP setups may use Apple's Secure Transport
         // rather than OpenSSL, causing issues with CA verification.
         // Allow configuration override of CA verification at users own risk.
-        if (isset($this->settings['SYSTEM']['verify_ca']) ){
-            if($this->settings['SYSTEM']['verify_ca'] == false){
-              $this->verifyCA = false;
+        if (isset($this->settings['SYSTEM']['verify_ca'])) {
+            if ($this->settings['SYSTEM']['verify_ca'] == false) {
+                $this->verifyCA = false;
             }
         } else {
             $this->verifyCA = true;
+        }
+
+        // Define some options for the CSV fetcher.
+        if (isset($this->settings['FETCHER']['field_delimiter'])) {
+            $this->csv_field_delimiter = $this->settings['FETCHER']['field_delimiter'];
+        } else {
+            $this->csv_field_delimiter = ',';
+        }
+        // Default enclosure is double quotation marks.
+        if (isset($this->settings['FETCHER']['field_enclosure'])) {
+            $this->csv_field_enclosure = $this->settings['FETCHER']['field_enclosure'];
+        }
+        // Default escape character is \.
+        if (isset($this->settings['FETCHER']['escape_character'])) {
+            $this->csv_escape_character = $this->settings['FETCHER']['escape_character'];
         }
 
         if (count($this->settings['CONFIG'])) {
@@ -52,14 +67,15 @@ class Config
     /**
      * Wrapper function for calling other functions that validate configuration data.
      *
-     * @param $type string
-     *   One of 'of 'snippets', 'urls', 'paths', 'aliases', 'input_directories', or 'all'.
+     * @param $cmd object
+     *   The Commando command object.
      */
-    public function validate($type = 'all')
+    public function validate($cmd)
     {
-        switch ($type) {
+        // One of 'of 'snippets', 'urls', 'paths', 'aliases', 'input_directories', or 'all'.
+        switch ($cmd['checkconfig']) {
             case 'all':
-                $this->checkMappingSnippets();
+                $this->checkMappingSnippets($cmd);
                 $this->checkPaths();
                 $this->checkOaiEndpoint();
                 $this->checkAliases();
@@ -69,7 +85,7 @@ class Config
                 exit;
                 break;
             case 'snippets':
-                $this->checkMappingSnippets();
+                $this->checkMappingSnippets($cmd);
                 exit;
                 break;
             case 'urls':
@@ -85,11 +101,11 @@ class Config
                 $this->checkAliases();
                 exit;
                 break;
-            case 'input_directories';
+            case 'input_directories':
                 $this->checkInputDirectories();
                 exit;
                 break;
-            case 'csv';
+            case 'csv':
                 $this->checkCsvFile();
                 exit;
                 break;
@@ -101,10 +117,10 @@ class Config
     /**
      * Tests metadata mapping snippets for well-formedness.
      */
-    public function checkMappingSnippets()
+    public function checkMappingSnippets($cmd)
     {
-        $fetchers = array('Cdm', 'Csv');
-        if (!in_array($this->settings['FETCHER']['class'], $fetchers)) {
+        $parsers = array('mods\CsvToMods', 'mods\CdmToMods');
+        if (!in_array($this->settings['METADATA_PARSER']['class'], $parsers)) {
             return;
         }
 
@@ -117,8 +133,11 @@ class Config
 
         $reader = Reader::createFromPath($path);
         foreach ($reader as $index => $row) {
-            if (count($row) > 1) {
-                if (strlen($row[1])) {
+            if ($cmd['ignore_null_mappings'] && preg_match('/^null/', $row[1])) {
+                continue;
+            }
+            if (count($row) > 1 && !preg_match('/^#/', $row[0])) {
+                if (strlen($row[0])) {
                     $doc = new \DOMDocument();
                     if (!@$doc->loadXML($row[1])) {
                         exit("Error: Mapping snippet $row[1] appears to be not well formed\n");
@@ -155,12 +174,12 @@ class Config
                     try {
                         $response = $client->get($value, ['verify' => $this->verifyCA]);
                         $code = $response->getStatusCode();
-                    }
-                    catch (RequestException $e) {
+                    } catch (RequestException $e) {
                         if ($key == 'utils_url') {
                             $value = preg_replace('/getthumbnail$/', '', $value);
                         }
-                        exit("Error: The URL $value (defined in configuration setting $key) appears to be a bad URL (response code $code).\n");
+                        exit("Error: The URL $value (defined in configuration setting $key) appears" .
+                            "to be a bad URL (response code $code).\n");
                     }
                 }
             }
@@ -183,8 +202,7 @@ class Config
         try {
             $response = $client->get($base_url);
             $code = $response->getStatusCode();
-        }
-        catch (RequestException $e) {
+        } catch (RequestException $e) {
             exit("Error: The OAI endpoint URL $base_url appears to be invalid.\n");
         }
         print "URLs are OK\n";
@@ -200,7 +218,8 @@ class Config
             foreach ($section as $key => $value) {
                 if (preg_match('/(_path|_directory)$/', $key) && strlen($value)) {
                     if (!file_exists($value)) {
-                        print "The path $value (defined in configuration setting $key) does not exist but will be created for you.\n";
+                        print "The path $value (defined in configuration setting $key) does not exist but will be " .
+                            "created for you.\n";
                     }
                 }
             }
@@ -234,8 +253,7 @@ class Config
         if (count($aliases) > 1) {
             $aliases_string = trim(implode(', ', $aliases));
             exit("Error: The values for CONTENTdm 'alias' settings are not unique: $aliases_string.\n");
-        }
-        else {
+        } else {
             print "CONTENTdm aliases are OK\n";
         }
     }
@@ -245,27 +263,26 @@ class Config
      *
      * See https://github.com/MarcusBarnes/mik/issues/169
      */
-     public function checkInputDirectories()
-     {
+    public function checkInputDirectories()
+    {
         // For Cdm toolchains, where multiple input directories are allowed.
-        $filegetters = array('CdmNewspapers', 'CdmSingleFile', 'CdmPhpDocuments');
+        $filegetters = array('CdmNewspapers', 'CdmBooks', 'CdmSingleFile', 'CdmPhpDocuments');
         if (in_array($this->settings['FILE_GETTER']['class'], $filegetters)) {
-            if (!isset($this->settings['FILE_GETTER']['input_directories'])) {
-                print "No input directories are defined in the FILE_GETTER section.\n";
-                return;
-            }
-            if (strlen($this->settings['FILE_GETTER']['input_directories'][0]) == 0) {
-                print "No input directories are defined in the FILE_GETTER section.\n";
-                return;
-            }
-            $input_directories = $this->settings['FILE_GETTER']['input_directories'];
-            foreach ($input_directories as $input_directory) {
-                if (!file_exists(realpath($input_directory))) {
-                    exit("Error: Can't find input directory $input_directory\n");
-                }
+            if (isset($this->settings['FILE_GETTER']['input_directories'])) {
+                $input_dirs = $this->settings['FILE_GETTER']['input_directories'];
             }
 
-            print "Input directory paths are OK.\n";
+            if (is_array($input_dirs) && count($input_dirs)) {
+                $input_directories = $this->settings['FILE_GETTER']['input_directories'];
+                foreach ($input_directories as $input_directory) {
+                    if (!file_exists(realpath($input_directory))) {
+                        exit("Error: Can't find input directory $input_directory\n");
+                    }
+                }
+                print "Input directory paths are OK.\n";
+            } else {
+                print "No input directory paths are defined.\n";
+            }
         }
 
         // For Csv toolchains, where a single input directory is allowed.
@@ -286,7 +303,7 @@ class Config
 
             print "Input directory paths are OK.\n";
         }
-     }
+    }
 
     /**
      * Tests whether the CSV input file is valid.
@@ -302,6 +319,13 @@ class Config
 
         try {
             $reader = Reader::createFromPath($this->settings['FETCHER']['input_file']);
+            $reader->setDelimiter($this->csv_field_delimiter);
+            if (isset($this->csv_field_enclosure)) {
+                $reader->setEnclosure($this->csv_field_enclosure);
+            }
+            if (isset($this->csv_escape_character)) {
+                $reader->setEscape($this->csv_escape_character);
+            }
         } catch (Exception $re) {
             $csv_has_errors = true;
             print "Error creating CSV reader: " . $re->getMessage() . PHP_EOL;
@@ -329,6 +353,14 @@ class Config
         foreach ($rows as $row) {
             $row_num++;
             $columns_in_row = count($row);
+
+            // Empty row.
+            if ($columns_in_row == 1) {
+                print "Row $row_num in the CSV input file appears to be empty; this is OK, just reporting it " .
+                    "in case it's unintentional." . PHP_EOL;
+                continue;
+            }
+
             if ($columns_in_row != $num_header_columns) {
                 $csv_has_errors = true;
                 print "Error with CSV input file: it appears that row $row_num does not have " .
@@ -340,5 +372,4 @@ class Config
             print "CSV input file appears to be OK.". PHP_EOL;
         }
     }
-
 }

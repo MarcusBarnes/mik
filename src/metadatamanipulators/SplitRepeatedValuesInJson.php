@@ -6,10 +6,11 @@
  * JSON metadata.
  *
  * Applies to the demonstration CsvToJson toolchain only. Not intended for production.
- * 
+ *
  */
 
 namespace mik\metadatamanipulators;
+
 use \Monolog\Logger;
 
 /**
@@ -24,7 +25,7 @@ class SplitRepeatedValuesInJson extends MetadataManipulator
     /**
      * Create a new metadata manipulator instance.
      */
-    public function __construct($settings = null, $paramsArray, $record_key)
+    public function __construct($settings, $paramsArray, $record_key)
     {
         parent::__construct($settings, $paramsArray, $record_key);
         $this->record_key = $record_key;
@@ -32,15 +33,16 @@ class SplitRepeatedValuesInJson extends MetadataManipulator
         // Set up logger.
         $this->pathToLog = $this->settings['LOGGING']['path_to_manipulator_log'];
         $this->log = new \Monolog\Logger('config');
-        $this->logStreamHandler = new \Monolog\Handler\StreamHandler($this->pathToLog,
-            Logger::INFO);
+        $this->logStreamHandler = new \Monolog\Handler\StreamHandler(
+            $this->pathToLog,
+            Logger::INFO
+        );
         $this->log->pushHandler($this->logStreamHandler);
 
         if (count($paramsArray) == 2) {
             $this->field_name = $paramsArray[0];
             $this->delimiter = $paramsArray[1];
-        }
-        else {
+        } else {
             $this->log->addInfo("SplitRepeatedValuesInJson", array('Wrong parameter count' => count($paramsArray)));
         }
     }
@@ -53,20 +55,19 @@ class SplitRepeatedValuesInJson extends MetadataManipulator
      * @return string
      *     Manipulated string
      */
-     public function manipulate($input)
-     {
-         if (preg_match('/' . $this->delimiter . '/', $input)) {
-             $return_array = explode($this->delimiter, $input);
-             $this->logSplit($input, $return_array);
-             foreach ($return_array as &$value) {
-                 $value = trim($value);
-             }
-             return $return_array;
-         }
-         else {
-             return $input;
-         }
-     }
+    public function manipulate($input)
+    {
+        if (preg_match('/' . $this->delimiter . '/', $input)) {
+            $return_array = explode($this->delimiter, $input);
+            $this->logSplit($input, $return_array);
+            foreach ($return_array as &$value) {
+                $value = trim($value);
+            }
+            return $return_array;
+        } else {
+            return $input;
+        }
+    }
 
     /**
      * Write a successful split operation to the manipulator log.
@@ -76,16 +77,16 @@ class SplitRepeatedValuesInJson extends MetadataManipulator
      * @param array
      *     The value after it has been manipulated (split).
      */
-     public function logSplit($source_value, $output)
-     {
-         $this->log->addInfo("SplitRepeatedValuesInJson",
-             array(
-                 'Record key' => $this->record_key,
-                 'Source field name' => $this->field_name,
-                 'Source value' => $source_value,
-                 'Output' => $output,
-             )
-         );
-     }
-
+    public function logSplit($source_value, $output)
+    {
+        $this->log->addInfo(
+            "SplitRepeatedValuesInJson",
+            array(
+               'Record key' => $this->record_key,
+               'Source field name' => $this->field_name,
+               'Source value' => $source_value,
+               'Output' => $output,
+            )
+        );
+    }
 }

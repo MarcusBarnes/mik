@@ -4,10 +4,6 @@ namespace mik\filegetters;
 
 class CsvCompound extends FileGetter
 {
-    /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
 
     /**
      * Create a new CSV Fetcher instance.
@@ -16,7 +12,7 @@ class CsvCompound extends FileGetter
      */
     public function __construct($settings)
     {
-        $this->settings = $settings['FILE_GETTER'];
+        parent::__construct($settings);
         $this->input_directory = $this->settings['input_directory'];
         $this->compound_directory_field = $this->settings['compound_directory_field'];
         $this->fetcher = new \mik\fetchers\Csv($settings);
@@ -64,5 +60,4 @@ class CsvCompound extends FileGetter
             $item_info->{$this->compound_directory_field};
         return $cpd_input_directory;
     }
-
 }

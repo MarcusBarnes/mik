@@ -29,11 +29,14 @@ class OaiToDc extends Dc
         $xml_doc = new \DOMDocument();
         $xml_doc->loadXML($objectInfo);
         $xpath = new \DOMXPath($xml_doc);
-        $xpath->registerNamespace("oai","http://www.openarchives.org/OAI/2.0/");
-        $xpath->registerNamespace("oai_dc","http://www.openarchives.org/OAI/2.0/oai_dc/");
+        $xpath->registerNamespace("oai", "http://www.openarchives.org/OAI/2.0/");
+        $xpath->registerNamespace("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
         $result = $xpath->query('//oai:metadata/*', $xml_doc);
         $dc_xml_nodelist = $result->item(0);
         $dc_xml = $xml_doc->saveXML($dc_xml_nodelist);
+
+        $identifiers = $xml_doc->getElementsByTagNameNS('http://www.openarchives.org/OAI/2.0/', 'identifier');
+        $record_key = urlencode($identifiers->item(0)->nodeValue);
 
         if (!is_null($this->metadatamanipulators)) {
             $dc_xml = $this->applyMetadatamanipulators($dc_xml, $record_key);
@@ -43,30 +46,32 @@ class OaiToDc extends Dc
     }
 
     /**
-     * @todo: Loop through the registered manipulators, just like wth Cdm and CSV,
-     *        but these manuipulators should apply to the entire XML document,
-     *        not snippets.
+     * Applies metadatamanipulators listed in the config to provided serialized XML document.
      *
-     * Applies metadatamanipulators listed in the config to provided XML snippet.
-     * @param string $xmlSnippet
-     *     An XML snippet that can be turned into a valid XML document.
+     * @param string $xml
+     *     The XML document as it was rendered by the Twig template.
+     * @param string $record_key
+     *   The current item's record_key.
+     *
      * @return string
-     *     XML snippet as string that whose nodes have been manipulated if applicable.
+     *     The modified XML document.
      */
-    private function applyMetadatamanipulators($xmlSnippet, $record_key)
+    private function applyMetadatamanipulators($xml, $record_key)
     {
         foreach ($this->metadatamanipulators as $metadatamanipulator) {
             $metadatamanipulatorClassAndParams = explode('|', $metadatamanipulator);
             $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
             $manipulatorParams = $metadatamanipulatorClassAndParams;
             $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
-            $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams,  $record_key);
-            $xmlSnippet = $metadatamanipulator->manipulate($xmlSnippet);
+            $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams, $record_key);
+            $modified_xml = $metadatamanipulator->manipulate($xml);
         }
-        return $xmlSnippet;
+
+        return $modified_xml;
     }
 
     /**
+     * {@inheritdoc}
      */
     public function metadata($record_key)
     {

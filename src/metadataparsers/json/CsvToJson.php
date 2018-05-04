@@ -18,7 +18,7 @@ class CsvToJson extends Json
      * @var array $metadatamanipulators - array of metadatamanimpulors from config.
      */
     public $metadatamanipulators;
-    
+
     /**
      * Create a new Metadata Instance
      *
@@ -40,13 +40,7 @@ class CsvToJson extends Json
     }
 
     /**
-     * Converts the object's metadata into JSON.
-     *
-     * @param object $objectInfo
-     *   The object's metadata.
-     *
-     * @return string
-     *   The serialized JSON version of the object's metadata.
+     * {@inheritdoc}
      */
     public function createJson($objectInfo)
     {
@@ -64,13 +58,9 @@ class CsvToJson extends Json
     }
 
     /**
-     * Gets the JSON metadata for a specific object.
+     * {@inheritdoc}
      *
-     * @param string $record_key
-     *   The object's record key.
-     *
-     * @return string
-     *   The serialized JSON version of the object's metadata.
+     * Returns the serialized JSON metadata as a string.
      */
     public function metadata($record_key)
     {
@@ -99,11 +89,14 @@ class CsvToJson extends Json
             $metadatamanipulatorClassName = array_shift($metadatamanipulatorClassAndParams);
             $manipulatorParams = $metadatamanipulatorClassAndParams;
             $metdataManipulatorClass = 'mik\\metadatamanipulators\\' . $metadatamanipulatorClassName;
-            $metadatamanipulator = new $metdataManipulatorClass($this->settings, $manipulatorParams,  $record_key, $field_name);
+            $metadatamanipulator = new $metdataManipulatorClass($this->settings,
+                $manipulatorParams,
+                $record_key,
+                $field_name
+            );
             $value = $metadatamanipulator->manipulate($value);
         }
 
         return $value;
     }
-
 }

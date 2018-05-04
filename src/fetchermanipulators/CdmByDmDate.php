@@ -1,6 +1,7 @@
 <?php
 
 namespace mik\fetchermanipulators;
+
 use GuzzleHttp\Client;
 use League\CLImate\CLImate;
 
@@ -29,8 +30,7 @@ class CdmByDmDate extends FetcherManipulator
     {
         if (preg_match('/\|/', $manipulator_settings[1])) {
             $parameters = explode('|', $manipulator_settings[1]);
-        }
-        else {
+        } else {
             $parameters = array($manipulator_settings[1]);
         }
 
@@ -44,9 +44,9 @@ class CdmByDmDate extends FetcherManipulator
         // Default Mac PHP setups may use Apple's Secure Transport
         // rather than OpenSSL, causing issues with CA verification.
         // Allow configuration override of CA verification at users own risk.
-        if (isset($this->settings['SYSTEM']['verify_ca']) ){
-            if($this->settings['SYSTEM']['verify_ca'] == false){
-              $this->verifyCA = false;
+        if (isset($this->settings['SYSTEM']['verify_ca'])) {
+            if ($this->settings['SYSTEM']['verify_ca'] == false) {
+                $this->verifyCA = false;
             }
         } else {
             $this->verifyCA = true;
@@ -86,18 +86,15 @@ class CdmByDmDate extends FetcherManipulator
                 if ($record->{$this->attribute} > $this->date) {
                     $filtered_records[] = $record;
                 }
-            }
-            elseif ($this->operator == '<') {
+            } elseif ($this->operator == '<') {
                 if ($record->{$this->attribute} < $this->date) {
                     $filtered_records[] = $record;
                 }
-            }
-            elseif ($this->operator == '==') {
+            } elseif ($this->operator == '==') {
                 if ($record->{$this->attribute} == $this->date) {
                     $filtered_records[] = $record;
                 }
-            }
-            // If the operator is unrecognized, do not filter records.
+            } // If the operator is unrecognized, do not filter records.
             else {
                 $filtered_records[] = $record;
             }
@@ -105,14 +102,13 @@ class CdmByDmDate extends FetcherManipulator
             $record_num++;
             if ($this->onWindows) {
                 print '.';
-            }
-            else {
+            } else {
                 $progress->current($record_num);
             }
-	}
+        }
 
-  	if ($this->onWindows) {
-	    print "\n";
+        if ($this->onWindows) {
+            print "\n";
         }
 
         return $filtered_records;
@@ -134,4 +130,3 @@ class CdmByDmDate extends FetcherManipulator
         return $dmmodified[0];
     }
 }
-

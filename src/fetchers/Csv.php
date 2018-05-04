@@ -1,14 +1,11 @@
 <?php
 
 namespace mik\fetchers;
+
 use League\Csv\Reader;
 
 class Csv extends Fetcher
 {
-    /**
-     * @var array $settings - configuration settings from confugration class.
-     */
-    public $settings;
 
     /**
      * @var array $fetchermanipulators - the fetchermanipulors from config,
@@ -32,8 +29,7 @@ class Csv extends Fetcher
         $this->record_key = $this->settings['record_key'];
         if (isset($settings['FETCHER']['field_delimiter'])) {
             $this->field_delimiter = $this->settings['field_delimiter'];
-        }
-        else {
+        } else {
             $this->field_delimiter = ',';
         }
 
@@ -48,21 +44,15 @@ class Csv extends Fetcher
 
         if (isset($settings['MANIPULATORS']['fetchermanipulators'])) {
             $this->fetchermanipulators = $settings['MANIPULATORS']['fetchermanipulators'];
-        }
-        else {
+        } else {
             $this->fetchermanipulators = null;
         }
 
-		if (!$this->createTempDirectory()) {
-		    $this->log->addError("CSV fetcher",
-                array('Cannot create temp_directory' => $e->getMessage()));
-		}
-
-        if (isset($settings['FETCHER']['use_cache'])) {
-            $this->use_cache = $settings['FETCHER']['use_cache'];
-        }
-        else {
-            $this->use_cache = true;
+        if (!$this->createTempDirectory()) {
+            $this->log->addError(
+                "CSV fetcher",
+                array('Cannot create temp_directory')
+            );
         }
     }
 
@@ -76,44 +66,49 @@ class Csv extends Fetcher
     */
     public function getRecords($limit = null)
     {
-
         // Use a static cache to avoid reading the CSV file multiple times.
         static $filtered_records;
         if (!isset($filtered_records) || $this->use_cache == false) {
             $inputCsv = Reader::createFromPath($this->input_file);
                 $inputCsv->setDelimiter($this->field_delimiter);
-                if (isset($this->field_enclosure)) {
-                    $inputCsv->setEnclosure($this->field_enclosure);
-                }
-                if (isset($this->escape_character)) {
-                    $inputCsv->setEscape($this->escape_character);
-                }
-                if (is_null($limit)) {
-                    // Get all records.
-                    $limit = -1;
-                }
+            if (isset($this->field_enclosure)) {
+                $inputCsv->setEnclosure($this->field_enclosure);
+            }
+            if (isset($this->escape_character)) {
+                $inputCsv->setEscape($this->escape_character);
+            }
+            if (is_null($limit)) {
+                // Get all records.
+                $limit = -1;
+            }
             $records = $inputCsv
                 ->addFilter(function ($row, $index) {
                     // Skip header row.
                     return $index > 0;
-            })
+                })
             ->setLimit($limit)
             ->fetchAssoc();
 
-            foreach ($records as $index => &$record) {
+            $current_records = array();
+            foreach ($records as $index => $record) {
                 if (!is_null($record[$this->record_key]) || strlen($record[$this->record_key])) {
-                    $record = (object) $record;
-                    $record->key = $record->{$this->record_key};
+                    // Commenting out rows only works if the # is the first
+                    // character in the record key field.
+                    if (!preg_match('/^#/', $record[$this->record_key])) {
+                        $record = (object) $record;
+                        $record->key = $record->{$this->record_key};
+                        $current_records[] = $record;
+                    }
                 }
-                else {
-                    unset($records[$index]);
-                }
+            }
+            $records = $current_records;
+            if ($limit != -1) {
+                $records = array_slice($records, 0, $limit);
             }
 
             if ($this->fetchermanipulators) {
                 $filtered_records = $this->applyFetchermanipulators($records);
-            }
-            else {
+            } else {
                 $filtered_records = $records;
             }
         }
@@ -157,8 +152,7 @@ class Csv extends Fetcher
                     return $record;
                 }
             }
-        }
-        else {
+        } else {
             return unserialize(file_get_contents($raw_metadata_cache));
         }
     }
@@ -169,7 +163,7 @@ class Csv extends Fetcher
     private function applyFetchermanipulators($records)
     {
         foreach ($this->fetchermanipulators as $manipulator) {
-            $manipulator_settings_array = explode('|', $manipulator, 2);
+            $manipulator_settings_array = explode('|', $manipulator);
             $manipulator_class = '\\mik\\fetchermanipulators\\' . $manipulator_settings_array[0];
             $fetchermanipulator = new $manipulator_class($this->all_settings,
                 $manipulator_settings_array);
@@ -193,14 +187,12 @@ class Csv extends Fetcher
         // explicitly in _construct.
         if (isset($this->field_enclosure)) {
             $enclosure = $this->field_enclosure;
-        }
-        else {
+        } else {
             $enclosure = '"';
         }
         if (isset($this->escape_character)) {
             $escape = $this->escape_character;
-        }
-        else {
+        } else {
             $escape = '\\';
         }
 
@@ -221,5 +213,4 @@ class Csv extends Fetcher
         }
         return $record;
     }
-
 }

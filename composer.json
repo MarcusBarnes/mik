@@ -4,16 +4,21 @@
     "type": "project",
     "description": "Move to Islandora Kit",
     "autoload": {
-        "classmap": ["src/"]
+        "classmap": ["src/"],
+        "psr-4": {
+            "mik\\tests\\": "tests/",
+            "mik\\" : "src/"
+        }
     },
     "require-dev": {
-        "phpunit/phpunit":"~4.5"
+        "phpunit/phpunit":"4.8.*"
     },
     "require": {
         "php": ">=5.5.0",
         "monolog/monolog": "~1.13",
         "squizlabs/php_codesniffer":"~2.3",
-        "league/csv":"~7.1",
+        "league/csv":"^8.0",
+        "box/spout":"*",
         "league/climate":"~3.1",
         "caseyamcl/phpoaipmh": "~2.0",
         "guzzlehttp/guzzle": "~6.0",
@@ -21,5 +26,12 @@
         "cocur/background-process": "^0.5.0",
         "nategood/commando": "*",
         "twig/twig": "~1.0"
+    },
+    "scripts": {
+        "check": "phpcs --standard=PSR2 src tests",
+        "test": [
+            "@check",
+            "phpunit"
+        ]
     }
 }
