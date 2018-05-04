@@ -67,6 +67,8 @@ The `--config` option is required, but you can also add a `--limit` option if yo
 
 ```./mik --config foo.ini --limit 10```
 
+The above will generate 10 valid packages if possible. Check the problem_records log for any that were skipped due to errors.
+
 Once MIK starts running, it will display its progress:
 
 ```
