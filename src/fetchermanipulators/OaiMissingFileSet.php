@@ -53,12 +53,11 @@ class OaiMissingFileSet extends FetcherManipulator
      * @param array $all_records
      *   All of the records from the fetcher.
      * @return array $filtered_records
-     *   An array of records do not have corresponding files in the output directory.
+     *   An array of records that have corresponding files in the output directory.
      */
     public function manipulate($all_records)
     {
         $numRecs = count($all_records);
-        echo "Filtering $numRecs records through the OaiMissingFileSet fetcher manipulator.\n";
         // Instantiate the progress bar if we're not running on Windows.
         if (!$this->onWindows) {
             $climate = new \League\CLImate\CLImate;
@@ -66,7 +65,16 @@ class OaiMissingFileSet extends FetcherManipulator
         }
 
         $record_keys_with_files = $this->getRecordKeysWithFiles();
-        var_dump($record_keys_with_files);
+        $num_recs_with_files = count($record_keys_with_files);
+        if ($num_recs_with_files == $numRecs) {
+            return array();
+        }
+        if ($num_recs_with_files == 0) {
+            return $all_records;
+        } else {
+            $num_missing_files = count($all_records) - $num_recs_with_files;
+            echo "The OaiMissingFileSet fetcher manipulator detects $num_missing_files missing files. MIK will retrieve them now.\n";
+        }
 
         $record_num = 0;
         $filtered_records = array();
@@ -74,17 +82,6 @@ class OaiMissingFileSet extends FetcherManipulator
             if (!in_array($record->key, $record_keys_with_files)) {
                 $filtered_records[] = $record;
             }
-
-            $record_num++;
-            if ($this->onWindows) {
-                print '.';
-            }
-            else {
-                $progress->current($record_num);
-            }
-        }
-        if ($this->onWindows) {
-            print "\n";
         }
 
         return $filtered_records;
@@ -95,7 +92,7 @@ class OaiMissingFileSet extends FetcherManipulator
      * in the output directory.
      *
      * @return array
-     *   The list of record keys (i.e., OAI-PMH identifiers) that do not
+     *   The list of record keys (i.e., OAI-PMH identifiers) that
      *   have a corresponding file in the output directory.
      */
     public function getRecordKeysWithFiles()
@@ -119,7 +116,7 @@ class OaiMissingFileSet extends FetcherManipulator
     public function getFileList()
     {
         $file_list = array();
-        $filetered_file_list = array();
+        $filtered_file_list = array();
         $pattern = $this->outputDirectory . DIRECTORY_SEPARATOR . "*";
         $file_list = glob($pattern);
         foreach ($file_list as $file_path) {
