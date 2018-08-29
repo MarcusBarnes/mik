@@ -81,7 +81,7 @@ class CdmToMods extends Mods
     {
         // Do not convert nicknames to field labels.
         if ($this->use_nicknames) {
-          return $objectInfo;
+            return $objectInfo;
         }
 
         // Create array with field values of proper name as $keys rather than 'nick' keys
