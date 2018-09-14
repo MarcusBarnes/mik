@@ -66,6 +66,12 @@ class CdmToMods extends Mods
         } else {
             $this->metadatamanipulators = null;
         }
+
+        if (isset($this->settings['METADATA_PARSER']['use_nicknames'])) {
+            $this->use_nicknames= $this->settings['METADATA_PARSER']['use_nicknames'];
+        } else {
+            $this->use_nicknames = false;
+        }
     }
 
     /**
@@ -73,6 +79,11 @@ class CdmToMods extends Mods
      */
     private function createCONTENTdmFieldValuesArray($objectInfo)
     {
+        // Do not convert nicknames to field labels.
+        if ($this->use_nicknames) {
+            return $objectInfo;
+        }
+
         // Create array with field values of proper name as $keys rather than 'nick' keys
         $CONTENTdmFieldValuesArray = array();
         foreach ($objectInfo as $key => $value) {
