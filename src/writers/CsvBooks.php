@@ -90,6 +90,9 @@ class CsvBooks extends Writer
             }
         }
 
+
+        //Create root output folder
+        $this->createOutputDirectory();
         // Create a book-level subdirectory in the output directory.
         $book_level_output_dir = $this->output_directory . DIRECTORY_SEPARATOR . $record_id;
         if (!file_exists($book_level_output_dir)) {
