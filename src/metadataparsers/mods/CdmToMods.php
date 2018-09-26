@@ -174,10 +174,10 @@ class CdmToMods extends Mods
         $includeMigratedFromUri = $this->includeMigratedFromUri;
         $itemId = $pointer;
         $collectionAlias = $this->alias;
-        if ($includeMigratedFromUri == true) {
+        if (!empty($includeMigratedFromUri)) {
             $CONTENTdmItemUrl = '<identifier type="uri" invalid="yes" ';
             $CONTENTdmItemUrl .= 'displayLabel="Migrated From">';
-            $CONTENTdmItemUrl .= 'http://content.lib.sfu.ca/cdm/ref/collection/';
+            $CONTENTdmItemUrl .= $includeMigratedFromUri;
             $CONTENTdmItemUrl .= $collectionAlias. '/id/'. $itemId .'</identifier>';
             $modsOpeningTag .= $CONTENTdmItemUrl;
         }
