@@ -53,6 +53,8 @@ To check your configuration options, run MIK and include the `--checkconfig` (or
 
 You can also check specific types of configuration values as described in this [Cookbook entry](https://github.com/MarcusBarnes/mik/wiki/Cookbook:-Check-your-MIK-configuration-values).
 
+Note: if you are using null mappings for metadata manipulators, --checkconfig will return errors. Use --ignore_null_mappings to avoid these.
+
 ### 3. Convert your source content into Islandora ingest packages
 
 Once you have checked your configuration options, you can run MIK to perform the data conversion:
