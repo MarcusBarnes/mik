@@ -21,7 +21,11 @@ class CsvNewspapers extends FileGetter
         $this->input_directory = $this->settings['input_directory'];
         $this->file_name_field = $this->settings['file_name_field'];
         $this->fetcher = new \mik\fetchers\Csv($settings);
-
+        if (isset($this->settings['allowed_file_extensions_for_OBJ'])) {
+            $this->allowed_file_extensions_for_OBJ = $this->settings['allowed_file_extensions_for_OBJ'];
+        } else {
+            $this->allowed_file_extensions_for_OBJ = array('tiff', 'tif', 'jp2');
+        }
         // Interate over inputDirectories to create $potentialObjFiles array.
         $potentialObjFiles = $this->getMasterFiles($this->input_directory, $this->allowed_file_extensions_for_OBJ);
         $this->OBJFilePaths = $this->determineObjItems($potentialObjFiles);
