@@ -6,12 +6,6 @@ class CsvBooks extends FileGetter
 {
 
     /**
-     * @var array allowed_file_extensions_for_OBJ - array of file extensions when searching
-     * for master files (for OBJ datastreams).
-     */
-    // public $allowed_file_extensions_for_OBJ = array('tiff', 'tif', 'jp2');
-
-    /**
      * Create a new CSV Books Filegetter instance.
      *
      * @param array $settings configuration settings.
