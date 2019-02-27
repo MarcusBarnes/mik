@@ -130,6 +130,9 @@ class CsvBooks extends Writer
             $filename_segments = explode($this->page_sequence_separator, $pathinfo['filename']);
 
             $page_number = ltrim(end($filename_segments), '0');
+            if (strlen($page_number) === 0) {
+                $page_number = '0';
+            }
             $page_level_output_dir = $book_level_output_dir . DIRECTORY_SEPARATOR . $page_number;
             mkdir($page_level_output_dir);
 
