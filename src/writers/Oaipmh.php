@@ -77,7 +77,7 @@ class Oaipmh extends Writer
         $subdirectory_path = $output_path . $subdirectory[0];
 
         if (!file_exists($subdirectory_path)) {
-          mkdir($subdirectory_path);
+            mkdir($subdirectory_path);
         }
 
         $this->writeMetadataFile($metadata, $metadata_file_path, true);
