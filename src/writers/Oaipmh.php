@@ -72,6 +72,14 @@ class Oaipmh extends Writer
 
         $normalized_record_id = $this->normalizeFilename($record_id);
         $metadata_file_path = $output_path . $normalized_record_id . '.xml';
+
+        $subdirectory = explode("/", $normalized_record_id);
+        $subdirectory_path = $output_path . $subdirectory[0];
+
+        if (!file_exists($subdirectory_path)) {
+          mkdir($subdirectory_path);
+        }
+
         $this->writeMetadataFile($metadata, $metadata_file_path, true);
 
         if ($this->metadata_only) {
