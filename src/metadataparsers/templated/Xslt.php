@@ -67,29 +67,27 @@ class Xslt extends MetadataParser
      * Applies an XSLT transform to an XML string.
      *
      * @param string $record_key
-     *   The record key.    
+     *   The record key.
      * @param string $input_xml
      *   The input XML file as an XML string.
      *
      * @return string
      *   The transformed XML.
      */
-    function applyXslt($xslt, $input_xml) {
+    public function applyXslt($xslt, $input_xml)
+    {
         $xslt = file_get_contents(realpath($this->xslt_stylesheet_path));
-//        $xslt = file_get_contents("/users/Brandon/sfuvault/mik/mru/mods.xsl");
-//        $xslt = file_get_contents("/users/Brandon/sfuvault/mik/mru/dc_to_mods_official.xsl");
         try {
-          $xsl_doc = new \DOMDocument();
-          $xsl_doc->loadXML($xslt);
-          $xml_doc = new \DOMDocument();
-          $xml_doc->loadXML($input_xml);
-          $xslt_proc = new \XSLTProcessor();
-          $xslt_proc->importStylesheet($xsl_doc);
-          $output_xml = $xslt_proc->transformToXML($xml_doc);
-        }
-        catch (exception $e) {
-          print $e->getMessage();
-          return false;
+            $xsl_doc = new \DOMDocument();
+            $xsl_doc->loadXML($xslt);
+            $xml_doc = new \DOMDocument();
+            $xml_doc->loadXML($input_xml);
+            $xslt_proc = new \XSLTProcessor();
+            $xslt_proc->importStylesheet($xsl_doc);
+            $output_xml = $xslt_proc->transformToXML($xml_doc);
+        } catch (exception $e) {
+            print $e->getMessage();
+            return false;
         }
 
         if (isset($this->metadatamanipulators)) {
@@ -98,5 +96,5 @@ class Xslt extends MetadataParser
         }
 
         return $output_xml;
-    }    
+    }
 }

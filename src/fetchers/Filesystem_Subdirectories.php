@@ -50,20 +50,8 @@ class Filesystem_Subdirectories extends Fetcher
             if (is_dir($path_to_entry)) {
                 $records[] = $record;
             }
-        } 
-
-        // @todo: If there is a limit, slice the $records array.
-
-/*
-        if ($this->fetchermanipulators) {
-            $filtered_records = $this->applyFetchermanipulators($records);
-        } else {
-            $filtered_records = $records;
         }
-*/
-//        $this->record_count = count($filtered_records);
-//        return $filtered_records;
-return $records;
+        return $records;
     }
 
     /**
@@ -95,9 +83,8 @@ return $records;
     {
         $record = new \stdClass;
         $record->key = $record_key;
-        // Getting the filename by globbing for it is brittle and hackish, but
-        // in the absence of an explicit value in input file, it'll have to do.
-        $file_path = $this->input_directory . DIRECTORY_SEPARATOR . $record_key . DIRECTORY_SEPARATOR . 'dublin_core.xml';
+        $file_path = $this->input_directory . DIRECTORY_SEPARATOR . $record_key .
+          DIRECTORY_SEPARATOR . 'dublin_core.xml';
         $record = file_get_contents($file_path);
         return $record;
     }

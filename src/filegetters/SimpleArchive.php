@@ -33,22 +33,23 @@ class SimpleArchive extends FileGetter
      */
     public function getFilePath($record_key)
     {
-       var_dump($this->settings);
+        var_dump($this->settings);
         $objectInfo = $this->fetcher->getItemInfo($record_key);
-        $contents_manifest_path = $this->input_directory . DIRECTORY_SEPARATOR . $record_key . DIRECTORY_SEPARATOR . 'contents';
+        $contents_manifest_path = $this->input_directory . DIRECTORY_SEPARATOR . $record_key .
+          DIRECTORY_SEPARATOR . 'contents';
         $contents_manifest_content = file($contents_manifest_path);
         $contents = array();
         // Searches the 'contents' for a file matching the configured filetype.
-        foreach ($contents_manifest_content AS $manifest_file) {
-          list($contents[], $extra) = preg_split('/\t/', $manifest_file);
+        foreach ($contents_manifest_content as $manifest_file) {
+            list($contents[], $extra) = preg_split('/\t/', $manifest_file);
         }
         $filetype = $this->filetype;
         
-        foreach ($contents AS $file) {
-          $file_split = explode(".", $file);
-          if (end($file_split) == $filetype) {
-            $payload_filename = $file;
-          }
+        foreach ($contents as $file) {
+            $file_split = explode(".", $file);
+            if (end($file_split) == $filetype) {
+                $payload_filename = $file;
+            }
         }
         
  //       list($payload_filename, $extra) = preg_split('/\t/', $contents_manifest_content[0]);
