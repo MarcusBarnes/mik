@@ -2,7 +2,7 @@
 
 namespace mik\fetchers;
 
-class Filesystem_Subdirectories extends Fetcher
+class FilesystemSubdirectories extends Fetcher
 {
     private $record_count;
     
