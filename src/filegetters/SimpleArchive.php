@@ -33,7 +33,6 @@ class SimpleArchive extends FileGetter
      */
     public function getFilePath($record_key)
     {
-        var_dump($this->settings);
         $objectInfo = $this->fetcher->getItemInfo($record_key);
         $contents_manifest_path = $this->input_directory . DIRECTORY_SEPARATOR . $record_key .
           DIRECTORY_SEPARATOR . 'contents';
