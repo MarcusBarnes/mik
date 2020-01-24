@@ -74,10 +74,13 @@ class Oaipmh extends Writer
         $metadata_file_path = $output_path . $normalized_record_id . '.xml';
 
         $subdirectory = explode("/", $normalized_record_id);
-        $subdirectory_path = $output_path . $subdirectory[0];
+        $subdirectory_path = $output_path;
 
-        if (!file_exists($subdirectory_path)) {
-          mkdir($subdirectory_path);
+        foreach ($subdirectory as $folder) {
+            $subdirectory_path = $subdirectory_path . $folder;
+            if (!file_exists($subdirectory_path)) {
+                mkdir($subdirectory_path);
+            }
         }
 
         $this->writeMetadataFile($metadata, $metadata_file_path, true);
@@ -88,7 +91,7 @@ class Oaipmh extends Writer
 
         // Retrieve the file associated with the document and write it to the output
         // folder using the filename or record_id identifier
-        $source_file_url = $this->fileGetter->getFilePath($record_id);
+        $source_file_url = $this->fileGetter->getFilePath($normalized_record_id);
         // Retrieve the PDF, etc. using Guzzle.
         if ($source_file_url) {
             $client = new Client();
