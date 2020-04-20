@@ -50,7 +50,7 @@ class Oaipmh extends Fetcher
         if (isset($settings['MANIPULATORS']['fetchermanipulators'])) {
             $this->fetchermanipulators = $settings['MANIPULATORS']['fetchermanipulators'];
         } else {
-            $this->fetchermanipulators = null;
+            $this->fetchermanipulators = array();
         }
 
         if (!$this->createTempDirectory()) {
