@@ -50,7 +50,7 @@ class Oaipmh extends Fetcher
         if (isset($settings['MANIPULATORS']['fetchermanipulators'])) {
             $this->fetchermanipulators = $settings['MANIPULATORS']['fetchermanipulators'];
         } else {
-            $this->fetchermanipulators = null;
+            $this->fetchermanipulators = array();
         }
 
         if (!$this->createTempDirectory()) {
@@ -77,7 +77,10 @@ class Oaipmh extends Fetcher
             $endpoint = new Endpoint($client);
             $records = $endpoint->listRecords($this->metadataPrefix, $this->from, $this->until, $this->setSpec);
             foreach ($records as $rec) {
-                $identifier = urlencode($rec->header->identifier);
+                $identifier = ($rec->header->identifier);
+                $identifier = json_decode(json_encode($identifier), 1)[0];
+                $identifier = urlencode(str_replace(':', '_', $identifier));
+
                 file_put_contents($this->tempDirectory . DIRECTORY_SEPARATOR . $identifier .
                     '.metadata', $rec->asXML());
                 // MIK expects each record to be an object with a ->key property.
