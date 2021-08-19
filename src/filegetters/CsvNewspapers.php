@@ -155,7 +155,6 @@ class CsvNewspapers extends FileGetter
         $item_info = $this->fetcher->getItemInfo($record_key);
         $issue_directory = $item_info->{$this->file_name_field};
         $directory_regex = '#' . DIRECTORY_SEPARATOR . $issue_directory . DIRECTORY_SEPARATOR . '#';
-        $directory_regex = preg_quote($directory_regex);
         foreach ($this->OBJFilePaths as $paths) {
             foreach ($paths as $path) {
                 if (preg_match($directory_regex, $path)) {
