@@ -88,7 +88,7 @@ class OaipmhIslandoraObj extends FileGetter
             // HEAD is probably more efficient than the default GET.
             stream_context_set_default(array('http' => array('method' => 'HEAD')));
             $headers = get_headers($ds_url, 1);
-            if ($headers[0] == 'HTTP/1.1 200 OK') {
+            if (preg_match('#200\sOK#', $headers[0])) {
                 return $ds_url;
             }
         }
